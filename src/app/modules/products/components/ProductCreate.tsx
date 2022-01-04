@@ -38,7 +38,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [attribuesList, setAttribues] = useState([])
   const [productsList, setProductsList] = useState([])
   
-  const [newPhotoGalleries, setNewPhotoGalleries] = useState([])
+  const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   //const [newPhotos, setNewPhotoUpdated] = useState([])
 
   let product: any = []
@@ -109,11 +109,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setSelectedAttr(option)
   }
 
-  const onChangeFileList = (fileList: any) => {
-    console.log(fileList.length)
+  const onChangeFileList = (fileList: any) => {   
+    console.log('fileList onChangeFileList', fileList)
+    console.log('inside onChangeFileList', newPhotoGalleries)
     setNewPhotoGalleries(fileList)   
+    console.log('below onChangeFileList', newPhotoGalleries)
   }
-  console.log(123, newPhotoGalleries.length)
 
   const formik = useFormik({
     initialValues: initialForm,
@@ -203,75 +204,71 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <span className='required'>Photo Gallery</span>
                       </label>
                       <div className='row'>
-                        <div className='col-md-5'>
-                          <div className='form-group'>
-                            <input
-                              id="file"
-                              name="new_photo_galleries"
-                              type="file"
-                              onChange={(event) => {
-                                const files = event.currentTarget.files
-                                if( files ) {
-                                  const fileList = handleFileUpload(files)                                  
-                                  formik.setFieldValue("new_photo_galleries", fileList)    
-                                  onChangeFileList(fileList)
-                                }                           
-                                //formik.handleChange(event)
-                              }}
-                              multiple
-                            />
-                            <div>                           
-                              { newPhotoGalleries.map((src: string, i:number) => {      
-                                return (
-                                  <div
-                                    className='form-group image-input image-input-outline'
-                                    key={'image_' + i}
-                                  >
-                                    <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
-                                      <img className='h-100' src={src} />
-                                    </div>
-                                  </div>
-                                )
-                              })}
-                            </div>
-                            {/* <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
+                        <div className='col-md-4'>
+                          <div className='form-group'>                            
+                            <Dropzone onDrop={(acceptedFiles) => {
+                                if( acceptedFiles && acceptedFiles != undefined ) {
+                                  handleFileUpload(acceptedFiles)
+                                  .then(images => {                                    
+                                    /* Once all promises are resolved, update state with image URI array */
+                                    setNewPhotoGalleries(images)   
+                                    formik.setFieldValue("new_photo_galleries", images)
+                                  }, error => {        
+                                      console.error(error);
+                                  });
+                                }   
+                              }}>
                               {({getRootProps, getInputProps}) => (
-                                <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-5 px-2 dropzone dz-clickable'>
+                                <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
                                   <div {...getRootProps()}>
-                                    <input {...getInputProps()} name='photo_galleries'/>
+                                    <input {...getInputProps()} name='photo_galleries' accept="image/*" />
                                     <div className='dropzone-msg dz-message needsclick d-flex'>
-                                      <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
+                                      <i className='bi bi-file-earmark-arrow-up text-primary fs-2x'></i>
                                       <div className='ms-4'>
-                                        <h3 className='fs-8 fw-bolder text-gray-900 mb-1'>
-                                          Drop files here or click to upload.
-                                        </h3>
-                                        <span className='fs-8 fw-bold text-gray-400'>
-                                          Set the product media gallery, upload up to 10 files.
-                                        </span>
+                                        <h3 className='fs-9 fw-bolder text-gray-noral mb-1'>
+                                          New photos, drop files here or click to upload.
+                                        </h3>                                       
                                       </div>
                                     </div>
                                   </div>
                                 </section>
                               )}
-                            </Dropzone> */}
+                            </Dropzone>     
+                            <span className='fs-8 fw-bold text-gray-400'>
+                              Set the product media gallery, upload up to 5 files.
+                            </span>                      
                           </div>
                         </div>
-                        <div className='col-md-7'>
-                          <div className='old-photo-galleries'>
-                          {(formik.values.photo_galleries &&
-                            formik.values.photo_galleries.map((image: any) => {
+                        <div className='col-md-8'>
+                          <div className='photo-galleries'>
+                          {
+                            (newPhotoGalleries && newPhotoGalleries.length > 0) 
+                            ? newPhotoGalleries.map((src: string, i:number) => {      
                               return (
                                 <div
                                   className='form-group image-input image-input-outline'
-                                  key={image.image_id}
+                                  key={'image_' + i}
                                 >
-                                  <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
-                                    <img className='h-100' src={image.src} />
+                                  <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
+                                    <img className='h-100' src={src} />
                                   </div>
                                 </div>
                               )
-                            })) ||
-                            null}
+                            })  : (
+                              (formik.values.photo_galleries &&
+                                formik.values.photo_galleries.map((image: any) => {
+                                  return (
+                                    <div
+                                      className='form-group image-input image-input-outline'
+                                      key={image.image_id}
+                                    >
+                                      <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
+                                        <img className='h-100' src={image.src} />
+                                      </div>
+                                    </div>
+                                  )
+                                })) || null 
+                            ) }
                           </div>
                         </div>
                       </div>

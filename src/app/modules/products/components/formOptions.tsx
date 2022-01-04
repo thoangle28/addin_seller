@@ -145,24 +145,13 @@ export const ProductsList = (userId: number) => {
 }
 
 export const handleFileUpload = (files: any) => {
-  let fileUploaded: any = []
-  if( files ) {
-    const fileList = Array.from(files)
-    fileList && fileList.forEach((file: any) => {
-      converFileToBase64(file).then((data) => {
-        fileUploaded.push(data)
-      })      
-    });
-  }
-
-  return fileUploaded
-} 
-
-function converFileToBase64(file: any) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
+  const filesList: any = Array.from(files)
+  return Promise.all(filesList.map((file: any) => {
+    return (new Promise((resolve,reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    }));
+  }))
 }

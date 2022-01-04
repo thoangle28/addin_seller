@@ -1,0 +1,33 @@
+<input
+                              id="file"
+                              name="new_photo_galleries"
+                              type="file"
+                              onChange={(event) => {
+                                const files = event.currentTarget.files                
+                                if( files && files != undefined ) {
+                                  handleFileUpload(files)
+                                  .then(images => {                                    
+                                    /* Once all promises are resolved, update state with image URI array */
+                                    setNewPhotoGalleries(images)   
+                                    formik.setFieldValue("new_photo_galleries", images)
+                                  }, error => {        
+                                      console.error(error);
+                                  });
+                                }                                
+                              }}
+                              multiple
+                            />
+                            <div>                           
+                              { (newPhotoGalleries || []).map((src: string, i:number) => {      
+                                return (
+                                  <div
+                                    className='form-group image-input image-input-outline'
+                                    key={'image_' + i}
+                                  >
+                                    <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
+                                      <img className='h-100' src={src} />
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
