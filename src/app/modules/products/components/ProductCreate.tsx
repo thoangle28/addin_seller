@@ -39,7 +39,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [productsList, setProductsList] = useState([])
   
   const [newPhotoGalleries, setNewPhotoGalleries] = useState([])
-  const [newPhotos, setNewPhotoUpdated] = useState([])
+  //const [newPhotos, setNewPhotoUpdated] = useState([])
 
   let product: any = []
 
@@ -54,11 +54,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setProductsList(ProductsList(currentUserId))
   }, [])
 
-  useEffect(() => {
+ /*  useEffect(() => {
     console.log(newPhotos)
     setNewPhotoGalleries(newPhotos)
     console.log(newPhotoGalleries)
-  }, [newPhotos, newPhotoGalleries])
+  }, [newPhotos, newPhotoGalleries]) */
 
   const tabDefault: any = useRef(null)
   //get product info
@@ -108,6 +108,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const onChangeAttr = (option: any) => {
     setSelectedAttr(option)
   }
+
+  const onChangeFileList = (fileList: any) => {
+    console.log(fileList.length)
+    setNewPhotoGalleries(fileList)   
+  }
+  console.log(123, newPhotoGalleries.length)
 
   const formik = useFormik({
     initialValues: initialForm,
@@ -206,17 +212,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               onChange={(event) => {
                                 const files = event.currentTarget.files
                                 if( files ) {
-                                  const fileList = handleFileUpload(files)
-                                  setNewPhotoUpdated(fileList)   
+                                  const fileList = handleFileUpload(files)                                  
                                   formik.setFieldValue("new_photo_galleries", fileList)    
+                                  onChangeFileList(fileList)
                                 }                           
                                 //formik.handleChange(event)
                               }}
                               multiple
                             />
-                            <div>
-                              { newPhotoGalleries.length }
-                              { newPhotoGalleries && newPhotoGalleries.map((src: string, i:number) => {      
+                            <div>                           
+                              { newPhotoGalleries.map((src: string, i:number) => {      
                                 return (
                                   <div
                                     className='form-group image-input image-input-outline'
