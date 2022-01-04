@@ -42,6 +42,8 @@ export  const initialForm = {
   linked_products_upsell: [],
   linked_products_cross_sell: [],
   selectedAttr: '',
+  thumbnail: '',
+  new_thumbnail: ''
 }
 
 export const TaxClass: any = [
@@ -146,6 +148,7 @@ export const ProductsList = (userId: number) => {
 
 export const handleFileUpload = (files: any) => {
   const filesList: any = Array.from(files)
+  /* Map each file to a promise that resolves to an array of image URI's */ 
   return Promise.all(filesList.map((file: any) => {
     return (new Promise((resolve,reject) => {
         const reader = new FileReader();

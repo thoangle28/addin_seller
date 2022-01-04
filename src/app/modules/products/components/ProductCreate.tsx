@@ -75,6 +75,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     initialForm.inventory_sku = product.inventory_sku
     initialForm.attributes = product.attributes
     initialForm.variations = product.variations
+    initialForm.thumbnail = product.thumbnail
+    initialForm.new_thumbnail = ""
     initialForm.photo_galleries = product.photo_galleries
     initialForm.new_photo_galleries = []
     initialForm.general_price = product.general_price
@@ -280,13 +282,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <span className='required'>Thumbnail</span>
                       </label>
                       <div className='form-group image-input image-input-outline'>
-                        {(product && product.thumbnail && (
-                          <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
-                            <img className='h-100' id='product_thumbnail' src={product.thumbnail} />
-                          </div>
-                        )) ||
-                          null}
-                        <div className='form-text fs-8'>Allowed file types: png, jpg, jpeg.</div>
+                        <div className='thumbnail'>
+                          {(formik.values && formik.values.thumbnail && (
+                            <div className='image-input-wrapper w-65px h-65px overflow-hidden'>
+                              <img className='h-100' id='thumbnail' src={formik.values.thumbnail} />
+                            </div>
+                          )) ||
+                            null}
+                        </div>
+                        <input type="file" name="new_thumbnail"  />
+                        <div className='form-text fs-9'>Allowed file types: png, jpg, jpeg.</div>
                       </div>
                     </div>
                   </div>
@@ -804,6 +809,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   {/*upload image */}
                                                   <div className='col-md-8'>
                                                     <div className='form-group mb-4'>
+                                                      <input type="file" name="new_thumbnail" />
                                                       <Dropzone
                                                         onDrop={(acceptedFiles) =>
                                                           console.log(acceptedFiles)
