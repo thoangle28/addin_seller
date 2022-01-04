@@ -25,12 +25,17 @@ export function getShippingClass() {
 
 
 export function getCategoires() {
-  return axios.get<any>(API_END_POINT_URL+ '/category-products')
+  return axios.get<any>(API_END_POINT_URL+ '/product/categories')
 }
 
 export function getAttributes() {
-  return axios.get<any>(API_END_POINT_URL+ '/attribute-product')
+  return axios.get<any>(API_END_POINT_URL+ '/product/attribute')
 }
+
+export function getSubAttributes(slug: string) {
+  return axios.post<any>(API_END_POINT_URL+ '/attribute-product/parent', { 'name' : slug })
+}
+
 
 export function getProductsList( userId: number) {  
   

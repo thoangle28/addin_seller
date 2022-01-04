@@ -1,31 +1,30 @@
 import React, {FC, useEffect, useRef, useState} from 'react'
-import {Formik, Form, FormikValues, ErrorMessage, useFormik} from 'formik'
+import {useFormik} from 'formik' //Formik, Form, FormikValues, ErrorMessage, 
 import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
-import SunEditor, {buttonList} from 'suneditor-react'
+import SunEditor from 'suneditor-react'
 import 'suneditor/dist/css/suneditor.min.css'
 import {useLocation} from 'react-router'
 import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
 import {
-  initialForm, options, styles, 
-  ShippingClass, Categoies, Attribues, ProductsList
+  initialForm, styles, SubAttribues, TaxClass,
+  ShippingClass, Categoies, Attribues, ProductsList,
+  StockStatus, handleFileUpload
 } from './formOptions'
-import VariantOption from './VariantOption'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ProductCreate: FC<PropsFromRedux> = (props) => {
+  const dispatch = useDispatch()
   //get product id or create new
   const userLocation: any = useLocation()
   //console.log(userLocation)
-  const {productId} = userLocation.state
-
-  const dispatch = useDispatch()
+  const {productId} = userLocation.state 
 
   const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
   const currentUserId = user ? user.ID : 0
@@ -33,11 +32,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     console.log(content)
   }
 
-  //Shiping Class
+  //useState
   const [shippingClass, setShippingClass] = useState([])
   const [productCategories, setProductCategory] = useState([])
   const [attribuesList, setAttribues] = useState([])
   const [productsList, setProductsList] = useState([])
+  
+  const [newPhotoGalleries, setNewPhotoGalleries] = useState([])
+  const [newPhotos, setNewPhotoUpdated] = useState([])
+
+  let product: any = []
 
   useEffect(() => {
     if (productId > 0) {
@@ -48,22 +52,31 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setProductCategory(Categoies())
     setAttribues(Attribues())
     setProductsList(ProductsList(currentUserId))
-
   }, [])
 
+  useEffect(() => {
+    console.log(newPhotos)
+    setNewPhotoGalleries(newPhotos)
+    console.log(newPhotoGalleries)
+  }, [newPhotos, newPhotoGalleries])
+
   const tabDefault: any = useRef(null)
-  const product: any = useSelector<RootState>(
+  //get product info
+  product = useSelector<RootState>(
     ({productDetail}) => productDetail.product,
     shallowEqual
   )
+
   if (product) {
     initialForm.name = product.name
     initialForm.content = product.product_content
     initialForm.is_variable = product.is_variable
+    initialForm.type_product = product.type_product
     initialForm.inventory_sku = product.inventory_sku
     initialForm.attributes = product.attributes
     initialForm.variations = product.variations
     initialForm.photo_galleries = product.photo_galleries
+    initialForm.new_photo_galleries = []
     initialForm.general_price = product.general_price
     initialForm.general_tax_status = product.general_tax_status
     initialForm.general_tax_class = product.general_tax_class
@@ -72,7 +85,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     initialForm.selectedAttr = ''
     initialForm.linked_products_upsell = product.linked_products_upsell
     initialForm.linked_products_cross_sell = product.linked_products_cross_sell
+    initialForm.general_wallet_credit = product.general_wallet_credit
+    initialForm.general_wallet_cashback = product.general_wallet_cashback
+    initialForm.general_commission = product.general_commission
+    //initialForm.inventory_stock_status = product.inventory_stock_status
   }
+
   //console.log(product)
   const is_simple = initialForm.is_variable ? 'variable' : 'simple'
   const [productType, setProductType] = useState(is_simple)
@@ -181,11 +199,41 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       <div className='row'>
                         <div className='col-md-5'>
                           <div className='form-group'>
-                            <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
+                            <input
+                              id="file"
+                              name="new_photo_galleries"
+                              type="file"
+                              onChange={(event) => {
+                                const files = event.currentTarget.files
+                                if( files ) {
+                                  const fileList = handleFileUpload(files)
+                                  setNewPhotoUpdated(fileList)   
+                                  formik.setFieldValue("new_photo_galleries", fileList)    
+                                }                           
+                                //formik.handleChange(event)
+                              }}
+                              multiple
+                            />
+                            <div>
+                              { newPhotoGalleries.length }
+                              { newPhotoGalleries && newPhotoGalleries.map((src: string, i:number) => {      
+                                return (
+                                  <div
+                                    className='form-group image-input image-input-outline'
+                                    key={'image_' + i}
+                                  >
+                                    <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
+                                      <img className='h-100' src={src} />
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                            {/* <Dropzone onDrop={(acceptedFiles) => console.log(acceptedFiles)}>
                               {({getRootProps, getInputProps}) => (
                                 <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-5 px-2 dropzone dz-clickable'>
                                   <div {...getRootProps()}>
-                                    <input {...getInputProps()} name='photo_galleries' />
+                                    <input {...getInputProps()} name='photo_galleries'/>
                                     <div className='dropzone-msg dz-message needsclick d-flex'>
                                       <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                                       <div className='ms-4'>
@@ -200,10 +248,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   </div>
                                 </section>
                               )}
-                            </Dropzone>
+                            </Dropzone> */}
                           </div>
                         </div>
                         <div className='col-md-7'>
+                          <div className='old-photo-galleries'>
                           {(formik.values.photo_galleries &&
                             formik.values.photo_galleries.map((image: any) => {
                               return (
@@ -218,6 +267,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               )
                             })) ||
                             null}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -251,10 +301,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       </div>
                       <div className='col-md-5'>
                         <select
-                          name='product_data'
+                          name='type_product'
                           className='form-select'
-                          value={productType}
-                          onChange={(e) => onChangeProducType(e)}
+                          value={formik.values.type_product}
+                          onChange={(e) => {
+                              onChangeProducType(e)
+                              formik.handleChange(e)
+                            }
+                          }
                         >
                           <option value='simple'>Simple product</option>
                           <option value='variable'>Variable product</option>
@@ -414,14 +468,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 </label>
                                 <select
                                   name='general_tax_class'
-                                  className='form-select'
+                                  className='form-select me-2'
                                   value={formik.values.general_tax_class}
                                   onChange={formik.handleChange}
                                 >
-                                  <option value=''>Standard</option>
-                                  <option value='reduced-rate'>Reduced rate</option>
-                                  <option value='zero-rate'>Zero rate</option>
-                                </select>
+                                  {TaxClass && TaxClass.map((item: any, i: number) => {
+                                      return(
+                                        <option key={item.value} value={item.value}>{item.label}</option>
+                                      )
+                                    })
+                                  }
+                                </select>                                
                               </div>
                             </div>
                             <div className='form-group row'>
@@ -432,8 +489,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <input
                                   type='text'
                                   className='form-control'
-                                  name='walletCredit'
-                                  placeholder=''
+                                  name='general_wallet_credit'
+                                  value={formik.values.general_wallet_credit}
+                                  onChange={formik.handleChange}
                                 />
                               </div>
                               <div className='col-md-4 mb-5'>
@@ -443,8 +501,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <input
                                   type='text'
                                   className='form-control'
-                                  name='walletCashback'
-                                  placeholder=''
+                                  name='general_wallet_cashback'
+                                  value={formik.values.general_wallet_cashback}
+                                  onChange={formik.handleChange}
                                 />
                               </div>
                               <div className='col-md-4 mb-5'>
@@ -454,8 +513,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <input
                                   type='number'
                                   className='form-control'
-                                  name='Commission'
-                                  placeholder=''
+                                  name='general_commission'
+                                  value={formik.values.general_commission}
+                                  onChange={formik.handleChange}
                                 />
                               </div>
                             </div>
@@ -489,11 +549,21 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                                     <span>Stock Status</span>
                                   </label>
-                                  <select name='StockStatus' className='form-select'>
-                                    <option value='instock'>In stock</option>
-                                    <option value='outofstock'>Out of stock</option>
-                                    <option value='onbackorder'>On backorder</option>
-                                  </select>
+                                  <select
+                                    name='inventory_stock_status'
+                                    className='form-select'
+                                    value={formik.values.inventory_stock_status}
+                                    onChange={formik.handleChange}
+                                  >
+                                    {StockStatus &&
+                                      StockStatus.map((item: any) => {
+                                        return (
+                                          <option key={item.value} value={item.value}>
+                                            {item.label}
+                                          </option>
+                                        )
+                                      })}
+                                  </select>                                 
                                   <div className='text-muted fs-7 mt-3'>
                                     Controls whether or not the product is listed as "in stock" or
                                     "out of stock" on the frontend.
@@ -561,7 +631,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <button
                                   /* onClick={prevStep} */
                                   type='button'
-                                  className='btn btn-md btn-primary'
+                                  className='btn btn-sm btn-primary'
                                 >
                                   Add
                                 </button>
@@ -569,91 +639,85 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             </div>
                             {/** */}
                             <div className='accordion' id='product_attribute'>
-                              <div className='accordion-item'>
-                                <h2 className='accordion-header' id='product_attribute_header_1'>
-                                  <button
-                                    className='accordion-button fs-6 fw-bold p-3 collapsed'
-                                    type='button'
-                                    data-bs-toggle='collapse'
-                                    data-bs-target='#product_attribute_body_1'
-                                    aria-expanded='false'
-                                    aria-controls='product_attribute_body_1'
-                                  >
-                                    Stock vendor
-                                  </button>
-                                </h2>
-                                <div
-                                  id='product_attribute_body_1'
-                                  className='accordion-collapse collapse'
-                                  aria-labelledby='product_attribute_header_1'
-                                  data-bs-parent='#product_attribute'
-                                >
-                                  <div className='accordion-body p-3'>
-                                    <div className='row'>
-                                      <div className='col-md-6'>
-                                        <label>Name</label>
-                                        <div className='fw-bold fs-6'>Stock vendor</div>
-                                        <div className='mt-5'>
-                                          <div className='form-check form-check-custom form-check-solid mb-3'>
-                                            <label className='form-check-label ms-0 d-flex align-items-center'>
-                                              <input
-                                                type='checkbox'
-                                                name='chkVisible'
-                                                value='1'
-                                                className='form-check-input me-2'
-                                                id='chkVisible'
-                                              />
-                                              Visible on the product page
-                                            </label>
+                              {(formik.values.attributes 
+                                && formik.values.attributes.map((attr: any, i: number) => {
+                                const subAttribues = SubAttribues(attr.name)
+                                return(
+                                   <div className='accordion-item' key={attr.name || attr.id}>
+                                    <h2 className='accordion-header' id={'product_attribute_header_' + attr.id}>
+                                      <button
+                                        className='accordion-button fs-6 fw-bold p-3 collapsed'
+                                        type='button'
+                                        data-bs-toggle='collapse'
+                                        data-bs-target={'#product_attribute_body_' + attr.id}
+                                        aria-expanded='false'
+                                        aria-controls={'product_attribute_body_' + attr.id}
+                                      >
+                                        {attr.title}
+                                      </button>
+                                    </h2>
+                                    <div
+                                      id={'product_attribute_body_' + attr.id}
+                                      className='accordion-collapse collapse'
+                                      aria-labelledby={'product_attribute_header_' + attr.id}
+                                      data-bs-parent='#product_attribute'
+                                    >
+                                      <div className='accordion-body p-3'>
+                                        <div className='row'>
+                                          <div className='col-md-6'>
+                                            <label>Name</label>
+                                            <div className='fw-bold fs-6'>{attr.title}</div>
+                                            <div className='mt-5'>
+                                              <div className='form-check form-check-custom form-check-solid mb-3'>
+                                                <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                  <input
+                                                    type='checkbox'
+                                                    name={`attributes[${i}].visible`}
+                                                    className='form-check-input me-2'                                                    
+                                                    checked={attr.visible}    
+                                                    value={attr.visible}                                          
+                                                    onChange={formik.handleChange}
+                                                  />
+                                                  Visible on the product page
+                                                </label>
+                                              </div>
+                                              <div className='form-check form-check-custom form-check-solid'>
+                                                <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                  <input
+                                                    type='checkbox'
+                                                    name={`attributes[${i}].variation`}
+                                                    className='form-check-input me-2'                                                   
+                                                    checked={attr.variation}
+                                                    value={attr.variation}  
+                                                    onChange={formik.handleChange}                   
+                                                  />
+                                                  Used for variations
+                                                </label>
+                                              </div>
+                                            </div>
                                           </div>
-                                          <div className='form-check form-check-custom form-check-solid'>
-                                            <label className='form-check-label ms-0 d-flex align-items-center'>
-                                              <input
-                                                type='checkbox'
-                                                name='chkVariations'
-                                                value='1'
-                                                className='form-check-input me-2'
-                                                id='chkVariations'
-                                              />
-                                              Used for variations
-                                            </label>
+                                          <div className='col-md-6'>
+                                            <label>Value(s)</label>
+                                            <Select
+                                              styles={styles}
+                                              closeMenuOnSelect={false}
+                                              isMulti
+                                              isSearchable
+                                              defaultValue={attr.options}
+                                              onChange={(selectedOption) => {
+                                                let event = { target: { name: `attributes[${i}].options`, value: selectedOption }}
+                                                formik.handleChange(event)
+                                              }}
+                                              options={subAttribues}
+                                              name={`attributes[${i}].options`}
+                                            />
                                           </div>
                                         </div>
                                       </div>
-                                      <div className='col-md-6'>
-                                        <label>Value(s)</label>
-                                        <select name='StockStatus' className='form-select'>
-                                          <option value={1}>Text 1</option>
-                                          <option value={2}>Text 2</option>
-                                          <option value={3}>Text 1</option>
-                                        </select>
-                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              </div>
-                              <div className='accordion-item'>
-                                <h2 className='accordion-header' id='product_attribute_header_2'>
-                                  <button
-                                    className='accordion-button fs-6 fw-bold collapsed p-3'
-                                    type='button'
-                                    data-bs-toggle='collapse'
-                                    data-bs-target='#product_attribute_body_2'
-                                    aria-expanded='false'
-                                    aria-controls='product_attribute_body_2'
-                                  >
-                                    Accordion Item #2
-                                  </button>
-                                </h2>
-                                <div
-                                  id='product_attribute_body_2'
-                                  className='accordion-collapse collapse'
-                                  aria-labelledby='product_attribute_header_2'
-                                  data-bs-parent='#product_attribute'
-                                >
-                                  <div className='accordion-body p-3'>...</div>
-                                </div>
-                              </div>
+                                )
+                              })) || null } 
                             </div>
                             {/** */}
                           </div>
@@ -665,10 +729,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 {/** begin variant */}
                                 {formik.values.variations &&
                                   formik.values.variations.map((variation: any, i: number) => {
-                                    //console.log(formik.values.variants[i].sku)
+                            
                                     const {sku, regular_price, sale_price, wallet_cashback,
-                                      shipping_class_id } =
-                                      formik.values.variations[i]
+                                      shipping_class_id, tax_class, enabled } = formik.values.variations[i]
                                     return (
                                       <div className='row' key={variation.id}>
                                         <div className='accordion' id={'variation_' + variation.id}>
@@ -765,25 +828,37 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   </div>
                                                 </div>
                                                 <div className='row'>
-                                                  <div className='col-md-3'>
-                                                    <div className='form-group mb-4'>
-                                                      <VariantOption />
-                                                    </div>
-                                                    <div className='form-group mb-4'>
-                                                      <label className='fs-6 fw-bold mb-2'>
-                                                        SKU
+                                                  <div className='form-group mb-4 col-md-4'>
+                                                    <div className='form-check form-check-custom form-check-solid mb-4'>
+                                                      <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                        <input
+                                                          type='checkbox'
+                                                          name={`variations[${i}].enabled`}
+                                                          className='form-check-input me-2'                                                    
+                                                          checked={enabled ? true : false}    
+                                                          value={enabled}                                          
+                                                          onChange={formik.handleChange}
+                                                        />
+                                                        Enabled
                                                       </label>
-                                                      <input
-                                                        type='text'
-                                                        className='form-control'
-                                                        name={`variations[${i}].sku`}
-                                                        value={sku}
-                                                        onChange={formik.handleChange}
-                                                        onBlur={formik.handleBlur}
-                                                      />
                                                     </div>
                                                   </div>
-                                                  <div className='col-md-9'>
+                                                  <div className='form-group mb-4 col-md-8'>
+                                                    <label className='fs-6 fw-bold mb-2'>
+                                                      SKU
+                                                    </label>
+                                                    <input
+                                                      type='text'
+                                                      className='form-control'
+                                                      name={`variations[${i}].sku`}
+                                                      value={sku}
+                                                      onChange={formik.handleChange}
+                                                      onBlur={formik.handleBlur}
+                                                    />
+                                                  </div>
+                                                </div>
+                                                <div className='row'>
+                                                  <div className='col-md-12'>
                                                     <div className='row'>
                                                       <div className='col-md-6 form-group mb-4'>
                                                         <label className='fs-6 fw-bold mb-2'>
@@ -794,7 +869,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           className='form-control'
                                                           placeholder=''
                                                           name={`variations[${i}].wallet_cashback`}
-                                                          value={wallet_cashback}
+                                                          value={wallet_cashback || ''}
                                                           onChange={formik.handleChange}
                                                           onBlur={formik.handleBlur}
                                                           data-bs-toggle='tooltip'
@@ -830,7 +905,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           type='text'
                                                           className='form-control'
                                                           name={`variations[${i}].regular_price`}
-                                                          value={regular_price}
+                                                          value={regular_price || ''}
                                                           onChange={formik.handleChange}
                                                           onBlur={formik.handleBlur}
                                                         />
@@ -843,7 +918,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           type='text'
                                                           className='form-control'
                                                           name={`variations[${i}].sale_price`}
-                                                          value={sale_price}
+                                                          value={sale_price || ''}
                                                           onChange={formik.handleChange}
                                                           onBlur={formik.handleBlur}
                                                         />
@@ -871,24 +946,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             })}
                                                         </select>                                                      
                                                       </div>
-                                                      <div className='col-md-6  form-group mb-4'>
+                                                      <div className='col-md-6 mb-4'>
                                                         <label className='fs-6 fw-bold mb-2'>
                                                           Tax class
-                                                        </label>
+                                                        </label>                                                       
                                                         <select
-                                                          name='vStockStatus'
+                                                          name={`variations[${i}].tax_class`}
                                                           className='form-select me-2'
+                                                          value={tax_class}
+                                                          onChange={formik.handleChange}
                                                         >
-                                                          <option value='parent'>
-                                                            Same as parent
-                                                          </option>
-                                                          <option value=''>Standard</option>
-                                                          <option value='reduced-rate'>
-                                                            Reduced rate
-                                                          </option>
-                                                          <option value='zero-rate'>
-                                                            Zero rate
-                                                          </option>
+                                                            {TaxClass && TaxClass.map((item: any, i: number) => {
+                                                            return(
+                                                              <option key={item.value} value={item.value}>{item.label}</option>
+                                                            )
+                                                          })
+                                                        }
                                                         </select>
                                                       </div>
                                                     </div>

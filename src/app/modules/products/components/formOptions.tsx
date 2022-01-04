@@ -11,10 +11,12 @@ export  const initialForm = {
   name: '',
   content: "",
   is_variable: false, //simple
+  type_product: 'simple',
   variations: [],
   attributes: [],
   thumnail: '',
   photo_galleries: [],
+  new_photo_galleries: [],
   general_price: '',
   general_regular_price: '',
   general_sale_price: '',
@@ -26,6 +28,7 @@ export  const initialForm = {
   general_commission: '',
   categories: [],
   inventory_sku: '',
+  inventory_stock_status: '',
   inventory_manage_stock: '',
   inventory_backorders: '',
   inventory_stock_quantity: '',
@@ -41,10 +44,17 @@ export  const initialForm = {
   selectedAttr: '',
 }
 
-export const options = [
-  {value: 'chocolate', label: 'Chocolate'},
-  {value: 'strawberry', label: 'Strawberry'},
-  {value: 'vanilla', label: 'Vanilla'},
+export const TaxClass: any = [
+  {value: 'parent', label: 'Same as parent'},
+  {value: '', label: 'Standard'},
+  {value: 'reduced-rate', label: 'Reduced rate'},
+  {value: 'zero-rate', label: 'Zero rate'},
+]
+
+export const StockStatus: any = [
+  {value: 'instock', label: 'In stock'},
+  {value: 'outofstock', label: 'Out of stock'},
+  {value: 'onbackorder', label: 'On backorder'}
 ]
 
 export const styles = {
@@ -53,7 +63,7 @@ export const styles = {
       ...styles,
       backgroundColor: '#009ef7',
       borderRadius: '5px',
-      padding: '5px',
+      padding: '2px 5px',
       color: '#FFFFFF',
     }
   },
@@ -105,6 +115,19 @@ export const Attribues = () => {
   return termsList
 }
 
+export const SubAttribues = (term_slug: string) => {
+  let termsList: any = []
+  common.getSubAttributes(term_slug)
+  .then((response) => {
+    const {data} = response.data 
+    data && data.forEach((e: any) => {
+      termsList.push({ value: e.term_id, label: e.name })
+    });
+  }).catch(() => {}) 
+
+  return termsList
+}
+
 export const ProductsList = (userId: number) => {
   let termsList: any = []
   
@@ -119,4 +142,27 @@ export const ProductsList = (userId: number) => {
   }).catch(() => {}) 
 
   return termsList
+}
+
+export const handleFileUpload = (files: any) => {
+  let fileUploaded: any = []
+  if( files ) {
+    const fileList = Array.from(files)
+    fileList && fileList.forEach((file: any) => {
+      converFileToBase64(file).then((data) => {
+        fileUploaded.push(data)
+      })      
+    });
+  }
+
+  return fileUploaded
+} 
+
+function converFileToBase64(file: any) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+  });
 }
