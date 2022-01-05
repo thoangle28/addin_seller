@@ -1,3 +1,4 @@
+import Dropzone from 'react-dropzone'
 import * as common from '../redux/ProductsList'
 
 /* export const variantOption = [
@@ -157,4 +158,41 @@ export const handleFileUpload = (files: any) => {
         reader.onerror = error => reject(error);
     }));
   }))
+}
+
+export const UploadImageField = (props : any) => {  
+  const { setFileToState, formik, fileName} = props
+  return(
+    <>
+    <div className='form-group mt-1'>
+      <Dropzone onDrop={(acceptedFiles) => {
+        if( acceptedFiles && acceptedFiles != undefined ) {
+            handleFileUpload(acceptedFiles)
+            .then(images => {             
+              setFileToState(images)   
+              formik.setFieldValue(fileName, images)
+            }, error => {        
+                console.error(error);
+            });
+          }
+        }}>
+        {({getRootProps, getInputProps}) => (
+          <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
+            <div {...getRootProps()}>
+              <input {...getInputProps()} name='photo_galleries' accept="image/*" />
+              <div className='dropzone-msg dz-message needsclick d-flex' style={{cursor: 'pointer'}}>
+                <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
+                <div className='ms-4'>
+                  <span className='fs-9 text-gray-normal mb-1'>
+                    Drop / click to upload to change the thumbnail.
+                  </span>                                       
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+      </Dropzone>    
+    </div>
+    </>
+  )
 }

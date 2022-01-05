@@ -12,7 +12,7 @@ import Select from 'react-select'
 import {
   initialForm, styles, SubAttribues, TaxClass,
   ShippingClass, Categoies, Attribues, ProductsList,
-  StockStatus, handleFileUpload
+  StockStatus, handleFileUpload, UploadImageField
 } from './formOptions'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
@@ -39,8 +39,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [productsList, setProductsList] = useState([])
   
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
-  //const [newPhotos, setNewPhotoUpdated] = useState([])
-
+  const [newThumbnail, setNewThumbnail] = useState('')
+  const [newVariantThumbnail, setNewVariantThumbnail] = useState<any>([])
+  
   let product: any = []
 
   useEffect(() => {
@@ -54,12 +55,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setProductsList(ProductsList(currentUserId))
   }, [])
 
- /*  useEffect(() => {
-    console.log(newPhotos)
-    setNewPhotoGalleries(newPhotos)
-    console.log(newPhotoGalleries)
-  }, [newPhotos, newPhotoGalleries]) */
-
   const tabDefault: any = useRef(null)
   //get product info
   product = useSelector<RootState>(
@@ -67,7 +62,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     shallowEqual
   )
 
-  if (product) {
+  if (product && productId > 0) {
     initialForm.name = product.name
     initialForm.content = product.product_content
     initialForm.is_variable = product.is_variable
@@ -109,13 +104,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [selectedAttr, setSelectedAttr] = useState('')
   const onChangeAttr = (option: any) => {
     setSelectedAttr(option)
-  }
-
-  const onChangeFileList = (fileList: any) => {   
-    console.log('fileList onChangeFileList', fileList)
-    console.log('inside onChangeFileList', newPhotoGalleries)
-    setNewPhotoGalleries(fileList)   
-    console.log('below onChangeFileList', newPhotoGalleries)
   }
 
   const formik = useFormik({
@@ -200,14 +188,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               </div>
               <div className='w-100'>
                 <div className='row'>
-                  <div className='col-md-9'>
+                  <div className='col-md-8'>
                     <div className='fv-row mb-5'>
                       <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                         <span className='required'>Photo Gallery</span>
                       </label>
                       <div className='row'>
-                        <div className='col-md-4'>
-                          <div className='form-group'>                            
+                        <div className='col-md-5'>
+                          <div className='form-group mt-1'>                            
                             <Dropzone onDrop={(acceptedFiles) => {
                                 if( acceptedFiles && acceptedFiles != undefined ) {
                                   handleFileUpload(acceptedFiles)
@@ -224,24 +212,21 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
                                   <div {...getRootProps()}>
                                     <input {...getInputProps()} name='photo_galleries' accept="image/*" />
-                                    <div className='dropzone-msg dz-message needsclick d-flex'>
-                                      <i className='bi bi-file-earmark-arrow-up text-primary fs-2x'></i>
+                                    <div className='dropzone-msg dz-message needsclick d-flex' style={{cursor: 'pointer'}}>
+                                      <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                                       <div className='ms-4'>
-                                        <h3 className='fs-9 fw-bolder text-gray-noral mb-1'>
-                                          New photos, drop files here or click to upload.
-                                        </h3>                                       
+                                        <span className='fs-9 text-gray-normal mb-1'>
+                                          Add more photos, drop files here or click to upload.
+                                        </span>                                       
                                       </div>
                                     </div>
                                   </div>
                                 </section>
                               )}
-                            </Dropzone>     
-                            <span className='fs-8 fw-bold text-gray-400'>
-                              Set the product media gallery, upload up to 5 files.
-                            </span>                      
+                            </Dropzone>              
                           </div>
                         </div>
-                        <div className='col-md-8'>
+                        <div className='col-md-7'>
                           <div className='photo-galleries'>
                           {
                             (newPhotoGalleries && newPhotoGalleries.length > 0) 
@@ -276,22 +261,34 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       </div>
                     </div>
                   </div>
-                  <div className='col-md-3'>
-                    <div className='fv-row mb-5'>
-                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                        <span className='required'>Thumbnail</span>
-                      </label>
-                      <div className='form-group image-input image-input-outline'>
-                        <div className='thumbnail'>
-                          {(formik.values && formik.values.thumbnail && (
-                            <div className='image-input-wrapper w-65px h-65px overflow-hidden'>
-                              <img className='h-100' id='thumbnail' src={formik.values.thumbnail} />
-                            </div>
-                          )) ||
-                            null}
+                  <div className='col-md-4'>
+                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                      <span className='required'>Thumbnail</span>
+                    </label>
+                    <div className='row'>
+                      <div className='col-md-3 mb-5'>                        
+                        <div className='form-group image-input image-input-outline'>
+                          <div className='thumbnail'>
+                            {
+                            (!newThumbnail && formik.values && formik.values.thumbnail && (
+                              <div className='image-input-wrapper w-65px h-65px overflow-hidden'>
+                                <img className='h-100' src={formik.values.thumbnail} />
+                              </div>
+                            )) 
+                            || ( newThumbnail && (
+                                <div className='image-input-wrapper w-65px h-65px overflow-hidden'>
+                                  <img className='h-100' src={newThumbnail} />
+                                </div>
+                              ) 
+                            || null )
+                            }
+                          </div>                        
                         </div>
-                        <input type="file" name="new_thumbnail"  />
-                        <div className='form-text fs-9'>Allowed file types: png, jpg, jpeg.</div>
+                      </div>
+                      <div className='col-md-9 mb-5'>
+                        <div className='form-group mt-1'>
+                          <UploadImageField setFileToState={setNewThumbnail} formik={formik} fileName={'new_thumbnail'} />
+                        </div>                        
                       </div>
                     </div>
                   </div>
@@ -737,7 +734,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 {formik.values.variations &&
                                   formik.values.variations.map((variation: any, i: number) => {
                             
-                                    const {sku, regular_price, sale_price, wallet_cashback,
+                                    const {sku, regular_price, sale_price, wallet_cashback, new_thumbnail,
                                       shipping_class_id, tax_class, enabled } = formik.values.variations[i]
                                     return (
                                       <div className='row' key={variation.id}>
@@ -795,22 +792,29 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 <div className='row mb-4'>
                                                   <div className='col-md-4'>
                                                     <div className='form-group image-input image-input-outline'>
-                                                      {(variation && variation.thumbnail && (
-                                                        <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
+                                                      <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
+                                                        {(!new_thumbnail && variation.thumbnail && (                                                          
                                                           <img
                                                             className='h-100 variation_thumbnail'
                                                             src={variation.thumbnail}
+                                                          />                                                          
+                                                        )) || (new_thumbnail && (
+                                                          <img
+                                                            className='h-100 variation_thumbnail'
+                                                            src={new_thumbnail}
                                                           />
-                                                        </div>
-                                                      )) ||
-                                                        null}
+                                                        )) || null}
+                                                      </div>
                                                     </div>
                                                   </div>
                                                   {/*upload image */}
                                                   <div className='col-md-8'>
                                                     <div className='form-group mb-4'>
-                                                      <input type="file" name="new_thumbnail" />
-                                                      <Dropzone
+                                                      <UploadImageField 
+                                                      setFileToState={setNewVariantThumbnail} 
+                                                      formik={formik} fileName={`variations[${i}].new_thumbnail`}
+                                                      variantIndex={i} />
+                                                    {/*   <Dropzone
                                                         onDrop={(acceptedFiles) =>
                                                           console.log(acceptedFiles)
                                                         }
@@ -831,7 +835,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             </div>
                                                           </section>
                                                         )}
-                                                      </Dropzone>
+                                                      </Dropzone> */}
                                                     </div>
                                                   </div>
                                                 </div>
