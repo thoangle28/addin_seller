@@ -28,8 +28,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
   const currentUserId: number = user ? user.ID : 0
-  const handleEditorChange = (content: any) => {
-    console.log(content)
+  const handleEditorChange = (content: any) => {   
+    formik.setFieldValue('content', content)
   }
 
   //useState
@@ -121,17 +121,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setSelectedAttr(option)
   }
 
-  const handleAddMoreAttributes = (attrSelected: any) => {
+  /* Add more Attributes */
+  const handleAddMoreAttributes = () => {
     
     if( !selectedAttr ) return
 
     const { value } = selectedAttr
+
+    const isAdded = initialForm.attributes.some((x: any) => x.id === value)
+    if( isAdded ) return
+    
     const attrFound = fullAttributesList.find((x: any) => x.id === value)
     //reset
     setSelectedAttr({ value: '', label: ''})
 
     if( !attrFound ) return
-    else {      
+    else {       
       initialForm.attributes.push(attrFound)
     }
   }
@@ -199,11 +204,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   </label>
                   <SunEditor
                     name='content'
-                    onChange={handleEditorChange}
+                    onChange={(event) => {
+                      formik.setFieldValue('content', event)
+                    }}
                     defaultValue={formik.values.content}
                     width='100%'
                     height='500px'
-                    setDefaultStyle='font-family: Poppins, Helvetica, "sans-serif"; font-size: 14px;'
+                    setDefaultStyle={''}
                     setOptions={{
                       buttonList: [
                         ['undo', 'redo'],
@@ -277,8 +284,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
                                     <img className='h-100' src={src} alt='' />
                                   </div>
-                                  <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
-                                  title="Remove image">x</span>
+                                  <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
+                                  data-kt-image-input-action="remove" 
+                                  data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                                    <i className="bi bi-x fs-2"></i>
+                                  </span>
                                 </div>
                               )
                             })  : (
@@ -292,8 +302,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
                                         <img className='h-100' src={image.src} alt='' />
                                       </div>
-                                      <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
-                                      title="Remove image">x</span>
+                                      <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
+                                      data-kt-image-input-action="remove" 
+                                      data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                                        <i className="bi bi-x fs-2"></i>
+                                      </span>
                                     </div>
                                   )
                                 })) || null 
@@ -321,8 +334,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                           || null )
                           }   
                           </div>
-                          <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
-                            title="Remove image">x</span>               
+                          <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
+                            data-kt-image-input-action="remove" 
+                            data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                              <i className="bi bi-x fs-2"></i>
+                            </span>             
                         </div>
                       </div>
                       <div className='col-md-9 mb-5'>
@@ -667,6 +683,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     isMulti={false}
                                     isSearchable
                                     defaultValue={selectedAttr}
+                                    value={selectedAttr}
                                     onChange={onChangeAttr}
                                     options={attributesList}
                                     name='attributes'
@@ -677,7 +694,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               <div className='col-md-3 mb-5'>
                                 <button
                                   onClick={(event) => {
-                                      handleAddMoreAttributes(formik.values.attributes)
+                                      handleAddMoreAttributes()
                                       formik.handleChange(event)
                                     }
                                   }
@@ -698,7 +715,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 
                                 return(
                                    <div className='accordion-item' key={attr.name || attr.id}>
-                                    <h2 className='accordion-header' id={'product_attribute_header_' + attr.id}>
+                                    <h2 className='accordion-header d-flex' id={'product_attribute_header_' + attr.id}>
+                                      <div className='remov-item'>
+                                        <span className="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" 
+                                          data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="" 
+                                          data-bs-original-title="Remove Attribute">
+                                          <i className="bi bi-x fs-2"></i>
+                                        </span>
+                                      </div>
                                       <button
                                         className='accordion-button fs-6 fw-bold p-3 collapsed'
                                         type='button'
@@ -852,8 +876,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           />
                                                         )) || null}
                                                       </div>
-                                                      <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
-                                                       title="Remove image">x</span>
+                                                      <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
+                                                      data-kt-image-input-action="remove" 
+                                                      data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                                                        <i className="bi bi-x fs-2"></i>
+                                                      </span>
                                                     </div>
                                                   </div>                                              
                                                   <div className='col-md-4 col-lg-4'>
