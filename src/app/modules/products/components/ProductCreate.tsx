@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useRef, useState} from 'react'
-import {useFormik} from 'formik' //Formik, Form, FormikValues, ErrorMessage, 
+import {useFormik} from 'formik'
 import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
@@ -10,9 +10,9 @@ import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
 import {
-  initialForm, styles, SubAttribues, TaxClass,
-  ShippingClass, Categoies, Attribues, ProductsList,
-  StockStatus, handleFileUpload, UploadImageField
+  initialForm, styles, SubAttributes, TaxClass,
+  ShippingClass, Categoies, Attributes, ProductsList,
+  StockStatus, handleFileUpload, UploadImageField, FallbackView
 } from './formOptions'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
@@ -27,32 +27,45 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const {productId} = userLocation.state 
 
   const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
-  const currentUserId = user ? user.ID : 0
+  const currentUserId: number = user ? user.ID : 0
   const handleEditorChange = (content: any) => {
     console.log(content)
   }
 
   //useState
+  const [loading, setLoading] = useState(true)
+  
   const [shippingClass, setShippingClass] = useState([])
   const [productCategories, setProductCategory] = useState([])
-  const [attribuesList, setAttribues] = useState([])
+  const [attributesList, setAttributes] = useState([])
+  const [fullAttributesList, setFullAttributes] = useState([])
   const [productsList, setProductsList] = useState([])
   
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
-  const [newVariantThumbnail, setNewVariantThumbnail] = useState<any>([])
   
   let product: any = []
 
   useEffect(() => {
-    if (productId > 0) {
-      dispatch(detail.actions.getProductDetail(currentUserId, productId))
+    const loadingEverything = () => {
+      if (productId > 0) {
+        dispatch(detail.actions.getProductDetail(currentUserId, productId))
+      }
+
+      setShippingClass(ShippingClass())
+      setProductCategory(Categoies())
+
+      const { termsList, fullList } = Attributes()
+      setAttributes(termsList)
+      setFullAttributes(fullList)
+
+      setProductsList(ProductsList(currentUserId))
+
+      setLoading(false)
     }
 
-    setShippingClass(ShippingClass())
-    setProductCategory(Categoies())
-    setAttribues(Attribues())
-    setProductsList(ProductsList(currentUserId))
+    loadingEverything()
+
   }, [])
 
   const tabDefault: any = useRef(null)
@@ -62,7 +75,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     shallowEqual
   )
 
-  if (product && productId > 0) {
+  let isSimple = 'simple'
+
+  if (product && productId > 0 && product.id === productId) {
     initialForm.name = product.name
     initialForm.content = product.product_content
     initialForm.is_variable = product.is_variable
@@ -86,24 +101,39 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     initialForm.general_wallet_cashback = product.general_wallet_cashback
     initialForm.general_commission = product.general_commission
     //initialForm.inventory_stock_status = product.inventory_stock_status
-  }
 
-  //console.log(product)
-  const is_simple = initialForm.is_variable ? 'variable' : 'simple'
-  const [productType, setProductType] = useState(is_simple)
+    isSimple = initialForm.is_variable ? 'variable' : 'simple'
+  }  
+ 
+  const [productType, setProductType] = useState(isSimple)
   const onChangeProducType = (event: any) => {
     const value = event.target.value
     setProductType(value)
   }
 
-  const [selectedOption, setSelectedOption] = useState(null)
+  /* const [selectedOption, setSelectedOption] = useState(null)
   const onChange = (option: any) => {
     setSelectedOption(option)
-  }
+  } */
 
-  const [selectedAttr, setSelectedAttr] = useState('')
+  const [selectedAttr, setSelectedAttr] = useState({ value: '', label: ''})
   const onChangeAttr = (option: any) => {
     setSelectedAttr(option)
+  }
+
+  const handleAddMoreAttributes = (attrSelected: any) => {
+    
+    if( !selectedAttr ) return
+
+    const { value } = selectedAttr
+    const attrFound = fullAttributesList.find((x: any) => x.id === value)
+    //reset
+    setSelectedAttr({ value: '', label: ''})
+
+    if( !attrFound ) return
+    else {      
+      initialForm.attributes.push(attrFound)
+    }
   }
 
   const formik = useFormik({
@@ -119,8 +149,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     },
   })
 
-  return (
+  return (       
     <>
+      {(loading) 
+      ? (
+      <div className='card mb-5 mb-xl-8 loading-wrapper'>
+        <div className='card-body py-3 loading-body'>
+          <FallbackView />
+        </div>
+      </div>) 
+      : ( 
       <div className='card mb-5 mb-xl-8'>
         <div className='card-header border-0 pt-5'>
           <h3 className='card-title align-items-start flex-column'>
@@ -197,7 +235,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <div className='col-md-5'>
                           <div className='form-group mt-1'>                            
                             <Dropzone onDrop={(acceptedFiles) => {
-                                if( acceptedFiles && acceptedFiles != undefined ) {
+                                if( acceptedFiles && acceptedFiles !== undefined ) {
                                   handleFileUpload(acceptedFiles)
                                   .then(images => {                                    
                                     /* Once all promises are resolved, update state with image URI array */
@@ -237,8 +275,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   key={'image_' + i}
                                 >
                                   <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
-                                    <img className='h-100' src={src} />
+                                    <img className='h-100' src={src} alt='' />
                                   </div>
+                                  <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
+                                  title="Remove image">x</span>
                                 </div>
                               )
                             })  : (
@@ -250,8 +290,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       key={image.image_id}
                                     >
                                       <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
-                                        <img className='h-100' src={image.src} />
+                                        <img className='h-100' src={image.src} alt='' />
                                       </div>
+                                      <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
+                                      title="Remove image">x</span>
                                     </div>
                                   )
                                 })) || null 
@@ -266,28 +308,29 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       <span className='required'>Thumbnail</span>
                     </label>
                     <div className='row'>
-                      <div className='col-md-3 mb-5'>                        
+                      <div className='col-md-3 mb-5 thumbnail'>                        
                         <div className='form-group image-input image-input-outline'>
-                          <div className='thumbnail'>
-                            {
-                            (!newThumbnail && formik.values && formik.values.thumbnail && (
-                              <div className='image-input-wrapper w-65px h-65px overflow-hidden'>
-                                <img className='h-100' src={formik.values.thumbnail} />
-                              </div>
-                            )) 
-                            || ( newThumbnail && (
-                                <div className='image-input-wrapper w-65px h-65px overflow-hidden'>
-                                  <img className='h-100' src={newThumbnail} />
-                                </div>
-                              ) 
-                            || null )
-                            }
-                          </div>                        
+                          <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
+                          {
+                          (!newThumbnail && formik.values && formik.values.thumbnail && (
+                            <img className='h-100' src={formik.values.thumbnail}  alt=''/>
+                          )) 
+                          || ( (newThumbnail && (                              
+                            <img className='h-100' src={newThumbnail}  alt=''/>
+                            ))
+                          || null )
+                          }   
+                          </div>
+                          <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
+                            title="Remove image">x</span>               
                         </div>
                       </div>
                       <div className='col-md-9 mb-5'>
                         <div className='form-group mt-1'>
-                          <UploadImageField setFileToState={setNewThumbnail} formik={formik} fileName={'new_thumbnail'} />
+                          <UploadImageField 
+                          setFileToState={setNewThumbnail} 
+                          formik={formik} 
+                          fileName={'new_thumbnail'} />
                         </div>                        
                       </div>
                     </div>
@@ -411,8 +454,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         </ul>
                       </div>
                       <div className='col-md-8 col-lg-9'>
-                        <div className='tab-content rounded border p-5  h-100'>
-                          {/* General */}
+                        <div className='tab-content rounded border p-5 h-100'>                         
                           <div className='tab-pane fade active show' id='general_pane'>
                             {productType !== 'variable' ? (
                               <div className='form-group row'>
@@ -606,7 +648,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               </div>
                             </div>
                           </div>
-                          {/* Attribues */}
+                          {/* Attributes */}
+                        
                           <div className='tab-pane fade' id='kt_vtab_pane_7'>
                             <div className='form-group row'>
                               <div className='col-md-12 mb-5'>
@@ -625,7 +668,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     isSearchable
                                     defaultValue={selectedAttr}
                                     onChange={onChangeAttr}
-                                    options={attribuesList}
+                                    options={attributesList}
                                     name='attributes'
                                     className='w-100'
                                   />                                 
@@ -633,19 +676,26 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               </div>
                               <div className='col-md-3 mb-5'>
                                 <button
-                                  /* onClick={prevStep} */
+                                  onClick={(event) => {
+                                      handleAddMoreAttributes(formik.values.attributes)
+                                      formik.handleChange(event)
+                                    }
+                                  }
                                   type='button'
                                   className='btn btn-sm btn-primary'
+                                  name="add-more-attr"
                                 >
-                                  Add
+                                  Add more
                                 </button>
                               </div>
                             </div>
-                            {/** */}
+                            {/** Product Attributes */}                          
+
                             <div className='accordion' id='product_attribute'>
                               {(formik.values.attributes 
-                                && formik.values.attributes.map((attr: any, i: number) => {
-                                const subAttribues = SubAttribues(attr.name)
+                                && formik.values.attributes.map((attr: any, i: number | string) => {                        
+                                const subAttributes = SubAttributes(attr.name)
+                                
                                 return(
                                    <div className='accordion-item' key={attr.name || attr.id}>
                                     <h2 className='accordion-header' id={'product_attribute_header_' + attr.id}>
@@ -705,14 +755,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             <Select
                                               styles={styles}
                                               closeMenuOnSelect={false}
-                                              isMulti
-                                              isSearchable
+                                              isMulti={true}
+                                              isSearchable={false}
                                               defaultValue={attr.options}
                                               onChange={(selectedOption) => {
                                                 let event = { target: { name: `attributes[${i}].options`, value: selectedOption }}
                                                 formik.handleChange(event)
                                               }}
-                                              options={subAttribues}
+                                              options={subAttributes}
                                               name={`attributes[${i}].options`}
                                             />
                                           </div>
@@ -722,15 +772,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   </div>
                                 )
                               })) || null } 
-                            </div>
-                            {/** */}
+                            </div>                            
                           </div>
-                          {/* End Attribues */}
-                          {/* Variants */}
+                        
                           {productType === 'variable' ? (
                             <div className='tab-pane fade' id='kt_vtab_pane_8'>
-                              <div className='variants form-group'>
-                                {/** begin variant */}
+                              <div className='variants form-group'>                             
                                 {formik.values.variations &&
                                   formik.values.variations.map((variation: any, i: number) => {
                             
@@ -790,85 +837,65 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             >
                                               <div className='accordion-body'>
                                                 <div className='row mb-4'>
-                                                  <div className='col-md-4'>
+                                                  <div className='col-md-3 col-lg-2 thumbnail'>
                                                     <div className='form-group image-input image-input-outline'>
-                                                      <div className='image-input-wrapper w-75px h-75px overflow-hidden'>
+                                                      <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
                                                         {(!new_thumbnail && variation.thumbnail && (                                                          
                                                           <img
                                                             className='h-100 variation_thumbnail'
-                                                            src={variation.thumbnail}
+                                                            src={variation.thumbnail} alt=''
                                                           />                                                          
                                                         )) || (new_thumbnail && (
                                                           <img
                                                             className='h-100 variation_thumbnail'
-                                                            src={new_thumbnail}
+                                                            src={new_thumbnail} alt=''
                                                           />
                                                         )) || null}
                                                       </div>
+                                                      <span className="btn-remove btn btn-xs btn-icon btn-circle btn-white btn-hover-text-primary btn-shadow" 
+                                                       title="Remove image">x</span>
                                                     </div>
-                                                  </div>
-                                                  {/*upload image */}
-                                                  <div className='col-md-8'>
-                                                    <div className='form-group mb-4'>
+                                                  </div>                                              
+                                                  <div className='col-md-4 col-lg-4'>
+                                                    <div className='form-group'>
                                                       <UploadImageField 
-                                                      setFileToState={setNewVariantThumbnail} 
-                                                      formik={formik} fileName={`variations[${i}].new_thumbnail`}
-                                                      variantIndex={i} />
-                                                    {/*   <Dropzone
-                                                        onDrop={(acceptedFiles) =>
-                                                          console.log(acceptedFiles)
-                                                        }
-                                                      >
-                                                        {({getRootProps, getInputProps}) => (
-                                                          <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed p-6 dropzone dz-clickable'>
-                                                            <div {...getRootProps()}>
-                                                              <input {...getInputProps()} />
-                                                              <div className='dropzone-msg dz-message needsclick d-flex'>
-                                                                <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
-                                                                <div className='ms-4'>
-                                                                  <h3 className='fs-7 fw-bolder text-gray-900 mb-1'>
-                                                                    Drop files here or click to
-                                                                    upload.
-                                                                  </h3>
-                                                                </div>
-                                                              </div>
-                                                            </div>
-                                                          </section>
-                                                        )}
-                                                      </Dropzone> */}
+                                                      /* setFileToState={setNewVariantThumbnail} */ 
+                                                      formik={formik} fileName={`variations[${i}].new_thumbnail`} />
                                                     </div>
                                                   </div>
-                                                </div>
-                                                <div className='row'>
-                                                  <div className='form-group mb-4 col-md-4'>
-                                                    <div className='form-check form-check-custom form-check-solid mb-4'>
-                                                      <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                  <div className='col-md-5 col-lg-6'>
+                                                    <div className='row'>
+                                                      <div className='form-group col-md-12'>
+                                                        <div className='form-check form-check-custom form-check-solid mb-4'>
+                                                          <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                            <input
+                                                              type='checkbox'
+                                                              name={`variations[${i}].enabled`}
+                                                              className='form-check-input me-2'                                                    
+                                                              checked={enabled ? true : false}    
+                                                              value={enabled}                                          
+                                                              onChange={formik.handleChange}
+                                                            />
+                                                            Enabled
+                                                          </label>
+                                                        </div>
+                                                      </div>
+                                                      <div className='form-group mb-4 col-md-12 d-flex align-items-center'>
+                                                        <label className='fs-6 fw-bold mb-2 me-3'>
+                                                          SKU
+                                                        </label>
                                                         <input
-                                                          type='checkbox'
-                                                          name={`variations[${i}].enabled`}
-                                                          className='form-check-input me-2'                                                    
-                                                          checked={enabled ? true : false}    
-                                                          value={enabled}                                          
+                                                          type='text'
+                                                          className='form-control'
+                                                          name={`variations[${i}].sku`}
+                                                          value={sku}
                                                           onChange={formik.handleChange}
+                                                          onBlur={formik.handleBlur}
                                                         />
-                                                        Enabled
-                                                      </label>
+                                                      </div>
                                                     </div>
                                                   </div>
-                                                  <div className='form-group mb-4 col-md-8'>
-                                                    <label className='fs-6 fw-bold mb-2'>
-                                                      SKU
-                                                    </label>
-                                                    <input
-                                                      type='text'
-                                                      className='form-control'
-                                                      name={`variations[${i}].sku`}
-                                                      value={sku}
-                                                      onChange={formik.handleChange}
-                                                      onBlur={formik.handleBlur}
-                                                    />
-                                                  </div>
-                                                </div>
+                                                </div>                                               
                                                 <div className='row'>
                                                   <div className='col-md-12'>
                                                     <div className='row'>
@@ -1096,7 +1123,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
             </div>
           </form>
         </div>
-      </div>
+      </div>)
+      }
     </>
   )
 }

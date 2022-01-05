@@ -3,7 +3,7 @@ import {toAbsoluteUrl} from '../../../helpers'
 export function FallbackView() {
   return (
     <div className='splash-screen'>
-      <img src={toAbsoluteUrl('/media/logos/logo-compact.svg')} alt='Start logo' />
+      <img src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
       <span>Loading ...</span>
     </div>
   )
