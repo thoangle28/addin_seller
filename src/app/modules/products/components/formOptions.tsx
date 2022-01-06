@@ -158,6 +158,18 @@ export const SubAttributes = (term_slug: string) => {
   return termsList
 }
 
+export const ProductDetail = (uId: number, pId: number) => {
+  let productDetail: any = []
+  common
+    .getProductInfoDetail(uId, pId)
+    .then((response) => {   
+      const {data} = response.data
+      return { ...data }
+    })
+    .catch(() => {})
+}
+
+
 export const ProductsList = (userId: number) => {
   let termsList: any = []
 
@@ -165,7 +177,6 @@ export const ProductsList = (userId: number) => {
     .getProductsList(userId)
     .then((response) => {
       const {data} = response.data
-
       data &&
         data.productsList &&
         data.productsList.map((e: any) => {
@@ -193,7 +204,7 @@ export const handleFileUpload = (files: any) => {
 }
 
 export const UploadImageField = (props: any) => {
-  const {setFileToState, formik, fileName} = props
+  const {setFileToState, setFieldValue, fileName} = props
   return (
     <>
       <div className='form-group mt-1'>
@@ -203,7 +214,7 @@ export const UploadImageField = (props: any) => {
               handleFileUpload(acceptedFiles).then(
                 (images) => {
                   setFileToState && setFileToState(images)
-                  formik.setFieldValue(fileName, images)
+                  setFieldValue(fileName, images)
                 },
                 (error) => {
                   console.error(error)

@@ -77,7 +77,6 @@ export const reducerProduct = persistReducer(
 function* sagaGetProduct(action: any) {      
   const { userId, ProductId} =  action.payload
   const {data: data} = yield getProductDetail(userId, ProductId)
-  yield delay(100)    
   yield put(actions.fillProductDetail(data.data))
 }
 

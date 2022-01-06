@@ -47,3 +47,9 @@ export function getProductsList( userId: number) {
 
   return axios.post<any>(API_END_POINT_URL+ '/products-by-user', args)
 }
+
+
+export function getProductInfoDetail(userId: number, product_id: number | 0) {
+  const args =  { product_id: product_id, author_id : userId }
+  return axios.post<any>(API_END_POINT_URL+ '/product', args)
+}
