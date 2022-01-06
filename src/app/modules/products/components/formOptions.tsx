@@ -50,6 +50,8 @@ export const initialForm = {
   new_thumbnail: '',
 }
 
+export const initFormValues = { ...initialForm }
+
 export const TaxClass: any = [
   {value: 'parent', label: 'Same as parent'},
   {value: '', label: 'Standard'},

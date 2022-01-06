@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useRef, useState} from 'react'
+import React, {FC, useEffect, useLayoutEffect, useRef, useState} from 'react'
 import {Formik, useFormik} from 'formik'
 import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
 import * as Yup from 'yup'
@@ -10,7 +10,7 @@ import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
 import {
-  initialForm, styles, SubAttributes, TaxClass,
+  initialForm, styles, SubAttributes, TaxClass, initFormValues,
   ShippingClass, Categoies, Attributes, ProductsList,
   StockStatus, handleFileUpload, UploadImageField, FallbackView
 } from './formOptions'
@@ -31,7 +31,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   //useState
   const [loading, setLoading] = useState(true)  
-  const [initialValues, setInitialValues] = useState<any>({})
+  const [initialValues, setInitialValues] = useState("")
   const [shippingClass, setShippingClass] = useState([])
   const [productCategories, setProductCategory] = useState([])
   const [attributesList, setAttributes] = useState([])
@@ -41,6 +41,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
   const [selectedAttr, setSelectedAttr] = useState({ value: '', label: ''})
+
   //----------------------------------------------------------------------------
   const mapValuesToForm = (initialValues: any, productValues: any) => {
     initialValues.name = productValues.name
@@ -71,7 +72,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   //Get product info from cache
   let product: any = []
   product = useSelector<RootState>(
-    ({productDetail}) => productDetail.product,
+    ({productDetail}) => { return productDetail.product || [] },
     shallowEqual
   )  
 
@@ -101,12 +102,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setProductType(isSimple)
       setLoading(false)
     } else {
+      
       ( productId > 0) 
-      ? dispatch(detail.actions.getProductDetail(currentUserId, productId))
+      ?  dispatch(detail.actions.getProductDetail(currentUserId, productId))
       : setLoading(false)
+
+      if( typeof productId === 'undefined' && (product.id > 0)) {      
+        dispatch(detail.actions.getProductDetail(currentUserId, 0)) 
+      } else {
+        setInitialValues('done')        
+        mapValuesToForm(initialForm, initFormValues)
+        setProductType('simple')
+        const reset = document.getElementById('resetButton')
+        reset?.click()
+      }
     }
-  }, [product])
+  }, [product, initialValues, productId])
   
+
   /**
    * The events on the form
    * @param event 
@@ -157,7 +170,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       email: Yup.string().required("Required!") */
     });
   }
-
+  
   return (       
     <>
       {(loading) 
@@ -176,9 +189,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         </div>
         <div className='card-body py-3'>
           <Formik
+            enableReinitialize
             initialValues={initialForm}
             validationSchema={ValidationSchema}
-            enableReinitialize={true}
             onSubmit={(values, { setSubmitting }) => {
               setTimeout(() => {
                 alert(JSON.stringify(values, null, 2));
@@ -1177,7 +1190,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       className='btn btn-lg btn-success w-100 ms-3'
                     >
                       Create &amp; Continue
-                    </button>
+                    </button>                  
+                    <button type='reset' id="resetButton" onClick={(event) => { alert(1113) }} >Create Product</button>
                   </div>
                 </div>
               </div>
