@@ -152,7 +152,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                           <Link
                             to={{
                               hash: '#' + ele.product_id,
-                              pathname: '/product/create',
+                              pathname: '/product/update/' + ele.product_id, /*/product/create*/
                               state: {productId: ele.product_id},
                             }}
                             className='btn btn-icon btn-bg-light btn-hover-primary btn-sm me-1'
@@ -162,7 +162,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                               className='svg-icon-3'
                             />
                           </Link>
-                          <Link
+                          {/* <Link
                             to={{hash: '#del-' + ele.product_id}}
                             onClick={(id) => {
                               alert(id)
@@ -173,7 +173,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                               path='/media/icons/duotune/general/gen027.svg'
                               className='svg-icon-3'
                             />
-                          </Link>
+                          </Link> */}
                         </div>
                       </td>
                     </tr>

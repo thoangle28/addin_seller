@@ -14,7 +14,7 @@ export interface IAttribute {
 export const initialForm = {
   name: '',
   content: '',
-  is_variable: false, //simple
+  is_variable: 'simple', //simple
   type_product: 'simple',
   variations: [],
   attributes: [],
@@ -49,6 +49,8 @@ export const initialForm = {
   thumbnail: '',
   new_thumbnail: '',
 }
+
+export const getInitialFormValues = { ...initialForm }
 
 export const TaxClass: any = [
   {value: 'parent', label: 'Same as parent'},
@@ -233,7 +235,7 @@ export const UploadImageField = (props: any) => {
                 >
                   <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                   <div className='ms-4'>
-                    <span className='fs-9 text-gray-normal mb-1'>
+                    <span className='fs-8 text-gray-normal mb-1'>
                       Click here to change the thumbnail.
                     </span>
                   </div>
@@ -249,7 +251,7 @@ export const UploadImageField = (props: any) => {
 
 export const FallbackView = () => {
   return (
-    <div className='text-center w-100='>
+    <div className='text-center w-100'>
       <img src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
       <div className='mt-5'>
         <span>Loading ...</span>

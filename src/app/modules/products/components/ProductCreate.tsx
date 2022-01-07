@@ -10,7 +10,7 @@ import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
 import {
-  initialForm, styles, SubAttributes, TaxClass,
+  initialForm, styles, SubAttributes, TaxClass, getInitialFormValues,
   ShippingClass, Categoies, Attributes, ProductsList,
   StockStatus, handleFileUpload, UploadImageField, FallbackView
 } from './formOptions'
@@ -31,7 +31,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   //useState
   const [loading, setLoading] = useState(true)  
-  const [initialValues, setInitialValues] = useState<any>({})
+  const [isNewProduct, setNewProduct] = useState(true)
   const [shippingClass, setShippingClass] = useState([])
   const [productCategories, setProductCategory] = useState([])
   const [attributesList, setAttributes] = useState([])
@@ -73,8 +73,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   product = useSelector<RootState>(
     ({productDetail}) => productDetail.product,
     shallowEqual
-  )  
-
+  )
+  
   //Get All Properties
   useEffect(() => {
     const loadingEverything = () => {      
@@ -97,15 +97,20 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)   
-      const isSimple = initialForm.is_variable ? 'variable' : 'simple'
+      const isSimple = initialForm.type_product ? 'variable' : 'simple'
       setProductType(isSimple)
+      setNewProduct(false)
       setLoading(false)
-    } else {
-      ( productId > 0) 
-      ? dispatch(detail.actions.getProductDetail(currentUserId, productId))
-      : setLoading(false)
+    } else {      
+      setNewProduct(true)
+      if( productId > 0) 
+        dispatch(detail.actions.getProductDetail(currentUserId, productId))
+      else {
+        setLoading(false)
+      }
     }
-  }, [product])
+   
+  }, [product, productId])
   
   /**
    * The events on the form
@@ -135,8 +140,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     else initialForm.attributes.push(attrFound)
   }
 
-  const removeAttribute = (id: number, value: any) => {
-    
+  /**
+   * Remove Attribute
+  */
+  const removeAttribute = (id: number, value: any) => {    
     mapValuesToForm(initialForm, value)
     const afterFilter = initialForm.attributes.filter((x: any) => x.id !== id)   
     initialForm.attributes = []
@@ -146,13 +153,26 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   /**
+   * Auto additional a variant when user choose the attribute is variant
+  */
+  const createOrUpdateVariants = (isChecked: any, var_id: number, formValues: any) => {
+    alert(isChecked)
+    console.log(formValues)
+   /*  mapValuesToForm(initialForm, formValues)
+    const afterFilter = initialForm.attributes.filter((x: any) => x.id !== id)   
+    initialForm.attributes = []
+    afterFilter && afterFilter.map((item) => {
+      initialForm.attributes.push(item)
+    }) */
+  }
+  /**
    * Begin Formik
   */
   
   const ValidationSchema = () => {
     return Yup.object().shape({
-      name: Yup.string().max(250, 'Must be 250 characters or less').required('Required'),
-      content: Yup.string().required('Required'),
+      name: Yup.string().max(250, 'Must be 250 characters or less').required('no-required'),
+      //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
     });
@@ -176,7 +196,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         </div>
         <div className='card-body py-3'>
           <Formik
-            initialValues={initialForm}
+            initialValues={ isNewProduct ? getInitialFormValues : initialForm }
             validationSchema={ValidationSchema}
             enableReinitialize={true}
             onSubmit={(values, { setSubmitting }) => {
@@ -209,7 +229,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 <div className='w-100'>
                   <div className='fv-row mb-5'>
                     <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                      <span className='required'>Product Title</span>
+                      <span className='no-required'>Product Title</span>
                     </label>
                     <input
                       name='name'
@@ -228,7 +248,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 <div className='w-100'>
                   <div className='fv-row mb-5'>
                     <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                      <span className='required'>Product Content</span>
+                      Product Content
                     </label>
                     <SunEditor
                       name='content'
@@ -237,6 +257,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         setFieldValue('content', event)
                       }}
                       defaultValue={values.content}
+                      setContents={values.content}
                       width='100%'
                       height='500px'
                       setDefaultStyle={''}
@@ -255,9 +276,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         ],
                       }}
                     />
-                  {/*  {touched.name && errors.name ? (
-                      <div className='text-danger'>{errors.name}</div>
-                    ) : null} */}
+                  {touched.content && errors.content ? (
+                      <div className='text-danger'>{errors.content}</div>
+                    ) : null}
                   </div>
                 </div>
                 <div className='w-100'>
@@ -265,7 +286,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                     <div className='col-md-8'>
                       <div className='fv-row mb-5'>
                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                          <span className='required'>Photo Gallery</span>
+                          <span className='no-required'>Photo Gallery</span>
                         </label>
                         <div className='row'>
                           <div className='col-md-5'>
@@ -289,7 +310,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <div className='dropzone-msg dz-message needsclick d-flex' style={{cursor: 'pointer'}}>
                                         <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                                         <div className='ms-4'>
-                                          <span className='fs-9 text-gray-normal mb-1'>
+                                          <span className='fs-8 text-gray-normal mb-1'>
                                             Add more photos, drop files here or click to upload.
                                           </span>                                       
                                         </div>
@@ -314,8 +335,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <img className='h-100' src={src} alt='' />
                                     </div>
                                     <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
-                                    data-kt-image-input-action="remove" 
-                                    data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                                      data-kt-image-input-action="remove" 
+                                      data-bs-toggle="tooltip" title="Remove Image">
                                       <i className="bi bi-x fs-2"></i>
                                     </span>
                                   </div>
@@ -333,7 +354,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         </div>
                                         <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
                                         data-kt-image-input-action="remove" 
-                                        data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                                        data-bs-toggle="tooltip" title="Remove Image">
                                           <i className="bi bi-x fs-2"></i>
                                         </span>
                                       </div>
@@ -347,7 +368,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                     </div>
                     <div className='col-md-4'>
                       <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                        <span className='required'>Thumbnail</span>
+                        <span className='no-required'>Thumbnail</span>
                       </label>
                       <div className='row'>
                         <div className='col-md-3 mb-5 thumbnail'>                        
@@ -360,14 +381,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             || ( (newThumbnail && (                              
                               <img className='h-100' src={newThumbnail}  alt=''/>
                               ))
-                            || null )
+                            || (<img className='h-100' src='https://via.placeholder.com/75x75/f0f0f0'  alt=''/>) )
                             }   
                             </div>
                             <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
                               data-kt-image-input-action="remove" 
-                              data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                              data-bs-toggle="tooltip" title="Remove Image">
                                 <i className="bi bi-x fs-2"></i>
-                              </span>             
+                            </span>             
                           </div>
                         </div>
                         <div className='col-md-9 mb-5'>
@@ -388,7 +409,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       <div className='row d-flex align-items-center'>
                         <div className='col-md-3'>
                           <label className='fs-6 fw-bold'>
-                            <span className='required'>Product Type</span>
+                            <span className='no-required'>Product Type</span>
                           </label>
                         </div>
                         <div className='col-md-5'>
@@ -801,7 +822,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       className='form-check-input me-2'                                                   
                                                       checked={attr.variation}
                                                       value={attr.variation}  
-                                                      onChange={handleChange}                   
+                                                      onChange={(event) => {                                                         
+                                                        createOrUpdateVariants(event.target.checked, attr.id, values) 
+                                                        handleChange(event)
+                                                      }}                   
                                                     />
                                                     Used for variations
                                                   </label>
@@ -816,6 +840,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 isMulti={true}
                                                 isSearchable={false}
                                                 defaultValue={attr.options}
+                                                value={attr.options}
                                                 onChange={(selectedOption) => {
                                                   let event = { target: { name: `attributes[${i}].options`, value: selectedOption }}
                                                   handleChange(event)
@@ -912,12 +937,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                         </div>
                                                         <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
                                                         data-kt-image-input-action="remove" 
-                                                        data-bs-toggle="tooltip" title="" data-bs-original-title="Remove Image">
+                                                        data-bs-toggle="tooltip" title="Remove Image">
                                                           <i className="bi bi-x fs-2"></i>
                                                         </span>
                                                       </div>
                                                     </div>                                              
-                                                    <div className='col-md-4 col-lg-4'>
+                                                    <div className='col-md-4 col-lg-5'>
                                                       <div className='form-group'>
                                                         <UploadImageField 
                                                         /* setFileToState={setNewVariantThumbnail} */ 
@@ -925,7 +950,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                         fileName={`variations[${i}].new_thumbnail`} />
                                                       </div>
                                                     </div>
-                                                    <div className='col-md-5 col-lg-6'>
+                                                    <div className='col-md-5 col-lg-5'>
                                                       <div className='row'>
                                                         <div className='form-group col-md-12'>
                                                           <div className='form-check form-check-custom form-check-solid mb-4'>
@@ -1093,6 +1118,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     isMulti
                                     isSearchable
                                     defaultValue={values.linked_products_upsell}
+                                    value={values.linked_products_upsell}
                                     onChange={(selectedOption) => {
                                       let event = { target: { name: 'linked_products_upsell', value: selectedOption }}
                                       handleChange(event)
@@ -1117,6 +1143,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   isMulti
                                   isSearchable
                                   defaultValue={values.linked_products_cross_sell}
+                                  value={values.linked_products_cross_sell}
                                   onChange={(selectedOption) => {
                                     let event = { target: { name: 'linked_products_cross_sell', value: selectedOption }}
                                     handleChange(event)
@@ -1143,6 +1170,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   isMulti
                                   isSearchable
                                   defaultValue={values.categories}
+                                  value={values.categories}
                                   onBlur={()=>{
                                     handleBlur({ target: {name:'categories'} });
                                   }}

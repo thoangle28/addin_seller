@@ -88,6 +88,7 @@ body {
 .photo-galleries .btn-icon:hover i,
 .accordion-item .btn-icon:hover i {
   color: #bd0000 !important;
+  cursor: pointer;
 }
 
 .loading-wrapper {

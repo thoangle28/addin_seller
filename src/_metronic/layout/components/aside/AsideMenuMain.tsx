@@ -24,6 +24,7 @@ export function AsideMenuMain() {
       />
       <AsideMenuItem
         to='/product/create'
+        state='createProduct'
         icon='/media/icons/duotune/general/gen022.svg'
         title='Create New Product'
         fontIcon='bi-layers'
