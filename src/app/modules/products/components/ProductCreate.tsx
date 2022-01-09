@@ -10,10 +10,21 @@ import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
 import {
-  initialForm, styles, SubAttributes, TaxClass, getInitialFormValues,
-  ShippingClass, Categoies, Attributes, ProductsList,
-  StockStatus, handleFileUpload, UploadImageField, FallbackView
+  initialForm,
+  styles,
+  SubAttributes,
+  TaxClass,
+  getInitialFormValues,
+  ShippingClass,
+  Categoies,
+  Attributes,
+  ProductsList,
+  StockStatus,
+  handleFileUpload,
+  UploadImageField,
+  FallbackView,
 } from './formOptions'
+import { number } from 'yup/lib/locale'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
@@ -24,13 +35,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   //get product id or create new
   const userLocation: any = useLocation()
   //console.log(userLocation)
-  const { productId } = (userLocation.state) ? userLocation.state  : 0
+  const {productId} = userLocation.state ? userLocation.state : 0
 
   const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
   const currentUserId: number = user ? user.ID : 0
 
   //useState
-  const [loading, setLoading] = useState(true)  
+  const [loading, setLoading] = useState(true)
   const [isNewProduct, setNewProduct] = useState(true)
   const [shippingClass, setShippingClass] = useState([])
   const [productCategories, setProductCategory] = useState([])
@@ -40,7 +51,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [productType, setProductType] = useState('simple')
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
-  const [selectedAttr, setSelectedAttr] = useState({ value: '', label: ''})
+  const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
+  const [selectedVar, setSelectedVar] = useState({value: 'add_one', label: 'Add variation'})
+  const [productAttributes, setProductAttributes] = useState<any>([])
+  const [productVariations, setProductVariations] = useState<any>([])
   //----------------------------------------------------------------------------
   const mapValuesToForm = (initialValues: any, productValues: any) => {
     initialValues.name = productValues.name
@@ -51,7 +65,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     initialValues.attributes = productValues.attributes
     initialValues.variations = productValues.variations
     initialValues.thumbnail = productValues.thumbnail
-    initialValues.new_thumbnail = ""
+    initialValues.new_thumbnail = ''
     initialValues.photo_galleries = productValues.photo_galleries
     initialValues.new_photo_galleries = []
     initialValues.general_price = productValues.general_price
@@ -60,1127 +74,1384 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     initialValues.categories = productValues.categories
     initialValues.shipping_class_id = productValues.shipping_class_id
     initialValues.selectedAttr = ''
+    initialValues.selectedVarAct = ''
     initialValues.linked_products_upsell = productValues.linked_products_upsell
     initialValues.linked_products_cross_sell = productValues.linked_products_cross_sell
     initialValues.general_wallet_credit = productValues.general_wallet_credit
     initialValues.general_wallet_cashback = productValues.general_wallet_cashback
     initialValues.general_commission = productValues.general_commission
+
+    /* const initProductAttr = productValues.attributes && productValues.attributes.filter((x: any) => x.variation) || []
+    setProductAttributes(initProductAttr)
+    setProductVariations(productValues.variations || []) */
   }
-  //---------------------------------------------------------------------------  
+  //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
   //Get product info from cache
   let product: any = []
-  product = useSelector<RootState>(
-    ({productDetail}) => productDetail.product,
-    shallowEqual
-  )
-  
+  product = useSelector<RootState>(({productDetail}) => productDetail.product, shallowEqual)
+
   //Get All Properties
   useEffect(() => {
-    const loadingEverything = () => {      
-
+    const loadingEverything = () => {
       setShippingClass(ShippingClass())
-      setProductCategory(Categoies())
-      const { termsList, fullList } = Attributes()
-      setAttributes(termsList)
-      setFullAttributes(fullList)
+      setProductCategory(Categoies())     
       setProductsList(ProductsList(currentUserId))
     }
 
     loadingEverything()
+  }, [])
 
-  }, [])  
+  useEffect(() => {
+    const loadAttributes = async () => {
+      const {termsList, fullList} = await Attributes()
+      setAttributes(termsList)
+      setFullAttributes(fullList)
+    }     
+    loadAttributes();
 
+  }, [])
   /**
    * Get Product Details
    */
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
-      mapValuesToForm(initialForm, product)   
+      mapValuesToForm(initialForm, product)
       const isSimple = initialForm.type_product ? 'variable' : 'simple'
       setProductType(isSimple)
       setNewProduct(false)
       setLoading(false)
-    } else {      
+    } else {
       setNewProduct(true)
-      if( productId > 0) 
-        dispatch(detail.actions.getProductDetail(currentUserId, productId))
+      if (productId > 0) dispatch(detail.actions.getProductDetail(currentUserId, productId))
       else {
         setLoading(false)
       }
     }
-   
   }, [product, productId])
-  
+
   /**
    * The events on the form
-   * @param event 
+   * @param event
    */
   const onChangeProducType = (event: any) => {
     const value = event.target.value
     setProductType(value)
   }
-  
+
   const onChangeAttr = (option: any) => {
     setSelectedAttr(option)
   }
 
-  /* Add more Attributes */
-  const handleAddMoreAttributes = () => {
-    
-    if( !selectedAttr ) return
-    const { value } = selectedAttr
-    const isAdded = initialForm.attributes.some((x: any) => x.id === value)
+  const onChangeVar = (option: any) => {
+    setSelectedVar(option)
+  }
 
-    if( isAdded ) return    
+  /* Add more Attributes */
+  const handleAddMoreAttributes = (formValues: any) => {
+    if (!selectedAttr) return
+    const {value} = selectedAttr
+    debugger
+    const isAdded = formValues.attributes.some((x: any) => x.id === value)
+
+    if (isAdded) return
     const attrFound = fullAttributesList.find((x: any) => x.id === value)
     //reset
-    setSelectedAttr({ value: '', label: ''})
-    if( !attrFound ) return
-    else initialForm.attributes.push(attrFound)
+    setSelectedAttr({value: '', label: ''})
+    if (!attrFound) return
+    else formValues.attributes.push(attrFound)
+    
+    mapValuesToForm(initialForm, formValues)
   }
 
   /**
    * Remove Attribute
-  */
-  const removeAttribute = (id: number, value: any) => {    
-    mapValuesToForm(initialForm, value)
-    const afterFilter = initialForm.attributes.filter((x: any) => x.id !== id)   
+   */
+  const removeAttribute = (id: number, formValues: any) => {
+    
+    mapValuesToForm(initialForm, formValues)
+    const afterFilter = initialForm.attributes.filter((x: any) => x.id !== id)
     initialForm.attributes = []
-    afterFilter && afterFilter.map((item) => {
-      initialForm.attributes.push(item)
-    })
+    afterFilter &&
+      afterFilter.map((item) => {
+        initialForm.attributes.push(item)
+      })
   }
 
   /**
    * Auto additional a variant when user choose the attribute is variant
-  */
-  const createOrUpdateVariants = (isChecked: any, var_id: number, formValues: any) => {
-    alert(isChecked)
-    console.log(formValues)
-   /*  mapValuesToForm(initialForm, formValues)
-    const afterFilter = initialForm.attributes.filter((x: any) => x.id !== id)   
-    initialForm.attributes = []
-    afterFilter && afterFilter.map((item) => {
-      initialForm.attributes.push(item)
-    }) */
+   */
+  const createOrUpdateVariants = (isChecked: any, attrId: number, formValues: any) => {
+
+    //sort
+    const beforeAddNewVar = {...productVariations}
+    console.log(beforeAddNewVar)
+  
+    const afterFilter = formValues.attributes.filter((x: any) => { 
+      return ((x.variation && x.id !== attrId && !isChecked) || (x.variation && isChecked ) || (x.id === attrId && isChecked)) 
+    })
+
+    afterFilter && afterFilter.map((x: any, i:number) => {
+      afterFilter[i].variation = true
+    })
+    
+    beforeAddNewVar &&  beforeAddNewVar.forEach((ele: any, i: number) => {
+      
+    });
+
+    setProductAttributes(afterFilter)
+    
   }
+
+
+  /* Add more Attributes */
+  const saveProductAttributes = (formValues: any) => {
+    console.log(formValues)
+    mapValuesToForm(initialForm, formValues)
+  }
+
+  /** Add Variations */
+  const createVariations = (num: number) => {
+    const list: any = []
+
+    const d = new Date();
+    let time = d.getTime();
+
+    for(let i = 0; i < num; i++) {
+      list.push({
+        id: 'new_' + time + i,
+        sku : '',
+        regular_price : '',
+        sale_price : '',
+        wallet_cashback : '',
+        new_thumbnail : '',
+        shipping_class_id : '',
+        tax_class : '',
+        enabled : true,
+        attributes : '',
+        stock_status : '',
+      })
+    }
+
+    return list
+  }
+  const handleAddVariations = (formValues: any) => {
+
+    let totalListVar = 1
+    if( selectedVar.value === 'add_all') {
+      formValues.attributes.map((x: any, i: number) => {  
+        if(x.variation) totalListVar *= (x.options.length > 0 ) ? x.options.length : 1
+      } )
+    }
+
+    switch(selectedVar.value) {
+      default:
+        formValues.variations = createVariations(totalListVar)
+        break;
+      case 'delete_all':
+        //formValues.variations = deleteAllVariations()
+        break;
+    }
+
+    mapValuesToForm(initialForm, formValues)
+  }
+
   /**
    * Begin Formik
-  */
-  
+   */
+
   const ValidationSchema = () => {
     return Yup.object().shape({
       name: Yup.string().max(250, 'Must be 250 characters or less').required('no-required'),
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
-    });
+    })
   }
 
-  return (       
+  return (
     <>
-      {(loading) 
-      ? (
-      <div className='card mb-5 mb-xl-8 loading-wrapper'>
-        <div className='card-body py-3 loading-body'>
-          <FallbackView />
+      {loading ? (
+        <div className='card mb-5 mb-xl-8 loading-wrapper'>
+          <div className='card-body py-3 loading-body'>
+            <FallbackView />
+          </div>
         </div>
-      </div>) 
-      : ( 
-      <div className='card mb-5 mb-xl-8'>
-        <div className='card-header border-0 pt-5'>
-          <h3 className='card-title align-items-start flex-column'>
-            <span className='card-label fw-bolder fs-3 mb-1'>Create Product</span>
-          </h3>
-        </div>
-        <div className='card-body py-3'>
-          <Formik
-            initialValues={ isNewProduct ? getInitialFormValues : initialForm }
-            validationSchema={ValidationSchema}
-            enableReinitialize={true}
-            onSubmit={(values, { setSubmitting }) => {
-              setTimeout(() => {
-                alert(JSON.stringify(values, null, 2));
-                console.log(values)
-                setSubmitting(false);
-              }, 400);
-            }}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-              isSubmitting,
-              resetForm,
-              setFieldValue
-              /* and other goodies */
-            }) => (          
-            <form
-              onSubmit={handleSubmit}
-              className='form'
-              noValidate
-              id='kt_modal_create_app_form'
+      ) : (
+        <div className='card mb-5 mb-xl-8'>
+          <div className='card-header border-0 pt-5'>
+            <h3 className='card-title align-items-start flex-column'>
+              <span className='card-label fw-bolder fs-3 mb-1'>Create Product</span>
+            </h3>
+          </div>
+          <div className='card-body py-3'>
+            <Formik
+              initialValues={isNewProduct ? getInitialFormValues : initialForm}
+              validationSchema={ValidationSchema}
+              enableReinitialize={true}
+              onSubmit={(values, {setSubmitting}) => {
+                setTimeout(() => {
+                  //alert(JSON.stringify(values, null, 2))
+                  console.log(values)
+                  setSubmitting(false)
+                }, 400)
+              }}
             >
-              <div className='current' data-kt-stepper-element='content'>
-                <div className='w-100'>
-                  <div className='fv-row mb-5'>
-                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                      <span className='no-required'>Product Title</span>
-                    </label>
-                    <input
-                      name='name'
-                      type='text'
-                      className='form-control'
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      value={values.name}
-                    />
-                    {touched.name && errors.name ? (
-                      <div className='text-danger'>{errors.name}</div>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className='w-100'>
-                  <div className='fv-row mb-5'>
-                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                      Product Content
-                    </label>
-                    <SunEditor
-                      name='content'
-                      //onBlur={handleBlur}
-                      onChange={(event) => {
-                        setFieldValue('content', event)
-                      }}
-                      defaultValue={values.content}
-                      setContents={values.content}
-                      width='100%'
-                      height='500px'
-                      setDefaultStyle={''}
-                      setOptions={{
-                        buttonList: [
-                          ['undo', 'redo'],
-                          ['font', 'fontSize', 'formatBlock'],
-                          ['paragraphStyle', 'blockquote'],
-                          ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                          ['fontColor', 'hiliteColor', 'textStyle'],
-                          ['removeFormat', 'outdent', 'indent'],
-                          ['align', 'horizontalRule', 'list', 'lineHeight'],
-                          ['table', 'link', 'image'], //[, 'video', 'audio']
-                          ['codeView'],
-                          //['fullScreen', 'showBlocks', 'preview', 'print', 'save', 'template'],
-                        ],
-                      }}
-                    />
-                  {touched.content && errors.content ? (
-                      <div className='text-danger'>{errors.content}</div>
-                    ) : null}
-                  </div>
-                </div>
-                <div className='w-100'>
-                  <div className='row'>
-                    <div className='col-md-8'>
+              {({
+                values,
+                errors,
+                touched,
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                isSubmitting,
+                resetForm,
+                setFieldValue,
+                /* and other goodies */
+              }) => (
+                <form
+                  onSubmit={handleSubmit}
+                  className='form'
+                  noValidate
+                  id='kt_modal_create_app_form'
+                >
+                  <div className='current' data-kt-stepper-element='content'>
+                    <div className='w-100'>
                       <div className='fv-row mb-5'>
                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                          <span className='no-required'>Photo Gallery</span>
+                          <span className='no-required'>Product Title</span>
                         </label>
-                        <div className='row'>
-                          <div className='col-md-5'>
-                            <div className='form-group mt-1'>                            
-                              <Dropzone onDrop={(acceptedFiles) => {
-                                  if( acceptedFiles && acceptedFiles !== undefined ) {
-                                    handleFileUpload(acceptedFiles)
-                                    .then(images => {                                    
-                                      /* Once all promises are resolved, update state with image URI array */
-                                      setNewPhotoGalleries(images)   
-                                      setFieldValue("new_photo_galleries", images)
-                                    }, error => {        
-                                        console.error(error);
-                                    });
-                                  }   
-                                }}>
-                                {({getRootProps, getInputProps}) => (
-                                  <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
-                                    <div {...getRootProps()}>
-                                      <input {...getInputProps()} name='photo_galleries' accept="image/*" />
-                                      <div className='dropzone-msg dz-message needsclick d-flex' style={{cursor: 'pointer'}}>
-                                        <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
-                                        <div className='ms-4'>
-                                          <span className='fs-8 text-gray-normal mb-1'>
-                                            Add more photos, drop files here or click to upload.
-                                          </span>                                       
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </section>
-                                )}
-                              </Dropzone>              
-                            </div>
-                          </div>
-                          <div className='col-md-7'>
-                            <div className='photo-galleries'>
-                            {
-                              (newPhotoGalleries && newPhotoGalleries.length > 0) 
-                              ? newPhotoGalleries.map((src: string, i:number) => {      
-                                return (
-                                  <div
-                                    className='form-group image-input image-input-outline'
-                                    key={'image_' + i}
-                                  >
-                                    <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
-                                      <img className='h-100' src={src} alt='' />
-                                    </div>
-                                    <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
-                                      data-kt-image-input-action="remove" 
-                                      data-bs-toggle="tooltip" title="Remove Image">
-                                      <i className="bi bi-x fs-2"></i>
-                                    </span>
-                                  </div>
-                                )
-                              })  : (
-                                (values.photo_galleries &&
-                                  values.photo_galleries.map((image: any) => {
-                                    return (
-                                      <div
-                                        className='form-group image-input image-input-outline'
-                                        key={image.image_id}
-                                      >
-                                        <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
-                                          <img className='h-100' src={image.src} alt='' />
-                                        </div>
-                                        <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
-                                        data-kt-image-input-action="remove" 
-                                        data-bs-toggle="tooltip" title="Remove Image">
-                                          <i className="bi bi-x fs-2"></i>
-                                        </span>
-                                      </div>
-                                    )
-                                  })) || null 
-                              ) }
-                            </div>
-                          </div>
-                        </div>
+                        <input
+                          name='name'
+                          type='text'
+                          className='form-control'
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          value={values.name}
+                        />
+                        {touched.name && errors.name ? (
+                          <div className='text-danger'>{errors.name}</div>
+                        ) : null}
                       </div>
                     </div>
-                    <div className='col-md-4'>
-                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                        <span className='no-required'>Thumbnail</span>
-                      </label>
-                      <div className='row'>
-                        <div className='col-md-3 mb-5 thumbnail'>                        
-                          <div className='form-group image-input image-input-outline'>
-                            <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
-                            {
-                            (!newThumbnail && values && values.thumbnail && (
-                              <img className='h-100' src={values.thumbnail}  alt=''/>
-                            )) 
-                            || ( (newThumbnail && (                              
-                              <img className='h-100' src={newThumbnail}  alt=''/>
-                              ))
-                            || (<img className='h-100' src='https://via.placeholder.com/75x75/f0f0f0'  alt=''/>) )
-                            }   
-                            </div>
-                            <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
-                              data-kt-image-input-action="remove" 
-                              data-bs-toggle="tooltip" title="Remove Image">
-                                <i className="bi bi-x fs-2"></i>
-                            </span>             
-                          </div>
-                        </div>
-                        <div className='col-md-9 mb-5'>
-                          <div className='form-group mt-1'>
-                            <UploadImageField 
-                            setFileToState={setNewThumbnail} 
-                            setFieldValue={setFieldValue} 
-                            fileName={'new_thumbnail'} />
-                          </div>                        
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className='rounded border p-5'>
-                  <div className='w-100'>
-                    <div className='fv-row mb-10'>
-                      <div className='row d-flex align-items-center'>
-                        <div className='col-md-3'>
-                          <label className='fs-6 fw-bold'>
-                            <span className='no-required'>Product Type</span>
-                          </label>
-                        </div>
-                        <div className='col-md-5'>
-                          <select
-                            name='type_product'
-                            className='form-select'
-                            value={values.type_product}
-                            onChange={(e) => {
-                                onChangeProducType(e)
-                                handleChange(e)
-                              }
-                            }
-                          >
-                            <option value='simple'>Simple product</option>
-                            <option value='variable'>Variable product</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div className='w-100'>
-                    <div className='fv-row mb-5'>
-                      <div className='row d-flex'>
-                        <div className='col-md-4 col-lg-3'>
-                          <ul className='nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-6'>
-                            <li className='nav-item me-0'>
-                              <a
-                                className='nav-link active btn btn-flex btn-active-secondary w-100'
-                                data-bs-toggle='tab'
-                                id='tab_general'
-                                href='#general_pane'
-                                ref={tabDefault}
-                              >
-                                <span className='d-flex flex-column align-items-start'>
-                                  <span>General</span>
-                                </span>
-                              </a>
-                            </li>
-                            <li className='nav-item me-0'>
-                              <a
-                                className='nav-link btn btn-flex btn-active-secondary w-100'
-                                data-bs-toggle='tab'
-                                href='#category_pane'
-                              >
-                                <span className='d-flex flex-column align-items-start'>
-                                  <span>Cagatories</span>
-                                </span>
-                              </a>
-                            </li>
-                            <li className='nav-item me-0'>
-                              <a
-                                className='nav-link btn btn-flex btn-active-secondary w-100'
-                                data-bs-toggle='tab'
-                                href='#kt_vtab_pane_5'
-                              >
-                                <span className='d-flex flex-column align-items-start'>
-                                  <span>Inventory</span>
-                                </span>
-                              </a>
-                            </li>
-                            <li className='nav-item me-0'>
-                              <a
-                                className='nav-link btn btn-flex btn-active-secondary w-100'
-                                data-bs-toggle='tab'
-                                href='#kt_vtab_pane_6'
-                              >
-                                <span className='d-flex flex-column align-items-start'>
-                                  <span>Shipping</span>
-                                </span>
-                              </a>
-                            </li>
-                            <li className='nav-item me-0'>
-                              <a
-                                className='nav-link btn btn-flex btn-active-secondary w-100'
-                                data-bs-toggle='tab'
-                                href='#linked_products_pane'
-                              >
-                                <span className='d-flex flex-column align-items-start'>
-                                  <span>Linked Products</span>
-                                </span>
-                              </a>
-                            </li>
-                            <li className='nav-item me-0'>
-                              <a
-                                className='nav-link btn btn-flex btn-active-secondary w-100'
-                                data-bs-toggle='tab'
-                                href='#kt_vtab_pane_7'
-                              >
-                                <span className='d-flex flex-column align-items-start'>
-                                  <span>Attributes</span>
-                                </span>
-                              </a>
-                            </li>
-                            {productType === 'variable' ? (
-                              <li className='nav-item me-0'>
-                                <a
-                                  className='nav-link btn btn-flex btn-active-secondary w-100'
-                                  data-bs-toggle='tab'
-                                  href='#kt_vtab_pane_8'
-                                >
-                                  <span className='d-flex flex-column align-items-start'>
-                                    <span>Variations</span>
-                                  </span>
-                                </a>
-                              </li>
-                            ) : null}
-                          </ul>
+                    <div className='w-100'>
+                      <div className='fv-row mb-5'>
+                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                          Product Content
+                        </label>
+                        <SunEditor
+                          name='content'
+                          //onBlur={handleBlur}
+                          onChange={(event) => {
+                            setFieldValue('content', event)
+                          }}
+                          defaultValue={values.content}
+                          setContents={values.content}
+                          width='100%'
+                          height='500px'
+                          setDefaultStyle={''}
+                          setOptions={{
+                            buttonList: [
+                              ['undo', 'redo'],
+                              ['font', 'fontSize', 'formatBlock'],
+                              ['paragraphStyle', 'blockquote'],
+                              ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
+                              ['fontColor', 'hiliteColor', 'textStyle'],
+                              ['removeFormat', 'outdent', 'indent'],
+                              ['align', 'horizontalRule', 'list', 'lineHeight'],
+                              ['table', 'link', 'image'], //[, 'video', 'audio']
+                              ['codeView'],
+                              //['fullScreen', 'showBlocks', 'preview', 'print', 'save', 'template'],
+                            ],
+                          }}
+                        />
+                        {touched.content && errors.content ? (
+                          <div className='text-danger'>{errors.content}</div>
+                        ) : null}
+                      </div>
+                    </div>
+                    <div className='w-100'>
+                      <div className='row'>
+                        <div className='col-md-8'>
+                          <div className='fv-row mb-5'>
+                            <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                              <span className='no-required'>Photo Gallery</span>
+                            </label>
+                            <div className='row'>
+                              <div className='col-md-5'>
+                                <div className='form-group mt-1'>
+                                  <Dropzone
+                                    onDrop={(acceptedFiles) => {
+                                      if (acceptedFiles && acceptedFiles !== undefined) {
+                                        handleFileUpload(acceptedFiles).then(
+                                          (images) => {
+                                            /* Once all promises are resolved, update state with image URI array */
+                                            setNewPhotoGalleries(images)
+                                            setFieldValue('new_photo_galleries', images)
+                                          },
+                                          (error) => {
+                                            console.error(error)
+                                          }
+                                        )
+                                      }
+                                    }}
+                                  >
+                                    {({getRootProps, getInputProps}) => (
+                                      <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
+                                        <div {...getRootProps()}>
+                                          <input
+                                            {...getInputProps()}
+                                            name='photo_galleries'
+                                            accept='image/*'
+                                          />
+                                          <div
+                                            className='dropzone-msg dz-message needsclick d-flex'
+                                            style={{cursor: 'pointer'}}
+                                          >
+                                            <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
+                                            <div className='ms-4'>
+                                              <span className='fs-8 text-gray-normal mb-1'>
+                                                Add more photos, drop files here or click to upload.
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </section>
+                                    )}
+                                  </Dropzone>
+                                </div>
+                              </div>
+                              <div className='col-md-7'>
+                                <div className='photo-galleries'>
+                                  {newPhotoGalleries && newPhotoGalleries.length > 0
+                                    ? newPhotoGalleries.map((src: string, i: number) => {
+                                        return (
+                                          <div
+                                            className='form-group image-input image-input-outline'
+                                            key={'image_' + i}
+                                          >
+                                            <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
+                                              <img className='h-100' src={src} alt='' />
+                                            </div>
+                                            <span
+                                              className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                              data-kt-image-input-action='remove'
+                                              data-bs-toggle='tooltip'
+                                              title='Remove Image'
+                                            >
+                                              <i className='bi bi-x fs-2'></i>
+                                            </span>
+                                          </div>
+                                        )
+                                      })
+                                    : (values.photo_galleries &&
+                                        values.photo_galleries.map((image: any) => {
+                                          return (
+                                            <div
+                                              className='form-group image-input image-input-outline'
+                                              key={image.image_id}
+                                            >
+                                              <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
+                                                <img className='h-100' src={image.src} alt='' />
+                                              </div>
+                                              <span
+                                                className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                                data-kt-image-input-action='remove'
+                                                data-bs-toggle='tooltip'
+                                                title='Remove Image'
+                                              >
+                                                <i className='bi bi-x fs-2'></i>
+                                              </span>
+                                            </div>
+                                          )
+                                        })) ||
+                                      null}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className='col-md-8 col-lg-9'>
-                          <div className='tab-content rounded border p-5 h-100'>                         
-                            <div className='tab-pane fade active show' id='general_pane'>
-                              {productType !== 'variable' ? (
-                                <div className='form-group row'>
-                                  <div className='col-md-6 mb-5'>
-                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                      <span>Regular Rrice</span>
-                                    </label>
-                                    <div className='input-group'>
-                                      <span className='input-group-text'>$</span>
+                        <div className='col-md-4'>
+                          <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                            <span className='no-required'>Thumbnail</span>
+                          </label>
+                          <div className='row'>
+                            <div className='col-md-3 mb-5 thumbnail'>
+                              <div className='form-group image-input image-input-outline'>
+                                <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
+                                  {(!newThumbnail && values && values.thumbnail && (
+                                    <img className='h-100' src={values.thumbnail} alt='' />
+                                  )) ||
+                                    (newThumbnail && (
+                                      <img className='h-100' src={newThumbnail} alt='' />
+                                    )) || (
+                                      <img
+                                        className='h-100'
+                                        src='https://via.placeholder.com/75x75/f0f0f0'
+                                        alt=''
+                                      />
+                                    )}
+                                </div>
+                                <span
+                                  className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                  data-kt-image-input-action='remove'
+                                  data-bs-toggle='tooltip'
+                                  title='Remove Image'
+                                >
+                                  <i className='bi bi-x fs-2'></i>
+                                </span>
+                              </div>
+                            </div>
+                            <div className='col-md-9 mb-5'>
+                              <div className='form-group mt-1'>
+                                <UploadImageField
+                                  setFileToState={setNewThumbnail}
+                                  setFieldValue={setFieldValue}
+                                  fileName={'new_thumbnail'}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className='rounded border p-5'>
+                      <div className='w-100'>
+                        <div className='fv-row mb-10'>
+                          <div className='row d-flex align-items-center'>
+                            <div className='col-md-3'>
+                              <label className='fs-6 fw-bold'>
+                                <span className='no-required'>Product Type</span>
+                              </label>
+                            </div>
+                            <div className='col-md-5'>
+                              <select
+                                name='type_product'
+                                className='form-select'
+                                value={values.type_product}
+                                onChange={(e) => {
+                                  onChangeProducType(e)
+                                  handleChange(e)
+                                }}
+                              >
+                                <option value='simple'>Simple product</option>
+                                <option value='variable'>Variable product</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className='w-100'>
+                        <div className='fv-row mb-5'>
+                          <div className='row d-flex'>
+                            <div className='col-md-4 col-lg-3'>
+                              <ul className='nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-6'>
+                                <li className='nav-item me-0'>
+                                  <a
+                                    className='nav-link active btn btn-flex btn-active-secondary w-100'
+                                    data-bs-toggle='tab'
+                                    id='tab_general'
+                                    href='#general_pane'
+                                    ref={tabDefault}
+                                  >
+                                    <span className='d-flex flex-column align-items-start'>
+                                      <span>General</span>
+                                    </span>
+                                  </a>
+                                </li>
+                                <li className='nav-item me-0'>
+                                  <a
+                                    className='nav-link btn btn-flex btn-active-secondary w-100'
+                                    data-bs-toggle='tab'
+                                    href='#category_pane'
+                                  >
+                                    <span className='d-flex flex-column align-items-start'>
+                                      <span>Cagatories</span>
+                                    </span>
+                                  </a>
+                                </li>
+                                <li className='nav-item me-0'>
+                                  <a
+                                    className='nav-link btn btn-flex btn-active-secondary w-100'
+                                    data-bs-toggle='tab'
+                                    href='#kt_vtab_pane_5'
+                                  >
+                                    <span className='d-flex flex-column align-items-start'>
+                                      <span>Inventory</span>
+                                    </span>
+                                  </a>
+                                </li>
+                                <li className='nav-item me-0'>
+                                  <a
+                                    className='nav-link btn btn-flex btn-active-secondary w-100'
+                                    data-bs-toggle='tab'
+                                    href='#kt_vtab_pane_6'
+                                  >
+                                    <span className='d-flex flex-column align-items-start'>
+                                      <span>Shipping</span>
+                                    </span>
+                                  </a>
+                                </li>
+                                <li className='nav-item me-0'>
+                                  <a
+                                    className='nav-link btn btn-flex btn-active-secondary w-100'
+                                    data-bs-toggle='tab'
+                                    href='#linked_products_pane'
+                                  >
+                                    <span className='d-flex flex-column align-items-start'>
+                                      <span>Linked Products</span>
+                                    </span>
+                                  </a>
+                                </li>
+                                <li className='nav-item me-0'>
+                                  <a
+                                    className='nav-link btn btn-flex btn-active-secondary w-100'
+                                    data-bs-toggle='tab'
+                                    href='#kt_vtab_pane_7'
+                                  >
+                                    <span className='d-flex flex-column align-items-start'>
+                                      <span>Attributes</span>
+                                    </span>
+                                  </a>
+                                </li>
+                                {productType === 'variable' ? (
+                                  <li className='nav-item me-0'>
+                                    <a
+                                      className='nav-link btn btn-flex btn-active-secondary w-100'
+                                      data-bs-toggle='tab'
+                                      href='#kt_vtab_pane_8'
+                                    >
+                                      <span className='d-flex flex-column align-items-start'>
+                                        <span>Variations</span>
+                                      </span>
+                                    </a>
+                                  </li>
+                                ) : null}
+                              </ul>
+                            </div>
+                            <div className='col-md-8 col-lg-9'>
+                              <div className='tab-content rounded border p-5 h-100'>
+                                <div className='tab-pane fade active show' id='general_pane'>
+                                  {productType !== 'variable' ? (
+                                    <div className='form-group row'>
+                                      <div className='col-md-6 mb-5'>
+                                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                          <span>Regular Rrice</span>
+                                        </label>
+                                        <div className='input-group'>
+                                          <span className='input-group-text'>$</span>
+                                          <input
+                                            type='number'
+                                            className='form-control'
+                                            name='general_price'
+                                            step='0.1'
+                                            placeholder=''
+                                            value={values.general_price}
+                                            onChange={handleChange}
+                                          />
+                                        </div>
+                                      </div>
+                                      <div className='col-md-6 mb-5'>
+                                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                          <span>Sale Price</span>
+                                        </label>
+                                        <div className='input-group'>
+                                          <span className='input-group-text'>$</span>
+                                          <input
+                                            type='number'
+                                            className='form-control'
+                                            name='salePrice'
+                                            step='0.1'
+                                            placeholder=''
+                                          />
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ) : null}
+                                  <div className='form-group row'>
+                                    <div className='col-md-6 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Tax status</span>
+                                      </label>
+                                      <select
+                                        name='general_tax_status'
+                                        className='form-select'
+                                        value={values.general_tax_status}
+                                        onChange={handleChange}
+                                      >
+                                        <option value='taxable'>Taxable</option>
+                                        <option value='shipping'>Shipping only</option>
+                                        <option value='none'>None</option>
+                                      </select>
+                                    </div>
+                                    <div className='col-md-6 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Tax class</span>
+                                      </label>
+                                      <select
+                                        name='general_tax_class'
+                                        className='form-select me-2'
+                                        value={values.general_tax_class}
+                                        onChange={handleChange}
+                                      >
+                                        {TaxClass &&
+                                          TaxClass.map((item: any, i: number) => {
+                                            return (
+                                              <option key={item.value} value={item.value}>
+                                                {item.label}
+                                              </option>
+                                            )
+                                          })}
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div className='form-group row'>
+                                    <div className='col-md-4 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Wallet Credit</span>
+                                      </label>
+                                      <input
+                                        type='text'
+                                        className='form-control'
+                                        name='general_wallet_credit'
+                                        value={values.general_wallet_credit}
+                                        onChange={handleChange}
+                                      />
+                                    </div>
+                                    <div className='col-md-4 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Wallet Cashback</span>
+                                      </label>
+                                      <input
+                                        type='text'
+                                        className='form-control'
+                                        name='general_wallet_cashback'
+                                        value={values.general_wallet_cashback}
+                                        onChange={handleChange}
+                                      />
+                                    </div>
+                                    <div className='col-md-4 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Commission (Fixed):</span>
+                                      </label>
                                       <input
                                         type='number'
                                         className='form-control'
-                                        name='general_price'
-                                        step='0.1'
-                                        placeholder=''
-                                        value={values.general_price}
+                                        name='general_commission'
+                                        value={values.general_commission}
                                         onChange={handleChange}
                                       />
                                     </div>
                                   </div>
-                                  <div className='col-md-6 mb-5'>
-                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                      <span>Sale Price</span>
-                                    </label>
-                                    <div className='input-group'>
-                                      <span className='input-group-text'>$</span>
+                                </div>
+                                {/* Invetory */}
+                                <div className='tab-pane fade' id='kt_vtab_pane_5'>
+                                  <div className='form-group row'>
+                                    <div className='col-md-12 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>SKU</span>
+                                      </label>
                                       <input
-                                        type='number'
+                                        type='text'
                                         className='form-control'
-                                        name='salePrice'
-                                        step='0.1'
+                                        name='inventory_sku'
+                                        onChange={handleChange}
+                                        value={values.inventory_sku}
                                         placeholder=''
+                                        data-bs-toggle='tooltip'
+                                        data-bs-placement='top'
                                       />
+                                      <div className='text-muted fs-7 mt-3'>
+                                        SKU refers to a Stock-keeping unit, a unique identifier for
+                                        each distinct product and service that can be purchased.
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
-                              ) : null}
-                              <div className='form-group row'>
-                                <div className='col-md-6 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Tax status</span>
-                                  </label>
-                                  <select
-                                    name='general_tax_status'
-                                    className='form-select'
-                                    value={values.general_tax_status}
-                                    onChange={handleChange}
-                                  >
-                                    <option value='taxable'>Taxable</option>
-                                    <option value='shipping'>Shipping only</option>
-                                    <option value='none'>None</option>
-                                  </select>
-                                </div>
-                                <div className='col-md-6 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Tax class</span>
-                                  </label>
-                                  <select
-                                    name='general_tax_class'
-                                    className='form-select me-2'
-                                    value={values.general_tax_class}
-                                    onChange={handleChange}
-                                  >
-                                    {TaxClass && TaxClass.map((item: any, i: number) => {
-                                        return(
-                                          <option key={item.value} value={item.value}>{item.label}</option>
-                                        )
-                                      })
-                                    }
-                                  </select>                                
-                                </div>
-                              </div>
-                              <div className='form-group row'>
-                                <div className='col-md-4 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Wallet Credit</span>
-                                  </label>
-                                  <input
-                                    type='text'
-                                    className='form-control'
-                                    name='general_wallet_credit'
-                                    value={values.general_wallet_credit}
-                                    onChange={handleChange}
-                                  />
-                                </div>
-                                <div className='col-md-4 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Wallet Cashback</span>
-                                  </label>
-                                  <input
-                                    type='text'
-                                    className='form-control'
-                                    name='general_wallet_cashback'
-                                    value={values.general_wallet_cashback}
-                                    onChange={handleChange}
-                                  />
-                                </div>
-                                <div className='col-md-4 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Commission (Fixed):</span>
-                                  </label>
-                                  <input
-                                    type='number'
-                                    className='form-control'
-                                    name='general_commission'
-                                    value={values.general_commission}
-                                    onChange={handleChange}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                            {/* Invetory */}
-                            <div className='tab-pane fade' id='kt_vtab_pane_5'>
-                              <div className='form-group row'>
-                                <div className='col-md-12 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>SKU</span>
-                                  </label>
-                                  <input
-                                    type='text'
-                                    className='form-control'
-                                    name='inventory_sku'
-                                    onChange={handleChange}
-                                    value={values.inventory_sku}
-                                    placeholder=''
-                                    data-bs-toggle='tooltip'
-                                    data-bs-placement='top'
-                                  />
-                                  <div className='text-muted fs-7 mt-3'>
-                                    SKU refers to a Stock-keeping unit, a unique identifier for each
-                                    distinct product and service that can be purchased.
-                                  </div>
-                                </div>
-                              </div>
-                              {productType !== 'variable' ? (
-                                <div className='form-group row'>
-                                  <div className='col-md-12 mb-5'>
-                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                      <span>Stock Status</span>
-                                    </label>
-                                    <select
-                                      name='inventory_stock_status'
-                                      className='form-select'
-                                      value={values.inventory_stock_status}
-                                      onChange={handleChange}
-                                    >
-                                      {StockStatus &&
-                                        StockStatus.map((item: any) => {
-                                          return (
-                                            <option key={item.value} value={item.value}>
-                                              {item.label}
-                                            </option>
-                                          )
-                                        })}
-                                    </select>                                 
-                                    <div className='text-muted fs-7 mt-3'>
-                                      Controls whether or not the product is listed as "in stock" or
-                                      "out of stock" on the frontend.
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : null}
-                            </div>
-                            {/* Shipping Class */}
-                            <div className='tab-pane fade' id='kt_vtab_pane_6'>
-                              <div className='form-group row'>
-                                <div className='col-md-12 mb-5'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Shipping Class</span>
-                                  </label>
-                                  <select
-                                    name='shipping_class_id'
-                                    className='form-select'
-                                    value={values.shipping_class_id}
-                                    onChange={handleChange}
-                                  >
-                                    <option value='-1'>No shipping class</option>
-                                    {shippingClass &&
-                                      shippingClass.map((item: any) => {
-                                        return (
-                                          <option key={item.value} value={item.value}>
-                                            {item.label}
-                                          </option>
-                                        )
-                                      })}
-                                  </select>
-                                  <div className='text-muted fs-7 mt-3'>
-                                    Shipping classes are used by certain shipping methods to group
-                                    similar products.
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                            {/* Attributes */}
-                          
-                            <div className='tab-pane fade' id='kt_vtab_pane_7'>
-                              <div className='form-group row'>
-                                <div className='col-md-12 mb-5'>
-                                  <div className='d-flex align-items-center'>
-                                    <label className='d-flex align-items-center fs-6 fw-bold'>
-                                      <span>Custom Product Attribute</span>
-                                    </label>
-                                  </div>
-                                </div>
-                                <div className='col-md-9 mb-5'>
-                                  <div className='d-flex align-items-center'>
-                                    <Select
-                                      styles={styles}
-                                      closeMenuOnSelect={true}
-                                      isMulti={false}
-                                      isSearchable
-                                      defaultValue={selectedAttr}
-                                      value={selectedAttr}
-                                      onChange={onChangeAttr}
-                                      options={attributesList}
-                                      name='attributes'
-                                      className='w-100'
-                                    />                                 
-                                  </div>
-                                </div>
-                                <div className='col-md-3 mb-5'>
-                                  <button
-                                    onClick={(event) => {
-                                        handleAddMoreAttributes()
-                                        handleChange(event)
-                                      }
-                                    }
-                                    type='button'
-                                    className='btn btn-sm btn-primary'
-                                    name="add-more-attr"
-                                  >
-                                    Add more
-                                  </button>
-                                </div>
-                              </div>
-                              {/** Product Attributes */}                          
-
-                              <div className='accordion' id='product_attribute'>
-                                {(values.attributes 
-                                  && values.attributes.map((attr: any, i: number | string) => {                        
-                                  const subAttributes = SubAttributes(attr.name)                              
-                                  return(
-                                    <div className='accordion-item' key={attr.name || attr.id}>
-                                      <h2 className='accordion-header d-flex' id={'product_attribute_header_' + attr.id}>
-                                        <div className='remov-item'>
-                                          <button type="button" 
-                                          className="btn btn-icon btn-circle btn-active-color-primary w-20px h-20px" 
-                                          title="Remove this attribute" 
-                                          name={'remove_' + attr.id}
-                                          onClick={(event) => {
-                                            removeAttribute(attr.id, values)
-                                            handleChange(event)
-                                            resetForm()
-                                          }} >
-                                            <i className="bi bi-x fs-2"></i>
-                                          </button>
-                                        </div>
-                                        <button
-                                          className='accordion-button fs-6 fw-bold p-3 collapsed'
-                                          type='button'
-                                          data-bs-toggle='collapse'
-                                          data-bs-target={'#product_attribute_body_' + attr.id}
-                                          aria-expanded='false'
-                                          aria-controls={'product_attribute_body_' + attr.id}
+                                  {productType !== 'variable' ? (
+                                    <div className='form-group row'>
+                                      <div className='col-md-12 mb-5'>
+                                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                          <span>Stock Status</span>
+                                        </label>
+                                        <select
+                                          name='inventory_stock_status'
+                                          className='form-select'
+                                          value={values.inventory_stock_status}
+                                          onChange={handleChange}
                                         >
-                                          {attr.title}
-                                        </button>
-                                      </h2>
-                                      <div
-                                        id={'product_attribute_body_' + attr.id}
-                                        className='accordion-collapse collapse'
-                                        aria-labelledby={'product_attribute_header_' + attr.id}
-                                        data-bs-parent='#product_attribute'
-                                      >
-                                        <div className='accordion-body p-3'>
-                                          <div className='row'>
-                                            <div className='col-md-6'>
-                                              <label>Name</label>
-                                              <div className='fw-bold fs-6'>{attr.title}</div>
-                                              <div className='mt-5'>
-                                                <div className='form-check form-check-custom form-check-solid mb-3'>
-                                                  <label className='form-check-label ms-0 d-flex align-items-center'>
-                                                    <input
-                                                      type='checkbox'
-                                                      name={`attributes[${i}].visible`}
-                                                      className='form-check-input me-2'                                                    
-                                                      checked={attr.visible}    
-                                                      value={attr.visible}                                          
-                                                      onChange={handleChange}
-                                                    />
-                                                    Visible on the product page
-                                                  </label>
-                                                </div>
-                                                <div className='form-check form-check-custom form-check-solid'>
-                                                  <label className='form-check-label ms-0 d-flex align-items-center'>
-                                                    <input
-                                                      type='checkbox'
-                                                      name={`attributes[${i}].variation`}
-                                                      className='form-check-input me-2'                                                   
-                                                      checked={attr.variation}
-                                                      value={attr.variation}  
-                                                      onChange={(event) => {                                                         
-                                                        createOrUpdateVariants(event.target.checked, attr.id, values) 
-                                                        handleChange(event)
-                                                      }}                   
-                                                    />
-                                                    Used for variations
-                                                  </label>
-                                                </div>
-                                              </div>
-                                            </div>
-                                            <div className='col-md-6'>
-                                              <label>Value(s)</label>
-                                              <Select
-                                                styles={styles}
-                                                closeMenuOnSelect={false}
-                                                isMulti={true}
-                                                isSearchable={false}
-                                                defaultValue={attr.options}
-                                                value={attr.options}
-                                                onChange={(selectedOption) => {
-                                                  let event = { target: { name: `attributes[${i}].options`, value: selectedOption }}
-                                                  handleChange(event)
-                                                }}
-                                                options={subAttributes}
-                                                name={`attributes[${i}].options`}
-                                              />
-                                            </div>
-                                          </div>
+                                          {StockStatus &&
+                                            StockStatus.map((item: any) => {
+                                              return (
+                                                <option key={item.value} value={item.value}>
+                                                  {item.label}
+                                                </option>
+                                              )
+                                            })}
+                                        </select>
+                                        <div className='text-muted fs-7 mt-3'>
+                                          Controls whether or not the product is listed as "in
+                                          stock" or "out of stock" on the frontend.
                                         </div>
                                       </div>
                                     </div>
-                                  )
-                                })) || null } 
-                              </div>                            
-                            </div>
-                          
-                            {productType === 'variable' ? (
-                              <div className='tab-pane fade' id='kt_vtab_pane_8'>
-                                <div className='variants form-group'>                             
-                                  {values.variations &&
-                                    values.variations.map((variation: any, i: number) => {
-                              
-                                      const {sku, regular_price, sale_price, wallet_cashback, new_thumbnail,
-                                        shipping_class_id, tax_class, enabled } = values.variations[i]
-                                      return (
-                                        <div className='row' key={variation.id}>
-                                          <div className='accordion' id={'variation_' + variation.id}>
-                                            <div className='accordion-item border-0'>
-                                              <div
-                                                className='accordion-header'
-                                                id={'variation_' + variation.id + '_header'}
-                                              >
-                                                <div className='col-md-12 d-flex align-items-center'>
-                                                  <div className='me-2'>
-                                                    <label className='fw-bold'>#{variation.id}</label>
-                                                  </div>
-                                                  <select
-                                                    name='StockStatus'
-                                                    className='form-select me-2'
-                                                  >
-                                                    <option value={1}>Text 1</option>
-                                                    <option value={2}>Text 2</option>
-                                                    <option value={3}>Text 1</option>
-                                                  </select>
-                                                  <select
-                                                    name='StockStatus1'
-                                                    className='form-select me-2'
-                                                  >
-                                                    <option value={1}>Text 1</option>
-                                                    <option value={2}>Text 2</option>
-                                                    <option value={3}>Text 1</option>
-                                                  </select>
-                                                  <a
-                                                    href='#'
-                                                    className='accordion-button fs-6 fw-bold collapsed w-250px bg-white'
-                                                    data-bs-toggle='collapse'
-                                                    data-bs-target={
-                                                      '#variation_' + variation.id + '_body'
-                                                    }
-                                                    aria-expanded='false'
-                                                    aria-controls={
-                                                      'variation_' + variation.id + '_body'
-                                                    }
-                                                  >
-                                                    Edit
-                                                  </a>
-                                                </div>
+                                  ) : null}
+                                </div>
+                                {/* Shipping Class */}
+                                <div className='tab-pane fade' id='kt_vtab_pane_6'>
+                                  <div className='form-group row'>
+                                    <div className='col-md-12 mb-5'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Shipping Class</span>
+                                      </label>
+                                      <select
+                                        name='shipping_class_id'
+                                        className='form-select'
+                                        value={values.shipping_class_id}
+                                        onChange={handleChange}
+                                      >
+                                        <option value='-1'>No shipping class</option>
+                                        {shippingClass &&
+                                          shippingClass.map((item: any) => {
+                                            return (
+                                              <option key={item.value} value={item.value}>
+                                                {item.label}
+                                              </option>
+                                            )
+                                          })}
+                                      </select>
+                                      <div className='text-muted fs-7 mt-3'>
+                                        Shipping classes are used by certain shipping methods to
+                                        group similar products.
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                {/* Attributes */}
+
+                                <div className='tab-pane fade' id='kt_vtab_pane_7'>
+                                  <div className='form-group row'>
+                                    <div className='col-md-12 mb-5'>
+                                      <div className='d-flex align-items-center'>
+                                        <label className='d-flex align-items-center fs-6 fw-bold'>
+                                          <span>Custom Product Attribute</span>
+                                        </label>
+                                      </div>
+                                    </div>
+                                    <div className='col-md-9 mb-5'>
+                                      <div className='d-flex align-items-center'>
+                                        <Select
+                                          styles={styles}
+                                          closeMenuOnSelect={true}
+                                          isMulti={false}
+                                          isSearchable
+                                          defaultValue={selectedAttr}
+                                          value={selectedAttr}
+                                          onChange={(onChangeAttr)}
+                                          options={attributesList}
+                                          name='attributes'
+                                          className='w-100'
+                                        />
+                                      </div>
+                                    </div>
+                                    <div className='col-md-3 mb-5'>
+                                      <button
+                                        onClick={(event) => {
+                                          handleAddMoreAttributes(values)
+                                          handleChange(event)
+                                        }}
+                                        type='button'
+                                        className='btn btn-sm btn-primary'
+                                        name='add-more-attr'
+                                      >
+                                        Add more
+                                      </button>
+                                    </div>
+                                  </div>
+                                  {/** Product Attributes */}
+
+                                  <div className='accordion' id='product_attribute'>
+                                    {(values.attributes &&
+                                      values.attributes.map((attr: any, i: number | string) => {
+                                        //find options list from attributes
+                                        const subAttributes = SubAttributes(attr.name)
+                                        return (
+                                          <div
+                                            className='accordion-item'
+                                            key={attr.name || attr.id}
+                                          >
+                                            <h2
+                                              className='accordion-header d-flex'
+                                              id={'product_attribute_header_' + attr.id}
+                                            >
+                                              <div className='remov-item'>
+                                                <button
+                                                  type='button'
+                                                  className='btn btn-icon btn-circle btn-active-color-primary w-20px h-20px'
+                                                  title='Remove this attribute'
+                                                  name={'remove_' + attr.id}
+                                                  onClick={(event) => {
+                                                    removeAttribute(attr.id, values)
+                                                    handleChange(event)
+                                                    //resetForm()
+                                                  }}
+                                                >
+                                                  <i className='bi bi-x fs-2' id={'remove_' + attr.id}></i>
+                                                </button>
                                               </div>
-                                              <div
-                                                id={'variation_' + variation.id + '_body'}
-                                                className='accordion-collapse collapse'
-                                                aria-labelledby={
-                                                  'variation_' + variation.id + '_header'
+                                              <button
+                                                className='accordion-button fs-6 fw-bold p-3 collapsed'
+                                                type='button'
+                                                data-bs-toggle='collapse'
+                                                data-bs-target={
+                                                  '#product_attribute_body_' + attr.id
                                                 }
-                                                data-bs-parent={'#variation_' + variation.id}
+                                                aria-expanded='false'
+                                                aria-controls={'product_attribute_body_' + attr.id}
                                               >
-                                                <div className='accordion-body'>
-                                                  <div className='row mb-4'>
-                                                    <div className='col-md-3 col-lg-2 thumbnail'>
-                                                      <div className='form-group image-input image-input-outline'>
-                                                        <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
-                                                          {(!new_thumbnail && variation.thumbnail && (                                                          
-                                                            <img
-                                                              className='h-100 variation_thumbnail'
-                                                              src={variation.thumbnail} alt=''
-                                                            />                                                          
-                                                          )) || (new_thumbnail && (
-                                                            <img
-                                                              className='h-100 variation_thumbnail'
-                                                              src={new_thumbnail} alt=''
-                                                            />
-                                                          )) || null}
-                                                        </div>
-                                                        <span className="btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow" 
-                                                        data-kt-image-input-action="remove" 
-                                                        data-bs-toggle="tooltip" title="Remove Image">
-                                                          <i className="bi bi-x fs-2"></i>
-                                                        </span>
+                                                {attr.title}
+                                              </button>
+                                            </h2>
+                                            <div
+                                              id={'product_attribute_body_' + attr.id}
+                                              className='accordion-collapse collapse'
+                                              aria-labelledby={
+                                                'product_attribute_header_' + attr.id
+                                              }
+                                              data-bs-parent='#product_attribute'
+                                            >
+                                              <div className='accordion-body p-3'>
+                                                <div className='row'>
+                                                  <div className='col-md-5'>
+                                                    <label>Name</label>
+                                                    <div className='fw-bold fs-6'>{attr.title}</div>
+                                                    <div className='mt-5'>
+                                                      <div className='form-check form-check-custom form-check-solid mb-3'>
+                                                        <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                          <input
+                                                            type='checkbox'
+                                                            name={`attributes[${i}].visible`}
+                                                            className='form-check-input me-2'
+                                                            checked={attr.visible}
+                                                            value={attr.visible}
+                                                            onChange={handleChange}
+                                                          />
+                                                          Visible on the product page
+                                                        </label>
                                                       </div>
-                                                    </div>                                              
-                                                    <div className='col-md-4 col-lg-5'>
-                                                      <div className='form-group'>
-                                                        <UploadImageField 
-                                                        /* setFileToState={setNewVariantThumbnail} */ 
-                                                        setFieldValue={setFieldValue} 
-                                                        fileName={`variations[${i}].new_thumbnail`} />
+                                                      <div className='form-check form-check-custom form-check-solid'>
+                                                        <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                          <input
+                                                            type='checkbox'
+                                                            name={`attributes[${i}].variation`}
+                                                            className='form-check-input me-2'
+                                                            checked={attr.variation}
+                                                            value={attr.variation}
+                                                            onChange={(event) => {                                                            
+                                                              handleChange(event)
+                                                            }}
+                                                          />
+                                                          Used for variations
+                                                        </label>
                                                       </div>
                                                     </div>
-                                                    <div className='col-md-5 col-lg-5'>
-                                                      <div className='row'>
-                                                        <div className='form-group col-md-12'>
-                                                          <div className='form-check form-check-custom form-check-solid mb-4'>
-                                                            <label className='form-check-label ms-0 d-flex align-items-center'>
-                                                              <input
-                                                                type='checkbox'
-                                                                name={`variations[${i}].enabled`}
-                                                                className='form-check-input me-2'                                                    
-                                                                checked={enabled ? true : false}    
-                                                                value={enabled}                                          
-                                                                onChange={handleChange}
-                                                              />
-                                                              Enabled
-                                                            </label>
-                                                          </div>
-                                                        </div>
-                                                        <div className='form-group mb-4 col-md-12 d-flex align-items-center'>
-                                                          <label className='fs-6 fw-bold mb-2 me-3'>
-                                                            SKU
-                                                          </label>
-                                                          <input
-                                                            type='text'
-                                                            className='form-control'
-                                                            name={`variations[${i}].sku`}
-                                                            value={sku}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                          />
-                                                        </div>
-                                                      </div>
-                                                    </div>
-                                                  </div>                                               
-                                                  <div className='row'>
-                                                    <div className='col-md-12'>
-                                                      <div className='row'>
-                                                        <div className='col-md-6 form-group mb-4'>
-                                                          <label className='fs-6 fw-bold mb-2'>
-                                                            Wallet Cashback
-                                                          </label>
-                                                          <input
-                                                            type='text'
-                                                            className='form-control'
-                                                            placeholder=''
-                                                            name={`variations[${i}].wallet_cashback`}
-                                                            value={wallet_cashback || ''}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                            data-bs-toggle='tooltip'
-                                                            data-bs-delay-show='1000'
-                                                            data-bs-placement='top'
-                                                            title='Enter an exact value, or a value ending with % to give a percentage or leave empty for no cashback'
-                                                          />
-                                                        </div>
-                                                        <div className='col-md-6 form-group mb-4'>
-                                                          <label className='fs-6 fw-bold mb-2'>
-                                                            Stock status
-                                                          </label>
-                                                          <select
-                                                            name='vStockStatus'
-                                                            className='form-select me-2'
-                                                          >
-                                                            <option value='instock'>In stock</option>
-                                                            <option value='outofstock'>
-                                                              Out of stock
-                                                            </option>
-                                                            <option value='onbackorder'>
-                                                              On backorder
-                                                            </option>
-                                                          </select>
-                                                        </div>
-                                                      </div>
-                                                      <div className='row'>
-                                                        <div className='col-md-6 form-group mb-4'>
-                                                          <label className='fs-6 fw-bold mb-2'>
-                                                            Regular Price ($)
-                                                          </label>
-                                                          <input
-                                                            type='text'
-                                                            className='form-control'
-                                                            name={`variations[${i}].regular_price`}
-                                                            value={regular_price || ''}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                          />
-                                                        </div>
-                                                        <div className='col-md-6 form-group mb-4'>
-                                                          <label className='fs-6 fw-bold mb-2'>
-                                                            Sale Price ($)
-                                                          </label>
-                                                          <input
-                                                            type='text'
-                                                            className='form-control'
-                                                            name={`variations[${i}].sale_price`}
-                                                            value={sale_price || ''}
-                                                            onChange={handleChange}
-                                                            onBlur={handleBlur}
-                                                          />
-                                                        </div>
-                                                      </div>
-                                                      <div className='row'>
-                                                        <div className='col-md-6 form-group mb-4'>
-                                                          <label className='fs-6 fw-bold mb-2'>
-                                                            Shipping class
-                                                          </label>
-                                                          <select
-                                                            name={`variations[${i}].shipping_class_id`}
-                                                            className='form-select'
-                                                            value={shipping_class_id}
-                                                            onChange={handleChange}
-                                                          >
-                                                            <option value='-1'>No shipping class</option>
-                                                            {shippingClass &&
-                                                              shippingClass.map((item: any) => {
-                                                                return (
-                                                                  <option key={item.value} value={item.value}>
-                                                                    {item.label}
-                                                                  </option>
-                                                                )
-                                                              })}
-                                                          </select>                                                      
-                                                        </div>
-                                                        <div className='col-md-6 mb-4'>
-                                                          <label className='fs-6 fw-bold mb-2'>
-                                                            Tax class
-                                                          </label>                                                       
-                                                          <select
-                                                            name={`variations[${i}].tax_class`}
-                                                            className='form-select me-2'
-                                                            value={tax_class}
-                                                            onChange={handleChange}
-                                                          >
-                                                              {TaxClass && TaxClass.map((item: any, i: number) => {
-                                                              return(
-                                                                <option key={item.value} value={item.value}>{item.label}</option>
-                                                              )
-                                                            })
-                                                          }
-                                                          </select>
-                                                        </div>
-                                                      </div>
-                                                    </div>
+                                                  </div>
+                                                  <div className='col-md-7'>
+                                                    <label>Value(s)</label>
+                                                    <Select
+                                                      styles={styles}
+                                                      closeMenuOnSelect={false}
+                                                      isLoading={true}
+                                                      isMulti={true}
+                                                      isSearchable={true}
+                                                      defaultValue={attr.options}
+                                                      value={attr.options}
+                                                      onChange={(event) => {
+                                                        /*selectedOption => let event = {
+                                                          target: {
+                                                            name: `attributes[${i}].options`,
+                                                            value: selectedOption,
+                                                          },
+                                                        }
+                                                        handleChange(event)*/
+                                                        setFieldValue(`attributes[${i}].options`, event)
+                                                      }}
+                                                      options={subAttributes}
+                                                      name={`attributes[${i}].options`}
+                                                    />
                                                   </div>
                                                 </div>
                                               </div>
                                             </div>
                                           </div>
-                                          <hr className='col-md-12 mt-3 mb-3' />
+                                        )
+                                      })) ||
+                                      null}
+                                  </div>
+                                  <div className='mt-4'>
+                                    <button
+                                        onClick={(event) => {
+                                          saveProductAttributes(values)  
+                                          handleChange(event)               
+                                        }}
+                                        type='button'
+                                        className='btn btn-sm btn-primary'
+                                        name='save-attributes'
+                                      >
+                                        Save Attributes
+                                      </button>
+                                  </div>
+                                </div>
+
+                                {productType === 'variable' ? (
+                                  <div className='tab-pane fade' id='kt_vtab_pane_8'>
+                                    <div className="mb-3">    
+                                      <div className='d-flex align-items-center'>                            
+                                        <div className='me-3 mb-3 w-100'>
+                                          <Select
+                                            styles={styles}
+                                            closeMenuOnSelect={true}
+                                            isMulti={false}
+                                            isSearchable={false}
+                                            defaultValue={selectedVar}
+                                            value={selectedVar}
+                                            onChange={(event) => {
+                                              onChangeVar(event)
+                                            }}
+                                            options={[
+                                              { value: 'add_one', label: 'Add variation'},
+                                              { value: 'add_all', label: 'Create variations from all attributes'},
+                                              { value: 'delete_all', label: 'Delete all variations'},
+                                            ]}
+                                            name={`variation_actions`}
+                                            className='w-100'
+                                          />                                        
                                         </div>
-                                      )
-                                    })}
-                                  {/** end variant */}
+                                        <div className='mb-3'>
+                                          <button
+                                            onClick={(event) => {
+                                              handleAddVariations(values)
+                                              handleChange(event)
+                                            }}
+                                            type='button'
+                                            className='btn btn-md btn-primary'
+                                            name='add-more-variations'
+                                          >
+                                            Update
+                                          </button>
+                                        </div>
+                                      </div>  
+                                      <hr className="col-md-12 mt-3 mb-3" />   
+                                    </div>                                    
+                                    <div className='variants form-group'>
+                                      {
+                                        values.variations &&
+                                        values.variations.map((variation: any, i: number) => {
+                                          const {
+                                            sku,
+                                            regular_price,
+                                            sale_price,
+                                            wallet_cashback,
+                                            new_thumbnail,
+                                            shipping_class_id,
+                                            tax_class,
+                                            enabled,
+                                            attributes,
+                                            stock_status
+                                          } : any = variation ///values.variations[i]
+                                          console.log(values)
+                                          return (
+                                            <div className='row' key={variation.id}>
+                                              <div
+                                                className='accordion'
+                                                id={'variation_' + variation.id}
+                                              >
+                                                <div className='accordion-item border-0'>
+                                                  <div
+                                                    className='accordion-header'
+                                                    id={'variation_' + variation.id + '_header'}
+                                                  >
+                                                    <div className='col-md-12 d-flex align-items-start'>
+                                                      <div className='remov-item flex-1 pt-2'>
+                                                        <button
+                                                          type='button'
+                                                          className='btn btn-icon btn-circle btn-active-color-primary w-20px h-20px'
+                                                          title='Remove this variation'
+                                                          name={'remove_' + variation.id }
+                                                          onClick={(event) => {
+                                                            removeAttribute(variation.id , values)
+                                                            handleChange(event)
+                                                            resetForm()
+                                                          }}
+                                                        >
+                                                          <i className='bi bi-x fs-2'></i>
+                                                        </button>
+                                                      </div>
+                                                      <div className='me-2 flex-1 pt-4'>
+                                                        <label className='fw-bold'>
+                                                          #{variation.id}
+                                                        </label>
+                                                      </div>
+                                                      <div className='variations flex-auto'>
+                                                      {
+                                                        values.attributes &&
+                                                        values.attributes.map(
+                                                          (attrOpt: any, index: number) => {     
+
+                                                            //const findSelectedValue = attributes[index] || { value: '', label: ''}                                                       
+                                                            return attrOpt.variation && (
+                                                              <Select
+                                                                key={`attribute_${attrOpt.name}`}                                                                
+                                                                styles={styles}
+                                                                closeMenuOnSelect={true}
+                                                                isSearchable={false}
+                                                                defaultValue={{ value: '', label: ''}}
+                                                                value={{ value: '', label: ''}}                                                            
+                                                                onChange={(selectedOption) => {
+                                                                  let event = {
+                                                                    target: {name: `variations[${i}].attributes[${index}]`, value: selectedOption},
+                                                                  }
+                                                                  handleChange(event)
+                                                                }}
+                                                                options={attrOpt.options}
+                                                                name={`variations[${i}].attributes[${index}]`}
+                                                                className="ms-2 me-2 float-start min-w-120px mb-3"
+                                                              />
+                                                            )
+                                                          }
+                                                        )}
+                                                      </div>
+                                                      {/* ---------------------------- */}
+                                                      <a
+                                                        href='#'
+                                                        className='accordion-button flex-1 fs-6 fw-bold collapsed w-250px bg-white pt-4'
+                                                        data-bs-toggle='collapse'
+                                                        data-bs-target={
+                                                          '#variation_' + variation.id + '_body'
+                                                        }
+                                                        aria-expanded='false'
+                                                        aria-controls={
+                                                          'variation_' + variation.id + '_body'
+                                                        }
+                                                      >
+                                                        Edit&nbsp;&nbsp;
+                                                      </a>
+                                                    </div>
+                                                  </div>
+                                                  <div
+                                                    id={'variation_' + variation.id + '_body'}
+                                                    className='accordion-collapse collapse'
+                                                    aria-labelledby={
+                                                      'variation_' + variation.id + '_header'
+                                                    }
+                                                    data-bs-parent={'#variation_' + variation.id}
+                                                  >
+                                                    <div className='accordion-body'>
+                                                      <div className='row mb-4'>
+                                                        <div className='col-md-3 col-lg-2 thumbnail'>
+                                                          <div className='form-group image-input image-input-outline'>
+                                                            <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
+                                                              {(!new_thumbnail &&
+                                                                variation.thumbnail && (
+                                                                  <img
+                                                                    className='h-100 variation_thumbnail'
+                                                                    src={variation.thumbnail}
+                                                                    alt=''
+                                                                  />
+                                                                )) ||
+                                                                (new_thumbnail && (
+                                                                  <img
+                                                                    className='h-100 variation_thumbnail'
+                                                                    src={new_thumbnail}
+                                                                    alt=''
+                                                                  />
+                                                                )) ||
+                                                                null}
+                                                            </div>
+                                                            <span
+                                                              className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                                              data-kt-image-input-action='remove'
+                                                              data-bs-toggle='tooltip'
+                                                              title='Remove Image'
+                                                            >
+                                                              <i className='bi bi-x fs-2'></i>
+                                                            </span>
+                                                          </div>
+                                                        </div>
+                                                        <div className='col-md-4 col-lg-5'>
+                                                          <div className='form-group'>
+                                                            <UploadImageField
+                                                              /* setFileToState={setNewVariantThumbnail} */
+                                                              setFieldValue={setFieldValue}
+                                                              fileName={`variations[${i}].new_thumbnail`}
+                                                            />
+                                                          </div>
+                                                        </div>
+                                                        <div className='col-md-5 col-lg-5'>
+                                                          <div className='row'>
+                                                            <div className='form-group col-md-12'>
+                                                              <div className='form-check form-check-custom form-check-solid mb-4'>
+                                                                <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                                  <input
+                                                                    type='checkbox'
+                                                                    name={`variations[${i}].enabled`}
+                                                                    className='form-check-input me-2'
+                                                                    checked={enabled ? true : false}
+                                                                    value={enabled}
+                                                                    onChange={handleChange}
+                                                                  />
+                                                                  Enabled
+                                                                </label>
+                                                              </div>
+                                                            </div>
+                                                            <div className='form-group mb-4 col-md-12 d-flex align-items-center'>
+                                                              <label className='fs-6 fw-bold mb-2 me-3'>
+                                                                SKU
+                                                              </label>
+                                                              <input
+                                                                type='text'
+                                                                className='form-control'
+                                                                name={`variations[${i}].sku`}
+                                                                value={sku}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                      <div className='row'>
+                                                        <div className='col-md-12'>
+                                                          <div className='row'>
+                                                            <div className='col-md-6 form-group mb-4'>
+                                                              <label className='fs-6 fw-bold mb-2'>
+                                                                Wallet Cashback
+                                                              </label>
+                                                              <input
+                                                                type='text'
+                                                                className='form-control'
+                                                                placeholder=''
+                                                                name={`variations[${i}].wallet_cashback`}
+                                                                value={wallet_cashback || ''}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                                data-bs-toggle='tooltip'
+                                                                data-bs-delay-show='1000'
+                                                                data-bs-placement='top'
+                                                                title='Enter an exact value, or a value ending with % to give a percentage or leave empty for no cashback'
+                                                              />
+                                                            </div>
+                                                            <div className='col-md-6 form-group mb-4'>
+                                                              <label className='fs-6 fw-bold mb-2'>
+                                                                Stock status
+                                                              </label>
+                                                              <select
+                                                                className='form-select me-2'
+                                                                name={`variations[${i}].stock_status`}
+                                                                value={stock_status}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                              >
+                                                                <option value='instock'>
+                                                                  In stock
+                                                                </option>
+                                                                <option value='outofstock'>
+                                                                  Out of stock
+                                                                </option>
+                                                                <option value='onbackorder'>
+                                                                  On backorder
+                                                                </option>
+                                                              </select>
+                                                            </div>
+                                                          </div>
+                                                          <div className='row'>
+                                                            <div className='col-md-6 form-group mb-4'>
+                                                              <label className='fs-6 fw-bold mb-2'>
+                                                                Regular Price ($)
+                                                              </label>
+                                                              <input
+                                                                type='number'
+                                                                step={0.1}
+                                                                className='form-control'
+                                                                name={`variations[${i}].regular_price`}
+                                                                value={regular_price || ''}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                              />
+                                                            </div>
+                                                            <div className='col-md-6 form-group mb-4'>
+                                                              <label className='fs-6 fw-bold mb-2'>
+                                                                Sale Price ($)
+                                                              </label>
+                                                              <input
+                                                                type='number'
+                                                                step={0.1}
+                                                                className='form-control'
+                                                                name={`variations[${i}].sale_price`}
+                                                                value={sale_price || ''}
+                                                                onChange={handleChange}
+                                                                onBlur={handleBlur}
+                                                              />
+                                                            </div>
+                                                          </div>
+                                                          <div className='row'>
+                                                            <div className='col-md-6 form-group mb-4'>
+                                                              <label className='fs-6 fw-bold mb-2'>
+                                                                Shipping class
+                                                              </label>
+                                                              <select
+                                                                name={`variations[${i}].shipping_class_id`}
+                                                                className='form-select'
+                                                                value={shipping_class_id}
+                                                                onChange={handleChange}
+                                                              >
+                                                                <option value='-1'>
+                                                                  No shipping class
+                                                                </option>
+                                                                {shippingClass &&
+                                                                  shippingClass.map((item: any) => {
+                                                                    return (
+                                                                      <option
+                                                                        key={item.value}
+                                                                        value={item.value}
+                                                                      >
+                                                                        {item.label}
+                                                                      </option>
+                                                                    )
+                                                                  })}
+                                                              </select>
+                                                            </div>
+                                                            <div className='col-md-6 mb-4'>
+                                                              <label className='fs-6 fw-bold mb-2'>
+                                                                Tax class
+                                                              </label>
+                                                              <select
+                                                                name={`variations[${i}].tax_class`}
+                                                                className='form-select me-2'
+                                                                value={tax_class}
+                                                                onChange={handleChange}
+                                                              >
+                                                                {TaxClass &&
+                                                                  TaxClass.map(
+                                                                    (item: any, i: number) => {
+                                                                      return (
+                                                                        <option
+                                                                          key={item.value}
+                                                                          value={item.value}
+                                                                        >
+                                                                          {item.label}
+                                                                        </option>
+                                                                      )
+                                                                    }
+                                                                  )}
+                                                              </select>
+                                                            </div>
+                                                          </div>
+                                                        </div>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                              <hr className='col-md-12 mt-3 mb-3' />
+                                            </div>
+                                          )
+                                        })}
+                                      {/** end variant */}
+                                    </div>
+                                  </div>
+                                ) : null}
+                                {/* End Variants */}
+                                <div className='tab-pane fade' id='linked_products_pane'>
+                                  <div className='col-md-12 mb-5'>
+                                    <div className='uppselles'>
+                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <span>Upsells</span>
+                                      </label>
+                                      <Select
+                                        styles={styles}
+                                        closeMenuOnSelect={false}
+                                        isMulti
+                                        isSearchable
+                                        defaultValue={values.linked_products_upsell}
+                                        value={values.linked_products_upsell}
+                                        onChange={(selectedOption) => {
+                                          let event = {
+                                            target: {
+                                              name: 'linked_products_upsell',
+                                              value: selectedOption,
+                                            },
+                                          }
+                                          handleChange(event)
+                                        }}
+                                        options={productsList}
+                                        name='linked_products_upsell'
+                                      />
+                                    </div>
+                                    <div className='text-muted fs-8 mt-3'>
+                                      Upsells are products which you recommend instead of the
+                                      currently viewed product, for example, products that are more
+                                      profitable or better quality or more expensive.
+                                    </div>
+                                  </div>
+                                  <div className='col-md-12 mb-5'>
+                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <span>Cross-sells</span>
+                                    </label>
+                                    <Select
+                                      styles={styles}
+                                      closeMenuOnSelect={false}
+                                      isMulti
+                                      isSearchable
+                                      defaultValue={values.linked_products_cross_sell}
+                                      value={values.linked_products_cross_sell}
+                                      onChange={(selectedOption) => {
+                                        let event = {
+                                          target: {
+                                            name: 'linked_products_cross_sell',
+                                            value: selectedOption,
+                                          },
+                                        }
+                                        handleChange(event)
+                                      }}
+                                      options={productsList}
+                                      name='linked_products_cross_sell'
+                                    />
+                                    <div className='text-muted fs-8 mt-3'>
+                                      Cross-sells are products which you promote in the cart, based
+                                      on the current product.
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            ) : null}
-                            {/* End Variants */}
-                            <div className='tab-pane fade' id='linked_products_pane'>
-                              <div className='col-md-12 mb-5'>
-                                <div className='uppselles'>
-                                  <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                    <span>Upsells</span>
-                                  </label>
-                                  <Select
-                                    styles={styles}
-                                    closeMenuOnSelect={false}
-                                    isMulti
-                                    isSearchable
-                                    defaultValue={values.linked_products_upsell}
-                                    value={values.linked_products_upsell}
-                                    onChange={(selectedOption) => {
-                                      let event = { target: { name: 'linked_products_upsell', value: selectedOption }}
-                                      handleChange(event)
-                                    }}
-                                    options={productsList}
-                                    name='linked_products_upsell'
-                                  />
-                                </div>
-                                <div className='text-muted fs-8 mt-3'>
-                                  Upsells are products which you recommend instead of the currently
-                                  viewed product, for example, products that are more profitable or
-                                  better quality or more expensive.
-                                </div>
-                              </div>
-                              <div className='col-md-12 mb-5'>
-                                <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                  <span>Cross-sells</span>
-                                </label>
-                                <Select
-                                  styles={styles}
-                                  closeMenuOnSelect={false}
-                                  isMulti
-                                  isSearchable
-                                  defaultValue={values.linked_products_cross_sell}
-                                  value={values.linked_products_cross_sell}
-                                  onChange={(selectedOption) => {
-                                    let event = { target: { name: 'linked_products_cross_sell', value: selectedOption }}
-                                    handleChange(event)
-                                  }}
-                                  options={productsList}
-                                  name='linked_products_cross_sell'
-                                />
-                                <div className='text-muted fs-8 mt-3'>
-                                  Cross-sells are products which you promote in the cart, based on the
-                                  current product.
-                                </div>
-                              </div>
-                            </div>
-                            {/** category_pane  */}
-                            <div className='tab-pane fade' id='category_pane'>
-                              <div className='col-md-12 mb-5'>
-                                <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                  <span>Categories</span>
-                                </label>
-                                <div className='form-group'>
-                                <Select
-                                  styles={styles}
-                                  closeMenuOnSelect={false}
-                                  isMulti
-                                  isSearchable
-                                  defaultValue={values.categories}
-                                  value={values.categories}
-                                  onBlur={()=>{
-                                    handleBlur({ target: {name:'categories'} });
-                                  }}
-                                  onChange={selectedOption => {
-                                    let event = { target : { name:'categories', value: selectedOption}}
-                                    handleChange(event)
-                                  }}
-                                  options={productCategories}
-                                  name='categories'
-                                />                          
+                                {/** category_pane  */}
+                                <div className='tab-pane fade' id='category_pane'>
+                                  <div className='col-md-12 mb-5'>
+                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <span>Categories</span>
+                                    </label>
+                                    <div className='form-group'>
+                                      <Select
+                                        styles={styles}
+                                        closeMenuOnSelect={false}
+                                        isMulti
+                                        isSearchable
+                                        defaultValue={values.categories}
+                                        value={values.categories}
+                                        onBlur={() => {
+                                          handleBlur({target: {name: 'categories'}})
+                                        }}
+                                        onChange={(selectedOption) => {
+                                          let event = {
+                                            target: {name: 'categories', value: selectedOption},
+                                          }
+                                          handleChange(event)
+                                        }}
+                                        options={productCategories}
+                                        name='categories'
+                                      />
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -1188,33 +1459,31 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         </div>
                       </div>
                     </div>
+                    <div className='pt-10 justify-content-center mb-5'>
+                      <div className='me-0 d-flex flex-stack '>
+                        <button
+                          /* onClick={prevStep} */
+                          type='submit'
+                          className='btn btn-lg btn-primary w-100 me-3'
+                        >
+                          Create Product
+                        </button>
+                        <button
+                          /* onClick={prevStep} */
+                          type='button'
+                          className='btn btn-lg btn-success w-100 ms-3'
+                        >
+                          Create &amp; Continue
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <div className='pt-10 justify-content-center mb-5'>
-                  <div className='me-0 d-flex flex-stack '>
-                    <button
-                      /* onClick={prevStep} */
-                      type='submit'
-                      className='btn btn-lg btn-primary w-100 me-3'
-                    >
-                      Create Product
-                    </button>
-                    <button
-                      /* onClick={prevStep} */
-                      type='button'
-                      className='btn btn-lg btn-success w-100 ms-3'
-                    >
-                      Create &amp; Continue
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </form>
-            )}
-          </Formik>
+                </form>
+              )}
+            </Formik>
+          </div>
         </div>
-      </div>)
-      }
+      )}
     </>
   )
 }

@@ -121,6 +121,7 @@ export const Attributes = () => {
     .getAttributes()
     .then((response) => {
       const {data} = response.data
+
       data &&
         data.forEach((item: any) => {
           //user for add more
@@ -141,7 +142,7 @@ export const Attributes = () => {
     })
     .catch(() => {})
 
-  return {termsList, fullList}
+    return {termsList, fullList}
 }
 
 export const SubAttributes = (term_slug: string) => {
