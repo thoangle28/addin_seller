@@ -17,6 +17,7 @@ export const initialForm = {
   is_variable: 'simple', //simple
   type_product: 'simple',
   variations: [],
+  variations_attr: [],
   attributes: [],
   thumnail: '',
   photo_galleries: [],

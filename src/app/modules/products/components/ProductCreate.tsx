@@ -51,7 +51,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
   const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
-  const [selectedVar, setSelectedVar] = useState({value: 'add_one', label: 'Add variation'})
+  const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
   //----------------------------------------------------------------------------
   const mapValuesToForm = (initialValues: any, productValues: any) => {
     initialValues.name = productValues.name
@@ -182,10 +182,29 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   /** Add Variations */
-  const createVariations = (num: number) => {
+  const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
     const list: any = []
-    for(let i = 0; i < num; i++) {
-      list.push({
+    const listAttr: any = []   
+
+    formValues.variations_attr &&
+    formValues.variations_attr.forEach((e: any) => {
+      listAttr.push({
+        attr: e,
+        id: 0,
+        label: "",
+        value: ""
+      })
+    })
+
+    let nextVar = 0
+
+    numToAdd = ( numToAdd > maxAllow) ? maxAllow : numToAdd
+    nextVar = (numToAdd === 1 && formValues.variations.length < maxAllow) 
+              ? 1
+              : numToAdd - formValues.variations.length
+
+    for(let i = 0; i < nextVar; i++) {
+      formValues.variations.push({
         id: Math.random().toString(36).slice(8),
         sku : '',
         regular_price : '',
@@ -195,12 +214,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         shipping_class_id : '',
         tax_class : '',
         enabled : true,
-        attributes : '',
+        attributes : listAttr,
         stock_status : '',
       })
     }
-
-    return list
+    
   }
   
   const updateAttrToVariations = ( name: any, isChecked: any,formValues: any ) => {
@@ -210,10 +228,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
       })
-    
+
+      filterAttr.map((newAttr: any) => { 
+        formValues.variations_attr.push(newAttr.name)
+      })
+
       formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.map((newAttr: any) => { 
-          formValues.variations_attr.push(newAttr.name)
+        filterAttr.map((newAttr: any) => {
           item.attributes.push({ 
             attr: newAttr.name,
             label: "",
@@ -225,9 +246,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return (x.variation && !isChecked && name === x.name && variationsAttr.includes(x.name))
       })
+
+      //remove
+      filterAttr.map((newAttr: any) => { 
+        formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
+      })
+
       formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.map((newAttr: any) => {        
-          formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
+        filterAttr.map((newAttr: any) => { 
           const findIndex = item.attributes.findIndex((x: any) => { return x.attr === newAttr.name })
           item.attributes.splice(findIndex, 1)
         })
@@ -239,16 +265,18 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const handleAddVariations = (formValues: any) => {
 
-    let totalListVar = 1
+    let maxRows = 1, totalListVar = 1
+    formValues.attributes.forEach((x: any, i: number) => {  
+      if(x.variation) maxRows *= (x.options.length > 0 ) ? x.options.length : 1
+    } )
+
     if( selectedVar.value === 'add_all') {
-      formValues.attributes.map((x: any, i: number) => {  
-        if(x.variation) totalListVar *= (x.options.length > 0 ) ? x.options.length : 1
-      } )
+      totalListVar = maxRows 
     }
 
     switch(selectedVar.value) {
       default:
-        formValues.variations = createVariations(totalListVar)
+        createVariations(totalListVar, maxRows, formValues)
         break;
       case 'delete_all':
         formValues.variations = []
