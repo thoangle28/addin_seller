@@ -151,7 +151,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const handleAddMoreAttributes = (formValues: any) => {
     if (!selectedAttr) return
     const {value} = selectedAttr
-    debugger
     const isAdded = formValues.attributes.some((x: any) => x.id === value)
 
     if (isAdded) return
@@ -160,7 +159,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setSelectedAttr({value: '', label: ''})
     if (!attrFound) return
     else formValues.attributes.push(attrFound)
-    
+
     mapValuesToForm(initialForm, formValues)
   }
 
@@ -219,7 +218,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
     for(let i = 0; i < num; i++) {
       list.push({
-        id: 'new_' + time + i,
+        id: Math.random().toString(36).slice(8),
         sku : '',
         regular_price : '',
         sale_price : '',
@@ -846,6 +845,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           closeMenuOnSelect={true}
                                           isMulti={false}
                                           isSearchable
+                                          isLoading={true}
                                           defaultValue={selectedAttr}
                                           value={selectedAttr}
                                           onChange={(onChangeAttr)}
@@ -1060,7 +1060,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             attributes,
                                             stock_status
                                           } : any = variation ///values.variations[i]
-                                          console.log(values)
+                          
                                           return (
                                             <div className='row' key={variation.id}>
                                               <div
@@ -1088,7 +1088,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           <i className='bi bi-x fs-2'></i>
                                                         </button>
                                                       </div>
-                                                      <div className='me-2 flex-1 pt-4'>
+                                                      <div className='me-2 flex-50 pt-4'>
                                                         <label className='fw-bold'>
                                                           #{variation.id}
                                                         </label>
@@ -1359,6 +1359,19 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           )
                                         })}
                                       {/** end variant */}
+                                    </div>
+                                    <div className='mt-4'>
+                                      <button
+                                          onClick={(event) => {
+                                            saveProductAttributes(values)  
+                                            handleChange(event)               
+                                          }}
+                                          type='button'
+                                          className='btn btn-sm btn-primary'
+                                          name='save-variations'
+                                        >
+                                          Save Varations
+                                        </button>
                                     </div>
                                   </div>
                                 ) : null}

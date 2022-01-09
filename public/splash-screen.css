@@ -116,3 +116,7 @@ body {
 .min-w-120px {
   width: 120px;
 }
+.flex-50 {
+  min-width: 50px;
+  flex: auto;
+}
