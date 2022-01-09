@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useRef, useState} from 'react'
-import {Formik, useFormik} from 'formik'
+import {Formik} from 'formik'
 import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
@@ -24,7 +24,6 @@ import {
   UploadImageField,
   FallbackView,
 } from './formOptions'
-import { number } from 'yup/lib/locale'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
@@ -53,8 +52,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newThumbnail, setNewThumbnail] = useState('')
   const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
   const [selectedVar, setSelectedVar] = useState({value: 'add_one', label: 'Add variation'})
-  const [productAttributes, setProductAttributes] = useState<any>([])
-  const [productVariations, setProductVariations] = useState<any>([])
   //----------------------------------------------------------------------------
   const mapValuesToForm = (initialValues: any, productValues: any) => {
     initialValues.name = productValues.name
@@ -75,15 +72,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     initialValues.shipping_class_id = productValues.shipping_class_id
     initialValues.selectedAttr = ''
     initialValues.selectedVarAct = ''
+    initialValues.variations_attr = productValues.variations_attr
     initialValues.linked_products_upsell = productValues.linked_products_upsell
     initialValues.linked_products_cross_sell = productValues.linked_products_cross_sell
     initialValues.general_wallet_credit = productValues.general_wallet_credit
     initialValues.general_wallet_cashback = productValues.general_wallet_cashback
     initialValues.general_commission = productValues.general_commission
-
-    /* const initProductAttr = productValues.attributes && productValues.attributes.filter((x: any) => x.variation) || []
-    setProductAttributes(initProductAttr)
-    setProductVariations(productValues.variations || []) */
   }
   //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
@@ -100,7 +94,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     }
 
     loadingEverything()
-  }, [])
+  }, [currentUserId])
 
   useEffect(() => {
     const loadAttributes = async () => {
@@ -128,7 +122,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         setLoading(false)
       }
     }
-  }, [product, productId])
+  }, [product, productId, currentUserId, dispatch])
 
   /**
    * The events on the form
@@ -167,41 +161,19 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * Remove Attribute
    */
   const removeAttribute = (id: number, formValues: any) => {
-    
+    const afterFilter = formValues.attributes.filter((x: any) => x.id !== id)
+    formValues.attributes = afterFilter
     mapValuesToForm(initialForm, formValues)
-    const afterFilter = initialForm.attributes.filter((x: any) => x.id !== id)
-    initialForm.attributes = []
-    afterFilter &&
-      afterFilter.map((item) => {
-        initialForm.attributes.push(item)
-      })
   }
 
   /**
-   * Auto additional a variant when user choose the attribute is variant
+   * Remove Attribute
    */
-  const createOrUpdateVariants = (isChecked: any, attrId: number, formValues: any) => {
-
-    //sort
-    const beforeAddNewVar = {...productVariations}
-    console.log(beforeAddNewVar)
-  
-    const afterFilter = formValues.attributes.filter((x: any) => { 
-      return ((x.variation && x.id !== attrId && !isChecked) || (x.variation && isChecked ) || (x.id === attrId && isChecked)) 
-    })
-
-    afterFilter && afterFilter.map((x: any, i:number) => {
-      afterFilter[i].variation = true
-    })
-    
-    beforeAddNewVar &&  beforeAddNewVar.forEach((ele: any, i: number) => {
-      
-    });
-
-    setProductAttributes(afterFilter)
-    
+  const removeVariations = (id: number, formValues: any) => {
+    const afterFilter = formValues.variations.filter((x: any) => x.id !== id)
+    formValues.variations = afterFilter
+    mapValuesToForm(initialForm, formValues)
   }
-
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
@@ -212,10 +184,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /** Add Variations */
   const createVariations = (num: number) => {
     const list: any = []
-
-    const d = new Date();
-    let time = d.getTime();
-
     for(let i = 0; i < num; i++) {
       list.push({
         id: Math.random().toString(36).slice(8),
@@ -234,6 +202,41 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
     return list
   }
+  
+  const updateAttrToVariations = ( name: any, isChecked: any,formValues: any ) => {
+    const variationsAttr: Array<string> = formValues.variations_attr || [];     
+    if( isChecked ) {
+      console.log(formValues.attributes)
+      const filterAttr = formValues.attributes.filter((x: any ) => { 
+        return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
+      })
+    
+      formValues.variations && formValues.variations.forEach((item:any) => {
+        filterAttr.map((newAttr: any) => { 
+          formValues.variations_attr.push(newAttr.name)
+          item.attributes.push({ 
+            attr: newAttr.name,
+            label: "",
+            value: ""
+          })
+        })
+      })
+    } else {
+      const filterAttr = formValues.attributes.filter((x: any ) => { 
+        return (x.variation && !isChecked && name === x.name && variationsAttr.includes(x.name))
+      })
+      formValues.variations && formValues.variations.forEach((item:any) => {
+        filterAttr.map((newAttr: any) => {        
+          formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
+          const findIndex = item.attributes.findIndex((x: any) => { return x.attr === newAttr.name })
+          item.attributes.splice(findIndex, 1)
+        })
+      })
+    }
+
+    mapValuesToForm(initialForm, formValues)
+  } 
+
   const handleAddVariations = (formValues: any) => {
 
     let totalListVar = 1
@@ -248,7 +251,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         formValues.variations = createVariations(totalListVar)
         break;
       case 'delete_all':
-        //formValues.variations = deleteAllVariations()
+        formValues.variations = []
         break;
     }
 
@@ -894,7 +897,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   onClick={(event) => {
                                                     removeAttribute(attr.id, values)
                                                     handleChange(event)
-                                                    //resetForm()
                                                   }}
                                                 >
                                                   <i className='bi bi-x fs-2' id={'remove_' + attr.id}></i>
@@ -948,7 +950,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             className='form-check-input me-2'
                                                             checked={attr.variation}
                                                             value={attr.variation}
-                                                            onChange={(event) => {                                                            
+                                                            onChange={(event) => {        
+                                                              updateAttrToVariations(attr.name, event.target.checked, values)                                                    
                                                               handleChange(event)
                                                             }}
                                                           />
@@ -1047,8 +1050,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <div className='variants form-group'>
                                       {
                                         values.variations &&
-                                        values.variations.map((variation: any, i: number) => {
+                                        values.variations.map((item: any, i: number) => {
                                           const {
+                                            id,
                                             sku,
                                             regular_price,
                                             sale_price,
@@ -1059,18 +1063,18 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             enabled,
                                             attributes,
                                             stock_status
-                                          } : any = variation ///values.variations[i]
-                          
+                                          } : any = values.variations[i]
+
                                           return (
-                                            <div className='row' key={variation.id}>
+                                            <div className='row' key={id}>
                                               <div
                                                 className='accordion'
-                                                id={'variation_' + variation.id}
+                                                id={'variation_' + id}
                                               >
                                                 <div className='accordion-item border-0'>
                                                   <div
                                                     className='accordion-header'
-                                                    id={'variation_' + variation.id + '_header'}
+                                                    id={'variation_' + id + '_header'}
                                                   >
                                                     <div className='col-md-12 d-flex align-items-start'>
                                                       <div className='remov-item flex-1 pt-2'>
@@ -1078,49 +1082,72 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           type='button'
                                                           className='btn btn-icon btn-circle btn-active-color-primary w-20px h-20px'
                                                           title='Remove this variation'
-                                                          name={'remove_' + variation.id }
+                                                          name={'remove_' + item.id }
                                                           onClick={(event) => {
-                                                            removeAttribute(variation.id , values)
+                                                            removeVariations(item.id , values)
                                                             handleChange(event)
-                                                            resetForm()
                                                           }}
                                                         >
-                                                          <i className='bi bi-x fs-2'></i>
+                                                          <i id={'remove_' + item.id } className='bi bi-x fs-2'></i>
                                                         </button>
                                                       </div>
                                                       <div className='me-2 flex-50 pt-4'>
                                                         <label className='fw-bold'>
-                                                          #{variation.id}
+                                                          #{item.id}
                                                         </label>
                                                       </div>
                                                       <div className='variations flex-auto'>
-                                                      {
-                                                        values.attributes &&
-                                                        values.attributes.map(
-                                                          (attrOpt: any, index: number) => {     
-
-                                                            //const findSelectedValue = attributes[index] || { value: '', label: ''}                                                       
-                                                            return attrOpt.variation && (
+                                                        { attributes && attributes.map((selectedValue: any, index: number) => {
+                                                          //find options that selected to build for variations 
+                                                          const attrOpt: any = values.attributes.find((a: any) => { return selectedValue.attr === a.name } )                                                         
+                                                          const fieldName =  `variations[${i}].attributes[${index}]` 
+                                                          return attrOpt && (
+                                                            <Select
+                                                              key={`attribute_${selectedValue.attr}`}                                                                
+                                                              styles={styles}
+                                                              closeMenuOnSelect={true}
+                                                              isSearchable={false}
+                                                              defaultValue={selectedValue}
+                                                              value={selectedValue}                                                            
+                                                              onChange={(selectedOption) => {
+                                                                let event = {
+                                                                  target: {
+                                                                    name: fieldName,
+                                                                    value: selectedOption,
+                                                                  },
+                                                                }
+                                                                handleChange(event)
+                                                              }}
+                                                              options={attrOpt.options}
+                                                              name={fieldName}
+                                                              className="ms-2 me-2 float-start min-w-120px mb-3"
+                                                            />
+                                                          )
+                                                        })}
+                                                        {/* other attributes with varations */}
+                                                        {/* { values.attributes &&
+                                                          values.attributes
+                                                          .filter((x: any) => { return x.variation })
+                                                          .map((attrOpt: any, index: number) => {                                                          
+                                                            const findIndex = index + attributes.length
+                                                            const fieldName =  `variations[${i}].attributes[${findIndex}]`     
+                                                            const selectedValue = { value: '', label: ''}
+                                                            return (
                                                               <Select
                                                                 key={`attribute_${attrOpt.name}`}                                                                
                                                                 styles={styles}
                                                                 closeMenuOnSelect={true}
                                                                 isSearchable={false}
-                                                                defaultValue={{ value: '', label: ''}}
-                                                                value={{ value: '', label: ''}}                                                            
-                                                                onChange={(selectedOption) => {
-                                                                  let event = {
-                                                                    target: {name: `variations[${i}].attributes[${index}]`, value: selectedOption},
-                                                                  }
-                                                                  handleChange(event)
-                                                                }}
+                                                                defaultValue={selectedValue}
+                                                                value={selectedValue}                                                            
+                                                                onChange={(value) => setFieldValue(fieldName, value)}
                                                                 options={attrOpt.options}
-                                                                name={`variations[${i}].attributes[${index}]`}
+                                                                name={fieldName}
                                                                 className="ms-2 me-2 float-start min-w-120px mb-3"
                                                               />
                                                             )
                                                           }
-                                                        )}
+                                                        )} */}
                                                       </div>
                                                       {/* ---------------------------- */}
                                                       <a
@@ -1128,11 +1155,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                         className='accordion-button flex-1 fs-6 fw-bold collapsed w-250px bg-white pt-4'
                                                         data-bs-toggle='collapse'
                                                         data-bs-target={
-                                                          '#variation_' + variation.id + '_body'
+                                                          '#variation_' + item.id + '_body'
                                                         }
                                                         aria-expanded='false'
                                                         aria-controls={
-                                                          'variation_' + variation.id + '_body'
+                                                          'variation_' + item.id + '_body'
                                                         }
                                                       >
                                                         Edit&nbsp;&nbsp;
@@ -1140,12 +1167,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                     </div>
                                                   </div>
                                                   <div
-                                                    id={'variation_' + variation.id + '_body'}
+                                                    id={'variation_' + item.id + '_body'}
                                                     className='accordion-collapse collapse'
                                                     aria-labelledby={
-                                                      'variation_' + variation.id + '_header'
+                                                      'variation_' + item.id + '_header'
                                                     }
-                                                    data-bs-parent={'#variation_' + variation.id}
+                                                    data-bs-parent={'#variation_' + item.id}
                                                   >
                                                     <div className='accordion-body'>
                                                       <div className='row mb-4'>
@@ -1153,10 +1180,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           <div className='form-group image-input image-input-outline'>
                                                             <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                                               {(!new_thumbnail &&
-                                                                variation.thumbnail && (
+                                                                item.thumbnail && (
                                                                   <img
                                                                     className='h-100 variation_thumbnail'
-                                                                    src={variation.thumbnail}
+                                                                    src={item.thumbnail}
                                                                     alt=''
                                                                   />
                                                                 )) ||

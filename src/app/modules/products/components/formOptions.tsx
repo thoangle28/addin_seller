@@ -150,10 +150,10 @@ export const SubAttributes = (term_slug: string) => {
   common
     .getSubAttributes(term_slug)
     .then((response) => {
-      const {data} = response.data
+      const {data} = response.data 
       data &&
         data.forEach((e: any) => {
-          termsList.push({value: e.term_id, label: e.name})
+          termsList.push({...e})
         })
     })
     .catch(() => {})
@@ -162,7 +162,6 @@ export const SubAttributes = (term_slug: string) => {
 }
 
 export const ProductDetail = (uId: number, pId: number) => {
-  let productDetail: any = []
   common
     .getProductInfoDetail(uId, pId)
     .then((response) => {   
@@ -182,7 +181,7 @@ export const ProductsList = (userId: number) => {
       const {data} = response.data
       data &&
         data.productsList &&
-        data.productsList.map((e: any) => {
+        data.productsList.forEach((e: any) => {
           termsList.push({value: e.product_id, label: e.product_name})
         })
     })

@@ -1,5 +1,5 @@
 import {Action} from '@reduxjs/toolkit'
-import { put, takeLatest, delay } from 'redux-saga/effects'
+import { put, takeLatest} from 'redux-saga/effects'
 import {getProductDetail} from './ProductsList'
 import {persistReducer} from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
