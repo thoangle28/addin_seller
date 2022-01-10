@@ -15,14 +15,15 @@ import {
   SubAttributes,
   TaxClass,
   getInitialFormValues,
-  ShippingClass,
+ /*  ShippingClass,
   Categoies,
   Attributes,
-  ProductsList,
+  ProductsList, */
   StockStatus,
   handleFileUpload,
   UploadImageField,
   FallbackView,
+  fetchProfileData,
 } from './formOptions'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
@@ -83,55 +84,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   //Get product info from cache
   let product: any = []
   product = useSelector<RootState>(({productDetail}) => productDetail.product, shallowEqual)
-  //https://www.digitalocean.com/community/tutorials/how-to-handle-async-data-loading-lazy-loading-and-code-splitting-with-react
-  //https://reactjs.org/docs/concurrent-mode-suspense.html
-  //https://www.freecodecamp.org/news/build-a-react-application-with-load-more-functionality-react-hooks/
-  //Get All Properties
 
-  const fetchProfileData = (userId: number) => {
-    return Promise.all([
-      fetchShippingClass(),
-      fetchCategoies(),
-      fetchAttributes(),
-      fetchProductsList(userId)
-    ]).then(([shippingClass, categories, attributes, productsList]) => {
-      return {shippingClass, categories, attributes, productsList}      
-    })
-  }
-
-  const fetchShippingClass = () => {
-    return new Promise((resolve, reject) => {
-      const shippingClass = ShippingClass()
-      resolve(shippingClass)
-    })    
-  }
-
-  const fetchCategoies = () => {
-    return new Promise((resolve, reject) => {
-      const categories = Categoies()
-      resolve(categories)
-    })    
-  }
-
-  const fetchAttributes = () => {
-    return new Promise((resolve, reject) => {
-      const attributes = Attributes()
-      resolve(attributes)
-    })    
-  }
-
-  const fetchProductsList = (userId: number) => {
-    return new Promise((resolve, reject) => {
-      const productsList = ProductsList(userId)
-      resolve(productsList)
-    })    
-  }
-
-  // Kick off fetching as early as possibleconst 
+  //Get All Properties  
   const promise = fetchProfileData( currentUserId );
+
   useEffect(() => {
     promise.then((data: any) => {
-      console.log(data)
+      
       setShippingClass(data.shippingClass)
       setProductCategory(data.categories)
       setProductsList(data.productsList)
@@ -139,9 +98,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const {termsList, fullList} = data.attributes
       setAttributes(termsList)
       setFullAttributes(fullList)
-
     });
-  }, []);
+  }, [productId]);
 
   //----------------------------------------
   /* useEffect(() => {
@@ -1080,14 +1038,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       isSearchable={true}
                                                       defaultValue={attr.options}
                                                       value={attr.options}
-                                                      onChange={(event) => {
-                                                        /*selectedOption => let event = {
-                                                          target: {
-                                                            name: `attributes[${i}].options`,
-                                                            value: selectedOption,
-                                                          },
-                                                        }
-                                                        handleChange(event)*/
+                                                      onChange={(event) => {                                                        
                                                         setFieldValue(`attributes[${i}].options`, event)
                                                       }}
                                                       options={subAttributes}

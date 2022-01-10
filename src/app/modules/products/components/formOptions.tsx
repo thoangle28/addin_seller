@@ -259,3 +259,66 @@ export const FallbackView = () => {
     </div>
   )
 }
+
+export const fetchProfileData = (userId: number) => {
+  return Promise.all([
+    fetchShippingClass(),
+    fetchCategoies(),
+    fetchAttributes(),
+    fetchProductsList(userId)
+  ]).then(([shippingClass, categories, attributes, productsList]) => {
+    return {shippingClass, categories, attributes, productsList}      
+  })
+}
+
+const fetchShippingClass = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      const shippingClass = ShippingClass()
+      resolve(shippingClass)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }    
+  })    
+}
+
+const fetchCategoies = () => {
+  return new Promise((resolve, reject) => {   
+    try {
+      const categories = Categoies()
+      resolve(categories)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }  
+  })    
+}
+
+const fetchAttributes = () => {
+  return new Promise((resolve, reject) => {   
+    try {
+      const attributes = Attributes()
+      resolve(attributes)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }  
+  })    
+}
+
+const fetchProductsList = (userId: number) => {
+  return new Promise((resolve, reject) => {    
+    try {
+      const productsList = ProductsList(userId)
+      resolve(productsList)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }  
+  })    
+}
