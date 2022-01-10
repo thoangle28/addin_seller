@@ -322,3 +322,29 @@ const fetchProductsList = (userId: number) => {
     }  
   })    
 }
+
+const postProduct = (params: any) => {
+  return new Promise((resolve, reject) => {    
+    try {
+      const update = saveProductToDB(params)
+      resolve(update)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while updating/creating data. Try again later.'
+      })
+    }  
+  })    
+}
+
+export const saveProductToDB = (params: any) => {
+  let termsList: any = []
+
+  common
+    .saveProductToDB(params)
+    .then((response) => {
+      const {data} = response.data      
+    })
+    .catch(() => {})
+
+  return termsList
+}

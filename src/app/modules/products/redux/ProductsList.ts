@@ -53,3 +53,8 @@ export function getProductInfoDetail(userId: number, product_id: number | 0) {
   const args =  { product_id: product_id, author_id : userId }
   return axios.post<any>(API_END_POINT_URL+ '/product', args)
 }
+
+
+export function saveProductToDB(params: any) {
+  return axios.post<any>(API_END_POINT_URL+ '/create-product', params)
+}
