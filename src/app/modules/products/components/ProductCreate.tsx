@@ -128,8 +128,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
-      const isSimple = initialForm.type_product ? 'variable' : 'simple'
-      setProductType(isSimple)
+      setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
     } else {
