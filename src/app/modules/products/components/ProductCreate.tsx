@@ -85,8 +85,66 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   product = useSelector<RootState>(({productDetail}) => productDetail.product, shallowEqual)
   //https://www.digitalocean.com/community/tutorials/how-to-handle-async-data-loading-lazy-loading-and-code-splitting-with-react
   //https://reactjs.org/docs/concurrent-mode-suspense.html
+  //https://www.freecodecamp.org/news/build-a-react-application-with-load-more-functionality-react-hooks/
   //Get All Properties
+
+  const fetchProfileData = (userId: number) => {
+    return Promise.all([
+      fetchShippingClass(),
+      fetchCategoies(),
+      fetchAttributes(),
+      fetchProductsList(userId)
+    ]).then(([shippingClass, categories, attributes, productsList]) => {
+      return {shippingClass, categories, attributes, productsList}      
+    })
+  }
+
+  const fetchShippingClass = () => {
+    return new Promise((resolve, reject) => {
+      const shippingClass = ShippingClass()
+      resolve(shippingClass)
+    })    
+  }
+
+  const fetchCategoies = () => {
+    return new Promise((resolve, reject) => {
+      const categories = Categoies()
+      resolve(categories)
+    })    
+  }
+
+  const fetchAttributes = () => {
+    return new Promise((resolve, reject) => {
+      const attributes = Attributes()
+      resolve(attributes)
+    })    
+  }
+
+  const fetchProductsList = (userId: number) => {
+    return new Promise((resolve, reject) => {
+      const productsList = ProductsList(userId)
+      resolve(productsList)
+    })    
+  }
+
+  // Kick off fetching as early as possibleconst 
+  const promise = fetchProfileData( currentUserId );
   useEffect(() => {
+    promise.then((data: any) => {
+      console.log(data)
+      setShippingClass(data.shippingClass)
+      setProductCategory(data.categories)
+      setProductsList(data.productsList)
+
+      const {termsList, fullList} = data.attributes
+      setAttributes(termsList)
+      setFullAttributes(fullList)
+
+    });
+  }, []);
+
+  //----------------------------------------
+  /* useEffect(() => {
     const loadingEverything = () => {
       setShippingClass(ShippingClass())
       setProductCategory(Categoies())     
@@ -105,7 +163,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
     loadAttributes();
 
-  }, [])
+  }, []) */
   /**
    * Get Product Details
    */
@@ -124,7 +182,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         setLoading(false)
       }
     }
-  }, [product, productId]) //, currentUserId, dispatch
+  }, [product, productId])
 
   /**
    * The events on the form

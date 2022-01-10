@@ -19,7 +19,8 @@ export const initialForm = {
   variations: [],
   variations_attr: [],
   attributes: [],
-  thumbnail: '',
+  thumbnail: '',  
+  new_thumbnail: '',
   photo_galleries: [],
   new_photo_galleries: [],
   general_price: '',
@@ -47,7 +48,6 @@ export const initialForm = {
   linked_products_upsell: [],
   linked_products_cross_sell: [],
   selectedAttr: '',
-  new_thumbnail: '',
 }
 
 export const getInitialFormValues = { ...initialForm }
@@ -131,7 +131,7 @@ export const Attributes = () => {
             name: item.name,
             visible: false,
             variation: false,
-            options: [],
+            options: item.options,
           }
 
           fullList.push(newItem)
