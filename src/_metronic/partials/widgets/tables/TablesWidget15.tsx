@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react'
-import {KTSVG, toAbsoluteUrl} from '../../../helpers'
+import {KTSVG} from '../../../helpers'
 import {Link} from 'react-router-dom'
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 
 const TablesWidget15: React.FC<Props> = ({className, dataList}) => {
   
-  const {productsList, pageSize, currentPage} = dataList
+  const {productsList} = dataList
 
   return (
     <div className={`card ${className}`}>
@@ -91,7 +91,7 @@ const TablesWidget15: React.FC<Props> = ({className, dataList}) => {
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
                       <td className='text-center'>
-                        {ele.status == 'publish' ? (
+                        {ele.status === 'publish' ? (
                           <span className='badge badge-light-success'>Approved</span>
                         ) : (
                           <span className='badge badge-light-warning'>Pending</span>

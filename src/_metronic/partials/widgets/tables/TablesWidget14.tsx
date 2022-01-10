@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, {useState} from 'react'
-import {KTSVG, toAbsoluteUrl} from '../../../helpers'
+import {KTSVG} from '../../../helpers'
 import {Link} from 'react-router-dom'
 
 type Props = {
@@ -44,7 +44,7 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
 
 const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined}: Props) => {
 
-  const {productsList, pageSize, currentPage, totalPages, totalProducts} = dataList
+  const {productsList, currentPage, totalPages, totalProducts} = dataList
 
   const listPages = find_page_begin_end(currentPage, totalPages)
 
@@ -141,7 +141,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
                       <td className='text-center'>
-                        {ele.status == 'publish' ? (
+                        {ele.status === 'publish' ? (
                           <span className='badge badge-light-success'>Approved</span>
                         ) : (
                           <span className='badge badge-light-warning'>Pending</span>

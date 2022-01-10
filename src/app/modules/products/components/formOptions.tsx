@@ -19,7 +19,7 @@ export const initialForm = {
   variations: [],
   variations_attr: [],
   attributes: [],
-  thumnail: '',
+  thumbnail: '',
   photo_galleries: [],
   new_photo_galleries: [],
   general_price: '',
@@ -47,7 +47,6 @@ export const initialForm = {
   linked_products_upsell: [],
   linked_products_cross_sell: [],
   selectedAttr: '',
-  thumbnail: '',
   new_thumbnail: '',
 }
 

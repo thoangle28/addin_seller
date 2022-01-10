@@ -177,23 +177,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
-    console.log(formValues)
     mapValuesToForm(initialForm, formValues)
   }
 
   /** Add Variations */
-  const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
-    const list: any = []
+  const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {   
     const listAttr: any = []   
 
     formValues.variations_attr &&
     formValues.variations_attr.forEach((e: any) => {
-      listAttr.push({
-        attr: e,
-        id: 0,
-        label: "",
-        value: ""
-      })
+      listAttr.push({ attr: e, id: 0, label: "", value: "" })
     })
 
     let nextVar = 0
@@ -223,18 +216,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   
   const updateAttrToVariations = ( name: any, isChecked: any,formValues: any ) => {
     const variationsAttr: Array<string> = formValues.variations_attr || [];     
-    if( isChecked ) {
-      console.log(formValues.attributes)
+    if( isChecked ) {    
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
       })
 
-      filterAttr.map((newAttr: any) => { 
+      filterAttr.foreEach((newAttr: any) => { 
         formValues.variations_attr.push(newAttr.name)
       })
 
       formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.map((newAttr: any) => {
+        filterAttr.foreEach((newAttr: any) => {
           item.attributes.push({ 
             attr: newAttr.name,
             label: "",
@@ -248,12 +240,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       })
 
       //remove
-      filterAttr.map((newAttr: any) => { 
+      filterAttr.foreEach((newAttr: any) => { 
         formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
       })
 
       formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.map((newAttr: any) => { 
+        filterAttr.foreEach((newAttr: any) => { 
           const findIndex = item.attributes.findIndex((x: any) => { return x.attr === newAttr.name })
           item.attributes.splice(findIndex, 1)
         })
