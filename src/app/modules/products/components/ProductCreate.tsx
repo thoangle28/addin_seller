@@ -24,6 +24,7 @@ import {
   UploadImageField,
   FallbackView,
   fetchProfileData,
+  postProduct
 } from './formOptions'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
@@ -339,11 +340,18 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               validationSchema={ValidationSchema}
               enableReinitialize={true}
               onSubmit={(values, {setSubmitting}) => {
-                setTimeout(() => {
+                //save to DB
+                postProduct(values).then(data => {
+
+                }).catch(() => {
+
+                })
+               /* setTimeout(() => {
                   //alert(JSON.stringify(values, null, 2))
                   console.log(values)
+                  postProduct(values)
                   setSubmitting(false)
-                }, 400)
+                }, 400) */
               }}
             >
               {({

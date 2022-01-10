@@ -323,7 +323,7 @@ const fetchProductsList = (userId: number) => {
   })    
 }
 
-const postProduct = (params: any) => {
+export const postProduct = (params: any) => {
   return new Promise((resolve, reject) => {    
     try {
       const update = saveProductToDB(params)
@@ -337,14 +337,15 @@ const postProduct = (params: any) => {
 }
 
 export const saveProductToDB = (params: any) => {
-  let termsList: any = []
+  let result: any = []
 
   common
     .saveProductToDB(params)
     .then((response) => {
-      const {data} = response.data      
+      const {data} = response.data
+      result = data
     })
     .catch(() => {})
 
-  return termsList
+  return result
 }
