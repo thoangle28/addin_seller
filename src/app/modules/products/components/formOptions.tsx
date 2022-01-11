@@ -369,6 +369,19 @@ export const postProduct = (params: any, token: string) => {
   })
 }
 
+
+export const getProduct = (uid: number, pid: number) => {
+  return new Promise((resolve, reject) => { 
+    common.getProductInfoDetail(uid, pid)
+    .then((response: any) => {
+      const {data} = response
+      resolve(data)
+    })
+    .catch(() => {})
+    .finally(() => {})
+  })
+}
+
 //----------------------------------------
 /* useEffect(() => {
   const loadingEverything = () => {

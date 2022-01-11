@@ -25,7 +25,8 @@ import {
   FallbackView,
   fetchProfileData,
   postProduct,
-  mapValuesToForm
+  mapValuesToForm,
+  getProduct
 } from './formOptions'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
@@ -56,16 +57,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newThumbnail, setNewThumbnail] = useState('')
   const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
   const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
- 
+  const [product, setProductDetail] = useState<any>([])
   //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
   //Get product info from cache
-  let product: any = []
-  product = useSelector<RootState>(({productDetail}) => productDetail.product, shallowEqual)
+  //let product: any = []
+  //product = useSelector<RootState>(({productDetail}) => productDetail.product, shallowEqual)
 
   //Get All Properties  
   const promise = fetchProfileData( currentUserId );
-
+  const productInfo = getProduct(currentUserId, productId)
+  
   useEffect(() => {
     promise.then((data: any) => {
       
@@ -77,13 +79,23 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setAttributes(termsList)
       setFullAttributes(fullList)
     });
+    
+    productInfo.then((response: any) => { 
+      const { code, message, data } = response
+      //product = {...data}
+      setProductDetail({...data})
+      //console.log(product)
+    })
   }, []);
   
   /**
    * Get Product Details
    */
   useEffect(() => {
-    if (product && productId > 0 && product.id === productId) {
+    //console.log(product)
+    //console.log(fullAttributesList)
+    //localStorage.setItem("fullAttributesList", JSON.stringify(fullAttributesList))
+    /* if (product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
       setProductType(initialForm.type_product)
       setNewProduct(false)
@@ -95,8 +107,21 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       else {
         setLoading(false)
       }
+    } */
+
+    if( product && productId > 0 && product.id === productId) {
+      mapValuesToForm(initialForm, product)
+      setProductType(initialForm.type_product)
+      setNewProduct(false)
+      setLoading(false)
+    } else {
+      if( typeof productId === 'undefined'  || productId <= 0 ) {
+        setNewProduct(true)
+        setProductType('simple')
+        setLoading(false)
+      }      
     }
-  }, [product, productId])
+  }, [product])
 
   /**
    * The events on the form
@@ -165,7 +190,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     const listAttr: any = []   
 
     formValues.variations_attr &&
-    formValues.variations_attr.forEach((e: any) => {
+    formValues.variations_attr.map((e: any) => {
       listAttr.push({ attr: e, id: 0, label: "", value: "" })
     })
 
@@ -200,13 +225,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
       })
-
-      filterAttr.foreEach((newAttr: any) => { 
+  
+      filterAttr && filterAttr.map((newAttr: any) => { 
         formValues.variations_attr.push(newAttr.name)
       })
 
-      formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.foreEach((newAttr: any) => {
+      formValues.variations && formValues.variations.map((item:any) => {
+        filterAttr && filterAttr.map((newAttr: any) => {
           item.attributes.push({ 
             attr: newAttr.name,
             label: "",
@@ -220,12 +245,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       })
 
       //remove
-      filterAttr.foreEach((newAttr: any) => { 
+      filterAttr && filterAttr.map((newAttr: any) => { 
         formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
       })
 
-      formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.foreEach((newAttr: any) => { 
+      formValues.variations && formValues.variations.map((item:any) => {
+        filterAttr && filterAttr.map((newAttr: any) => { 
           const findIndex = item.attributes.findIndex((x: any) => { return x.attr === newAttr.name })
           item.attributes.splice(findIndex, 1)
         })
@@ -238,7 +263,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const handleAddVariations = (formValues: any) => {
 
     let maxRows = 1, totalListVar = 1
-    formValues.attributes.forEach((x: any, i: number) => {  
+    formValues.attributes.map((x: any, i: number) => {  
       if(x.variation) maxRows *= (x.options.length > 0 ) ? x.options.length : 1
     } )
 
@@ -904,7 +929,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     {(values.attributes &&
                                       values.attributes.map((attr: any, i: number | string) => {
                                         //find options list from attributes
-                                        const subAttributes = SubAttributes(attr.name)
+                                        //const subAttributes = SubAttributes(attr.name)
+                                        const subAttributes: any = fullAttributesList && fullAttributesList.find((x: any) => {
+                                          return x.name === attr.name
+                                        })
+
                                         return (
                                           <div
                                             className='accordion-item'
@@ -991,7 +1020,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                     <Select
                                                       styles={styles}
                                                       closeMenuOnSelect={false}
-                                                      isLoading={true}
+                                                      isLoading={false}
                                                       isMulti={true}
                                                       isSearchable={true}
                                                       defaultValue={attr.options}
@@ -999,7 +1028,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       onChange={(event) => {                                                        
                                                         setFieldValue(`attributes[${i}].options`, event)
                                                       }}
-                                                      options={subAttributes}
+                                                      options={subAttributes && subAttributes.options}
                                                       name={`attributes[${i}].options`}
                                                     />
                                                   </div>
