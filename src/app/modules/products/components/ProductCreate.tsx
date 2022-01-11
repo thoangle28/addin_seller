@@ -24,7 +24,8 @@ import {
   UploadImageField,
   FallbackView,
   fetchProfileData,
-  postProduct
+  postProduct,
+  mapValuesToForm
 } from './formOptions'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
@@ -37,7 +38,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const userLocation: any = useLocation()
   const {productId} = userLocation.state ? userLocation.state : 0
 
-  const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
+  //const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
+  const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
+  const { accessToken, user } = auth
   const currentUserId: number = user ? user.ID : 0
 
   //useState
@@ -53,33 +56,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newThumbnail, setNewThumbnail] = useState('')
   const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
   const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
-  //----------------------------------------------------------------------------
-  const mapValuesToForm = (initialValues: any, productValues: any) => {
-    initialValues.name = productValues.name
-    initialValues.content = productValues.content
-    initialValues.is_variable = productValues.is_variable
-    initialValues.type_product = productValues.type_product
-    initialValues.inventory_sku = productValues.inventory_sku
-    initialValues.attributes = productValues.attributes
-    initialValues.variations = productValues.variations
-    initialValues.thumbnail = productValues.thumbnail
-    initialValues.new_thumbnail = ''
-    initialValues.photo_galleries = productValues.photo_galleries
-    initialValues.new_photo_galleries = productValues.new_photo_galleries
-    initialValues.general_price = productValues.general_price
-    initialValues.general_tax_status = productValues.general_tax_status
-    initialValues.general_tax_class = productValues.general_tax_class
-    initialValues.categories = productValues.categories
-    initialValues.shipping_class_id = productValues.shipping_class_id
-    initialValues.selectedAttr = ''
-    initialValues.selectedVarAct = ''
-    initialValues.variations_attr = productValues.variations_attr
-    initialValues.linked_products_upsell = productValues.linked_products_upsell
-    initialValues.linked_products_cross_sell = productValues.linked_products_cross_sell
-    initialValues.general_wallet_credit = productValues.general_wallet_credit
-    initialValues.general_wallet_cashback = productValues.general_wallet_cashback
-    initialValues.general_commission = productValues.general_commission
-  }
+ 
   //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
   //Get product info from cache
@@ -100,29 +77,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setAttributes(termsList)
       setFullAttributes(fullList)
     });
-  }, [productId]);
-
-  //----------------------------------------
-  /* useEffect(() => {
-    const loadingEverything = () => {
-      setShippingClass(ShippingClass())
-      setProductCategory(Categoies())     
-      setProductsList(ProductsList(currentUserId))
-    }
-
-    loadingEverything()
-  }, [])
-
-  useEffect(() => {
-    const loadAttributes = () => {
-      const {termsList, fullList} = Attributes()
-      setAttributes(termsList)
-      setFullAttributes(fullList)
-    }     
-
-    loadAttributes();
-
-  }, []) */
+  }, []);
+  
   /**
    * Get Product Details
    */
@@ -341,17 +297,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               enableReinitialize={true}
               onSubmit={(values, {setSubmitting}) => {
                 //save to DB
-                postProduct(values).then(data => {
-
-                }).catch(() => {
-
-                })
-               /* setTimeout(() => {
-                  //alert(JSON.stringify(values, null, 2))
-                  console.log(values)
-                  postProduct(values)
-                  setSubmitting(false)
-                }, 400) */
+                setSubmitting(true)
+                console.log(accessToken)
+                postProduct(values, accessToken).then((product) => {
+                  console.log(product)
+                  setSubmitting(false) //done
+                }).catch(() => {})              
               }}
             >
               {({
@@ -1193,33 +1144,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               className="ms-2 me-2 float-start min-w-120px mb-3"
                                                             />
                                                           )
-                                                        })}
-                                                        {/* other attributes with varations */}
-                                                        {/* { values.attributes &&
-                                                          values.attributes
-                                                          .filter((x: any) => { return x.variation })
-                                                          .map((attrOpt: any, index: number) => {                                                          
-                                                            const findIndex = index + attributes.length
-                                                            const fieldName =  `variations[${i}].attributes[${findIndex}]`     
-                                                            const selectedValue = { value: '', label: ''}
-                                                            return (
-                                                              <Select
-                                                                key={`attribute_${attrOpt.name}`}                                                                
-                                                                styles={styles}
-                                                                closeMenuOnSelect={true}
-                                                                isSearchable={false}
-                                                                defaultValue={selectedValue}
-                                                                value={selectedValue}                                                            
-                                                                onChange={(value) => setFieldValue(fieldName, value)}
-                                                                options={attrOpt.options}
-                                                                name={fieldName}
-                                                                className="ms-2 me-2 float-start min-w-120px mb-3"
-                                                              />
-                                                            )
-                                                          }
-                                                        )} */}
-                                                      </div>
-                                                      {/* ---------------------------- */}
+                                                        })}                                                       
+                                                      </div>                                                      
                                                       <a
                                                         href='#'
                                                         className='accordion-button flex-1 fs-6 fw-bold collapsed w-250px bg-white pt-4'
@@ -1577,8 +1503,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                           /* onClick={prevStep} */
                           type='submit'
                           className='btn btn-lg btn-primary w-100 me-3'
+                          disabled={isSubmitting}
                         >
-                          Create Product
+                          { isSubmitting ? 'Processing...' : 'Create Product'}
                         </button>
                         <button
                           /* onClick={prevStep} */

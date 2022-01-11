@@ -12,6 +12,7 @@ export interface IAttribute {
 }
 
 export const initialForm = {
+  productId: 0,
   name: '',
   content: '',
   is_variable: 'simple', //simple
@@ -51,6 +52,34 @@ export const initialForm = {
 }
 
 export const getInitialFormValues = { ...initialForm }
+
+export const mapValuesToForm = (initialValues: any, productValues: any) => {
+  initialValues.productId = productValues.id
+  initialValues.name = productValues.name
+  initialValues.content = productValues.content
+  initialValues.is_variable = productValues.is_variable
+  initialValues.type_product = productValues.type_product
+  initialValues.inventory_sku = productValues.inventory_sku
+  initialValues.attributes = productValues.attributes
+  initialValues.variations = productValues.variations
+  initialValues.thumbnail = productValues.thumbnail
+  initialValues.new_thumbnail = ''
+  initialValues.photo_galleries = productValues.photo_galleries
+  initialValues.new_photo_galleries = productValues.new_photo_galleries
+  initialValues.general_price = productValues.general_price
+  initialValues.general_tax_status = productValues.general_tax_status
+  initialValues.general_tax_class = productValues.general_tax_class
+  initialValues.categories = productValues.categories
+  initialValues.shipping_class_id = productValues.shipping_class_id
+  initialValues.selectedAttr = ''
+  initialValues.selectedVarAct = ''
+  initialValues.variations_attr = productValues.variations_attr
+  initialValues.linked_products_upsell = productValues.linked_products_upsell
+  initialValues.linked_products_cross_sell = productValues.linked_products_cross_sell
+  initialValues.general_wallet_credit = productValues.general_wallet_credit
+  initialValues.general_wallet_cashback = productValues.general_wallet_cashback
+  initialValues.general_commission = productValues.general_commission
+}
 
 export const TaxClass: any = [
   {value: 'parent', label: 'Same as parent'},
@@ -253,8 +282,15 @@ export const FallbackView = () => {
   return (
     <div className='text-center w-100'>
       <img src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
-      <div className='mt-5'>
-        <span>Loading ...</span>
+      <div className='mt-5 text-center d-flex justify-content-center'>
+        <div className='loadding'>
+          <span>Loading ...</span>
+          <div className="balls mt-3">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -323,29 +359,34 @@ const fetchProductsList = (userId: number) => {
   })    
 }
 
-export const postProduct = (params: any) => {
-  return new Promise((resolve, reject) => {    
-    try {
-      const update = saveProductToDB(params)
-      resolve(update)
-    } catch(e) {
-      reject({
-        errorMsg: 'Error while updating/creating data. Try again later.'
-      })
-    }  
-  })    
-}
-
-export const saveProductToDB = (params: any) => {
-  let result: any = []
-
-  common
-    .saveProductToDB(params)
-    .then((response) => {
-      const {data} = response.data
-      result = data
+export const postProduct = (params: any, token: string) => {
+  return new Promise((resolve, reject) => { 
+    common.saveProductToDB(params, token).then((response) => {
+      //console.log(response)
+      const { data } = response
+      resolve(data)
     })
-    .catch(() => {})
-
-  return result
+  })
 }
+
+//----------------------------------------
+/* useEffect(() => {
+  const loadingEverything = () => {
+    setShippingClass(ShippingClass())
+    setProductCategory(Categoies())     
+    setProductsList(ProductsList(currentUserId))
+  }
+
+  loadingEverything()
+}, [])
+
+useEffect(() => {
+  const loadAttributes = () => {
+    const {termsList, fullList} = Attributes()
+    setAttributes(termsList)
+    setFullAttributes(fullList)
+  }     
+
+  loadAttributes();
+
+}, []) */
