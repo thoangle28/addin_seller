@@ -92,7 +92,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * Get Product Details
    */
   useEffect(() => {
-    //console.log(product)
+    console.log(product)
     //console.log(fullAttributesList)
     //localStorage.setItem("fullAttributesList", JSON.stringify(fullAttributesList))
     /* if (product && productId > 0 && product.id === productId) {
@@ -147,12 +147,15 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     const isAdded = formValues.attributes.some((x: any) => x.id === value)
 
     if (isAdded) return
-    const attrFound = fullAttributesList.find((x: any) => x.id === value)
+    const attrFound: any = fullAttributesList.find((x: any) => x.id === value)
     //reset
     setSelectedAttr({value: '', label: ''})
     if (!attrFound) return
-    else formValues.attributes.push(attrFound)
-
+    else {
+      const cloneAttrFound = {...attrFound}
+      cloneAttrFound.options = []
+      formValues.attributes.push(cloneAttrFound)
+    }
     mapValuesToForm(initialForm, formValues)
   }
 
