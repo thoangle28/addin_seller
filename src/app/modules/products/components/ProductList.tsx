@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
 import * as product from '../redux/ProductRedux'
 import {RootState} from '../../../../setup'
@@ -21,9 +21,13 @@ const ProductList: FC<PropsFromRedux> = (props) => {
     userId: 0,
   }
   
+
+  const [isLoading, setLoading] = useState(true)
+
   useEffect(() => {
     initLoad.userId = currentUserId;
     dispatch(product.actions.getProductList(initLoad));
+    //setLoading    
     // eslint-disable-next-line
   }, [])
   

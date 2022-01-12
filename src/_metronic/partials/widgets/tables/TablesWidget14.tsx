@@ -54,7 +54,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
     setPageSize(s)
     onChange(-1, s)
   }
-
+  
   return (
     <div className={`card ${className}`}>
       {/* begin::Header */}

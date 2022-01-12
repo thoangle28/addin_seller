@@ -51,7 +51,7 @@ export const initialForm = {
   selectedAttr: '',
 }
 
-export const getInitialFormValues = { ...initialForm }
+export const initialFormValues = { ...initialForm }
 
 export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.productId = productValues.id

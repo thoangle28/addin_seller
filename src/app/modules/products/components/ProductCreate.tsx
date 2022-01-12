@@ -14,7 +14,7 @@ import {
   styles,
   SubAttributes,
   TaxClass,
-  getInitialFormValues,
+  initialFormValues,
  /*  ShippingClass,
   Categoies,
   Attributes,
@@ -92,23 +92,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * Get Product Details
    */
   useEffect(() => {
-    console.log(product)
-    //console.log(fullAttributesList)
-    //localStorage.setItem("fullAttributesList", JSON.stringify(fullAttributesList))
-    /* if (product && productId > 0 && product.id === productId) {
-      mapValuesToForm(initialForm, product)
-      setProductType(initialForm.type_product)
-      setNewProduct(false)
-      setLoading(false)
-    } else {
-      setNewProduct(true)
-      setProductType('simple')
-      if (productId > 0) dispatch(detail.actions.getProductDetail(currentUserId, productId))
-      else {
-        setLoading(false)
-      }
-    } */
-
+    //console.log(product)
     if( product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
       setProductType(initialForm.type_product)
@@ -116,12 +100,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setLoading(false)
     } else {
       if( typeof productId === 'undefined'  || productId <= 0 ) {
+        mapValuesToForm(initialForm, initialFormValues)
         setNewProduct(true)
         setProductType('simple')
         setLoading(false)
       }      
     }
-  }, [product])
+  }, [product, productId])
 
   /**
    * The events on the form
@@ -320,7 +305,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           </div>
           <div className='card-body py-3'>
             <Formik
-              initialValues={isNewProduct ? getInitialFormValues : initialForm}
+              initialValues={isNewProduct ? initialFormValues : initialForm}
               validationSchema={ValidationSchema}
               enableReinitialize={true}
               onSubmit={(values, {setSubmitting}) => {
