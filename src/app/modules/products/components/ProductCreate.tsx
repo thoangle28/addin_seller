@@ -311,11 +311,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               onSubmit={(values, {setSubmitting}) => {
                 //save to DB
                 setSubmitting(true)
-                console.log(accessToken)
+                console.log(values)
                 postProduct(values, accessToken).then((product) => {
                   console.log(product)
                   setSubmitting(false) //done
-                }).catch(() => {})              
+                }).catch(() => {
+                  setSubmitting(false) //error
+                })              
               }}
             >
               {({
