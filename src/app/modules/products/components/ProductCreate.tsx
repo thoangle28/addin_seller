@@ -677,24 +677,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <div className='form-group row'>
                                       <div className='col-md-6 mb-5'>
                                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                          <span>Regular Rrice</span>
+                                          <span>Regular Price</span>
                                         </label>
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
                                             type='number'
                                             className='form-control'
-                                            name='general_price'
+                                            name='general_regular_price'
                                             step='0.1'
                                             placeholder=''
-                                            value={values.general_price}
+                                            value={values.general_regular_price}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                           />                                         
                                         </div>
-                                        {touched.general_price && errors.general_price ? (
-                                            <div className='text-danger fs-8'>{errors.general_price}</div>
-                                          ) : null}
+                                      {/*   {touched.general_regular_price && errors.general_regular_price ? (
+                                            <div className='text-danger fs-8'>{errors.general_regular_price}</div>
+                                          ) : null} */}
                                       </div>
                                       <div className='col-md-6 mb-5'>
                                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
@@ -705,9 +705,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           <input
                                             type='number'
                                             className='form-control'
-                                            name='salePrice'
+                                            name='general_sale_price'
                                             step='0.1'
                                             placeholder=''
+                                            value={values.general_sale_price}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
                                           />
                                         </div>
                                       </div>
