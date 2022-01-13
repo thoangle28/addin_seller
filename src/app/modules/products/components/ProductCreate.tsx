@@ -92,7 +92,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * Get Product Details
    */
   useEffect(() => {
-    //console.log(product)
+    console.log(product)
     if( product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
       setProductType(initialForm.type_product)
@@ -316,7 +316,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   console.log(product)
                   setSubmitting(false) //done
                 }).catch(() => {
-                  setSubmitting(false) //error
+                  //setSubmitting(false) //error
                 })              
               }}
             >
@@ -518,8 +518,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               <div className='form-group image-input image-input-outline'>
                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
                                   {
-                                    (!newThumbnail && values && values.thumbnail && (
-                                      <img className='h-100' src={values.thumbnail} alt='' />
+                                    (!newThumbnail && values && values.thumbnail.src && (
+                                      <img className='h-100' src={values.thumbnail.src} alt='' />
                                     )) ||
                                     (newThumbnail && (
                                       <img className='h-100' src={newThumbnail} alt='' />
@@ -682,15 +682,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
-                                            type='number'
+                                            type='text'
                                             className='form-control'
-                                            name='general_regular_price'
-                                            step='0.1'
-                                            placeholder=''
+                                            name='general_regular_price'                                           
                                             value={values.general_regular_price}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                          />                                         
+                                          />
                                         </div>
                                       {/*   {touched.general_regular_price && errors.general_regular_price ? (
                                             <div className='text-danger fs-8'>{errors.general_regular_price}</div>
@@ -703,15 +701,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
-                                            type='number'
+                                            type='text'
                                             className='form-control'
                                             name='general_sale_price'
-                                            step='0.1'
                                             placeholder=''
                                             value={values.general_sale_price}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                          />
+                                          />            
                                         </div>
                                       </div>
                                     </div>
@@ -990,7 +987,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           Visible on the product page
                                                         </label>
                                                       </div>
-                                                      <div className='form-check form-check-custom form-check-solid'>
+                                                      { productType === 'variable' 
+                                                      && (<div className='form-check form-check-custom form-check-solid'>
                                                         <label className='form-check-label ms-0 d-flex align-items-center'>
                                                           <input
                                                             type='checkbox'
@@ -1005,7 +1003,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           />
                                                           Used for variations
                                                         </label>
-                                                      </div>
+                                                      </div>)}
                                                     </div>
                                                   </div>
                                                   <div className='col-md-7'>
@@ -1107,6 +1105,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             attributes,
                                             stock_status
                                           } : any = values.variations[i]
+                                          
+                                          //const newAttrVarirant = (!!attributes && values.attributes.filter((x: any) => { return x.variation })) || attributes
 
                                           return (
                                             <div className='row' key={id}>
@@ -1201,7 +1201,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 item.thumbnail && (
                                                                   <img
                                                                     className='h-100 variation_thumbnail'
-                                                                    src={item.thumbnail || 'https://via.placeholder.com/75x75/f0f0f0'}
+                                                                    src={item.thumbnail.src || 'https://via.placeholder.com/75x75/f0f0f0'}
                                                                     alt=''
                                                                   />
                                                                 )) ||

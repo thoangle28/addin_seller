@@ -13,6 +13,7 @@ export interface IAttribute {
 
 export const initialForm = {
   productId: 0,
+  id: 0,
   name: '',
   content: '',
   is_variable: 'simple', //simple
@@ -20,7 +21,7 @@ export const initialForm = {
   variations: [],
   variations_attr: [],
   attributes: [],
-  thumbnail: '',  
+  thumbnail: { src: '', image_id: ''},  
   new_thumbnail: '',
   photo_galleries: [],
   new_photo_galleries: [],
@@ -55,6 +56,7 @@ export const initialFormValues = { ...initialForm }
 
 export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.productId = productValues.id
+  initialValues.id = productValues.id
   initialValues.name = productValues.name
   initialValues.content = productValues.content
   initialValues.is_variable = productValues.is_variable
@@ -67,6 +69,8 @@ export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.photo_galleries = productValues.photo_galleries
   initialValues.new_photo_galleries = productValues.new_photo_galleries
   initialValues.general_price = productValues.general_price
+  initialValues.general_regular_price = productValues.general_regular_price
+  initialValues.general_sale_price = productValues.general_sale_price
   initialValues.general_tax_status = productValues.general_tax_status
   initialValues.general_tax_class = productValues.general_tax_class
   initialValues.categories = productValues.categories
