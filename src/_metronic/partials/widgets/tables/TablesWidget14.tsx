@@ -103,7 +103,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
               {
                 (!!productsList && productsList.length > 0) ? (
                 productsList.map((ele: any, index: number) => {
-                  const real_price = ele.regular_price > 0 ? ele.regular_price : ele.price
+                  //const real_price = ele.sale_price > 0 ? ele.sale_price : ele.price
 
                   return (
                     <tr key={index}>
@@ -127,17 +127,18 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                       </td>
                       <td className='text-center'>{ele.sku}</td>
                       <td className='text-end'>
-                        {ele.sale_price > 0 ? (
+                        
+                        { (ele.sale_price > 0 && ele.sale_price < ele.price)  ? (
                           <>
-                            {' '}
+                            <span>${ele.sale_price}</span><br />
                             <small className='me-2' style={{color: '#999', textDecoration: 'line-through'}}>
-                              ${ele.regular_price}
-                            </small>
-                            <span>${real_price}</span>
+                              ${ele.price}
+                            </small>                            
                           </>
                         ) : (
-                          <span>${real_price}</span>
+                          <span>${ele.price}</span>
                         )}
+
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
                       <td className='text-center'>

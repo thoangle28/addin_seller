@@ -78,6 +78,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const {termsList, fullList} = data.attributes
       setAttributes(termsList)
       setFullAttributes(fullList)
+      //if(fullList.length > 0) localStorage.setItem('fullList', fullList)
     });
     
     productInfo.then((response: any) => { 
@@ -285,6 +286,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
+    })
+  }
+
+  const loadOptions = (slug: string) => {
+    return new Promise((resolve) => {
+      resolve(SubAttributes(slug))
     })
   }
 
@@ -922,7 +929,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         //const subAttributes = SubAttributes(attr.name)
                                         const subAttributes: any = fullAttributesList && fullAttributesList.find((x: any) => {
                                           return x.name === attr.name
-                                        })
+                                        }) || SubAttributes(attr.name)
 
                                         return (
                                           <div
@@ -1019,7 +1026,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       onChange={(event) => {                                                        
                                                         setFieldValue(`attributes[${i}].options`, event)
                                                       }}
-                                                      options={subAttributes && subAttributes.options}
+                                                      options={(subAttributes && subAttributes.options)}
                                                       name={`attributes[${i}].options`}
                                                     />
                                                   </div>
@@ -1090,7 +1097,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     </div>                                    
                                     <div className='variants form-group'>
                                       {
-                                        values.variations &&
+                                        values.attributes.some((x: any) => { return x.variation })
+                                        && values.variations &&
                                         values.variations.map((item: any, i: number) => {
                                           const {
                                             id,
@@ -1141,25 +1149,19 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       </div>
                                                       <div className='variations flex-auto'>
                                                         { attributes && attributes.map((selectedValue: any, index: number) => {
-                                                          //find options that selected to build for variations 
-                                                          const attrOpt: any = values.attributes.find((a: any) => { return selectedValue.attr === a.name } )                                                         
+                                                          //find options that selected to build for variations                  
+                                                          const attrOpt: any = values.attributes.find((attr: any) => { return selectedValue.attr === attr.name } )                                                         
                                                           const fieldName =  `variations[${i}].attributes[${index}]` 
                                                           return attrOpt && (
                                                             <Select
-                                                              key={`attribute_${selectedValue.attr}`}                                                                
+                                                              key={fieldName}                                                                
                                                               styles={styles}
                                                               closeMenuOnSelect={true}
                                                               isSearchable={false}
                                                               defaultValue={selectedValue}
                                                               value={selectedValue}                                                            
-                                                              onChange={(selectedOption) => {
-                                                                let event = {
-                                                                  target: {
-                                                                    name: fieldName,
-                                                                    value: selectedOption,
-                                                                  },
-                                                                }
-                                                                handleChange(event)
+                                                              onChange={(event) => {                                                               
+                                                                setFieldValue(fieldName, event)
                                                               }}
                                                               options={attrOpt.options}
                                                               name={fieldName}
