@@ -276,6 +276,30 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const removePhotoGallery  = (postion: number, isNew: boolean) => {
     alert(postion + '---' + isNew)
   }
+
+  const removeVariationThumbnail = (case_type: string, id: number | string, formValues: any) => {
+    switch(case_type) {
+      case 'variations':
+        formValues.variations.find((x: any) => { return x.id === id }).thumbnail = { image_id: false, src: ''}   
+        break;
+      case 'galleries':
+        const index = formValues.photo_galleries.findIndex((x: any) => { return x.image_id === id })
+        formValues.photo_galleries[index] = { image_id: false, src: ''}   
+        break;
+      case 'new_galleries':
+        if( formValues.new_photo_galleries[id] ) formValues.new_photo_galleries[id] = ''
+        break;
+      case 'thumbnail':
+        formValues.thumbnail = { image_id: false, src: ''}   
+        break;
+      case 'newThumbnail':
+        formValues.new_thumbnail = ''
+        setNewThumbnail('')
+        break;
+    }
+    
+    mapValuesToForm(initialForm, formValues)
+  }
   /**
    * Begin Formik
    */
@@ -457,11 +481,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <div className='photo-galleries'>
                                   {
                                     values.photo_galleries &&
-                                    values.photo_galleries.map((image: any) => {
-                                      return (
+                                    values.photo_galleries.map((image: any, i: number) => {
+                                      return image.src && (
                                         <div
                                           className='form-group image-input image-input-outline'
-                                          key={image.image_id}
+                                          key={`photo-galleries-${i}`}
                                         >
                                           <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                             <img className='h-100' src={image.src} alt='' />
@@ -471,13 +495,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             data-kt-image-input-action='remove'
                                             data-bs-toggle='tooltip'
                                             title='Remove Image'
-                                            key={'remove_image_' + image.image_id}
+                                            key={'remove_image_' + i}
                                             onClick={(event) => {
-                                              removePhotoGallery(image.image_id, false)
+                                              //removePhotoGallery(image.image_id, false)
+                                              removeVariationThumbnail('galleries', image.image_id, values)
                                               handleChange(event)
                                             }}
                                           >
-                                            <i className='bi bi-x fs-2' id={'remove_image_' + image.image_id}></i>
+                                            <i className='bi bi-x fs-2' id={'remove_image_' + i}></i>
                                           </span>
                                         </div>
                                       )
@@ -486,7 +511,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   {
                                     newPhotoGalleries && 
                                     newPhotoGalleries.map((src: string, i: number) => {
-                                      return (
+                                      return src && (
                                         <div
                                           className='form-group image-input image-input-outline'
                                           key={'image_' + i}
@@ -501,7 +526,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             title='Remove Image'
                                             key={'remove_image_' + i}
                                             onClick={(event) => {
-                                              removePhotoGallery(i, true)
+                                              removeVariationThumbnail('new_galleries', i, values)
                                               handleChange(event)
                                             }}
                                           >
@@ -544,8 +569,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   data-kt-image-input-action='remove'
                                   data-bs-toggle='tooltip'
                                   title='Remove Image'
+                                  id={`product_thumbnail`}
+                                  onClick={(event) => {
+                                    if( newThumbnail )
+                                      removeVariationThumbnail('newThumbnail', 0, values)
+                                    else
+                                      removeVariationThumbnail('thumbnail', values.thumbnail.image_id, values)
+                                    handleChange(event)
+                                  }}
                                 >
-                                  <i className='bi bi-x fs-2'></i>
+                                  <i id={`product_thumbnail_1`} className='bi bi-x fs-2'></i>
                                 </span>
                               </div>
                             </div>
@@ -1221,8 +1254,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               data-kt-image-input-action='remove'
                                                               data-bs-toggle='tooltip'
                                                               title='Remove Image'
+                                                              id={`thumbnail_${item.id}`}
+                                                              onClick={(event) => {
+                                                                removeVariationThumbnail('variations', item.id, values)
+                                                                handleChange(event)
+                                                              }}
                                                             >
-                                                              <i className='bi bi-x fs-2'></i>
+                                                              <i id={`thumbnail__${item.id}`} className='bi bi-x fs-2'></i>
                                                             </span>
                                                           </div>
                                                         </div>
