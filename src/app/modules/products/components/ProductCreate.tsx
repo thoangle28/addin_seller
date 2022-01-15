@@ -243,38 +243,48 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   
   const updateAttrToVariations = ( name: any, isChecked: any,formValues: any ) => {
     const variationsAttr: Array<string> = formValues.variations_attr || [];     
+    console.log(formValues)
     if( isChecked ) {    
+      //if added before
+      /* const checkExisted = formValues.variations.some((x: any ) => { return x.name ===  name})
+      if( checkExisted ) return */
+
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
       })
   
       filterAttr && filterAttr.map((newAttr: any) => { 
-        formValues.variations_attr.push(newAttr.name)
+        const checkExisted = formValues.variations_attr.some((x: string ) => { return x ===  newAttr.name})
+        if( !checkExisted) formValues.variations_attr.push(newAttr.name)
       })
 
       formValues.variations && formValues.variations.map((item:any) => {
         filterAttr && filterAttr.map((newAttr: any) => {
-          item.attributes.push({ 
-            attr: newAttr.name,
-            label: "",
-            value: ""
-          })
+          const checkExisted = item.attributes.some((x: any ) => { return x.attr ===  newAttr.name})
+          if(!checkExisted) {
+            item.attributes.push({ 
+              attr: newAttr.name,
+              label: "",
+              value: ""
+            })
+          }
         })
       })
-    } else {
+    } else { //remove
+
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return (x.variation && !isChecked && name === x.name && variationsAttr.includes(x.name))
       })
 
-      //remove
       filterAttr && filterAttr.map((newAttr: any) => { 
-        formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
+        const indexOf = formValues.variations_attr.indexOf(newAttr.name)
+        if( indexOf > -1) formValues.variations_attr.splice(indexOf, 1)
       })
 
       formValues.variations && formValues.variations.map((item:any) => {
         filterAttr && filterAttr.map((newAttr: any) => { 
           const findIndex = item.attributes.findIndex((x: any) => { return x.attr === newAttr.name })
-          item.attributes.splice(findIndex, 1)
+          if( findIndex > -1) item.attributes.splice(findIndex, 1)
         })
       })
     }
