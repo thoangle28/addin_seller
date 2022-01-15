@@ -32,8 +32,12 @@ export function getAttributes() {
   return axios.get<any>(API_END_POINT_URL+ '/product/attribute')
 }
 
+export function getAttributesNoChild() {
+  return axios.get<any>(API_END_POINT_URL+ '/product/attribute/parents')
+}
+
 export function getSubAttributes(slug: string) {
-  return axios.post<any>(API_END_POINT_URL+ '/attribute-product/parent', { 'name' : slug })
+  return axios.post<any>(API_END_POINT_URL+ '/product/attribute-list', { 'name' : slug })
 }
 
 

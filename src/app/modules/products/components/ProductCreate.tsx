@@ -9,6 +9,7 @@ import {useLocation} from 'react-router'
 import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
+import { AsyncPaginate } from 'react-select-async-paginate'
 import {
   initialForm,
   styles,
@@ -26,8 +27,13 @@ import {
   fetchProfileData,
   postProduct,
   mapValuesToForm,
-  getProduct
+  getProduct,
+  loadSubAttrOptions,
+  loadAttributeOptions,
+  loadCategoriesOptions,
+  loadProducts,
 } from './formOptions'
+import axios from 'axios'
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
@@ -58,6 +64,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
   const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
   const [product, setProductDetail] = useState<any>([])
+  const [isAttributeAdded, setAttritesAdded] = useState(false)
   //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
   //Get product info from cache
@@ -72,12 +79,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     promise.then((data: any) => {
       
       setShippingClass(data.shippingClass)
-      setProductCategory(data.categories)
-      setProductsList(data.productsList)
+      //setProductCategory(data.categories)
+      //setProductsList(data.productsList)
 
-      const {termsList, fullList} = data.attributes
-      setAttributes(termsList)
-      setFullAttributes(fullList)
+      //const {termsList, fullList} = data.attributes
+      //setAttributes(termsList)
+      //setFullAttributes(fullList)
       //if(fullList.length > 0) localStorage.setItem('fullList', fullList)
     });
     
@@ -118,8 +125,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setProductType(value)
   }
 
-  const onChangeAttr = (option: any) => {
-    setSelectedAttr(option)
+  const onChangeAttr = (newOption: any) => {
+    //console.log(newOption)
+    setAttritesAdded(false)
+    setSelectedAttr(newOption)
   }
 
   const onChangeVar = (option: any) => {
@@ -128,11 +137,34 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const handleAddMoreAttributes = (formValues: any) => {
-    if (!selectedAttr) return
-    const {value} = selectedAttr
-    const isAdded = formValues.attributes.some((x: any) => x.id === value)
+    if (!selectedAttr || !selectedAttr.value) return
+    //console.log(selectedAttr)
+    const value: any = {...selectedAttr}
+    const isAdded = formValues.attributes.some((x: any) => x.id === value.id)
+    
+    if (isAdded) {
+      setAttritesAdded(isAdded)
+      return
+    }
+    const newAttr: any = {
+        id: value.id,
+        is_taxonomy: 1,
+        is_variation: 0,
+        is_visible: 1,
+        name: value.name,
+        options: [],
+        position: 0,
+        title: value.label,
+        value: "",
+        variation: false,
+        visible: true
+      }
+    formValues.attributes.push(newAttr)
 
-    if (isAdded) return
+    //reset
+    setSelectedAttr({value: '', label: ''})
+
+    /* if (isAdded) return
     const attrFound: any = fullAttributesList.find((x: any) => x.id === value)
     //reset
     setSelectedAttr({value: '', label: ''})
@@ -141,7 +173,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const cloneAttrFound = {...attrFound}
       cloneAttrFound.options = []
       formValues.attributes.push(cloneAttrFound)
-    }
+    } */
+
     mapValuesToForm(initialForm, formValues)
   }
 
@@ -313,12 +346,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
-  const loadOptions = (slug: string) => {
-    return new Promise((resolve) => {
-      resolve(SubAttributes(slug))
-    })
-  }
-
   return (
     <>
       {loading ? (
@@ -423,7 +450,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         />
                        {/*  {touched.content && errors.content ? (
                           <div className='text-danger'>{errors.content}</div>
-                        ) : null} */}
+                        ) : null} */}                    
                       </div>
                     </div>
                     <div className='w-100'>
@@ -924,20 +951,35 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     </div>
                                     <div className='col-md-9 mb-5'>
                                       <div className='d-flex align-items-center'>
-                                        <Select
+                                        {/* <Select
                                           styles={styles}
                                           closeMenuOnSelect={true}
                                           isMulti={false}
                                           isSearchable
-                                          isLoading={true}
+                                          isLoading={false}
                                           defaultValue={selectedAttr}
                                           value={selectedAttr}
                                           onChange={(onChangeAttr)}
                                           options={attributesList}
                                           name='attributes'
                                           className='w-100'
+                                        /> */}
+                                        <AsyncPaginate
+                                          placeholder='Select attribute value...'
+                                          isMulti={false}      
+                                          styles={styles}                                    
+                                          closeMenuOnSelect={true}
+                                          value={selectedAttr}        
+                                          loadOptions={() => { return loadAttributeOptions()}}
+                                          onChange={onChangeAttr}
+                                          name="attributes"
+                                          className='w-100'
+                                          noOptionsMessage={() => 'No attribute found'}
+                                          loadingMessage={() => 'Loading data, please wait...'} 
                                         />
                                       </div>
+                                      { isAttributeAdded && 
+                                      (<div className='text-danger'>The attribute has added, pls choose other item...!</div>)}
                                     </div>
                                     <div className='col-md-3 mb-5'>
                                       <button
@@ -960,10 +1002,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       values.attributes.map((attr: any, i: number | string) => {
                                         //find options list from attributes
                                         //const subAttributes = SubAttributes(attr.name)
-                                        const subAttributes: any = fullAttributesList && fullAttributesList.find((x: any) => {
+                                        /* const subAttributes: any = fullAttributesList && fullAttributesList.find((x: any) => {
                                           return x.name === attr.name
-                                        }) || SubAttributes(attr.name)
-
+                                        }) || SubAttributes(attr.name) */
+                                        
                                         return (
                                           <div
                                             className='accordion-item'
@@ -1048,7 +1090,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   </div>
                                                   <div className='col-md-7'>
                                                     <label>Value(s)</label>
-                                                    <Select
+                                                   {/*  <Select
                                                       styles={styles}
                                                       closeMenuOnSelect={false}
                                                       isLoading={false}
@@ -1061,6 +1103,20 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       }}
                                                       options={(subAttributes && subAttributes.options)}
                                                       name={`attributes[${i}].options`}
+                                                    /> */}
+                                                    <AsyncPaginate
+                                                      placeholder='Select term value(s)...'
+                                                      isMulti              
+                                                      styles={styles}                                    
+                                                      closeMenuOnSelect={false}
+                                                      value={attr.options}        
+                                                      loadOptions={() => { return loadSubAttrOptions(attr.name)}}
+                                                      onChange={(event) => {                                                        
+                                                        setFieldValue(`attributes[${i}].options`, event)
+                                                      }}
+                                                      name={`attributes[${i}].options`}
+                                                      noOptionsMessage={() => 'No value(s) found'}
+                                                      loadingMessage={() => 'Loading data, please wait...'} 
                                                     />
                                                   </div>
                                                 </div>
@@ -1469,7 +1525,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                                         <span>Upsells</span>
                                       </label>
-                                      <Select
+                                      {/* <Select
                                         styles={styles}
                                         closeMenuOnSelect={false}
                                         isMulti
@@ -1487,6 +1543,27 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         }}
                                         options={productsList}
                                         name='linked_products_upsell'
+                                      /> */}
+                                      <AsyncPaginate
+                                        placeholder='Select product...'
+                                        isMulti={true}      
+                                        styles={styles}                                    
+                                        closeMenuOnSelect={false}
+                                        value={values.linked_products_upsell}       
+                                        loadOptions={() => { return loadProducts(currentUserId)}}
+                                        onChange={(selectedOption) => {
+                                          let event = {
+                                            target: {
+                                              name: 'linked_products_upsell',
+                                              value: selectedOption,
+                                            },
+                                          }
+                                          handleChange(event)
+                                        }}
+                                        name="linked_products_upsell"
+                                        className='w-100'
+                                        noOptionsMessage={() => 'No products found'}
+                                        loadingMessage={() => 'Loading data, please wait...'} 
                                       />
                                     </div>
                                     <div className='text-muted fs-8 mt-3'>
@@ -1499,7 +1576,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                                       <span>Cross-sells</span>
                                     </label>
-                                    <Select
+                                    {/* <Select
                                       styles={styles}
                                       closeMenuOnSelect={false}
                                       isMulti
@@ -1517,6 +1594,27 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       }}
                                       options={productsList}
                                       name='linked_products_cross_sell'
+                                    /> */}
+                                    <AsyncPaginate
+                                      placeholder='Select product...'
+                                      isMulti={true}      
+                                      styles={styles}                                    
+                                      closeMenuOnSelect={false}
+                                      value={values.linked_products_cross_sell}       
+                                      loadOptions={() => { return loadProducts(currentUserId)}}
+                                      onChange={(selectedOption) => {
+                                        let event = {
+                                          target: {
+                                            name: 'linked_products_cross_sell',
+                                            value: selectedOption,
+                                          },
+                                        }
+                                        handleChange(event)
+                                      }}
+                                      name="linked_products_cross_sell"
+                                      className='w-100'
+                                      noOptionsMessage={() => 'No products found'}
+                                      loadingMessage={() => 'Loading data, please wait...'} 
                                     />
                                     <div className='text-muted fs-8 mt-3'>
                                       Cross-sells are products which you promote in the cart, based
@@ -1531,7 +1629,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <span>Categories</span>
                                     </label>
                                     <div className='form-group'>
-                                      <Select
+                                      {/* <Select
                                         styles={styles}
                                         closeMenuOnSelect={false}
                                         isMulti
@@ -1549,6 +1647,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         }}
                                         options={productCategories}
                                         name='categories'
+                                      /> */}
+                                      <AsyncPaginate
+                                        placeholder='Select categories...'
+                                        isMulti={true}      
+                                        styles={styles}                                    
+                                        closeMenuOnSelect={false}
+                                        value={values.categories}        
+                                        loadOptions={() => { return loadCategoriesOptions()}}
+                                        onChange={(selectedOption) => {
+                                          let event = {
+                                            target: {name: 'categories', value: selectedOption},
+                                          }
+                                          handleChange(event)
+                                        }}
+                                        name="categories"
+                                        className='w-100'
+                                        noOptionsMessage={() => 'No categories found'}
+                                        loadingMessage={() => 'Loading data, please wait...'} 
                                       />
                                     </div>
                                   </div>

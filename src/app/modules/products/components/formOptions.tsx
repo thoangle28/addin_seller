@@ -303,11 +303,11 @@ export const FallbackView = () => {
 export const fetchProfileData = (userId: number) => {
   return Promise.all([
     fetchShippingClass(),
-    fetchCategoies(),
-    fetchAttributes(),
-    fetchProductsList(userId)
-  ]).then(([shippingClass, categories, attributes, productsList]) => {
-    return {shippingClass, categories, attributes, productsList}      
+    //fetchCategoies(),
+    //fetchAttributes(),
+    //fetchProductsList(userId)
+  ]).then(([shippingClass]) => { //, categories, attributes, productsList
+    return {shippingClass}  //, categories, attributes, productsList
   })
 }
 
@@ -386,6 +386,57 @@ export const getProduct = (uid: number, pid: number) => {
   })
 }
 
+export const loadSubAttrOptions = async (search: any) => {        
+  const response = await  common.getSubAttributes(search)
+  const responseJSON = await response.data
+  console.log(responseJSON.data)
+  return {
+    options: responseJSON.data,
+    hasMore: false
+  };
+}
+
+export const loadAttributeOptions = async () => {        
+  const response = await  common.getAttributesNoChild()
+  const responseJSON = await response.data
+  return {
+    options: responseJSON.data,
+    hasMore: false
+  };
+}
+
+
+export const loadCategoriesOptions = async () => {        
+  const response = await  common.getCategoires()
+  const responseJSON = await response.data
+  console.log(responseJSON.data)
+  return {
+    options: responseJSON.data,
+    hasMore: false,
+  };
+}
+
+export const loadProducts = async (userId: number) => {        
+ 
+  const response = await  common.getProductsList(userId)
+  const responseJSON = await response.data
+  const termsList = await convertToList(responseJSON.data)
+  return {
+    options: termsList,
+    hasMore: false,
+  };
+}
+
+const convertToList = (data: any) => {
+  const termsList: any = []
+  data &&
+  data.productsList &&
+  data.productsList.forEach((e: any) => {
+    termsList.push({value: e.product_id, label: e.product_name.replace('&amp;', '&')})
+  })
+
+  return termsList
+}
 //----------------------------------------
 /* useEffect(() => {
   const loadingEverything = () => {
