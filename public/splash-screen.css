@@ -161,3 +161,43 @@ body {
     transform: translateX(100%);
   }
 }
+
+.custom-ui {
+  text-align: center;
+  width: auto;
+  max-width: 500px;
+  padding: 20px 25px;
+  background: rgba(0, 149, 232, 0.7);
+  box-shadow: 0 20px 75px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  border-radius: 5px;
+}
+
+.custom-ui > h2 {
+  margin-top: 0;
+  color: #fff;
+}
+
+.custom-ui > button {
+  width: auto;
+  margin: 10px;
+  /* padding: 10px;
+  border: 1px solid transparent;
+  margin: 10px;
+  cursor: pointer;
+  background: none;
+  color: #fff;
+  font-size: 14px; */
+}
+/* 
+.custom-ui > button.yes {
+  background-color: #bd0000;
+}
+
+.custom-ui > button.no {
+  background-color: #00bd10;
+} */
+
+.react-confirm-alert-overlay {
+  background: rgba(255, 255, 255, 0.7);
+}
