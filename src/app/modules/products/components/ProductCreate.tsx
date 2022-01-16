@@ -5,15 +5,14 @@ import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
 import SunEditor from 'suneditor-react'
 import 'suneditor/dist/css/suneditor.min.css'
-import {useLocation} from 'react-router'
+import {useHistory, useLocation} from 'react-router'
 import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
 import { AsyncPaginate } from 'react-select-async-paginate'
 import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
-import {  initialForm,  styles,  SubAttributes,  TaxClass,  initialFormValues, 
-  /*  ShippingClass,  Categoies,  Attributes,  ProductsList, */
+import {  initialForm,  styles,  TaxClass,  initialFormValues, saveProductProperties,
   StockStatus,  handleFileUpload,  UploadImageField,  FallbackView,  fetchProfileData,  postProduct,  mapValuesToForm,
   getProduct,  loadSubAttrOptions,  loadAttributeOptions,  loadCategoriesOptions,  loadProducts,} from './formOptions'
 
@@ -24,6 +23,8 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ProductCreate: FC<PropsFromRedux> = (props) => {
   const dispatch = useDispatch()
+  const history = useHistory();
+  
   //get product id or create new
   const userLocation: any = useLocation()
   const {productId} = userLocation.state ? userLocation.state : 0
@@ -37,10 +38,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [loading, setLoading] = useState(true)
   const [isNewProduct, setNewProduct] = useState(true)
   const [shippingClass, setShippingClass] = useState([])
-  const [productCategories, setProductCategory] = useState([])
-  const [attributesList, setAttributes] = useState([])
-  const [fullAttributesList, setFullAttributes] = useState([])
-  const [productsList, setProductsList] = useState([])
+  const [reloadPage, setReloadPage] = useState(false)
   const [productType, setProductType] = useState('simple')
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
@@ -48,6 +46,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
   const [product, setProductDetail] = useState<any>([])
   const [isAttributeAdded, setAttritesAdded] = useState(false)
+  const [isSaveAttr, setSaveAttr] = useState({loading: false, error: ''})
+  const [isSaveVar, setSaveVar] = useState({loading: false, error: ''})
   //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
   //Get All Properties  
@@ -55,16 +55,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const productInfo = getProduct(currentUserId, productId)
   
   useEffect(() => {
-    promise.then((data: any) => {
-      
+    promise.then((data: any) => {      
       setShippingClass(data.shippingClass)
     });
     
     productInfo.then((response: any) => { 
       const { code, message, data } = response     
       setProductDetail({...data})
-    })
-  }, []);
+    })    
+
+  }, [reloadPage]);
   
   /**
    * Get Product Details
@@ -78,6 +78,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setLoading(false)
     } else {
       if( typeof productId === 'undefined'  || productId <= 0 ) {
+        initialFormValues.user_id = currentUserId
         mapValuesToForm(initialForm, initialFormValues)
         setNewProduct(true)
         setProductType('simple')
@@ -96,7 +97,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   const onChangeAttr = (newOption: any) => {
-    //console.log(newOption)
+    
     setAttritesAdded(false)
     setSelectedAttr(newOption)
   }
@@ -108,7 +109,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const handleAddMoreAttributes = (formValues: any) => {
     if (!selectedAttr || !selectedAttr.value) return
-    //console.log(selectedAttr)
+   
     const value: any = {...selectedAttr}
     const isAdded = formValues.attributes.some((x: any) => x.id === value.id)
     
@@ -156,11 +157,40 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
-    //mapValuesToForm(initialForm, formValues)
+    setSaveAttr({loading: true,  error: ''})
+    saveProductProperties({
+      accessToken, 
+      product_id: formValues.id, 
+      attributes: formValues.attributes, 
+      type: 'attr'})
+    .then((response: any) =>{
+      const { code, message, data } = response.data 
+      setSaveAttr({loading: false,  error: message})
+      setTimeout(() => {
+        setSaveAttr({loading: false,  error: ''})
+        setReloadPage(true)
+      }, 2000)
+    })
   }
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
+    setSaveVar({loading: true,  error: ''})
+    saveProductProperties({
+      accessToken, 
+      product_id: formValues.id, 
+      variations: formValues.variations, 
+      type: 'var'})
+    .then((response: any) => {      
+      const { code, message, data } = response.data     
+      setSaveVar({loading: false,  error: message})
+      setTimeout(() => {
+        setSaveVar({loading: false,  error: ''})
+        setReloadPage(true)
+      }, 2000)
+    }).catch(() => {
+
+    })
     //mapValuesToForm(initialForm, formValues)
   }
   
@@ -203,7 +233,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   
   const updateAttrToVariations = ( name: any, isChecked: any,formValues: any ) => {
     const variationsAttr: Array<string> = formValues.variations_attr || [];     
-    console.log(formValues)
+
     if( isChecked ) {   
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
@@ -276,7 +306,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     window.location.reload();
   }
 
-  const conformDelete = (event: any, handleAction: any) => {
+  const confirmDelete = (event: any, handleAction: any) => {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
@@ -294,6 +324,33 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               }}
             >
               Yes, Delete it!
+            </button>
+          </div>
+        )
+      }
+    })
+  }
+
+  const confirmRequest = (message: string) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="custom-ui">
+            <p>{message}</p>
+            <button
+              className='btn btn-sm btn-success'
+              onClick={() => {
+                setReloadPage(true)
+                onClose()
+              }}>Still on this page</button>
+            <button
+              className='btn btn-sm btn-danger'
+              onClick={() => {
+                history.push("/product/listing");
+                onClose()
+              }}
+            >
+              Go to the products list
             </button>
           </div>
         )
@@ -385,12 +442,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 console.log(values)
                 postProduct(values, accessToken).then((product: any) => {
                   const { code, message } = product
+                  console.log(product)
                   switch(code) {
                     case 200:
-                      //show alert
-                      refreshPage()
+                      confirmRequest(message)
                       break;
-                  }                  
+                  }            
                   setSubmitting(false) //done
                 }).catch(() => {
                   //setSubmitting(false) //error
@@ -419,7 +476,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                     <div className='w-100'>
                       <div className='fv-row mb-5'>
                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                          <span className='no-required'>Product Title</span>
+                          <span className='required'>Product Title</span>
                         </label>
                         <input
                           name='name'
@@ -969,20 +1026,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       </div>
                                     </div>
                                     <div className='col-md-9 mb-5'>
-                                      <div className='d-flex align-items-center'>
-                                        {/* <Select
-                                          styles={styles}
-                                          closeMenuOnSelect={true}
-                                          isMulti={false}
-                                          isSearchable
-                                          isLoading={false}
-                                          defaultValue={selectedAttr}
-                                          value={selectedAttr}
-                                          onChange={(onChangeAttr)}
-                                          options={attributesList}
-                                          name='attributes'
-                                          className='w-100'
-                                        /> */}
+                                      <div className='d-flex align-items-center'>                                       
                                         <AsyncPaginate
                                           placeholder='Select attribute value...'
                                           isMulti={false}      
@@ -1125,7 +1169,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       })) ||
                                       null}
                                   </div>
-                                  {/* !isNewProduct && (
+                                  { !isNewProduct && (
                                   <div className='mt-4'>
                                     <button
                                         onClick={(event) => {
@@ -1133,13 +1177,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           handleChange(event)               
                                         }}
                                         type='button'
-                                        className='btn btn-sm btn-primary'
+                                        className='btn btn-sm btn-dark'
                                         name='save-attributes'
+                                        disabled={isSaveAttr.loading}
                                       >
-                                        Save Attributes
+                                        { !isSaveAttr.loading ?
+                                        (<span className='indicator-label'>Save Attributes</span>) : 
+                                        (<span className='indicator-progress' style={{display: 'block'}}>
+                                          Processing...
+                                          <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                                        </span>)}
                                       </button>
+                                      {isSaveAttr.error && (
+                                        <div className="alam fs-8 p-2 w-auto mt-2 deley-200" role="alert">
+                                          {isSaveAttr.error}
+                                        </div>
+                                      )}
                                   </div>
-                                  )*/}
+                                  ) }
                                 </div>
 
                                 {productType === 'variable' ? (
@@ -1219,7 +1274,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           title='Remove this variation'
                                                           name={'remove_' + item.id }
                                                           onClick={(event) => {
-                                                            conformDelete(event, () => {                                                              
+                                                            confirmDelete(event, () => {                                                              
                                                               removeVariations(item.id , values)
                                                               handleChange(event)
                                                             })                                                            
@@ -1496,7 +1551,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         })}
                                       {/** end variant */}
                                     </div>
-                                    {/* !isNewProduct && (
+                                    { !isNewProduct && (
                                     <div className='mt-4'>
                                       <button
                                           onClick={(event) => {
@@ -1504,13 +1559,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             handleChange(event)               
                                           }}
                                           type='button'
-                                          className='btn btn-sm btn-primary'
+                                          className='btn btn-sm btn-dark'
                                           name='save-variations'
+                                          disabled={isSaveVar.loading}
                                         >
-                                          Save Varations
+                                          { !isSaveVar.loading ?
+                                          (<span className='indicator-label'>Save Variations</span>) : 
+                                          (<span className='indicator-progress' style={{display: 'block'}}>
+                                            Processing...
+                                            <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                                          </span>)}
                                         </button>
+                                        {(isSaveVar.error) && (
+                                          <div className="alam fs-8 p-2 w-auto mt-2 deley-200" role="alert">
+                                            {isSaveVar.error}
+                                          </div>
+                                        )}
                                     </div>
-                                    )*/}
+                                    )}
                                   </div>
                                 ) : null}
                                 {/* End Variants */}
@@ -1614,20 +1680,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       </div>
                     </div>
                     <div className='pt-10 justify-content-center mb-5'>
-                      <div className='me-0 d-flex flex-stack '>
+                      <div className='me-0 d-flex flex-stack justify-content-center indicator-progress'>
                         <button
                           type='submit'
-                          className='btn btn-lg btn-primary w-100 me-3'
+                          className='btn btn-lg btn-success w-50 me-3'
                           disabled={isSubmitting}
                         >
-                          { isSubmitting ? 'Processing...' : 'Create Product'}
-                        </button>
-                        <button
-                          type='button'
-                          className='btn btn-lg btn-success w-100 ms-3'
-                        >
-                          Create &amp; Continue
-                        </button>
+                          { isSubmitting 
+                          ? (<>Processing... <span className='spinner-border spinner-border-sm align-middle ms-2'></span></>) 
+                          : (!isNewProduct ? 'Update Product': 'Create Product')}
+                        </button>                       
                       </div>
                     </div>
                   </div>

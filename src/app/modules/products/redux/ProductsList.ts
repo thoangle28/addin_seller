@@ -62,3 +62,9 @@ export function getProductInfoDetail(userId: number, product_id: number | 0) {
 export function saveProductToDB(params: any, token: string) {
   return axios.post<{result: any}>(API_END_POINT_URL+ '/create-product', { product_info: params, accessToken: token }) 
 }
+
+//accessToken: string, product_id: number, params: any, type: string
+export function updateProductAttr(obj: any) {
+  const url = (obj.type === 'attr') ? '/product/create-attributes' : '/product/create-variations'
+  return axios.post<any>(API_END_POINT_URL+ url, {data: obj })
+}

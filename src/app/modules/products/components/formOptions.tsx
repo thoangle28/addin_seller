@@ -14,6 +14,7 @@ export interface IAttribute {
 export const initialForm = {
   productId: 0,
   id: 0,
+  user_id: 0,
   name: '',
   content: '',
   is_variable: 'simple', //simple
@@ -57,6 +58,7 @@ export const initialFormValues = { ...initialForm }
 export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.productId = productValues.id
   initialValues.id = productValues.id
+  initialValues.user_id = productValues.user_id
   initialValues.name = productValues.name
   initialValues.content = productValues.content
   initialValues.is_variable = productValues.is_variable
@@ -389,9 +391,8 @@ export const getProduct = (uid: number, pid: number) => {
 export const loadSubAttrOptions = async (search: any) => {        
   const response = await  common.getSubAttributes(search)
   const responseJSON = await response.data
-  console.log(responseJSON.data)
   return {
-    options: responseJSON.data,
+    options: responseJSON.data || [],
     hasMore: false
   };
 }
@@ -400,7 +401,7 @@ export const loadAttributeOptions = async () => {
   const response = await  common.getAttributesNoChild()
   const responseJSON = await response.data
   return {
-    options: responseJSON.data,
+    options: responseJSON.data || [],
     hasMore: false
   };
 }
@@ -408,10 +409,9 @@ export const loadAttributeOptions = async () => {
 
 export const loadCategoriesOptions = async () => {        
   const response = await  common.getCategoires()
-  const responseJSON = await response.data
-  console.log(responseJSON.data)
+  const responseJSON = await response.data 
   return {
-    options: responseJSON.data,
+    options: responseJSON.data || [],
     hasMore: false,
   };
 }
@@ -422,7 +422,7 @@ export const loadProducts = async (userId: number) => {
   const responseJSON = await response.data
   const termsList = await convertToList(responseJSON.data)
   return {
-    options: termsList,
+    options: termsList || [],
     hasMore: false,
   };
 }
@@ -437,24 +437,8 @@ const convertToList = (data: any) => {
 
   return termsList
 }
-//----------------------------------------
-/* useEffect(() => {
-  const loadingEverything = () => {
-    setShippingClass(ShippingClass())
-    setProductCategory(Categoies())     
-    setProductsList(ProductsList(currentUserId))
-  }
 
-  loadingEverything()
-}, [])
 
-useEffect(() => {
-  const loadAttributes = () => {
-    const {termsList, fullList} = Attributes()
-    setAttributes(termsList)
-    setFullAttributes(fullList)
-  }     
-
-  loadAttributes();
-
-}, []) */
+export const saveProductProperties = async (params: any) => {
+  return common.updateProductAttr(params)
+}
