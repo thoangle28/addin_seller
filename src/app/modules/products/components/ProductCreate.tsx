@@ -28,8 +28,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   //get product id or create new
   const userLocation: any = useLocation()
   const {productId} = userLocation.state ? userLocation.state : 0
-
-  //const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
   const { accessToken, user } = auth
   const currentUserId: number = user ? user.ID : 0
@@ -188,10 +186,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         setSaveVar({loading: false,  error: ''})
         setReloadPage(true)
       }, 2000)
-    }).catch(() => {
-
-    })
-    //mapValuesToForm(initialForm, formValues)
+    }).catch(() => {})
   }
   
 
@@ -368,7 +363,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
             <button onClick={onClose}>No</button>
             <button
               onClick={() => {
-                //this.handleClickDelete();
                 onClose()
               }}
             >
