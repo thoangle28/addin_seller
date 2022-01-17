@@ -27,7 +27,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   
   //get product id or create new
   const userLocation: any = useLocation()
-  const {productId} = userLocation.state ? userLocation.state : 0
+  const { productId } = userLocation.state ? userLocation.state : 0
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
   const { accessToken, user } = auth
   const currentUserId: number = user ? user.ID : 0
@@ -321,18 +321,23 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
-  const confirmRequest = (message: string) => {
+  const confirmRequest = (message: string, product_id: number) => {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
           <div className="custom-ui">
             <p>{message}</p>
-            <button
+            {/* <button
               className='btn btn-sm btn-success'
               onClick={() => {
-                setReloadPage(true)
+                //clear product, productId
+                history.push({
+                  hash: '#' + product_id,
+                  pathname: '/product/update/' + product_id,
+                  state: { productId: product_id},
+                });
                 onClose()
-              }}>Still on this page</button>
+              }}>Still on this page</button> */}
             <button
               className='btn btn-sm btn-danger'
               onClick={() => {
@@ -378,12 +383,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const ValidationSchema = () => {
     return Yup.object().shape({
       name: Yup.string().max(250, 'Must be 250 characters or less').required('Pls enter the product title'),    
-      variations: Yup.array().of(
+     /*  variations: Yup.array().of(
         Yup.object().shape({
           regular_price: Yup.number().test("regularPrice", "Invalid number", (value) => {
             if (value) return !isNaN(parseFloat(String(value))) && isFinite(Number(value))
           }) // 20 score
-        }))
+        })) */
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
@@ -415,11 +420,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 setSubmitting(true)
                 //console.log(values)
                 postProduct(values, accessToken).then((product: any) => {
-                  const { code, message } = product
+                  const { code, message, data } = product
                   //console.log(product)
                   switch(code) {
                     case 200:
-                      confirmRequest(message)
+                      confirmRequest(message, data)
                       break;
                   }            
                   setSubmitting(false) //done
@@ -640,7 +645,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     )
                                   }
                                 </div>
-                                {(newThumbnail || values && values.thumbnail.src) &&
+                                {(newThumbnail || (values && values.thumbnail.src)) &&
                                 (<span
                                   className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
                                   data-kt-image-input-action='remove'
@@ -686,9 +691,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 name='type_product'
                                 className='form-select'
                                 value={values.type_product}
-                                onChange={(e) => {
-                                  onChangeProducType(e)
-                                  handleChange(e)
+                                onChange={(event) => {
+                                  onChangeProducType(event)
+                                  handleChange(event)
                                 }}
                               >
                                 <option value='simple'>Simple product</option>
