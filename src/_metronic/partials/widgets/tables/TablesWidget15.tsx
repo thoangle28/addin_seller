@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react'
-import {KTSVG, toAbsoluteUrl} from '../../../helpers'
+import {KTSVG} from '../../../helpers'
 import {Link} from 'react-router-dom'
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 
 const TablesWidget15: React.FC<Props> = ({className, dataList}) => {
   
-  const {productsList, pageSize, currentPage} = dataList
+  const {productsList} = dataList
 
   return (
     <div className={`card ${className}`}>
@@ -59,7 +59,7 @@ const TablesWidget15: React.FC<Props> = ({className, dataList}) => {
             <tbody>
               {productsList ? (
                 productsList.map((ele: any, index: number) => {
-                  const real_price = (ele.regular_price > 0) ? ele.regular_price : ele.price
+                  //const real_price = (ele.regular_price > 0) ? ele.regular_price : ele.price
 
                   return (
                     <tr key={index}>
@@ -83,15 +83,20 @@ const TablesWidget15: React.FC<Props> = ({className, dataList}) => {
                       </td>
                       <td className='text-center'>{ele.sku}</td>
                       <td className='text-end'>
-                        {ele.sale_price > 0 ? (
-                          <> <small style={{color: '#999', textDecoration: 'line-through'}}>
-                            ${ele.regular_price}
-                          </small><span>${real_price}</span></>
-                        ) : (<span>${real_price}</span>)}
+                        { (ele.sale_price > 0 && ele.sale_price < ele.price)  ? (
+                          <>
+                            <span>${ele.sale_price}</span><br />
+                            <small className='me-2' style={{color: '#999', textDecoration: 'line-through'}}>
+                              ${ele.price}
+                            </small>                            
+                          </>
+                        ) : (
+                          <span>${ele.price}</span>
+                        )}
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
                       <td className='text-center'>
-                        {ele.status == 'publish' ? (
+                        {ele.status === 'publish' ? (
                           <span className='badge badge-light-success'>Approved</span>
                         ) : (
                           <span className='badge badge-light-warning'>Pending</span>

@@ -1,12 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState} from 'react'
-import {KTSVG, toAbsoluteUrl} from '../../../helpers'
+import React, {useEffect, useState} from 'react'
+import {KTSVG} from '../../../helpers'
 import {Link} from 'react-router-dom'
 
 type Props = {
   className: string
   dataList: any | []
   isHome: boolean | false
+  FallbackView?: any
   onChange?: (p:any, s: any) => void
 }
 
@@ -42,18 +43,27 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
   return listPages
 }
 
-const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined}: Props) => {
+const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = () => undefined}: Props) => {
 
-  const {productsList, pageSize, currentPage, totalPages, totalProducts} = dataList
+  const {productsList, currentPage, totalPages, totalProducts} = dataList
 
   const listPages = find_page_begin_end(currentPage, totalPages)
 
   const [newPageSize, setPageSize] = useState(10)
+  const [isLoading, setLoading] = useState(true)
+  const [isPaginate, setPaginate] = useState(false)
 
   const onChangePageSize = ( s: any ) => {
     setPageSize(s)
     onChange(-1, s)
   }
+  
+  useEffect(() => {   
+    let timer = setTimeout(() => setPaginate(false), 2000);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [currentPage])
 
   return (
     <div className={`card ${className}`}>
@@ -103,7 +113,7 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
               {
                 (!!productsList && productsList.length > 0) ? (
                 productsList.map((ele: any, index: number) => {
-                  const real_price = ele.regular_price > 0 ? ele.regular_price : ele.price
+                  //const real_price = ele.sale_price > 0 ? ele.sale_price : ele.price
 
                   return (
                     <tr key={index}>
@@ -127,21 +137,22 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                       </td>
                       <td className='text-center'>{ele.sku}</td>
                       <td className='text-end'>
-                        {ele.sale_price > 0 ? (
+                        
+                        { (ele.sale_price > 0 && ele.sale_price < ele.price)  ? (
                           <>
-                            {' '}
+                            <span>${ele.sale_price}</span><br />
                             <small className='me-2' style={{color: '#999', textDecoration: 'line-through'}}>
-                              ${ele.regular_price}
-                            </small>
-                            <span>${real_price}</span>
+                              ${ele.price}
+                            </small>                            
                           </>
                         ) : (
-                          <span>${real_price}</span>
+                          <span>${ele.price}</span>
                         )}
+
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
                       <td className='text-center'>
-                        {ele.status == 'publish' ? (
+                        {ele.status === 'publish' ? (
                           <span className='badge badge-light-success'>Approved</span>
                         ) : (
                           <span className='badge badge-light-warning'>Pending</span>
@@ -182,7 +193,15 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
               ) : (
                 <tr>
                   <td className='text-center' colSpan={8}>
-                    No products here!
+                    {(!isLoading && !!productsList && productsList.length === 0) 
+                    ? <>No products here!</> 
+                    : (
+                      <div className='card mb-0 mb-xl-8 loading-wrapper'>
+                        <div className='card-body py-3 loading-body'>
+                          <FallbackView />
+                        </div>
+                      </div>
+                    ) }
                   </td>
                 </tr>
               )}
@@ -207,21 +226,26 @@ const TablesWidget14 = ({className, dataList, isHome, onChange = () => undefined
                       <option value='50'>50</option>
                       <option value='100'>100</option>
                     </select>
-                    <span className='text-muted ms-3'>item(s)/page</span>
-                    {/* <div className='d-flex align-items-center'>
-                      <div className='mr-2 text-muted'>Loading...</div>
-                      <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                    </div> */}
+                    <span className='text-muted ms-3'>item(s)/page</span>                   
                     <span className='text-muted ms-5'>
                       Displaying {currentPage} of {totalPages} pages
                     </span>
+                    { isPaginate &&
+                      (<span className='ms-5 indicator-progress' style={{display: 'block'}}>
+                       Loading...
+                        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                      </span>)}
                   </div>
                   <div className='d-flex flex-wrap py-2 mr-3'>                                 
                     {
                       listPages &&
                         listPages.map((item,index) => {
                           return (<a key={index}
-                          href={'#' + item.page} onClick={() => onChange(item.page, -1) }
+                          href={'#' + item.page} onClick={() => {
+                              setPaginate(true)
+                              onChange(item.page, -1) 
+                            }
+                          }
                           className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}
                         >{item.label}</a>)
                         })

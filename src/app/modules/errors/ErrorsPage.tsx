@@ -18,13 +18,14 @@ const ErrorsPage: React.FC = () => {
         style={{backgroundImage: `url('${toAbsoluteUrl('/media/illustrations/progress-hd.png')}')`}}
       >
         <div className='d-flex flex-column flex-column-fluid text-center p-10 py-lg-20'>
+          <div style={{ "height":"300px"}}>
           <a href='/dashboard' className='mb-10 pt-lg-20'>
             <img
               alt='Logo'
-              src={toAbsoluteUrl('/media/logos/logo-1.svg')}
+              src={toAbsoluteUrl('/media/logos/logo-v5-200.png')}
               className='h-50px mb-5'
             />
-          </a>
+          </a></div>
           <div className='pt-lg-10 mb-10'>
             <Switch>
               <Route path='/error/404' exact={true}>
@@ -61,15 +62,7 @@ const ErrorsPage: React.FC = () => {
 
         <div className='d-flex flex-center flex-column-auto p-10'>
           <div className='d-flex align-items-center fw-bold fs-6'>
-            <a href='https://keenthemes.com' className='text-muted text-hover-primary px-2'>
-              About
-            </a>
-            <a href='mailto:support@keenthemes.com' className='text-muted text-hover-primary px-2'>
-              Contact
-            </a>
-            <a href='https://1.envato.market/EA4JP' className='text-muted text-hover-primary px-2'>
-              Contact Us
-            </a>
+            Addin SG &copy; 2022
           </div>
         </div>
       </div>

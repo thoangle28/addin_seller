@@ -12,6 +12,9 @@ export interface IAttribute {
 }
 
 export const initialForm = {
+  productId: 0,
+  id: 0,
+  user_id: 0,
   name: '',
   content: '',
   is_variable: 'simple', //simple
@@ -19,7 +22,8 @@ export const initialForm = {
   variations: [],
   variations_attr: [],
   attributes: [],
-  thumnail: '',
+  thumbnail: { src: '', image_id: ''},  
+  new_thumbnail: '',
   photo_galleries: [],
   new_photo_galleries: [],
   general_price: '',
@@ -47,11 +51,41 @@ export const initialForm = {
   linked_products_upsell: [],
   linked_products_cross_sell: [],
   selectedAttr: '',
-  thumbnail: '',
-  new_thumbnail: '',
 }
 
-export const getInitialFormValues = { ...initialForm }
+export const initialFormValues = { ...initialForm }
+
+export const mapValuesToForm = (initialValues: any, productValues: any) => {
+  initialValues.productId = productValues.id
+  initialValues.id = productValues.id
+  initialValues.user_id = productValues.user_id
+  initialValues.name = productValues.name
+  initialValues.content = productValues.content
+  initialValues.is_variable = productValues.is_variable
+  initialValues.type_product = productValues.type_product
+  initialValues.inventory_sku = productValues.inventory_sku
+  initialValues.attributes = productValues.attributes
+  initialValues.variations = productValues.variations
+  initialValues.thumbnail = productValues.thumbnail
+  initialValues.new_thumbnail = ''
+  initialValues.photo_galleries = productValues.photo_galleries
+  initialValues.new_photo_galleries = productValues.new_photo_galleries
+  initialValues.general_price = productValues.general_price
+  initialValues.general_regular_price = productValues.general_regular_price
+  initialValues.general_sale_price = productValues.general_sale_price
+  initialValues.general_tax_status = productValues.general_tax_status
+  initialValues.general_tax_class = productValues.general_tax_class
+  initialValues.categories = productValues.categories
+  initialValues.shipping_class_id = productValues.shipping_class_id
+  initialValues.selectedAttr = ''
+  initialValues.selectedVarAct = ''
+  initialValues.variations_attr = productValues.variations_attr
+  initialValues.linked_products_upsell = productValues.linked_products_upsell
+  initialValues.linked_products_cross_sell = productValues.linked_products_cross_sell
+  initialValues.general_wallet_credit = productValues.general_wallet_credit
+  initialValues.general_wallet_cashback = productValues.general_wallet_cashback
+  initialValues.general_commission = productValues.general_commission
+}
 
 export const TaxClass: any = [
   {value: 'parent', label: 'Same as parent'},
@@ -132,7 +166,7 @@ export const Attributes = () => {
             name: item.name,
             visible: false,
             variation: false,
-            options: [],
+            options: item.options,
           }
 
           fullList.push(newItem)
@@ -254,9 +288,157 @@ export const FallbackView = () => {
   return (
     <div className='text-center w-100'>
       <img src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
-      <div className='mt-5'>
-        <span>Loading ...</span>
+      <div className='mt-5 text-center d-flex justify-content-center'>
+        <div className='loadding'>
+          <span>Loading ...</span>
+          <div className="balls mt-3">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
       </div>
     </div>
   )
+}
+
+export const fetchProfileData = (userId: number) => {
+  return Promise.all([
+    fetchShippingClass(),
+    //fetchCategoies(),
+    //fetchAttributes(),
+    //fetchProductsList(userId)
+  ]).then(([shippingClass]) => { //, categories, attributes, productsList
+    return {shippingClass}  //, categories, attributes, productsList
+  })
+}
+
+const fetchShippingClass = () => {
+  return new Promise((resolve, reject) => {
+    try {
+      const shippingClass = ShippingClass()
+      resolve(shippingClass)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }    
+  })    
+}
+
+const fetchCategoies = () => {
+  return new Promise((resolve, reject) => {   
+    try {
+      const categories = Categoies()
+      resolve(categories)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }  
+  })    
+}
+
+const fetchAttributes = () => {
+  return new Promise((resolve, reject) => {   
+    try {
+      const attributes = Attributes()
+      resolve(attributes)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }  
+  })    
+}
+
+const fetchProductsList = (userId: number) => {
+  return new Promise((resolve, reject) => {    
+    try {
+      const productsList = ProductsList(userId)
+      resolve(productsList)
+    } catch(e) {
+      reject({
+        errorMsg: 'Error while loading data. Try again later.'
+      })
+    }  
+  })    
+}
+
+export const postProduct = (params: any, token: string) => {
+  return new Promise((resolve, reject) => { 
+    common.saveProductToDB(params, token).then((response) => {
+      //console.log(response)
+      const { data } = response
+      resolve(data)
+    })
+  })
+}
+
+
+export const getProduct = (uid: number, pid: number) => {
+  return new Promise((resolve, reject) => { 
+    common.getProductInfoDetail(uid, pid)
+    .then((response: any) => {
+      const {data} = response
+      resolve(data)
+    })
+    .catch(() => {})
+    .finally(() => {})
+  })
+}
+
+export const loadSubAttrOptions = async (search: any) => {        
+  const response = await  common.getSubAttributes(search)
+  const responseJSON = await response.data
+  return {
+    options: responseJSON.data || [],
+    hasMore: false
+  };
+}
+
+export const loadAttributeOptions = async () => {        
+  const response = await  common.getAttributesNoChild()
+  const responseJSON = await response.data
+  return {
+    options: responseJSON.data || [],
+    hasMore: false
+  };
+}
+
+
+export const loadCategoriesOptions = async () => {        
+  const response = await  common.getCategoires()
+  const responseJSON = await response.data 
+  return {
+    options: responseJSON.data || [],
+    hasMore: false,
+  };
+}
+
+export const loadProducts = async (userId: number) => {        
+ 
+  const response = await  common.getProductsList(userId)
+  const responseJSON = await response.data
+  const termsList = await convertToList(responseJSON.data)
+  return {
+    options: termsList || [],
+    hasMore: false,
+  };
+}
+
+const convertToList = (data: any) => {
+  const termsList: any = []
+  data &&
+  data.productsList &&
+  data.productsList.forEach((e: any) => {
+    termsList.push({value: e.product_id, label: e.product_name.replace('&amp;', '&')})
+  })
+
+  return termsList
+}
+
+
+export const saveProductProperties = async (params: any) => {
+  return common.updateProductAttr(params)
 }

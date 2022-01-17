@@ -5,25 +5,17 @@ import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
 import SunEditor from 'suneditor-react'
 import 'suneditor/dist/css/suneditor.min.css'
-import {useLocation} from 'react-router'
+import {useHistory, useLocation} from 'react-router'
 import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
 import Select from 'react-select'
-import {
-  initialForm,
-  styles,
-  SubAttributes,
-  TaxClass,
-  getInitialFormValues,
-  ShippingClass,
-  Categoies,
-  Attributes,
-  ProductsList,
-  StockStatus,
-  handleFileUpload,
-  UploadImageField,
-  FallbackView,
-} from './formOptions'
+import { AsyncPaginate } from 'react-select-async-paginate'
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import {  initialForm,  styles,  TaxClass,  initialFormValues, saveProductProperties,
+  StockStatus,  handleFileUpload,  UploadImageField,  FallbackView,  fetchProfileData,  postProduct,  mapValuesToForm,
+  getProduct,  loadSubAttrOptions,  loadAttributeOptions,  loadCategoriesOptions,  loadProducts,} from './formOptions'
+
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
@@ -31,98 +23,67 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ProductCreate: FC<PropsFromRedux> = (props) => {
   const dispatch = useDispatch()
+  const history = useHistory();
+  
   //get product id or create new
   const userLocation: any = useLocation()
-  //console.log(userLocation)
   const {productId} = userLocation.state ? userLocation.state : 0
-
-  const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
+  const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
+  const { accessToken, user } = auth
   const currentUserId: number = user ? user.ID : 0
 
   //useState
   const [loading, setLoading] = useState(true)
   const [isNewProduct, setNewProduct] = useState(true)
   const [shippingClass, setShippingClass] = useState([])
-  const [productCategories, setProductCategory] = useState([])
-  const [attributesList, setAttributes] = useState([])
-  const [fullAttributesList, setFullAttributes] = useState([])
-  const [productsList, setProductsList] = useState([])
+  const [reloadPage, setReloadPage] = useState(false)
   const [productType, setProductType] = useState('simple')
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
   const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
   const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
-  //----------------------------------------------------------------------------
-  const mapValuesToForm = (initialValues: any, productValues: any) => {
-    initialValues.name = productValues.name
-    initialValues.content = productValues.content
-    initialValues.is_variable = productValues.is_variable
-    initialValues.type_product = productValues.type_product
-    initialValues.inventory_sku = productValues.inventory_sku
-    initialValues.attributes = productValues.attributes
-    initialValues.variations = productValues.variations
-    initialValues.thumbnail = productValues.thumbnail
-    initialValues.new_thumbnail = ''
-    initialValues.photo_galleries = productValues.photo_galleries
-    initialValues.new_photo_galleries = []
-    initialValues.general_price = productValues.general_price
-    initialValues.general_tax_status = productValues.general_tax_status
-    initialValues.general_tax_class = productValues.general_tax_class
-    initialValues.categories = productValues.categories
-    initialValues.shipping_class_id = productValues.shipping_class_id
-    initialValues.selectedAttr = ''
-    initialValues.selectedVarAct = ''
-    initialValues.variations_attr = productValues.variations_attr
-    initialValues.linked_products_upsell = productValues.linked_products_upsell
-    initialValues.linked_products_cross_sell = productValues.linked_products_cross_sell
-    initialValues.general_wallet_credit = productValues.general_wallet_credit
-    initialValues.general_wallet_cashback = productValues.general_wallet_cashback
-    initialValues.general_commission = productValues.general_commission
-  }
+  const [product, setProductDetail] = useState<any>([])
+  const [isAttributeAdded, setAttritesAdded] = useState(false)
+  const [isSaveAttr, setSaveAttr] = useState({loading: false, error: ''})
+  const [isSaveVar, setSaveVar] = useState({loading: false, error: ''})
   //---------------------------------------------------------------------------
   const tabDefault: any = useRef(null)
-  //Get product info from cache
-  let product: any = []
-  product = useSelector<RootState>(({productDetail}) => productDetail.product, shallowEqual)
-
-  //Get All Properties
+  //Get All Properties  
+  const promise = fetchProfileData( currentUserId );
+  const productInfo = getProduct(currentUserId, productId)
+  
   useEffect(() => {
-    const loadingEverything = () => {
-      setShippingClass(ShippingClass())
-      setProductCategory(Categoies())     
-      setProductsList(ProductsList(currentUserId))
-    }
+    promise.then((data: any) => {      
+      setShippingClass(data.shippingClass)
+    });
+    
+    productInfo.then((response: any) => { 
+      const { code, message, data } = response     
+      setProductDetail({...data})
+    })    
 
-    loadingEverything()
-  }, [currentUserId])
-
-  useEffect(() => {
-    const loadAttributes = async () => {
-      const {termsList, fullList} = await Attributes()
-      setAttributes(termsList)
-      setFullAttributes(fullList)
-    }     
-    loadAttributes();
-
-  }, [])
+  }, [reloadPage]);
+  
   /**
    * Get Product Details
    */
   useEffect(() => {
-    if (product && productId > 0 && product.id === productId) {
+    console.log(product)
+    if( product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
-      const isSimple = initialForm.type_product ? 'variable' : 'simple'
-      setProductType(isSimple)
+      setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
     } else {
-      setNewProduct(true)
-      if (productId > 0) dispatch(detail.actions.getProductDetail(currentUserId, productId))
-      else {
+      if( typeof productId === 'undefined'  || productId <= 0 ) {
+        initialFormValues.user_id = currentUserId
+        mapValuesToForm(initialForm, initialFormValues)
+        setNewProduct(true)
+        setProductType('simple')
         setLoading(false)
-      }
+      }      
     }
-  }, [product, productId, currentUserId, dispatch])
+  }, [product, productId])
 
   /**
    * The events on the form
@@ -133,8 +94,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setProductType(value)
   }
 
-  const onChangeAttr = (option: any) => {
-    setSelectedAttr(option)
+  const onChangeAttr = (newOption: any) => {
+    
+    setAttritesAdded(false)
+    setSelectedAttr(newOption)
   }
 
   const onChangeVar = (option: any) => {
@@ -143,17 +106,32 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const handleAddMoreAttributes = (formValues: any) => {
-    if (!selectedAttr) return
-    const {value} = selectedAttr
-    const isAdded = formValues.attributes.some((x: any) => x.id === value)
+    if (!selectedAttr || !selectedAttr.value) return
+   
+    const value: any = {...selectedAttr}
+    const isAdded = formValues.attributes.some((x: any) => x.id === value.id)
+    
+    if (isAdded) {
+      setAttritesAdded(isAdded)
+      return
+    }
+    const newAttr: any = {
+        id: value.id,
+        is_taxonomy: 1,
+        is_variation: 0,
+        is_visible: 1,
+        name: value.name,
+        options: [],
+        position: 0,
+        title: value.label,
+        value: "",
+        variation: false,
+        visible: true
+      }
+    formValues.attributes.push(newAttr)
 
-    if (isAdded) return
-    const attrFound = fullAttributesList.find((x: any) => x.id === value)
     //reset
     setSelectedAttr({value: '', label: ''})
-    if (!attrFound) return
-    else formValues.attributes.push(attrFound)
-
     mapValuesToForm(initialForm, formValues)
   }
 
@@ -177,23 +155,48 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
-    console.log(formValues)
-    mapValuesToForm(initialForm, formValues)
+    setSaveAttr({loading: true,  error: ''})
+    saveProductProperties({
+      accessToken, 
+      product_id: formValues.id, 
+      attributes: formValues.attributes, 
+      type: 'attr'})
+    .then((response: any) =>{
+      const { code, message, data } = response.data 
+      setSaveAttr({loading: false,  error: message})
+      setTimeout(() => {
+        setSaveAttr({loading: false,  error: ''})
+        setReloadPage(true)
+      }, 2000)
+    })
   }
 
+  /* Add more Attributes */
+  const saveProductVariations = (formValues: any) => {
+    setSaveVar({loading: true,  error: ''})
+    saveProductProperties({
+      accessToken, 
+      product_id: formValues.id, 
+      variations: formValues.variations, 
+      type: 'var'})
+    .then((response: any) => {      
+      const { code, message, data } = response.data     
+      setSaveVar({loading: false,  error: message})
+      setTimeout(() => {
+        setSaveVar({loading: false,  error: ''})
+        setReloadPage(true)
+      }, 2000)
+    }).catch(() => {})
+  }
+  
+
   /** Add Variations */
-  const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
-    const list: any = []
+  const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {   
     const listAttr: any = []   
 
     formValues.variations_attr &&
-    formValues.variations_attr.forEach((e: any) => {
-      listAttr.push({
-        attr: e,
-        id: 0,
-        label: "",
-        value: ""
-      })
+    formValues.variations_attr.map((e: any) => {
+      listAttr.push({ attr: e, id: 0, label: "", value: "" })
     })
 
     let nextVar = 0
@@ -216,6 +219,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         enabled : true,
         attributes : listAttr,
         stock_status : '',
+        is_new: true,
+        is_remove: false
       })
     }
     
@@ -223,39 +228,44 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   
   const updateAttrToVariations = ( name: any, isChecked: any,formValues: any ) => {
     const variationsAttr: Array<string> = formValues.variations_attr || [];     
-    if( isChecked ) {
-      console.log(formValues.attributes)
+
+    if( isChecked ) {   
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return ((x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name))
       })
-
-      filterAttr.map((newAttr: any) => { 
-        formValues.variations_attr.push(newAttr.name)
+  
+      filterAttr && filterAttr.map((newAttr: any) => { 
+        const checkExisted = formValues.variations_attr.some((x: string ) => { return x ===  newAttr.name})
+        if( !checkExisted) formValues.variations_attr.push(newAttr.name)
       })
 
-      formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.map((newAttr: any) => {
-          item.attributes.push({ 
-            attr: newAttr.name,
-            label: "",
-            value: ""
-          })
+      formValues.variations && formValues.variations.map((item:any) => {
+        filterAttr && filterAttr.map((newAttr: any) => {
+          const checkExisted = item.attributes.some((x: any ) => { return x.attr ===  newAttr.name})
+          if(!checkExisted) {
+            item.attributes.push({ 
+              attr: newAttr.name,
+              label: "",
+              value: ""
+            })
+          }
         })
       })
-    } else {
+    } else { //remove
+
       const filterAttr = formValues.attributes.filter((x: any ) => { 
         return (x.variation && !isChecked && name === x.name && variationsAttr.includes(x.name))
       })
 
-      //remove
-      filterAttr.map((newAttr: any) => { 
-        formValues.variations_attr.splice(formValues.variations_attr.indexOf(newAttr.name), 1)
+      filterAttr && filterAttr.map((newAttr: any) => { 
+        const indexOf = formValues.variations_attr.indexOf(newAttr.name)
+        if( indexOf > -1) formValues.variations_attr.splice(indexOf, 1)
       })
 
-      formValues.variations && formValues.variations.forEach((item:any) => {
-        filterAttr.map((newAttr: any) => { 
+      formValues.variations && formValues.variations.map((item:any) => {
+        filterAttr && filterAttr.map((newAttr: any) => { 
           const findIndex = item.attributes.findIndex((x: any) => { return x.attr === newAttr.name })
-          item.attributes.splice(findIndex, 1)
+          if( findIndex > -1) item.attributes.splice(findIndex, 1)
         })
       })
     }
@@ -266,7 +276,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const handleAddVariations = (formValues: any) => {
 
     let maxRows = 1, totalListVar = 1
-    formValues.attributes.forEach((x: any, i: number) => {  
+    formValues.attributes.map((x: any, i: number) => {  
       if(x.variation) maxRows *= (x.options.length > 0 ) ? x.options.length : 1
     } )
 
@@ -286,13 +296,114 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     mapValuesToForm(initialForm, formValues)
   }
 
+  /* remove image */
+  const refreshPage  = () => {
+    window.location.reload();
+  }
+
+  const confirmDelete = (event: any, handleAction: any) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="custom-ui">
+            <h2>Are you sure?</h2>
+            <p>You want to delete this item?</p>
+            <button
+              className='btn btn-sm btn-success'
+              onClick={onClose}>No</button>
+            <button
+              className='btn btn-sm btn-danger'
+              onClick={() => {
+                handleAction()
+                onClose()
+              }}
+            >
+              Yes, Delete it!
+            </button>
+          </div>
+        )
+      }
+    })
+  }
+
+  const confirmRequest = (message: string) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="custom-ui">
+            <p>{message}</p>
+            <button
+              className='btn btn-sm btn-success'
+              onClick={() => {
+                setReloadPage(true)
+                onClose()
+              }}>Still on this page</button>
+            <button
+              className='btn btn-sm btn-danger'
+              onClick={() => {
+                history.push("/product/listing");
+                onClose()
+              }}
+            >
+              Go to the products list
+            </button>
+          </div>
+        )
+      }
+    })
+  }
+
+  const conformContinue = () => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="custom-ui">
+            <h1>Are you sure?</h1>
+            <p>You want to delete this file?</p>
+            <button onClick={onClose}>No</button>
+            <button
+              onClick={() => {
+                onClose()
+              }}
+            >
+              Yes, Delete it!
+            </button>
+          </div>
+        )
+      }
+    })
+  }
+
+  const removeVariationThumbnail = (case_type: string, id: number | string, formValues: any) => {
+    switch(case_type) {
+      case 'variations':
+        formValues.variations.find((x: any) => { return x.id === id }).thumbnail = { image_id: false, src: ''}   
+        break;
+      case 'galleries':
+        const index = formValues.photo_galleries.findIndex((x: any) => { return x.image_id === id })
+        formValues.photo_galleries[index] = { image_id: false, src: ''}   
+        break;
+      case 'new_galleries':
+        if( formValues.new_photo_galleries[id] ) formValues.new_photo_galleries[id] = ''
+        break;
+      case 'thumbnail':
+        formValues.thumbnail = { image_id: false, src: ''}   
+        break;
+      case 'newThumbnail':
+        formValues.new_thumbnail = ''
+        setNewThumbnail('')
+        break;
+    }
+    
+    mapValuesToForm(initialForm, formValues)
+  }
   /**
    * Begin Formik
    */
 
   const ValidationSchema = () => {
     return Yup.object().shape({
-      name: Yup.string().max(250, 'Must be 250 characters or less').required('no-required'),
+      name: Yup.string().max(250, 'Must be 250 characters or less').required('Pls enter the product title'),      
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
@@ -316,15 +427,25 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           </div>
           <div className='card-body py-3'>
             <Formik
-              initialValues={isNewProduct ? getInitialFormValues : initialForm}
+              initialValues={isNewProduct ? initialFormValues : initialForm}
               validationSchema={ValidationSchema}
               enableReinitialize={true}
               onSubmit={(values, {setSubmitting}) => {
-                setTimeout(() => {
-                  //alert(JSON.stringify(values, null, 2))
-                  console.log(values)
-                  setSubmitting(false)
-                }, 400)
+                //save to DB
+                setSubmitting(true)
+                console.log(values)
+                postProduct(values, accessToken).then((product: any) => {
+                  const { code, message } = product
+                  console.log(product)
+                  switch(code) {
+                    case 200:
+                      confirmRequest(message)
+                      break;
+                  }            
+                  setSubmitting(false) //done
+                }).catch(() => {
+                  //setSubmitting(false) //error
+                })              
               }}
             >
               {({
@@ -349,7 +470,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                     <div className='w-100'>
                       <div className='fv-row mb-5'>
                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                          <span className='no-required'>Product Title</span>
+                          <span className='required'>Product Title</span>
                         </label>
                         <input
                           name='name'
@@ -360,7 +481,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                           value={values.name}
                         />
                         {touched.name && errors.name ? (
-                          <div className='text-danger'>{errors.name}</div>
+                          <div className='text-danger fs-8'>{errors.name}</div>
                         ) : null}
                       </div>
                     </div>
@@ -372,7 +493,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         </label>
                         <SunEditor
                           name='content'
-                          //onBlur={handleBlur}
+                          placeholder="Please type here..."
+                          autoFocus={false}
                           onChange={(event) => {
                             setFieldValue('content', event)
                           }}
@@ -383,22 +505,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                           setDefaultStyle={''}
                           setOptions={{
                             buttonList: [
-                              ['undo', 'redo'],
+                              //['undo', 'redo'],
                               ['font', 'fontSize', 'formatBlock'],
-                              ['paragraphStyle', 'blockquote'],
+                              //['paragraphStyle', 'blockquote'],
                               ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                              ['fontColor', 'hiliteColor', 'textStyle'],
-                              ['removeFormat', 'outdent', 'indent'],
-                              ['align', 'horizontalRule', 'list', 'lineHeight'],
+                              ['fontColor',  'textStyle'], //'hiliteColor',
+                              //['removeFormat', 'outdent', 'indent'],
+                              ['align', 'horizontalRule', 'list'], //, 'lineHeight'
                               ['table', 'link', 'image'], //[, 'video', 'audio']
                               ['codeView'],
                               //['fullScreen', 'showBlocks', 'preview', 'print', 'save', 'template'],
                             ],
                           }}
                         />
-                        {touched.content && errors.content ? (
+                       {/*  {touched.content && errors.content ? (
                           <div className='text-danger'>{errors.content}</div>
-                        ) : null}
+                        ) : null} */}                    
                       </div>
                     </div>
                     <div className='w-100'>
@@ -454,49 +576,62 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               </div>
                               <div className='col-md-7'>
                                 <div className='photo-galleries'>
-                                  {newPhotoGalleries && newPhotoGalleries.length > 0
-                                    ? newPhotoGalleries.map((src: string, i: number) => {
-                                        return (
-                                          <div
-                                            className='form-group image-input image-input-outline'
-                                            key={'image_' + i}
-                                          >
-                                            <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
-                                              <img className='h-100' src={src} alt='' />
-                                            </div>
-                                            <span
-                                              className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
-                                              data-kt-image-input-action='remove'
-                                              data-bs-toggle='tooltip'
-                                              title='Remove Image'
-                                            >
-                                              <i className='bi bi-x fs-2'></i>
-                                            </span>
+                                  {
+                                    values.photo_galleries &&
+                                    values.photo_galleries.map((image: any, i: number) => {
+                                      return image.src && (
+                                        <div
+                                          className='form-group image-input image-input-outline'
+                                          key={`photo-galleries-${i}`}
+                                        >
+                                          <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
+                                            <img className='h-100' src={image.src} alt='' />
                                           </div>
-                                        )
-                                      })
-                                    : (values.photo_galleries &&
-                                        values.photo_galleries.map((image: any) => {
-                                          return (
-                                            <div
-                                              className='form-group image-input image-input-outline'
-                                              key={image.image_id}
-                                            >
-                                              <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
-                                                <img className='h-100' src={image.src} alt='' />
-                                              </div>
-                                              <span
-                                                className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
-                                                data-kt-image-input-action='remove'
-                                                data-bs-toggle='tooltip'
-                                                title='Remove Image'
-                                              >
-                                                <i className='bi bi-x fs-2'></i>
-                                              </span>
-                                            </div>
-                                          )
-                                        })) ||
-                                      null}
+                                          <span
+                                            className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                            data-kt-image-input-action='remove'
+                                            data-bs-toggle='tooltip'
+                                            title='Remove Image'
+                                            key={'remove_image_' + i}
+                                            onClick={(event) => {
+                                              removeVariationThumbnail('galleries', image.image_id, values)
+                                              handleChange(event)
+                                            }}
+                                          >
+                                            <i className='bi bi-x fs-2' id={'remove_image_' + i}></i>
+                                          </span>
+                                        </div>
+                                      )
+                                    })
+                                  }
+                                  {
+                                    newPhotoGalleries && 
+                                    newPhotoGalleries.map((src: string, i: number) => {
+                                      return src && (
+                                        <div
+                                          className='form-group image-input image-input-outline'
+                                          key={'image_' + i}
+                                        >
+                                          <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
+                                            <img className='h-100' src={src} alt='' />
+                                          </div>
+                                          <span
+                                            className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                            data-kt-image-input-action='remove'
+                                            data-bs-toggle='tooltip'
+                                            title='Remove Image'
+                                            key={'remove_image_' + i}
+                                            onClick={(event) => {
+                                              removeVariationThumbnail('new_galleries', i, values)
+                                              handleChange(event)
+                                            }}
+                                          >
+                                            <i id={'remove_image_' + i} className='bi bi-x fs-2'></i>
+                                          </span>
+                                        </div>
+                                      )
+                                    })
+                                  }                                 
                                 </div>
                               </div>
                             </div>
@@ -510,9 +645,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             <div className='col-md-3 mb-5 thumbnail'>
                               <div className='form-group image-input image-input-outline'>
                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
-                                  {(!newThumbnail && values && values.thumbnail && (
-                                    <img className='h-100' src={values.thumbnail} alt='' />
-                                  )) ||
+                                  {
+                                    (!newThumbnail && values && values.thumbnail.src && (
+                                      <img className='h-100' src={values.thumbnail.src} alt='' />
+                                    )) ||
                                     (newThumbnail && (
                                       <img className='h-100' src={newThumbnail} alt='' />
                                     )) || (
@@ -521,16 +657,26 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         src='https://via.placeholder.com/75x75/f0f0f0'
                                         alt=''
                                       />
-                                    )}
+                                    )
+                                  }
                                 </div>
-                                <span
+                                {(newThumbnail || values && values.thumbnail.src) &&
+                                (<span
                                   className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
                                   data-kt-image-input-action='remove'
                                   data-bs-toggle='tooltip'
                                   title='Remove Image'
+                                  id={`product_thumbnail`}
+                                  onClick={(event) => {
+                                    if( newThumbnail )
+                                      removeVariationThumbnail('newThumbnail', 0, values)
+                                    else
+                                      removeVariationThumbnail('thumbnail', values.thumbnail.image_id, values)
+                                    handleChange(event)
+                                  }}
                                 >
-                                  <i className='bi bi-x fs-2'></i>
-                                </span>
+                                  <i id={`product_thumbnail_1`} className='bi bi-x fs-2'></i>
+                                </span>)}
                               </div>
                             </div>
                             <div className='col-md-9 mb-5'>
@@ -668,20 +814,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <div className='form-group row'>
                                       <div className='col-md-6 mb-5'>
                                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                          <span>Regular Rrice</span>
+                                          <span>Regular Price</span>
                                         </label>
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
-                                            type='number'
+                                            type='text'
                                             className='form-control'
-                                            name='general_price'
-                                            step='0.1'
-                                            placeholder=''
-                                            value={values.general_price}
+                                            name='general_regular_price'                                           
+                                            value={values.general_regular_price}
                                             onChange={handleChange}
+                                            onBlur={handleBlur}
                                           />
                                         </div>
+                                      {/*   {touched.general_regular_price && errors.general_regular_price ? (
+                                            <div className='text-danger fs-8'>{errors.general_regular_price}</div>
+                                          ) : null} */}
                                       </div>
                                       <div className='col-md-6 mb-5'>
                                         <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
@@ -690,12 +838,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
-                                            type='number'
+                                            type='text'
                                             className='form-control'
-                                            name='salePrice'
-                                            step='0.1'
+                                            name='general_sale_price'
                                             placeholder=''
-                                          />
+                                            value={values.general_sale_price}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                          />            
                                         </div>
                                       </div>
                                     </div>
@@ -870,21 +1020,23 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       </div>
                                     </div>
                                     <div className='col-md-9 mb-5'>
-                                      <div className='d-flex align-items-center'>
-                                        <Select
-                                          styles={styles}
+                                      <div className='d-flex align-items-center'>                                       
+                                        <AsyncPaginate
+                                          placeholder='Select attribute value...'
+                                          isMulti={false}      
+                                          styles={styles}                                    
                                           closeMenuOnSelect={true}
-                                          isMulti={false}
-                                          isSearchable
-                                          isLoading={true}
-                                          defaultValue={selectedAttr}
-                                          value={selectedAttr}
-                                          onChange={(onChangeAttr)}
-                                          options={attributesList}
-                                          name='attributes'
+                                          value={selectedAttr}        
+                                          loadOptions={() => { return loadAttributeOptions()}}
+                                          onChange={onChangeAttr}
+                                          name="attributes"
                                           className='w-100'
+                                          noOptionsMessage={() => 'No attribute found'}
+                                          loadingMessage={() => 'Loading data, please wait...'} 
                                         />
                                       </div>
+                                      { isAttributeAdded && 
+                                      (<div className='text-danger'>The attribute has added, pls choose other item...!</div>)}
                                     </div>
                                     <div className='col-md-3 mb-5'>
                                       <button
@@ -901,12 +1053,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     </div>
                                   </div>
                                   {/** Product Attributes */}
-
                                   <div className='accordion' id='product_attribute'>
                                     {(values.attributes &&
-                                      values.attributes.map((attr: any, i: number | string) => {
-                                        //find options list from attributes
-                                        const subAttributes = SubAttributes(attr.name)
+                                      values.attributes.map((attr: any, i: number | string) => { 
                                         return (
                                           <div
                                             className='accordion-item'
@@ -970,7 +1119,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           Visible on the product page
                                                         </label>
                                                       </div>
-                                                      <div className='form-check form-check-custom form-check-solid'>
+                                                      { productType === 'variable' 
+                                                      && (<div className='form-check form-check-custom form-check-solid'>
                                                         <label className='form-check-label ms-0 d-flex align-items-center'>
                                                           <input
                                                             type='checkbox'
@@ -985,31 +1135,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           />
                                                           Used for variations
                                                         </label>
-                                                      </div>
+                                                      </div>)}
                                                     </div>
                                                   </div>
                                                   <div className='col-md-7'>
-                                                    <label>Value(s)</label>
-                                                    <Select
-                                                      styles={styles}
+                                                    <label>Value(s)</label>                                                   
+                                                    <AsyncPaginate
+                                                      placeholder='Select term value(s)...'
+                                                      isMulti              
+                                                      styles={styles}                                    
                                                       closeMenuOnSelect={false}
-                                                      isLoading={true}
-                                                      isMulti={true}
-                                                      isSearchable={true}
-                                                      defaultValue={attr.options}
-                                                      value={attr.options}
-                                                      onChange={(event) => {
-                                                        /*selectedOption => let event = {
-                                                          target: {
-                                                            name: `attributes[${i}].options`,
-                                                            value: selectedOption,
-                                                          },
-                                                        }
-                                                        handleChange(event)*/
+                                                      value={attr.options}        
+                                                      loadOptions={() => { return loadSubAttrOptions(attr.name)}}
+                                                      onChange={(event) => {                                                        
                                                         setFieldValue(`attributes[${i}].options`, event)
                                                       }}
-                                                      options={subAttributes}
                                                       name={`attributes[${i}].options`}
+                                                      noOptionsMessage={() => 'No value(s) found'}
+                                                      loadingMessage={() => 'Loading data, please wait...'} 
                                                     />
                                                   </div>
                                                 </div>
@@ -1020,6 +1163,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       })) ||
                                       null}
                                   </div>
+                                  { !isNewProduct && (
                                   <div className='mt-4'>
                                     <button
                                         onClick={(event) => {
@@ -1027,12 +1171,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           handleChange(event)               
                                         }}
                                         type='button'
-                                        className='btn btn-sm btn-primary'
+                                        className='btn btn-sm btn-dark'
                                         name='save-attributes'
+                                        disabled={isSaveAttr.loading}
                                       >
-                                        Save Attributes
+                                        { !isSaveAttr.loading ?
+                                        (<span className='indicator-label'>Save Attributes</span>) : 
+                                        (<span className='indicator-progress' style={{display: 'block'}}>
+                                          Processing...
+                                          <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                                        </span>)}
                                       </button>
+                                      {isSaveAttr.error && (
+                                        <div className="alam fs-8 p-2 w-auto mt-2 deley-200" role="alert">
+                                          {isSaveAttr.error}
+                                        </div>
+                                      )}
                                   </div>
+                                  ) }
                                 </div>
 
                                 {productType === 'variable' ? (
@@ -1077,7 +1233,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     </div>                                    
                                     <div className='variants form-group'>
                                       {
-                                        values.variations &&
+                                        values.attributes.some((x: any) => { return x.variation })
+                                        && values.variations &&
                                         values.variations.map((item: any, i: number) => {
                                           const {
                                             id,
@@ -1092,7 +1249,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             attributes,
                                             stock_status
                                           } : any = values.variations[i]
-
                                           return (
                                             <div className='row' key={id}>
                                               <div
@@ -1112,8 +1268,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           title='Remove this variation'
                                                           name={'remove_' + item.id }
                                                           onClick={(event) => {
-                                                            removeVariations(item.id , values)
-                                                            handleChange(event)
+                                                            confirmDelete(event, () => {                                                              
+                                                              removeVariations(item.id , values)
+                                                              handleChange(event)
+                                                            })                                                            
                                                           }}
                                                         >
                                                           <i id={'remove_' + item.id } className='bi bi-x fs-2'></i>
@@ -1126,58 +1284,27 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       </div>
                                                       <div className='variations flex-auto'>
                                                         { attributes && attributes.map((selectedValue: any, index: number) => {
-                                                          //find options that selected to build for variations 
-                                                          const attrOpt: any = values.attributes.find((a: any) => { return selectedValue.attr === a.name } )                                                         
+                                                          //find options that selected to build for variations                  
+                                                          const attrOpt: any = values.attributes.find((attr: any) => { return selectedValue.attr === attr.name } )                                                         
                                                           const fieldName =  `variations[${i}].attributes[${index}]` 
                                                           return attrOpt && (
                                                             <Select
-                                                              key={`attribute_${selectedValue.attr}`}                                                                
+                                                              key={fieldName}                                                                
                                                               styles={styles}
                                                               closeMenuOnSelect={true}
                                                               isSearchable={false}
                                                               defaultValue={selectedValue}
                                                               value={selectedValue}                                                            
-                                                              onChange={(selectedOption) => {
-                                                                let event = {
-                                                                  target: {
-                                                                    name: fieldName,
-                                                                    value: selectedOption,
-                                                                  },
-                                                                }
-                                                                handleChange(event)
+                                                              onChange={(event) => {                                                               
+                                                                setFieldValue(fieldName, event)
                                                               }}
                                                               options={attrOpt.options}
                                                               name={fieldName}
                                                               className="ms-2 me-2 float-start min-w-120px mb-3"
                                                             />
                                                           )
-                                                        })}
-                                                        {/* other attributes with varations */}
-                                                        {/* { values.attributes &&
-                                                          values.attributes
-                                                          .filter((x: any) => { return x.variation })
-                                                          .map((attrOpt: any, index: number) => {                                                          
-                                                            const findIndex = index + attributes.length
-                                                            const fieldName =  `variations[${i}].attributes[${findIndex}]`     
-                                                            const selectedValue = { value: '', label: ''}
-                                                            return (
-                                                              <Select
-                                                                key={`attribute_${attrOpt.name}`}                                                                
-                                                                styles={styles}
-                                                                closeMenuOnSelect={true}
-                                                                isSearchable={false}
-                                                                defaultValue={selectedValue}
-                                                                value={selectedValue}                                                            
-                                                                onChange={(value) => setFieldValue(fieldName, value)}
-                                                                options={attrOpt.options}
-                                                                name={fieldName}
-                                                                className="ms-2 me-2 float-start min-w-120px mb-3"
-                                                              />
-                                                            )
-                                                          }
-                                                        )} */}
-                                                      </div>
-                                                      {/* ---------------------------- */}
+                                                        })}                                                       
+                                                      </div>                                                      
                                                       <a
                                                         href='#'
                                                         className='accordion-button flex-1 fs-6 fw-bold collapsed w-250px bg-white pt-4'
@@ -1211,33 +1338,36 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 item.thumbnail && (
                                                                   <img
                                                                     className='h-100 variation_thumbnail'
-                                                                    src={item.thumbnail}
+                                                                    src={item.thumbnail.src || 'https://via.placeholder.com/75x75/f0f0f0'}
                                                                     alt=''
                                                                   />
                                                                 )) ||
-                                                                (new_thumbnail && (
-                                                                  <img
+                                                                (<img
                                                                     className='h-100 variation_thumbnail'
-                                                                    src={new_thumbnail}
+                                                                    src={new_thumbnail|| 'https://via.placeholder.com/75x75/f0f0f0'}
                                                                     alt=''
                                                                   />
-                                                                )) ||
-                                                                null}
+                                                                )}
                                                             </div>
+                                                            {(new_thumbnail || item.thumbnail) && (
                                                             <span
                                                               className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
                                                               data-kt-image-input-action='remove'
                                                               data-bs-toggle='tooltip'
                                                               title='Remove Image'
+                                                              id={`thumbnail_${item.id}`}
+                                                              onClick={(event) => {
+                                                                removeVariationThumbnail('variations', item.id, values)
+                                                                handleChange(event)
+                                                              }}
                                                             >
-                                                              <i className='bi bi-x fs-2'></i>
-                                                            </span>
+                                                              <i id={`thumbnail__${item.id}`} className='bi bi-x fs-2'></i>
+                                                            </span>)}
                                                           </div>
                                                         </div>
                                                         <div className='col-md-4 col-lg-5'>
                                                           <div className='form-group'>
                                                             <UploadImageField
-                                                              /* setFileToState={setNewVariantThumbnail} */
                                                               setFieldValue={setFieldValue}
                                                               fileName={`variations[${i}].new_thumbnail`}
                                                             />
@@ -1415,19 +1545,32 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         })}
                                       {/** end variant */}
                                     </div>
+                                    { !isNewProduct && (
                                     <div className='mt-4'>
                                       <button
                                           onClick={(event) => {
-                                            saveProductAttributes(values)  
+                                            saveProductVariations(values)  
                                             handleChange(event)               
                                           }}
                                           type='button'
-                                          className='btn btn-sm btn-primary'
+                                          className='btn btn-sm btn-dark'
                                           name='save-variations'
+                                          disabled={isSaveVar.loading}
                                         >
-                                          Save Varations
+                                          { !isSaveVar.loading ?
+                                          (<span className='indicator-label'>Save Variations</span>) : 
+                                          (<span className='indicator-progress' style={{display: 'block'}}>
+                                            Processing...
+                                            <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                                          </span>)}
                                         </button>
+                                        {(isSaveVar.error) && (
+                                          <div className="alam fs-8 p-2 w-auto mt-2 deley-200" role="alert">
+                                            {isSaveVar.error}
+                                          </div>
+                                        )}
                                     </div>
+                                    )}
                                   </div>
                                 ) : null}
                                 {/* End Variants */}
@@ -1436,14 +1579,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <div className='uppselles'>
                                       <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                                         <span>Upsells</span>
-                                      </label>
-                                      <Select
-                                        styles={styles}
+                                      </label>                                     
+                                      <AsyncPaginate
+                                        placeholder='Select product...'
+                                        isMulti={true}      
+                                        styles={styles}                                    
                                         closeMenuOnSelect={false}
-                                        isMulti
-                                        isSearchable
-                                        defaultValue={values.linked_products_upsell}
-                                        value={values.linked_products_upsell}
+                                        value={values.linked_products_upsell}       
+                                        loadOptions={() => { return loadProducts(currentUserId)}}
                                         onChange={(selectedOption) => {
                                           let event = {
                                             target: {
@@ -1453,8 +1596,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           }
                                           handleChange(event)
                                         }}
-                                        options={productsList}
-                                        name='linked_products_upsell'
+                                        name="linked_products_upsell"
+                                        className='w-100'
+                                        noOptionsMessage={() => 'No products found'}
+                                        loadingMessage={() => 'Loading data, please wait...'} 
                                       />
                                     </div>
                                     <div className='text-muted fs-8 mt-3'>
@@ -1466,14 +1611,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   <div className='col-md-12 mb-5'>
                                     <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                                       <span>Cross-sells</span>
-                                    </label>
-                                    <Select
-                                      styles={styles}
+                                    </label>                                   
+                                    <AsyncPaginate
+                                      placeholder='Select product...'
+                                      isMulti={true}      
+                                      styles={styles}                                    
                                       closeMenuOnSelect={false}
-                                      isMulti
-                                      isSearchable
-                                      defaultValue={values.linked_products_cross_sell}
-                                      value={values.linked_products_cross_sell}
+                                      value={values.linked_products_cross_sell}       
+                                      loadOptions={() => { return loadProducts(currentUserId)}}
                                       onChange={(selectedOption) => {
                                         let event = {
                                           target: {
@@ -1483,8 +1628,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         }
                                         handleChange(event)
                                       }}
-                                      options={productsList}
-                                      name='linked_products_cross_sell'
+                                      name="linked_products_cross_sell"
+                                      className='w-100'
+                                      noOptionsMessage={() => 'No products found'}
+                                      loadingMessage={() => 'Loading data, please wait...'} 
                                     />
                                     <div className='text-muted fs-8 mt-3'>
                                       Cross-sells are products which you promote in the cart, based
@@ -1498,25 +1645,24 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
                                       <span>Categories</span>
                                     </label>
-                                    <div className='form-group'>
-                                      <Select
-                                        styles={styles}
+                                    <div className='form-group'>                                      
+                                      <AsyncPaginate
+                                        placeholder='Select categories...'
+                                        isMulti={true}      
+                                        styles={styles}                                    
                                         closeMenuOnSelect={false}
-                                        isMulti
-                                        isSearchable
-                                        defaultValue={values.categories}
-                                        value={values.categories}
-                                        onBlur={() => {
-                                          handleBlur({target: {name: 'categories'}})
-                                        }}
+                                        value={values.categories}        
+                                        loadOptions={() => { return loadCategoriesOptions()}}
                                         onChange={(selectedOption) => {
                                           let event = {
                                             target: {name: 'categories', value: selectedOption},
                                           }
                                           handleChange(event)
                                         }}
-                                        options={productCategories}
-                                        name='categories'
+                                        name="categories"
+                                        className='w-100'
+                                        noOptionsMessage={() => 'No categories found'}
+                                        loadingMessage={() => 'Loading data, please wait...'} 
                                       />
                                     </div>
                                   </div>
@@ -1528,21 +1674,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       </div>
                     </div>
                     <div className='pt-10 justify-content-center mb-5'>
-                      <div className='me-0 d-flex flex-stack '>
+                      <div className='me-0 d-flex flex-stack justify-content-center indicator-progress'>
                         <button
-                          /* onClick={prevStep} */
                           type='submit'
-                          className='btn btn-lg btn-primary w-100 me-3'
+                          className='btn btn-lg btn-success w-50 me-3'
+                          disabled={isSubmitting}
                         >
-                          Create Product
-                        </button>
-                        <button
-                          /* onClick={prevStep} */
-                          type='button'
-                          className='btn btn-lg btn-success w-100 ms-3'
-                        >
-                          Create &amp; Continue
-                        </button>
+                          { isSubmitting 
+                          ? (<>Processing... <span className='spinner-border spinner-border-sm align-middle ms-2'></span></>) 
+                          : (!isNewProduct ? 'Update Product': 'Create Product')}
+                        </button>                       
                       </div>
                     </div>
                   </div>

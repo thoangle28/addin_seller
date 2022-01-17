@@ -1,8 +1,9 @@
-import { FC, useEffect } from 'react'
+import { FC, useEffect, useState } from 'react'
 import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
 import * as product from '../redux/ProductRedux'
 import {RootState} from '../../../../setup'
 import {TablesWidget14} from '../../../../_metronic/partials/widgets/tables/TablesWidget14'
+import { FallbackView } from './formOptions'
 
 const mapState = (state: RootState) => ({product: state.product})
 const connector = connect(mapState, product.actions)
@@ -19,11 +20,15 @@ const ProductList: FC<PropsFromRedux> = (props) => {
     currentPage: 1,
     pageSize: 10,
     userId: 0,
-  }
-  
+  }  
+
+  const [isLoading, setLoading] = useState(true)
+  const [isPageLoading, setPageLoading] = useState(false)
+
   useEffect(() => {
     initLoad.userId = currentUserId;
     dispatch(product.actions.getProductList(initLoad));
+    //setLoading    
     // eslint-disable-next-line
   }, [])
   
@@ -37,9 +42,18 @@ const ProductList: FC<PropsFromRedux> = (props) => {
     dispatch(product.actions.getProductNextPage(initLoad));
   }   
 
+  useEffect(() => {
+    setPageLoading(false)
+  }, [data, initLoad])
   return (
     <>
-     <TablesWidget14  className='mb-5 mb-xl-8' dataList={data} isHome={false} onChange={onChangeNextPage} />
+     <TablesWidget14  
+      className='mb-5 mb-xl-8' 
+      FallbackView={FallbackView} 
+      dataList={data} 
+      isHome={false} 
+      onChange={onChangeNextPage} 
+     />
     </>
   )
 }

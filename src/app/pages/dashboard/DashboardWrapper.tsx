@@ -10,7 +10,7 @@ import {
   TablesWidget14,
 } from '../../../_metronic/partials/widgets'
 
-
+import { FallbackView } from '../../modules/products/components/formOptions'
 import * as product from '../../modules/products/redux/ProductRedux'
 import {RootState} from '../../../setup'
 
@@ -47,7 +47,11 @@ const DashboardPage: FC<Props> = ( {dataList = []}) => (
 
     <div className='row g-5 gx-xxl-8'>    
       <div className='col-xxl-12'>
-        <TablesWidget14 className='card-xxl-stretch mb-5 mb-xxl-8' dataList={dataList} isHome={true} />
+        <TablesWidget14 
+        className='card-xxl-stretch mb-5 mb-xxl-8' 
+        FallbackView={FallbackView}
+        dataList={dataList} 
+        isHome={true} />
       </div>
     </div>
   </>

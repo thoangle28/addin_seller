@@ -32,8 +32,12 @@ export function getAttributes() {
   return axios.get<any>(API_END_POINT_URL+ '/product/attribute')
 }
 
+export function getAttributesNoChild() {
+  return axios.get<any>(API_END_POINT_URL+ '/product/attribute/parents')
+}
+
 export function getSubAttributes(slug: string) {
-  return axios.post<any>(API_END_POINT_URL+ '/attribute-product/parent', { 'name' : slug })
+  return axios.post<any>(API_END_POINT_URL+ '/product/attribute-list', { 'name' : slug })
 }
 
 
@@ -52,4 +56,15 @@ export function getProductsList( userId: number) {
 export function getProductInfoDetail(userId: number, product_id: number | 0) {
   const args =  { product_id: product_id, author_id : userId }
   return axios.post<any>(API_END_POINT_URL+ '/product', args)
+}
+
+
+export function saveProductToDB(params: any, token: string) {
+  return axios.post<{result: any}>(API_END_POINT_URL+ '/create-product', { product_info: params, accessToken: token }) 
+}
+
+//accessToken: string, product_id: number, params: any, type: string
+export function updateProductAttr(obj: any) {
+  const url = (obj.type === 'attr') ? '/product/create-attributes' : '/product/create-variations'
+  return axios.post<any>(API_END_POINT_URL+ url, {data: obj })
 }
