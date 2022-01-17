@@ -1,6 +1,6 @@
 import React, {FC, useEffect, useRef, useState} from 'react'
 import {Formik} from 'formik'
-import {shallowEqual, useSelector, connect, useDispatch, ConnectedProps} from 'react-redux'
+import {shallowEqual, useSelector, connect, ConnectedProps} from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
 import SunEditor from 'suneditor-react'
@@ -22,7 +22,7 @@ const connector = connect(mapState, detail.actions)
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ProductCreate: FC<PropsFromRedux> = (props) => {
-  const dispatch = useDispatch()
+  
   const history = useHistory();
   
   //get product id or create new
@@ -68,7 +68,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * Get Product Details
    */
   useEffect(() => {
-    console.log(product)
+    //console.log(product)
     if( product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
       setProductType(initialForm.type_product)
@@ -296,11 +296,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     mapValuesToForm(initialForm, formValues)
   }
 
-  /* remove image */
-  const refreshPage  = () => {
-    window.location.reload();
-  }
-
   const confirmDelete = (event: any, handleAction: any) => {
     confirmAlert({
       customUI: ({ onClose }) => {
@@ -353,27 +348,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
-  const conformContinue = () => {
-    confirmAlert({
-      customUI: ({ onClose }) => {
-        return (
-          <div className="custom-ui">
-            <h1>Are you sure?</h1>
-            <p>You want to delete this file?</p>
-            <button onClick={onClose}>No</button>
-            <button
-              onClick={() => {
-                onClose()
-              }}
-            >
-              Yes, Delete it!
-            </button>
-          </div>
-        )
-      }
-    })
-  }
-
   const removeVariationThumbnail = (case_type: string, id: number | string, formValues: any) => {
     switch(case_type) {
       case 'variations':
@@ -403,7 +377,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const ValidationSchema = () => {
     return Yup.object().shape({
-      name: Yup.string().max(250, 'Must be 250 characters or less').required('Pls enter the product title'),      
+      name: Yup.string().max(250, 'Must be 250 characters or less').required('Pls enter the product title'),    
+      variations: Yup.array().of(
+        Yup.object().shape({
+          regular_price: Yup.number().test("regularPrice", "Invalid number", (value) => {
+            if (value) return !isNaN(parseFloat(String(value))) && isFinite(Number(value))
+          }) // 20 score
+        }))
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
@@ -433,10 +413,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               onSubmit={(values, {setSubmitting}) => {
                 //save to DB
                 setSubmitting(true)
-                console.log(values)
+                //console.log(values)
                 postProduct(values, accessToken).then((product: any) => {
                   const { code, message } = product
-                  console.log(product)
+                  //console.log(product)
                   switch(code) {
                     case 200:
                       confirmRequest(message)
