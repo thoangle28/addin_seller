@@ -105,16 +105,7 @@ export function Login() {
           <div className='d-flex flex-stack mb-2'>
             {/* begin::Label */}
             <label className='form-label fw-bolder text-dark fs-6 mb-0'>Password</label>
-            {/* end::Label */}
-            {/* begin::Link */}
-           {/*  <Link
-              to='/auth/forgot-password'
-              className='link-primary fs-6 fw-bolder'
-              style={{marginLeft: '5px'}}
-            >
-              Forgot Password ?
-            </Link> */}
-            {/* end::Link */}
+            {/* end::Label */}          
           </div>
         </div>
         <input
@@ -157,6 +148,16 @@ export function Login() {
             </span>
           )}
         </button>
+        {/* begin::Link */}
+        <Link
+            to={{ pathname: 'https://addin.sg/my-account/lost-password/'}}
+            className='link-primary fs-7 fw-normal'
+            style={{marginLeft: '5px'}}
+            target="_blank" 
+          >
+            Forgot password?
+          </Link>
+        {/* end::Link */}
       </div>
       {/* end::Action */}
     </form>
