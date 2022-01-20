@@ -22,9 +22,8 @@ const connector = connect(mapState, detail.actions)
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 const ProductCreate: FC<PropsFromRedux> = (props) => {
-  
+
   const history = useHistory();
-  
   //get product id or create new
   const userLocation: any = useLocation()
   const { productId } = userLocation.state ? userLocation.state : 0
@@ -68,7 +67,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * Get Product Details
    */
   useEffect(() => {
-    //console.log(product)
+    
     if( product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
       setProductType(initialForm.type_product)
@@ -76,8 +75,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setLoading(false)
     } else {
       if( typeof productId === 'undefined'  || productId <= 0 ) {
-        initialFormValues.user_id = currentUserId
-        mapValuesToForm(initialForm, initialFormValues)
+        //console.log(initialFormValues)
+        initialFormValues.user_id = currentUserId      
+        //mapValuesToForm(initialForm, initialFormValues)       
         setNewProduct(true)
         setProductType('simple')
         setLoading(false)
@@ -174,6 +174,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
     setSaveVar({loading: true,  error: ''})
+    //console.log(formValues)
     saveProductProperties({
       accessToken, 
       product_id: formValues.id, 
@@ -182,6 +183,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     .then((response: any) => {      
       const { code, message, data } = response.data     
       setSaveVar({loading: false,  error: message})
+      //console.log(data)
       setTimeout(() => {
         setSaveVar({loading: false,  error: ''})
         setReloadPage(true)
@@ -415,7 +417,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           </div>
           <div className='card-body py-3'>
             <Formik
-              initialValues={isNewProduct ? initialFormValues : initialForm}
+              initialValues={isNewProduct ? {...initialFormValues} : {...initialForm}}
               validationSchema={ValidationSchema}
               enableReinitialize={true}
               onSubmit={(values, {setSubmitting}) => {
@@ -424,9 +426,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 //console.log(values)
                 postProduct(values, accessToken).then((product: any) => {
                   const { code, message, data } = product
+                  initialFormValues.attributes = [] //clear
+                  initialFormValues.variations = [] //clear     
+                  initialFormValues.variations_attr = [] 
                   //console.log(product)
                   switch(code) {
-                    case 200:
+                    case 200:                                     
                       confirmRequest(message, data)
                       break;
                   }            
@@ -457,13 +462,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   <div className='current' data-kt-stepper-element='content'>
                     <div className='w-100'>
                       <div className='fv-row mb-5'>
-                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                        <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                           <span className='required'>Product Title</span>
                         </label>
                         <input
                           name='name'
                           type='text'
-                          className='form-control'
+                          className='form-control fs-7'
                           onChange={handleChange}
                           onBlur={handleBlur}
                           value={values.name}
@@ -476,7 +481,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
                     <div className='w-100'>
                       <div className='fv-row mb-5'>
-                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                        <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                           Product Content
                         </label>
                         <SunEditor
@@ -515,11 +520,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       <div className='row'>
                         <div className='col-md-8'>
                           <div className='fv-row mb-5'>
-                            <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                            <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                               <span className='no-required'>Photo Gallery</span>
                             </label>
                             <div className='row'>
-                              <div className='col-md-5'>
+                              <div className='col-md-12'>
                                 <div className='form-group mt-1'>
                                   <Dropzone
                                     onDrop={(acceptedFiles) => {
@@ -546,7 +551,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             accept='image/*'
                                           />
                                           <div
-                                            className='dropzone-msg dz-message needsclick d-flex'
+                                            className='dropzone-msg dz-message needsclick d-flex align-items-center'
                                             style={{cursor: 'pointer'}}
                                           >
                                             <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
@@ -562,7 +567,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   </Dropzone>
                                 </div>
                               </div>
-                              <div className='col-md-7'>
+                              <div className='col-md-12'>
                                 <div className='photo-galleries'>
                                   {
                                     values.photo_galleries &&
@@ -626,11 +631,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                           </div>
                         </div>
                         <div className='col-md-4'>
-                          <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                          <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                             <span className='no-required'>Thumbnail</span>
                           </label>
                           <div className='row'>
-                            <div className='col-md-3 mb-5 thumbnail'>
+                            <div className='col-md-4 thumbnail'>
                               <div className='form-group image-input image-input-outline'>
                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden me-2 mb-3'>
                                   {
@@ -667,7 +672,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 </span>)}
                               </div>
                             </div>
-                            <div className='col-md-9 mb-5'>
+                            <div className='col-md-8 mb-5'>
                               <div className='form-group mt-1'>
                                 <UploadImageField
                                   setFileToState={setNewThumbnail}
@@ -685,14 +690,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <div className='fv-row mb-10'>
                           <div className='row d-flex align-items-center'>
                             <div className='col-md-3'>
-                              <label className='fs-6 fw-bold'>
+                              <label className='fs-7 fw-bold'>
                                 <span className='no-required'>Product Type</span>
                               </label>
                             </div>
                             <div className='col-md-5'>
                               <select
                                 name='type_product'
-                                className='form-select'
+                                className='form-select fs-7'
                                 value={values.type_product}
                                 onChange={(event) => {
                                   onChangeProducType(event)
@@ -710,8 +715,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       <div className='w-100'>
                         <div className='fv-row mb-5'>
                           <div className='row d-flex'>
-                            <div className='col-md-4 col-lg-3'>
-                              <ul className='nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-6'>
+                            <div className='col-md-4 col-lg-4'>
+                              <ul className='nav nav-tabs nav-pills flex-row border-0 flex-md-column me-5 mb-3 mb-md-0 fs-7'>
                                 <li className='nav-item me-0'>
                                   <a
                                     className='nav-link active btn btn-flex btn-active-secondary w-100'
@@ -721,7 +726,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     ref={tabDefault}
                                   >
                                     <span className='d-flex flex-column align-items-start'>
-                                      <span>General</span>
+                                      <span className='fs-7'>General</span>
                                     </span>
                                   </a>
                                 </li>
@@ -732,7 +737,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     href='#category_pane'
                                   >
                                     <span className='d-flex flex-column align-items-start'>
-                                      <span>Cagatories</span>
+                                      <span className='fs-7'>Cagatories</span>
                                     </span>
                                   </a>
                                 </li>
@@ -743,7 +748,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     href='#kt_vtab_pane_5'
                                   >
                                     <span className='d-flex flex-column align-items-start'>
-                                      <span>Inventory</span>
+                                      <span className='fs-7'>Inventory</span>
                                     </span>
                                   </a>
                                 </li>
@@ -754,7 +759,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     href='#kt_vtab_pane_6'
                                   >
                                     <span className='d-flex flex-column align-items-start'>
-                                      <span>Shipping</span>
+                                      <span className='fs-7'>Shipping</span>
                                     </span>
                                   </a>
                                 </li>
@@ -765,7 +770,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     href='#linked_products_pane'
                                   >
                                     <span className='d-flex flex-column align-items-start'>
-                                      <span>Linked Products</span>
+                                      <span className='fs-7'>Linked Products</span>
                                     </span>
                                   </a>
                                 </li>
@@ -776,7 +781,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     href='#kt_vtab_pane_7'
                                   >
                                     <span className='d-flex flex-column align-items-start'>
-                                      <span>Attributes</span>
+                                      <span className='fs-7'>Attributes</span>
                                     </span>
                                   </a>
                                 </li>
@@ -788,27 +793,27 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       href='#kt_vtab_pane_8'
                                     >
                                       <span className='d-flex flex-column align-items-start'>
-                                        <span>Variations</span>
+                                        <span className='fs-7'>Variations</span>
                                       </span>
                                     </a>
                                   </li>
                                 ) : null}
                               </ul>
                             </div>
-                            <div className='col-md-8 col-lg-9'>
-                              <div className='tab-content rounded border p-5 h-100'>
+                            <div className='col-md-8 col-lg-8'>
+                              <div className='tab-content rounded border p-4 h-100'>
                                 <div className='tab-pane fade active show' id='general_pane'>
                                   {productType !== 'variable' ? (
                                     <div className='form-group row'>
                                       <div className='col-md-6 mb-5'>
-                                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                           <span>Regular Price</span>
                                         </label>
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
                                             type='text'
-                                            className='form-control'
+                                            className='form-control fs-7'
                                             name='general_regular_price'                                           
                                             value={values.general_regular_price}
                                             onChange={handleChange}
@@ -820,14 +825,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           ) : null} */}
                                       </div>
                                       <div className='col-md-6 mb-5'>
-                                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                           <span>Sale Price</span>
                                         </label>
                                         <div className='input-group'>
                                           <span className='input-group-text'>$</span>
                                           <input
                                             type='text'
-                                            className='form-control'
+                                            className='form-control fs-7'
                                             name='general_sale_price'
                                             placeholder=''
                                             value={values.general_sale_price}
@@ -840,12 +845,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   ) : null}
                                   <div className='form-group row'>
                                     <div className='col-md-6 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>Tax status</span>
                                       </label>
                                       <select
                                         name='general_tax_status'
-                                        className='form-select'
+                                        className='form-select fs-7'
                                         value={values.general_tax_status}
                                         onChange={handleChange}
                                       >
@@ -855,12 +860,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       </select>
                                     </div>
                                     <div className='col-md-6 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>Tax class</span>
                                       </label>
                                       <select
                                         name='general_tax_class'
-                                        className='form-select me-2'
+                                        className='form-select me-2 fs-7'
                                         value={values.general_tax_class}
                                         onChange={handleChange}
                                       >
@@ -877,36 +882,36 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   </div>
                                   <div className='form-group row'>
                                     <div className='col-md-4 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>Wallet Credit</span>
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control'
+                                        className='form-control fs-7'
                                         name='general_wallet_credit'
                                         value={values.general_wallet_credit}
                                         onChange={handleChange}
                                       />
                                     </div>
                                     <div className='col-md-4 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>Wallet Cashback</span>
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control'
+                                        className='form-control fs-7'
                                         name='general_wallet_cashback'
                                         value={values.general_wallet_cashback}
                                         onChange={handleChange}
                                       />
                                     </div>
                                     <div className='col-md-4 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
-                                        <span>Commission (Fixed):</span>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
+                                        <span>Commission:</span>
                                       </label>
                                       <input
                                         type='number'
-                                        className='form-control'
+                                        className='form-control fs-7'
                                         name='general_commission'
                                         value={values.general_commission}
                                         onChange={handleChange}
@@ -918,12 +923,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <div className='tab-pane fade' id='kt_vtab_pane_5'>
                                   <div className='form-group row'>
                                     <div className='col-md-12 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>SKU</span>
                                       </label>
                                       <input
                                         type='text'
-                                        className='form-control'
+                                        className='form-control fs-7'
                                         name='inventory_sku'
                                         onChange={handleChange}
                                         value={values.inventory_sku}
@@ -931,7 +936,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         data-bs-toggle='tooltip'
                                         data-bs-placement='top'
                                       />
-                                      <div className='text-muted fs-7 mt-3'>
+                                      <div className='text-muted fs-9 mt-3'>
                                         SKU refers to a Stock-keeping unit, a unique identifier for
                                         each distinct product and service that can be purchased.
                                       </div>
@@ -940,12 +945,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   {productType !== 'variable' ? (
                                     <div className='form-group row'>
                                       <div className='col-md-12 mb-5'>
-                                        <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                        <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                           <span>Stock Status</span>
                                         </label>
                                         <select
                                           name='inventory_stock_status'
-                                          className='form-select'
+                                          className='form-select fs-7'
                                           value={values.inventory_stock_status}
                                           onChange={handleChange}
                                         >
@@ -958,7 +963,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               )
                                             })}
                                         </select>
-                                        <div className='text-muted fs-7 mt-3'>
+                                        <div className='text-muted fs-9 mt-3'>
                                           Controls whether or not the product is listed as "in
                                           stock" or "out of stock" on the frontend.
                                         </div>
@@ -970,12 +975,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <div className='tab-pane fade' id='kt_vtab_pane_6'>
                                   <div className='form-group row'>
                                     <div className='col-md-12 mb-5'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>Shipping Class</span>
                                       </label>
                                       <select
                                         name='shipping_class_id'
-                                        className='form-select'
+                                        className='form-select fs-7'
                                         value={values.shipping_class_id}
                                         onChange={handleChange}
                                       >
@@ -989,7 +994,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             )
                                           })}
                                       </select>
-                                      <div className='text-muted fs-7 mt-3'>
+                                      <div className='text-muted fs-9 mt-3'>
                                         Shipping classes are used by certain shipping methods to
                                         group similar products.
                                       </div>
@@ -1002,12 +1007,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   <div className='form-group row'>
                                     <div className='col-md-12 mb-5'>
                                       <div className='d-flex align-items-center'>
-                                        <label className='d-flex align-items-center fs-6 fw-bold'>
+                                        <label className='d-flex align-items-center fs-7 fw-bold'>
                                           <span>Custom Product Attribute</span>
                                         </label>
                                       </div>
                                     </div>
-                                    <div className='col-md-9 mb-5'>
+                                    <div className='col-md-8 mb-5'>
                                       <div className='d-flex align-items-center'>                                       
                                         <AsyncPaginate
                                           placeholder='Select attribute value...'
@@ -1018,15 +1023,15 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           loadOptions={() => { return loadAttributeOptions()}}
                                           onChange={onChangeAttr}
                                           name="attributes"
-                                          className='w-100'
+                                          className='w-100 fs-7'
                                           noOptionsMessage={() => 'No attribute found'}
                                           loadingMessage={() => 'Loading data, please wait...'} 
                                         />
                                       </div>
                                       { isAttributeAdded && 
-                                      (<div className='text-danger'>The attribute has added, pls choose other item...!</div>)}
+                                      (<div className='text-danger fs-9'>The attribute has added, pls choose other item...!</div>)}
                                     </div>
-                                    <div className='col-md-3 mb-5'>
+                                    <div className='col-md-4 mb-5'>
                                       <button
                                         onClick={(event) => {
                                           handleAddMoreAttributes(values)
@@ -1068,7 +1073,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 </button>
                                               </div>
                                               <button
-                                                className='accordion-button fs-6 fw-bold p-3 collapsed'
+                                                className='accordion-button fs-7 fw-bold p-3 collapsed'
                                                 type='button'
                                                 data-bs-toggle='collapse'
                                                 data-bs-target={
@@ -1092,14 +1097,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 <div className='row'>
                                                   <div className='col-md-5'>
                                                     <label>Name</label>
-                                                    <div className='fw-bold fs-6'>{attr.title}</div>
+                                                    <div className='fw-bold fs-7'>{attr.title}</div>
                                                     <div className='mt-5'>
                                                       <div className='form-check form-check-custom form-check-solid mb-3'>
                                                         <label className='form-check-label ms-0 d-flex align-items-center'>
                                                           <input
                                                             type='checkbox'
                                                             name={`attributes[${i}].visible`}
-                                                            className='form-check-input me-2'
+                                                            className='form-check-input me-2 fs-7'
                                                             checked={attr.visible}
                                                             value={attr.visible}
                                                             onChange={handleChange}
@@ -1113,7 +1118,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           <input
                                                             type='checkbox'
                                                             name={`attributes[${i}].variation`}
-                                                            className='form-check-input me-2'
+                                                            className='form-check-input me-2 fs-7'
                                                             checked={attr.variation}
                                                             value={attr.variation}
                                                             onChange={(event) => {        
@@ -1127,7 +1132,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                     </div>
                                                   </div>
                                                   <div className='col-md-7'>
-                                                    <label>Value(s)</label>                                                   
+                                                    <label className='fs-7'>Value(s)</label>                                                   
                                                     <AsyncPaginate
                                                       placeholder='Select term value(s)...'
                                                       isMulti              
@@ -1141,6 +1146,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       name={`attributes[${i}].options`}
                                                       noOptionsMessage={() => 'No value(s) found'}
                                                       loadingMessage={() => 'Loading data, please wait...'} 
+                                                      className="fs-7"
                                                     />
                                                   </div>
                                                 </div>
@@ -1200,7 +1206,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               { value: 'delete_all', label: 'Delete all variations'},
                                             ]}
                                             name={`variation_actions`}
-                                            className='w-100'
+                                            className='w-100 fs-7'
                                           />                                        
                                         </div>
                                         <div className='mb-3'>
@@ -1210,7 +1216,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               handleChange(event)
                                             }}
                                             type='button'
-                                            className='btn btn-md btn-primary'
+                                            className='btn btn-sm btn-primary'
                                             name='add-more-variations'
                                           >
                                             Update
@@ -1266,7 +1272,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                         </button>
                                                       </div>
                                                       <div className='me-2 flex-50 pt-4'>
-                                                        <label className='fw-bold'>
+                                                        <label className='fw-bold fs-7' >
                                                           #{item.id}
                                                         </label>
                                                       </div>
@@ -1288,14 +1294,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               }}
                                                               options={attrOpt.options}
                                                               name={fieldName}
-                                                              className="ms-2 me-2 float-start min-w-120px mb-3"
+                                                              className="ms-2 me-2 float-start min-w-120px mb-3 fs-7"
                                                             />
                                                           )
                                                         })}                                                       
                                                       </div>                                                      
                                                       <a
                                                         href='#'
-                                                        className='accordion-button flex-1 fs-6 fw-bold collapsed w-250px bg-white pt-4'
+                                                        className='accordion-button flex-1 fs-7 fw-bold collapsed w-250px bg-white pt-4'
                                                         data-bs-toggle='collapse'
                                                         data-bs-target={
                                                           '#variation_' + item.id + '_body'
@@ -1319,7 +1325,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   >
                                                     <div className='accordion-body'>
                                                       <div className='row mb-4'>
-                                                        <div className='col-md-3 col-lg-2 thumbnail'>
+                                                        <div className='col-md-3 thumbnail'>
                                                           <div className='form-group image-input image-input-outline'>
                                                             <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                                               {(!new_thumbnail &&
@@ -1353,7 +1359,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             </span>)}
                                                           </div>
                                                         </div>
-                                                        <div className='col-md-4 col-lg-5'>
+                                                        <div className='col-md-9'>
                                                           <div className='form-group'>
                                                             <UploadImageField
                                                               setFieldValue={setFieldValue}
@@ -1361,11 +1367,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             />
                                                           </div>
                                                         </div>
-                                                        <div className='col-md-5 col-lg-5'>
+                                                        <div className='col-md-12'>
                                                           <div className='row'>
                                                             <div className='form-group col-md-12'>
                                                               <div className='form-check form-check-custom form-check-solid mb-4'>
-                                                                <label className='form-check-label ms-0 d-flex align-items-center'>
+                                                                <label className='form-check-label ms-0 d-flex align-items-center fs-7'>
                                                                   <input
                                                                     type='checkbox'
                                                                     name={`variations[${i}].enabled`}
@@ -1379,12 +1385,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               </div>
                                                             </div>
                                                             <div className='form-group mb-4 col-md-12 d-flex align-items-center'>
-                                                              <label className='fs-6 fw-bold mb-2 me-3'>
+                                                              <label className='fs-7 fw-bold mb-2 me-3'>
                                                                 SKU
                                                               </label>
                                                               <input
                                                                 type='text'
-                                                                className='form-control'
+                                                                className='form-control fs-7'
                                                                 name={`variations[${i}].sku`}
                                                                 value={sku}
                                                                 onChange={handleChange}
@@ -1398,12 +1404,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                         <div className='col-md-12'>
                                                           <div className='row'>
                                                             <div className='col-md-6 form-group mb-4'>
-                                                              <label className='fs-6 fw-bold mb-2'>
+                                                              <label className='fs-7 fw-bold mb-2'>
                                                                 Wallet Cashback
                                                               </label>
                                                               <input
                                                                 type='text'
-                                                                className='form-control'
+                                                                className='form-control fs-7'
                                                                 placeholder=''
                                                                 name={`variations[${i}].wallet_cashback`}
                                                                 value={wallet_cashback || ''}
@@ -1416,11 +1422,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               />
                                                             </div>
                                                             <div className='col-md-6 form-group mb-4'>
-                                                              <label className='fs-6 fw-bold mb-2'>
+                                                              <label className='fs-7 fw-bold mb-2'>
                                                                 Stock status
                                                               </label>
                                                               <select
-                                                                className='form-select me-2'
+                                                                className='form-select me-2 fs-7'
                                                                 name={`variations[${i}].stock_status`}
                                                                 value={stock_status}
                                                                 onChange={handleChange}
@@ -1440,13 +1446,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           </div>
                                                           <div className='row'>
                                                             <div className='col-md-6 form-group mb-4'>
-                                                              <label className='fs-6 fw-bold mb-2'>
+                                                              <label className='fs-7 fw-bold mb-2'>
                                                                 Regular Price ($)
                                                               </label>
                                                               <input
                                                                 type='number'
                                                                 step={0.1}
-                                                                className='form-control'
+                                                                className='form-control fs-7'
                                                                 name={`variations[${i}].regular_price`}
                                                                 value={regular_price || ''}
                                                                 onChange={handleChange}
@@ -1457,13 +1463,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 ) : null}
                                                             </div>
                                                             <div className='col-md-6 form-group mb-4'>
-                                                              <label className='fs-6 fw-bold mb-2'>
+                                                              <label className='fs-7 fw-bold mb-2'>
                                                                 Sale Price ($)
                                                               </label>
                                                               <input
                                                                 type='number'
                                                                 step={0.1}
-                                                                className='form-control'
+                                                                className='form-control fs-7'
                                                                 name={`variations[${i}].sale_price`}
                                                                 value={sale_price || ''}
                                                                 onChange={handleChange}
@@ -1473,12 +1479,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           </div>
                                                           <div className='row'>
                                                             <div className='col-md-6 form-group mb-4'>
-                                                              <label className='fs-6 fw-bold mb-2'>
+                                                              <label className='fs-7 fw-bold mb-2'>
                                                                 Shipping class
                                                               </label>
                                                               <select
                                                                 name={`variations[${i}].shipping_class_id`}
-                                                                className='form-select'
+                                                                className='form-select fs-7'
                                                                 value={shipping_class_id}
                                                                 onChange={handleChange}
                                                               >
@@ -1499,12 +1505,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               </select>
                                                             </div>
                                                             <div className='col-md-6 mb-4'>
-                                                              <label className='fs-6 fw-bold mb-2'>
+                                                              <label className='fs-7 fw-bold mb-2'>
                                                                 Tax class
                                                               </label>
                                                               <select
                                                                 name={`variations[${i}].tax_class`}
-                                                                className='form-select me-2'
+                                                                className='form-select me-2 fs-7'
                                                                 value={tax_class}
                                                                 onChange={handleChange}
                                                               >
@@ -1549,7 +1555,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           disabled={isSaveVar.loading}
                                         >
                                           { !isSaveVar.loading ?
-                                          (<span className='indicator-label'>Save Variations</span>) : 
+                                          (<span className='indicator-label' id='save-variations'>Save Variations</span>) : 
                                           (<span className='indicator-progress' style={{display: 'block'}}>
                                             Processing...
                                             <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
@@ -1568,7 +1574,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 <div className='tab-pane fade' id='linked_products_pane'>
                                   <div className='col-md-12 mb-5'>
                                     <div className='uppselles'>
-                                      <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                      <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                         <span>Upsells</span>
                                       </label>                                     
                                       <AsyncPaginate
@@ -1588,19 +1594,19 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           handleChange(event)
                                         }}
                                         name="linked_products_upsell"
-                                        className='w-100'
+                                        className='w-100 fs-7'
                                         noOptionsMessage={() => 'No products found'}
                                         loadingMessage={() => 'Loading data, please wait...'} 
                                       />
                                     </div>
-                                    <div className='text-muted fs-8 mt-3'>
+                                    <div className='text-muted fs-9 mt-3'>
                                       Upsells are products which you recommend instead of the
                                       currently viewed product, for example, products that are more
                                       profitable or better quality or more expensive.
                                     </div>
                                   </div>
                                   <div className='col-md-12 mb-5'>
-                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                    <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                       <span>Cross-sells</span>
                                     </label>                                   
                                     <AsyncPaginate
@@ -1620,11 +1626,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         handleChange(event)
                                       }}
                                       name="linked_products_cross_sell"
-                                      className='w-100'
+                                      className='w-100 fs-7'
                                       noOptionsMessage={() => 'No products found'}
                                       loadingMessage={() => 'Loading data, please wait...'} 
                                     />
-                                    <div className='text-muted fs-8 mt-3'>
+                                    <div className='text-muted fs-9 mt-3'>
                                       Cross-sells are products which you promote in the cart, based
                                       on the current product.
                                     </div>
@@ -1633,7 +1639,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                 {/** category_pane  */}
                                 <div className='tab-pane fade' id='category_pane'>
                                   <div className='col-md-12 mb-5'>
-                                    <label className='d-flex align-items-center fs-6 fw-bold mb-2'>
+                                    <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                       <span>Categories</span>
                                     </label>
                                     <div className='form-group'>                                      
@@ -1651,7 +1657,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           handleChange(event)
                                         }}
                                         name="categories"
-                                        className='w-100'
+                                        className='w-100 fs-7'
                                         noOptionsMessage={() => 'No categories found'}
                                         loadingMessage={() => 'Loading data, please wait...'} 
                                       />

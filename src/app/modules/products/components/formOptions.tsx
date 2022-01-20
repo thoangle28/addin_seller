@@ -11,7 +11,7 @@ export interface IAttribute {
   options: Array<any>
 }
 
-export const initialForm = {
+export const initialDefaultForm = {
   productId: 0,
   id: 0,
   user_id: 0,
@@ -53,7 +53,8 @@ export const initialForm = {
   selectedAttr: '',
 }
 
-export const initialFormValues = { ...initialForm }
+export const initialFormValues = { ...initialDefaultForm }
+export const initialForm = { ...initialDefaultForm }
 
 export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.productId = productValues.id
@@ -265,13 +266,13 @@ export const UploadImageField = (props: any) => {
               <div {...getRootProps()}>
                 <input {...getInputProps()} name={fileName} accept='image/*' />
                 <div
-                  className='dropzone-msg dz-message needsclick d-flex'
+                  className='dropzone-msg dz-message needsclick d-flex align-items-center'
                   style={{cursor: 'pointer'}}
                 >
                   <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                   <div className='ms-4'>
                     <span className='fs-8 text-gray-normal mb-1'>
-                      Click here to change the thumbnail.
+                      Click here to change.
                     </span>
                   </div>
                 </div>
