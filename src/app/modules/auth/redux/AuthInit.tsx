@@ -4,6 +4,7 @@ import {LayoutSplashScreen} from '../../../../_metronic/layout/core'
 import * as auth from './AuthRedux'
 import {getUserByAccessToken} from './AuthCRUD'
 import {RootState} from '../../../../setup'
+import { useHistory } from 'react-router-dom';
 
 const mapState = (state: RootState) => ({auth: state.auth})
 const connector = connect(mapState, auth.actions)
@@ -14,11 +15,15 @@ const AuthInit: FC<PropsFromRedux> = (props) => {
   const dispatch = useDispatch()
   const [showSplashScreen, setShowSplashScreen] = useState(true)
   //const accessToken: any = useSelector<RootState>(({auth}) => auth.accessToken, shallowEqual)
-   
+  const history = useHistory(); 
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
   const { accessToken, expireDate, user } = auth
   const currentUserId : number = user ? user.ID : 0
 
+  const logOut = () => {
+    localStorage.clear();//clear all
+    history.push('/auth/login')
+  }
   // We should request user by authToken before rendering the application
   useEffect(() => {
     const requestUser = async () => {
@@ -27,13 +32,16 @@ const AuthInit: FC<PropsFromRedux> = (props) => {
           const {data: user} = await getUserByAccessToken(accessToken, currentUserId)
           if( user.data )
             dispatch(props.fulfillUser(user.data)) //reupdate the user info
-          else 
+          else {
             dispatch(props.logout())
+            logOut();
+          }
         }
       } catch (error) {
         //console.error(error)
         if (!didRequest.current) {
           dispatch(props.logout())
+          logOut();
         }
       } finally {
         setShowSplashScreen(false)
@@ -48,6 +56,7 @@ const AuthInit: FC<PropsFromRedux> = (props) => {
       requestUser()
     } else {
       dispatch(props.logout())
+      logOut();
       setShowSplashScreen(false)
     }
     // eslint-disable-next-line

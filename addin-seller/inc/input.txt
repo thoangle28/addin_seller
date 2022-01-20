@@ -1,0 +1,330 @@
+/**
+ * API create product
+ *      Simple Product                                                        Variable Product
+ * ex: {
+ *      "post_author":16,                                                     "post_author":16,          
+ *      "sku":"SLK9302",                                                      "sku":"SLK9302", 
+ *      "post_content":"product-test",                                        "post_content":"product-test",
+ *      "post_title":"test-product",                                          "post_title":"test-product",
+ *      "short_description":"short description",                              "short_description":"short description",
+ *      "project_description":"produc project description",                   "project_description":"produc project description",
+ *      "product_cat":["Furniture","Foyer"],                                  "product_cat":["Furniture","Foyer"],
+ *      "price":678,                                                          "price":678,
+ *      "sale_price":null,                                                    "sale_price":null,
+ *      "sale_price_dates_from":"2022-01-02",                                 "sale_price_dates_from":"2022-01-02",
+ *      "sale_price_dates_to":"2022-02-23",                                   "sale_price_dates_to":"2022-02-23",
+ *      "product_type":"simple",                                              "product_type":"variable",
+ *                                                                            "attribute_data": 
+ *                                                                               [
+ *                                                                                        {
+ *                                                                                        "name":"size-test",  
+ *                                                                                         "options":["S", "L", "XL", "XXL"],
+ *                                                                                         "visible": 1, 
+ *                                                                                          "variation": 1
+ *                                                                                         }, 
+ *                                                                                        {
+ *                                                                                         "name":"color-test",  
+ *                                                                                         "options":["Red", "Blue", "Black", "White"],
+ *                                                                                         "visible": 1, 
+ *                                                                                         "variation": 1
+ *                                                                                        }
+ *                                                                                       ]                                                     
+ *                                                                                        
+ * }
+ */
+
+
+ https://stackoverflow.com/questions/47518280/create-programmatically-a-woocommerce-product-variation-with-new-attribute-value/47766413#47766413
+
+ OK
+ https://stackoverflow.com/questions/52937409/create-programmatically-a-product-using-crud-methods-in-woocommerce-3/52941994#52941994
+
+ https://hotexamples.com/examples/-/WC_Product_Attribute/set_variation/php-wc_product_attribute-set_variation-method-examples.html
+
+
+ ////////////////////////////////////////////////////////////////////////
+ 
+
+  //print_r($product);
+  /*
+  $post_author = $request->get_param("post_author");
+  $post_content = $request->get_param("post_content");
+  $post_title = $request->get_param("post_title");
+  $short_description = $request->get_param("short_description");
+  $product_cat = $request->get_param("product_cat");
+  $product_type = $request->get_param("product_type"); 
+  $price = $request->get_param("price");
+  $sale_price = $request->get_param("sale_price");
+  $sale_price_dates_from = $request->get_param("sale_price_dates_from");
+  $sale_price_dates_to = $request->get_param("sale_price_dates_to");
+  $project_description = $request->get_param("project_description");
+  $sku = $request->get_param("sku");
+  $attributes_data = $request->get_param("attribute_data");
+
+  $post = array(
+    'post_author' => $post_author,
+    'post_content' => $post_content,
+    'post_status' => "publish",
+    'post_title' => $post_title,
+    'post_parent' => '',
+    'post_type' => "product",
+    'post_excerpt' => $short_description
+  );
+
+  $post_id = wp_insert_post($post);
+
+  if ($post_id) {
+  
+    wp_set_object_terms($post_id, $product_cat, 'product_cat');
+    wp_set_object_terms($post_id, $product_type, 'product_type');
+    update_post_meta($post_id, '_visibility', 'visible');
+    update_post_meta($post_id, '_stock_status', 'instock');
+    update_post_meta($post_id, 'total_sales', '0');
+    update_post_meta($post_id, '_downloadable', 'yes');
+    update_post_meta($post_id, '_virtual', 'yes');
+    update_post_meta($post_id, '_regular_price', $price);
+    update_post_meta($post_id, '_sale_price', $sale_price);
+    update_post_meta($post_id, '_purchase_note', "");
+    update_post_meta($post_id, '_featured', "no");
+    update_post_meta($post_id, '_weight', "");
+    update_post_meta($post_id, '_length', "");
+    update_post_meta($post_id, '_width', "");
+    update_post_meta($post_id, '_height', "");
+    update_post_meta($post_id, '_sku', $sku);
+    update_post_meta($post_id, '_sale_price_dates_from', $sale_price_dates_from);
+    update_post_meta($post_id, '_sale_price_dates_to', $sale_price_dates_to);
+    update_post_meta($post_id, '_price', $price);
+    update_post_meta($post_id, '_sold_individually', "");
+    update_post_meta($post_id, '_manage_stock', "no");
+    update_post_meta($post_id, '_backorders', "no");
+    update_post_meta($post_id, '_stock', "");
+    update_post_meta($post_id, 'project_description', $project_description);
+
+    //update attribute data for variable product
+    if (sizeof($attributes_data) > 0) {
+      $attributes = array();
+
+      foreach ($attributes_data as $key => $attribute_array) {
+        if (isset($attribute_array['name']) && isset($attribute_array['options'])) {
+        
+          $taxonomy = 'pa_' . wc_sanitize_taxonomy_name($attribute_array['name']);
+          $option_term_ids = array(); 
+
+          foreach ($attribute_array['options'] as $option) {               
+              wp_set_object_terms($post_id, $option, $taxonomy, true);         
+              $option_term_ids[] = get_term_by('name', $option, $taxonomy)->term_id;
+          }
+        }
+        
+        $attributes[$taxonomy] = array(
+          'name'          => $taxonomy,
+          'value'         => $option_term_ids,
+          'position'      => $key + 1,
+          'is_visible'    => $attribute_array['visible'],
+          'is_variation'  => $attribute_array['variation'],
+          'is_taxonomy'   => '1'
+        );
+      }
+     
+      update_post_meta($post_id, '_product_attributes', $attributes);
+    }
+    addin_seller_create_variable_product($post_id,$attributes_data);
+
+    return addin_seller_message_status(200, null, $post_id);
+  } else {
+    return addin_seller_message_status(404, esc_html__('Error', 'addin.sg'), null);
+  }*/
+
+  
+/* function addin_seller_update_product_attribues($post_id, $attributes_data) {
+    $attributes = array();
+
+    foreach ($attributes_data as $key => $attribute_array) {
+      if (isset($attribute_array['name']) && isset($attribute_array['options'])) {
+      
+        $taxonomy = 'pa_' . wc_sanitize_taxonomy_name($attribute_array['name']);
+        $option_term_ids = array(); 
+
+        foreach ($attribute_array['options'] as $option) {               
+            wp_set_object_terms($post_id, $option, $taxonomy, true);         
+            $option_term_ids[] = get_term_by('name', $option, $taxonomy)->term_id;
+        }
+      }
+      
+      $attributes[$taxonomy] = array(
+        'name'          => $taxonomy,
+        'value'         => $option_term_ids,
+        'position'      => $key + 1,
+        'is_visible'    => $attribute_array['visible'],
+        'is_variation'  => $attribute_array['variation'],
+        'is_taxonomy'   => '1'
+      );
+    }
+    
+    update_post_meta($post_id, '_product_attributes', $attributes);
+} */
+
+/* function addin_seller_update_product_variations($post_id, $attributes_data) {
+  $post_parent = $request->get_param("post_parent");
+  $data = $request->get_param("data");
+
+  foreach ($data as $key => $value) {
+    $my_post = array(
+      'post_status' => 'publish',
+      'post_parent' => $post_parent,
+      'post_type' => 'product_variation',
+    );
+
+    $attID = wp_insert_post($my_post);
+    update_post_meta($attID, '_regular_price',  $value['regular_price']);
+
+    $array = json_decode(json_encode($value['attributes']), true);
+
+    foreach ($array as $k => $v) {
+      update_post_meta($attID, 'attribute_' . $v['attr'], $v['value']);
+    }
+  }
+} */
+
+
+/* // Create array variations product before create variable product
+function addin_seller_processing_array_variations_after($data)
+{
+  $t = [];
+  $output = [];
+
+  foreach ($data as $key => $attribute_array) {
+    foreach ($attribute_array['options'] as $option) {
+      $t[$attribute_array['name']][] = $option;
+    }
+  }
+
+  $output = addin_seller_processing_array_variations_before($t);
+  return $output;
+}
+function addin_seller_create_variable_product($post_id,$data){
+  $data = addin_seller_processing_array_variations_after($data);
+  if (!empty($data)) {
+    foreach ($data as $array) {
+
+      $my_post = array(
+        'post_status' => 'publish',
+        'post_parent' => $post_id,
+        'post_type' => 'product_variation',
+      );
+
+      $attID = wp_insert_post($my_post);
+
+      if (is_array($array)) {
+        foreach ($array as $key => $value) {      
+          update_post_meta($attID, 'attribute_pa_' . strtolower($key), strtolower(str_replace(' ','-',$value)));
+        }
+      }
+    }
+  } else {
+    return addin_seller_message_status(404, esc_html__('Error', 'addin.sg'), null);
+  }
+} */
+
+/**
+ * API Create varion product from attribute
+ */
+/* function  addin_seller_create_variation_products($request) 
+{
+  $post_parent = $request->get_param("post_parent");
+  $data = $request->get_param("data");
+
+  foreach ($data as $key => $value) {
+    $my_post = array(
+      'post_status' => 'publish',
+      'post_parent' => $post_parent,
+      'post_type' => 'product_variation',
+    );
+
+    $attID = wp_insert_post($my_post);
+    update_post_meta($attID, '_regular_price',  $value['regular_price']);
+
+    $array = json_decode(json_encode($value['attributes']), true);
+
+    foreach ($array as $k => $v) {
+      update_post_meta($attID, 'attribute_' . $v['attr'], $v['value']);
+    }
+  }
+} */
+
+/* function addin_seller_update_post_catgories_taxonomy($post_id, $product_cat, $product_type) {
+  wp_set_object_terms($post_id, $product_cat, 'product_cat');
+  wp_set_object_terms($post_id, $product_type, 'product_type');
+} */
+
+//  Processing array variations before create variable product
+function addin_seller_processing_array_variations_before($array)
+{
+  if (empty($array)) {
+    return [];
+  }
+
+  function traverse($array, $parent_ind)
+  {
+    $r = [];
+    $pr = '';
+
+    if (!is_numeric($parent_ind)) {
+      $pr = $parent_ind . '-';
+    }
+
+    foreach ($array as $ind => $el) {
+      if (is_array($el)) {
+        $r = array_merge($r, traverse($el, $pr . (is_numeric($ind) ? '' : $ind)));
+      } elseif (is_numeric($ind)) {
+        $r[] = $pr . $el;
+      } else {
+        $r[] = $pr . $ind . '-' . $el;
+      }
+    }
+
+    return $r;
+  }
+
+  $keys = [];
+  $size = 1;
+
+  foreach ($array as $key => $elems) {
+    if (is_array($elems)) {
+      $rr = [];
+
+      foreach ($elems as $ind => $elem) {
+        if (is_array($elem)) {
+          $rr = array_merge($rr, traverse($elem, $ind));
+        } else {
+          $rr[] = $elem;
+        }
+      }
+
+      $array[$key] = $rr;
+      $size *= count($rr);
+    }
+
+    $keys[] = $key;
+  }
+
+  $output = [];
+  for ($i = 0; $i < $size; $i++) {
+    $output[$i] = [];
+
+    foreach ($array as $key => $value) {
+      $current = current($array[$key]);
+      $output[$i][$key] = $current;
+    }
+
+    foreach ($keys as $key) {
+      if (!next($array[$key])) {
+        reset($array[$key]);
+      } else {
+        break;
+      }
+    }
+  }
+
+  return $output;
+}

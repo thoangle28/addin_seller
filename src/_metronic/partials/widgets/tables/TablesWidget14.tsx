@@ -43,6 +43,17 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
   return listPages
 }
 
+const formatToCurrency = (amount: number) => {
+  let formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  });
+  return  (amount > 0) ? formatter.format(amount) : '';
+};
+
+
+
+
 const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = () => undefined}: Props) => {
 
   const {productsList, currentPage, totalPages, totalProducts} = dataList
@@ -100,6 +111,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
               <tr className='fw-bolder text-muted'>
                 <th className='w-5 text-center'>#ID</th>
                 <th className='w-50'>Product Name</th>
+                <th className='w-25 text-center'>Type</th>
                 <th className='w-25 text-center'>SKU</th>
                 <th className='w-5 text-end'>Price</th>
                 <th className='w-25 text-end'>Date</th>
@@ -135,18 +147,19 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
                           </div>
                         </div>
                       </td>
+                      <td className='text-center'>{ele.type}</td>
                       <td className='text-center'>{ele.sku}</td>
                       <td className='text-end'>
                         
                         { (ele.sale_price > 0 && ele.sale_price < ele.price)  ? (
                           <>
-                            <span>${ele.sale_price}</span><br />
+                            <span>{formatToCurrency(ele.sale_price)}</span><br />
                             <small className='me-2' style={{color: '#999', textDecoration: 'line-through'}}>
-                              ${ele.price}
+                              {formatToCurrency(ele.price)}
                             </small>                            
                           </>
                         ) : (
-                          <span>${ele.price}</span>
+                          <span>{formatToCurrency(ele.price)}</span>
                         )}
 
                       </td>
