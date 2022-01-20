@@ -4,7 +4,14 @@
  */
 function addin_seller_get_all_category_product()
 {
-  $args = array(
+  $categories = build_custom_category_tree(0, $categories, 0);
+  if ($categories) {
+    return addin_seller_message_status('200', null, $categories);
+  } else {
+    return addin_seller_message_status('404', esc_html__('No category', 'addin.sg'), null);
+  }
+
+  /*$args = array(
     'taxonomy' => 'product_cat',
     'orderby' => 'name',
     'order' => 'ASC',
@@ -29,7 +36,7 @@ function addin_seller_get_all_category_product()
     return addin_seller_message_status('200', null, $filtered);
   } else {
     return addin_seller_message_status('404', esc_html__('No category', 'addin.sg'), null);
-  }
+  }*/
 }
 
 /**
@@ -378,4 +385,43 @@ function addin_seller_get_the_terms($product_id, $type) {
   }
 
   return [];
+}
+
+function build_custom_category_tree ($parentId = 0, &$categories, $level = 0) {
+  $terms = get_terms( array(
+      'taxonomy' => 'product_cat',
+      'hide_empty' => false,
+      'hierarchical' => true,
+      'parent' => $parentId,
+      'orderby' => 'name',
+      'order' => 'ASC',
+  ) );
+
+  if (count($terms)) {
+      foreach ($terms as $id => $term) {			
+          $categories[] = [ 
+            //'id' => $term->term_id, 
+            'label' => add_text($level). str_replace('&amp;', '&', $term->name), 
+            'value' => $term->term_id 
+          ];
+          $sub = get_term_children($term->term_id, 'product_cat');
+          if( $sub ) build_custom_category_tree($term->term_id, $categories, $level + 1);
+      }
+  }
+
+  return $categories;
+}
+
+function show_build_custom_category_tree() {
+  $test = [];
+  build_custom_category_tree(0, $test, 0);
+  print_r($test);
+}
+
+function add_text($level) {
+$_ = '';
+for($i = 0; $i < $level; $i++) {
+    $_ .= '--';
+}
+return $_;
 }

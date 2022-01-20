@@ -10,6 +10,8 @@
 define('NAME_SPACE', "addin-seller/");
 define('VERSION','v1');
 
+require_once("simple_html_dom.php");
+
 require_once('inc/rest_attribute.php');
 require_once('inc/rest_category.php');
 require_once('inc/rest_user.php');
