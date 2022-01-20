@@ -142,8 +142,8 @@ function addin_seller_get_all_products_by_user($request) {
 
     foreach($products_list as $key => $value){      
       $product = [];
-      $price_for_display = $value->price;
-      $price_for_display = $value->sale_price;
+      $price_for_display = floatval($value->regular_price);
+      $price_sale_display = floatval($value->sale_price);
       if($value->is_type( 'variable' )) {
         $price_for_display = $value->get_variation_regular_price('min', true);
         $price_sale_display = $value->get_variation_sale_price('min', true); // Min sale price for display
@@ -152,11 +152,12 @@ function addin_seller_get_all_products_by_user($request) {
 
       $product['product_id'] = $value->id;
       $product['sku'] = $value->sku;
-      $product['regular_price'] = $value->regular_price;
-      $product['sale_price'] = $price_sale_display;
-      $product['price'] = $price_for_display;
+      $product['type'] = $value->is_type( 'variable' ) ? 'Variable' : "Simple";
+      $product['regular_price'] = floatval($value->regular_price);
+      $product['sale_price'] = floatval($price_sale_display);
+      $product['price'] = floatval($price_for_display);
       $product['product_name'] = $value->name;
-      $product['posted_date'] = wc_format_datetime($value->get_date_created(), 'm/d/Y h:i');
+      $product['posted_date'] = wc_format_datetime($value->get_date_created(), 'm/d/Y');
       $product['status'] = $value->status;
 
       $categories = get_the_terms( $value->id, 'product_cat' );

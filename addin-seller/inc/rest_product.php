@@ -4,20 +4,23 @@ function create_or_update_product_basic_info($product_id, $data) {
 	$product = null;
 	
 	if( isset($product_id) && $product_id > 0 ) {
- 		$product =  wc_get_product($product_id);	
-		if( ! $product ) return addin_seller_message_status(404, 'Not found', null);
+ 		$product =  wc_get_product($product_id);		 
+		if( ! $product ) return addin_seller_message_status(404, 'Not found', null);		
 	} else { //add new
-		//$product = addin_seller_get_product_object_type( $data->type_product );	
-		//$product_id = $product->get_id();
+		$product = addin_seller_get_product_object_type( $data->type_product );	
+		$product->save();
+
+		$product_id = $product->get_id();
 		$arg = array(
+			'ID' => $product_id,
 			'post_type' => 'product', 
 			'post_status' => 'pending', 
 			'post_author' => $data->user_id,
 			'post_title' => wp_strip_all_tags($data->name),
-			'post_content' => wp_strip_all_tags($data->content),
+			'post_content' => addin_seller_update_image_inside_content($data->content)
 		);
 
-		$product_id = wp_insert_post( $arg );	
+		$product_id = wp_update_post( $arg );	
 		$product =  wc_get_product($product_id);
 	}
 	//create or update
@@ -28,13 +31,15 @@ function create_or_update_product_basic_info($product_id, $data) {
 
 function addin_seller_product_update_general($product, $data) {
 	
-	$product_id = $product->get_id();
-
+	$product_id = $product->get_id();	
+	
 	if(isset($data->name) && $data->name) 
 		$product->set_name(wp_strip_all_tags($data->name));
 
-	if( isset($data->content) && $data->content) 
-		$product->set_description( $data->content);
+	if( isset($data->content) && $data->content) {
+		$content = addin_seller_update_image_inside_content($data->content, wp_strip_all_tags($data->name));
+		$product->set_description( $content );
+	}
 
 	$product->set_featured(false); //not feature
 	$product->set_virtual(false);
@@ -42,14 +47,7 @@ function addin_seller_product_update_general($product, $data) {
 	// Prices
 	$product->set_regular_price( isset($data->general_regular_price) ? $data->general_regular_price : '');
 	$product->set_sale_price( isset( $data->general_sale_price) ? $data->general_sale_price : '' );
-	$product->set_price( isset( $data->general_sale_price) ? $data->general_sale_price :  $data->general_regular_price);
-
-	//From simple to variable
-	$old_product_type = $product->is_type('simple') ? 'simple' : 'variable';
-	if( $data->type_product !== $old_product_type) {		
-		wp_remove_object_terms( $product_id, $old_product_type, 'product_type', true );
-		wp_set_object_terms( $product_id, $data->type_product, 'product_type', true ); 
-	}
+	$product->set_price( isset( $data->general_sale_price) ? $data->general_sale_price :  $data->general_regular_price);	
 	
 	// Taxes
 	if ( get_option( 'woocommerce_calc_taxes' ) === 'yes' ) {
@@ -170,11 +168,12 @@ function addin_seller_product_update_general($product, $data) {
 	
 	## --- UPDATE INFO OF PRODUCT --- ##
 	$product_id = $product->save();
-
+	update_product_type($product_id, $product, $data);
+	
 	if( is_wp_error($product_id)) {
 		return addin_seller_message_status(400, $product_id->get_error_message(), null);
 	} else {
-		return addin_seller_message_status(200, 'The product have been created/updated successfull!', null);
+		return addin_seller_message_status(200, 'The product have been created/updated successfull!',  $product_id);
 	}
 }
 
@@ -182,7 +181,7 @@ function addin_seller_product_update_general($product, $data) {
 // For New Product
 function addin_seller_get_product_object_type( $type ) {
 	// Get an instance of the WC_Product object (depending on his type)
-	/* switch($type) {
+	switch($type) {
 		case 'variable':
 			$product = new WC_Product_Variable();
 			break;
@@ -197,33 +196,36 @@ function addin_seller_get_product_object_type( $type ) {
 			break;
 	}
 	
-	return ( ! is_a( $product, 'WC_Product' ) ) ? false : $product; */
+	return ( ! is_a( $product, 'WC_Product' ) ) ? false : $product;
 }
 
-
+/**
+ * Delete variations
+*/
 function delete_variations($product_id, $variations){
-	$product =  wc_get_product($product_id);  
-	$product_variations = $product->get_available_variations();
+	$product_variable = new WC_Product_Variable($product_id);
+  $old_variations = $product_variable->get_children();
 
 	$new_variations = [];
 	foreach($variations as $var ) {
-		$new_variations[] = $var->id;
+		$new_variations[] = intval($var->id);
 	}
 
-	foreach($product_variations as $var) {	
-		if( !in_array($var['variation_id'], $new_variations)) {
-			$variation = new WC_Product_Variation($var['variation_id']);
+	foreach($old_variations as $id => $value) {	
+		if( !in_array($value, $new_variations)) {
+			$variation = new WC_Product_Variation($value);
 			$variation->delete(true);
 		}
 	}
 }
 // Utility function that prepare product attributes before saving
 function addin_seller_update_variations( $product_id, $variations ){
-	foreach( $variations as $key => $variation) {
-	
-		//Delete
-		delete_variations($product_id, $variations);
-		
+
+	//Delete
+	delete_variations($product_id, $variations);
+
+	foreach( $variations as $key => $variation) {	
+
 		if( is_numeric($variation->id)) 
 			$productVar = new WC_Product_Variation($variation->id );
 		else 
@@ -260,7 +262,10 @@ function addin_seller_update_variations( $product_id, $variations ){
 		//$variation->set_upsell_ids();
 		//$variation->set_cross_sell_ids(); 
 		$productVar->save();
-		update_post_meta($variation->id, '_fsww_cashback', $variation->wallet_cashback);		
+		update_post_meta($productVar->get_variation_id(), '_fsww_cashback', $variation->wallet_cashback);		
+
+		$upadeProduct = wc_get_product($product_id);
+		$upadeProduct->save();		
 	}
 }
 
@@ -327,7 +332,8 @@ function addin_seller_save_image_base64( $base64_img, $title = null, $is_post = 
 	$image_parts = explode(";base64,", $base64_img);
 	$imgExt = str_replace('data:image/', '', $image_parts[0]);      
 	$image = str_replace(' ', '+', $image_parts[1]);
-	$imageName =  str_replace(' ','_', $title).".".$imgExt;
+	$file_name = $title ? strtolower(str_replace(' ','_', $title)) : time();
+	$imageName =  wp_trim_words($file_name, 5) . ".".$imgExt;
 	$decoded = base64_decode($image_parts[1]);
 	$file_type = 'image/jpeg';
 	// Save the image in the uploads directory.
@@ -336,7 +342,7 @@ function addin_seller_save_image_base64( $base64_img, $title = null, $is_post = 
 	$file_array = array(
 		'name' => $imageName,
 		'tmp_name' => $upload_path . $imageName,
-		'type'=> $imgExt
+		'type'=> str_replace('jpeg','jpg', $imgExt)
 	);
 
 	$file_return = wp_handle_sideload( $file_array, array( 'test_form' => false ) );
@@ -355,7 +361,7 @@ function addin_seller_save_image_base64( $base64_img, $title = null, $is_post = 
 
 	$attach_id = wp_insert_attachment( $attachment, $filename);
 	$attachment_meta = wp_generate_attachment_metadata($attach_id, $filename ,0);
-	wp_update_attachment_metadata($attach_id,$attachment_meta);
+	wp_update_attachment_metadata($attach_id, $attachment_meta);
 
 	return $attach_id;
 }
@@ -422,7 +428,43 @@ function addin_seller_create_variation_products($request) {
 	if( !$allowAccess ) return addin_seller_message_status(401, 'Unauthorized', null);
 	if( !$variations ) return addin_seller_message_status(404, 'Not Found', null);	
 	
-	addin_seller_update_variations($product_id, $variations);
+	$data = addin_seller_update_variations($product_id, $variations);
 
-	return addin_seller_message_status(200, 'Done', null);
+	return addin_seller_message_status(200, 'Done', $data);
+}
+
+
+function addin_seller_update_image_inside_content($content, $title = '') {
+
+	if(!$content) return '';
+
+	// Find all images
+    $newContent = $content;
+
+    $html = file_get_html_contents($content);    
+
+    foreach($html->find('img') as $element) {
+        $image_path = $element->src;
+        $path_parts = pathinfo($image_path);
+        $image_extensions_allowed = array('jpg', 'jpeg', 'png', 'gif','bmp');    
+        if( isset($path_parts['extension']) && in_array($path_parts['extension'], $image_extensions_allowed)) {
+			continue;
+        } else {
+            $attach_id = addin_seller_save_image_base64( $image_path, $title);
+            $upload_file = wp_get_attachment_url($attach_id);       
+            $newContent = str_replace($image_path, $upload_file, $newContent);
+        }
+    }
+
+    return $newContent;
+}
+
+function update_product_type($product_id, $product, $data) {
+	//From simple to variable
+	$old_product_type = $product->is_type('simple') ? 'simple' : 'variable';
+	
+	if( $data->type_product != $old_product_type) {		
+		wp_remove_object_terms( $product_id, $old_product_type, 'product_type');
+		wp_set_object_terms( $product_id, $data->type_product, 'product_type', true ); 
+	}
 }
