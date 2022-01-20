@@ -305,9 +305,6 @@ export const FallbackView = () => {
 export const fetchProfileData = (userId: number) => {
   return Promise.all([
     fetchShippingClass(),
-    //fetchCategoies(),
-    //fetchAttributes(),
-    //fetchProductsList(userId)
   ]).then(([shippingClass]) => { //, categories, attributes, productsList
     return {shippingClass}  //, categories, attributes, productsList
   })
