@@ -385,8 +385,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       name: Yup.string().max(250, 'Must be 250 characters or less').required('Pls enter the product title'),    
      /*  variations: Yup.array().of(
         Yup.object().shape({
-          regular_price: Yup.number().test("regularPrice", "Invalid number", (value) => {
-            if (value) return !isNaN(parseFloat(String(value))) && isFinite(Number(value))
+          regular_price: Yup.number().test("regular_price", "Invalid number", (value) => {
+            if (value) 
+              return !isNaN(parseFloat(String(value))) && isFinite(Number(value))
+            else
+              return false // nullable
           }) // 20 score
         })) */
       //content: Yup.string().required('no-required'),
@@ -1449,6 +1452,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 onChange={handleChange}
                                                                 onBlur={handleBlur}
                                                               />
+                                                               {touched.variations[i].regular_price && errors.variations[i].regular_price ? (
+                                                                  <div className='text-danger fs-8'>{errors.variations[i].regular_price}</div>
+                                                                ) : null}
                                                             </div>
                                                             <div className='col-md-6 form-group mb-4'>
                                                               <label className='fs-6 fw-bold mb-2'>
