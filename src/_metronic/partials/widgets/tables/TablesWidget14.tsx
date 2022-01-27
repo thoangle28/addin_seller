@@ -77,7 +77,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
   }, [currentPage])
 
   return (
-    <div className={`card ${className}`}>
+    <div className={`card card-products ${className}`}>
       {/* begin::Header */}
       <div className='card-header border-0 pt-5'>
         <h3 className='card-title align-items-start flex-column'>
@@ -125,8 +125,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
               {
                 (!!productsList && productsList.length > 0) ? (
                 productsList.map((ele: any, index: number) => {
-                  //const real_price = ele.sale_price > 0 ? ele.sale_price : ele.price
-
+       
                   return (
                     <tr key={index}>
                       <td className='text-center'>{ele.product_id}</td>
@@ -206,8 +205,8 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
               ) : (
                 <tr>
                   <td className='text-center' colSpan={8}>
-                    {(!isLoading && !!productsList && productsList.length === 0) 
-                    ? <>No products here!</> 
+                    {(typeof productsList === 'undefined' || (!!productsList && productsList.length === 0)) 
+                    ? <>No products here / Loadding</> 
                     : (
                       <div className='card mb-0 mb-xl-8 loading-wrapper'>
                         <div className='card-body py-3 loading-body'>
@@ -222,7 +221,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
             {/* end::Table body */}
           </table>
           {/* end::Table */}
-          {totalPages >= 1 &&
+          {totalPages > 1 &&
             (!isHome ? (
               <>
                 <hr />

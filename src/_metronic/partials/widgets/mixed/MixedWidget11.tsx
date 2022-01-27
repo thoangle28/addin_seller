@@ -38,11 +38,10 @@ const MixedWidget11: React.FC<Props> = ({className, chartColor, chartHeight}) =>
         <div className='d-flex flex-stack flex-wrap flex-grow-1 px-9 pt-9 pb-3'>
           <div className='me-2'>
             <span className='fw-bolder text-gray-800 d-block fs-3'>Sales</span>
-
-            <span className='text-gray-400 fw-bold'>Oct 8 - Oct 26 2021</span>
+            <span className='text-gray-400 fw-bold'>Oct 8 - Feb 16 2022</span>
           </div>
 
-          <div className={`fw-bolder fs-3 text-${chartColor}`}>$15,300</div>
+          <div className={`fw-bolder fs-3 text-${chartColor}`}>{/* $15,300 */}</div>
         </div>
         {/* end::Hidden */}
 
@@ -63,7 +62,7 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
   return {
     series: [
       {
-        name: 'Net Profit',
+        name: 'This feature will be ready soon.',//'Net Profit',
         data: [50, 60, 70, 80, 60, 50, 70, 60],
       },
       {
@@ -150,7 +149,7 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
       },
       y: {
         formatter: function (val) {
-          return '$' + val + ' revenue'
+          return ''//'$' + val + ' revenue'
         },
       },
     },

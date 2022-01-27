@@ -194,3 +194,8 @@ body {
 .alam {
   color: #7fbc02;
 }
+
+
+.card-products {
+  min-height: 100vh;
+}

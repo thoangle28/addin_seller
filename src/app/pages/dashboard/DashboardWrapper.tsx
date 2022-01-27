@@ -20,7 +20,7 @@ type Props = {
 
 const DashboardPage: FC<Props> = ( {dataList = []}) => (
   <>
-    {/* begin::Row */}
+    {/* begin::Row Sale Report */}
     <div className='row gy-5 g-xl-8'>
       <div className='col-xxl-6'>
         <MixedWidget2
