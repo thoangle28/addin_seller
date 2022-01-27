@@ -45,7 +45,7 @@ const MixedWidget10: React.FC<Props> = ({className, chartColor, chartHeight}) =>
               <div className='text-muted fs-7 fw-bold'>Finance and accounting reports</div>
             </div>
 
-            <div className={`fw-bolder fs-3 text-${chartColor}`}>$24,500</div>
+            <div className={`fw-bolder fs-3 text-${chartColor}`}>{/* $24,500 */}</div>
           </div>
         </div>
         {/* end::Stats */}
@@ -68,7 +68,7 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
   return {
     series: [
       {
-        name: 'Net Profit',
+        name: 'This feature will be ready soon.',//'Net Profit',
         data: [15, 25, 15, 40, 20, 50],
       },
     ],
@@ -169,7 +169,7 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
       },
       y: {
         formatter: function (val) {
-          return '$' + val + ' thousands'
+          return '' //'$' + val + ' thousands'
         },
       },
     },

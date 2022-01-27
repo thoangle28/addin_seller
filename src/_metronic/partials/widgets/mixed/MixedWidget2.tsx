@@ -139,7 +139,7 @@ const chartOptions = (
   return {
     series: [
       {
-        name: 'Net Profit',
+        name: 'This feature will be ready soon.', //'Net Profit',
         data: [30, 45, 32, 70, 40, 40, 40],
       },
     ],
@@ -246,7 +246,7 @@ const chartOptions = (
       },
       y: {
         formatter: function (val) {
-          return '$' + val + ' thousands'
+          return ''//'$' + val + ' thousands'
         },
       },
       marker: {
