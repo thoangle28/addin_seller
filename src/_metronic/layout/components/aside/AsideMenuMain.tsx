@@ -19,7 +19,7 @@ export function AsideMenuMain() {
       <AsideMenuItem
         to='/product/listing'
         icon='/media/icons/duotune/general/gen019.svg'
-        title='Product Listing'
+        title='Products Listing'
         fontIcon='bi-layers'
       />
       <AsideMenuItem
