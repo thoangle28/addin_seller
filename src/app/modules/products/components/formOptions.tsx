@@ -350,19 +350,6 @@ const fetchAttributes = () => {
   })    
 }
 
-const fetchProductsList = (userId: number) => {
-  return new Promise((resolve, reject) => {    
-    try {
-      const productsList = ProductsList(userId)
-      resolve(productsList)
-    } catch(e) {
-      reject({
-        errorMsg: 'Error while loading data. Try again later.'
-      })
-    }  
-  })    
-}
-
 export const postProduct = (params: any, token: string) => {
   return new Promise((resolve, reject) => { 
     common.saveProductToDB(params, token).then((response) => {

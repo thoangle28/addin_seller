@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC, useEffect} from 'react'
+import {FC, useEffect, useState} from 'react'
 import {shallowEqual, useSelector, useDispatch } from 'react-redux'
 import {useIntl} from 'react-intl'
 import {PageTitle} from '../../../_metronic/layout/core'
@@ -16,9 +16,10 @@ import {RootState} from '../../../setup'
 
 type Props = {
   dataList: any | []
+  isPageLoading: boolean | true
 }
 
-const DashboardPage: FC<Props> = ( {dataList = []}) => (
+const DashboardPage: FC<Props> = ( {dataList = [], isPageLoading}: Props) => (
   <>
     {/* begin::Row Sale Report */}
     <div className='row gy-5 g-xl-8'>
@@ -51,7 +52,8 @@ const DashboardPage: FC<Props> = ( {dataList = []}) => (
         className='card-xxl-stretch mb-5 mb-xxl-8' 
         FallbackView={FallbackView}
         dataList={dataList} 
-        isHome={true} />
+        isHome={true}
+        isPageLoading={isPageLoading} />
       </div>
     </div>
   </>
@@ -68,12 +70,22 @@ const DashboardWrapper: FC = () => {
   const dispatch = useDispatch()
   const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
   const currentUserId = user ? user.ID : 0
-  useEffect(() => {
+
+  const [isPageLoading, setPageLoading] = useState(true);
+  
+  useEffect(() => {   
+    initLoad.userId = currentUserId
     const getProductList = () => {
-      initLoad.userId = currentUserId
-      dispatch(product.actions.getProductList(initLoad))
-    }
-    getProductList()
+      return new Promise((resolve, reject) => { 
+        dispatch(product.actions.getProductList(initLoad));        
+        resolve(true)
+      });
+    }    
+
+    getProductList().then((data: any) => {       
+      setPageLoading(false);
+    });
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   
@@ -82,7 +94,7 @@ const DashboardWrapper: FC = () => {
   return (
     <>
       <PageTitle breadcrumbs={[]}>{intl.formatMessage({id: 'MENU.DASHBOARD'})}</PageTitle>
-      <DashboardPage dataList={data} />
+      <DashboardPage dataList={data} isPageLoading={isPageLoading} />
     </>
   )
 }

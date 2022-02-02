@@ -68,3 +68,14 @@ export function updateProductAttr(obj: any) {
   const url = (obj.type === 'attr') ? '/product/create-attributes' : '/product/create-variations'
   return axios.post<any>(API_END_POINT_URL+ url, {data: obj })
 }
+
+export function getProductsListing( userId: number, currentPage: number, pageSize: number) {  
+  
+  const args = { 
+    user_id : userId ? userId : 0,
+    page_size : pageSize ? pageSize : 10,
+    current_page : currentPage ? currentPage : 1 
+  };
+
+  return axios.post<any>(API_END_POINT_URL+ '/products-by-user', args);
+}
