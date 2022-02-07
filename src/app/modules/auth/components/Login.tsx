@@ -70,7 +70,7 @@ export function Login() {
     >
       {/* begin::Heading */}
       <div className='text-center mb-10'>
-        <h1 className='text-dark mb-3'>Sign In to Addin SG</h1>      
+        <h1 className='text-dark mb-3'>Sign In to Seller Portal</h1>      
       </div>
       {/* begin::Heading */}
 
@@ -149,13 +149,16 @@ export function Login() {
           )}
         </button>
         {/* begin::Link */}
+        <Link 
+          to='/auth/registration' 
+          className='link-primary fs-6 fw-normal'>
+          Create New Account.
+        </Link>&nbsp;&nbsp;|&nbsp;&nbsp;
         <Link
-            to={{ pathname: 'https://addin.sg/my-account/lost-password/'}}
-            className='link-primary fs-7 fw-normal'
-            style={{marginLeft: '5px'}}
-            target="_blank" 
+            to='/auth/forgot-password'
+            className='link-primary fs-6 fw-normal'
           >
-            Forgot password?
+            Forgot Password?
           </Link>
         {/* end::Link */}
       </div>

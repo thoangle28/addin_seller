@@ -82,10 +82,10 @@ export function Registration() {
         {/* end::Title */}
 
         {/* begin::Link */}
-        <div className='text-gray-400 fw-bold fs-4'>
-          Already have an account?
-          <Link to='/auth/login' className='link-primary fw-bolder' style={{marginLeft: '5px'}}>
-            Forgot Password ?
+        <div className='text-gray-400 fw-normal fs-6'>
+          Already have an account,&nbsp;
+          <Link to='/auth/login' className='link-primary fw-normal'>
+            click here to login.
           </Link>
         </div>
         {/* end::Link */}
@@ -93,14 +93,14 @@ export function Registration() {
       {/* end::Heading */}
 
       {/* begin::Action */}
-      <button type='button' className='btn btn-light-primary fw-bolder w-100 mb-10'>
+      {/* <button type='button' className='btn btn-light-primary fw-bolder w-100 mb-10'>
         <img
           alt='Logo'
           src={toAbsoluteUrl('/media/svg/brand-logos/google-icon.svg')}
           className='h-20px me-3'
         />
         Sign in with Google
-      </button>
+      </button> */}
       {/* end::Action */}
 
       <div className='d-flex align-items-center mb-10'>
@@ -118,7 +118,7 @@ export function Registration() {
       {/* begin::Form group Firstname */}
       <div className='row fv-row mb-7'>
         <div className='col-xl-6'>
-          <label className='class="form-label fw-bolder text-dark fs-6'>First name</label>
+          <label className='form-label fw-bolder text-dark fs-6'>First name</label>
           <input
             placeholder='First name'
             type='text'
@@ -135,7 +135,7 @@ export function Registration() {
             )}
           />
           {formik.touched.firstname && formik.errors.firstname && (
-            <div className='fv-plugins-message-container'>
+            <div className='fv-plugins-message-container invalid-feedback'>
               <div className='fv-help-block'>
                 <span role='alert'>{formik.errors.firstname}</span>
               </div>
@@ -144,7 +144,7 @@ export function Registration() {
         </div>
         <div className='col-xl-6'>
           {/* begin::Form group Lastname */}
-          <div className='fv-row mb-5'>
+          <div className='fv-row'>
             <label className='form-label fw-bolder text-dark fs-6'>Last name</label>
             <input
               placeholder='Last name'
@@ -162,7 +162,7 @@ export function Registration() {
               )}
             />
             {formik.touched.lastname && formik.errors.lastname && (
-              <div className='fv-plugins-message-container'>
+              <div className='fv-plugins-message-container invalid-feedback'>
                 <div className='fv-help-block'>
                   <span role='alert'>{formik.errors.lastname}</span>
                 </div>
@@ -191,7 +191,7 @@ export function Registration() {
           )}
         />
         {formik.touched.email && formik.errors.email && (
-          <div className='fv-plugins-message-container'>
+          <div className='fv-plugins-message-container invalid-feedback'>
             <div className='fv-help-block'>
               <span role='alert'>{formik.errors.email}</span>
             </div>
@@ -200,66 +200,71 @@ export function Registration() {
       </div>
       {/* end::Form group */}
 
-      {/* begin::Form group Password */}
-      <div className='mb-10 fv-row' data-kt-password-meter='true'>
-        <div className='mb-1'>
-          <label className='form-label fw-bolder text-dark fs-6'>Password</label>
-          <div className='position-relative mb-3'>
+      
+      <div className="row">
+        <div className="col-12 col-md-6"> 
+        {/* begin::Form group Password */}
+          <div className='mb-10 fv-row' data-kt-password-meter='true'>
+            <div className='mb-1'>
+              <label className='form-label fw-bolder text-dark fs-6'>Password</label>
+              <div className='position-relative mb-3'>
+                <input
+                  type='password'
+                  placeholder='Password'
+                  autoComplete='off'
+                  {...formik.getFieldProps('password')}
+                  className={clsx(
+                    'form-control form-control-lg form-control-solid',
+                    {
+                      'is-invalid': formik.touched.password && formik.errors.password,
+                    },
+                    {
+                      'is-valid': formik.touched.password && !formik.errors.password,
+                    }
+                  )}
+                />
+                {formik.touched.password && formik.errors.password && (
+                  <div className='fv-plugins-message-container invalid-feedback'>
+                    <div className='fv-help-block'>
+                      <span role='alert'>{formik.errors.password}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        {/* end::Form group */}
+        </div>
+        <div className="col-12 col-md-6"> 
+          {/* begin::Form group Confirm password */}
+          <div className='fv-row mb-5'>
+            <label className='form-label fw-bolder text-dark fs-6'>Confirm Password</label>
             <input
               type='password'
-              placeholder='Password'
+              placeholder='Password confirmation'
               autoComplete='off'
-              {...formik.getFieldProps('password')}
+              {...formik.getFieldProps('changepassword')}
               className={clsx(
                 'form-control form-control-lg form-control-solid',
                 {
-                  'is-invalid': formik.touched.password && formik.errors.password,
+                  'is-invalid': formik.touched.changepassword && formik.errors.changepassword,
                 },
                 {
-                  'is-valid': formik.touched.password && !formik.errors.password,
+                  'is-valid': formik.touched.changepassword && !formik.errors.changepassword,
                 }
               )}
             />
-            {formik.touched.password && formik.errors.password && (
-              <div className='fv-plugins-message-container'>
+            {formik.touched.changepassword && formik.errors.changepassword && (
+              <div className='fv-plugins-message-container invalid-feedback'>
                 <div className='fv-help-block'>
-                  <span role='alert'>{formik.errors.password}</span>
+                  <span role='alert'>{formik.errors.changepassword}</span>
                 </div>
               </div>
             )}
           </div>
+          {/* end::Form group */}
         </div>
       </div>
-      {/* end::Form group */}
-
-      {/* begin::Form group Confirm password */}
-      <div className='fv-row mb-5'>
-        <label className='form-label fw-bolder text-dark fs-6'>Confirm Password</label>
-        <input
-          type='password'
-          placeholder='Password confirmation'
-          autoComplete='off'
-          {...formik.getFieldProps('changepassword')}
-          className={clsx(
-            'form-control form-control-lg form-control-solid',
-            {
-              'is-invalid': formik.touched.changepassword && formik.errors.changepassword,
-            },
-            {
-              'is-valid': formik.touched.changepassword && !formik.errors.changepassword,
-            }
-          )}
-        />
-        {formik.touched.changepassword && formik.errors.changepassword && (
-          <div className='fv-plugins-message-container'>
-            <div className='fv-help-block'>
-              <span role='alert'>{formik.errors.changepassword}</span>
-            </div>
-          </div>
-        )}
-      </div>
-      {/* end::Form group */}
-
       {/* begin::Form group */}
       <div className='fv-row mb-10'>
         <div className='form-check form-check-custom form-check-solid'>
@@ -274,13 +279,18 @@ export function Registration() {
             htmlFor='kt_login_toc_agree'
           >
             I Agree the{' '}
-            <Link to='/auth/terms' className='ms-1 link-primary'>
+            <Link 
+              to={{
+                pathname: 'https://addin.sg/terms-conditions/'                
+              }} 
+              target = '_blank'
+              className='ms-1 link-primary'>
               terms and conditions
             </Link>
             .
           </label>
           {formik.touched.acceptTerms && formik.errors.acceptTerms && (
-            <div className='fv-plugins-message-container'>
+            <div className='fv-plugins-message-container invalid-feedback'>
               <div className='fv-help-block'>
                 <span role='alert'>{formik.errors.acceptTerms}</span>
               </div>
@@ -292,29 +302,35 @@ export function Registration() {
 
       {/* begin::Form group */}
       <div className='text-center'>
-        <button
-          type='submit'
-          id='kt_sign_up_submit'
-          className='btn btn-lg btn-primary w-100 mb-5'
-          disabled={formik.isSubmitting || !formik.isValid || !formik.values.acceptTerms}
-        >
-          {!loading && <span className='indicator-label'>Submit</span>}
-          {loading && (
-            <span className='indicator-progress' style={{display: 'block'}}>
-              Please wait...{' '}
-              <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-            </span>
-          )}
-        </button>
-        <Link to='/auth/login'>
+        <div className="row">
+          <div className="col-12 col-md-6">        
           <button
-            type='button'
-            id='kt_login_signup_form_cancel_button'
-            className='btn btn-lg btn-light-primary w-100 mb-5'
+            type='submit'
+            id='kt_sign_up_submit'
+            className='btn btn-lg btn-primary w-100 mb-5'
+            disabled={formik.isSubmitting || !formik.isValid || !formik.values.acceptTerms}
           >
-            Cancel
-          </button>
-        </Link>
+            {!loading && <span className='indicator-label'>Submit</span>}
+            {loading && (
+              <span className='indicator-progress' style={{display: 'block'}}>
+                Please wait...{' '}
+                <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+              </span>
+            )}
+          </button>              
+          </div>
+          <div className="col-12 col-md-6">         
+            <Link to='/auth/login'>
+              <button
+                type='button'
+                id='kt_login_signup_form_cancel_button'
+                className='btn btn-lg btn-light-primary w-100 mb-5'
+              >
+                Cancel
+              </button>
+            </Link>
+          </div>
+        </div>
       </div>
       {/* end::Form group */}
     </form>
