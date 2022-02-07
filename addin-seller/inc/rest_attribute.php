@@ -176,17 +176,18 @@ function addin_seller_get_all_products_by_user($request) {
     }
   }
 
-  if ( $products ) {
-    $response = [
-      'totalPages' => $paginate->max_num_pages,
-      'totalProducts' => $paginate->total,
-      'currentPage' =>  $current_page,
-      'pageSize' =>   $page_size,
-      'productsList' =>  $products
-    ];
+  $response = [
+    'totalPages' => $paginate->max_num_pages,
+    'totalProducts' => $paginate->total,
+    'currentPage' =>  $current_page,
+    'pageSize' =>   $page_size,
+    'productsList' =>  $products
+  ];
+
+  if ( $products ) {    
     return addin_seller_message_status( 200, null, $response );
   } else {
-    return addin_seller_message_status( 404, esc_html__('The products is not found!', 'addin.sg'), null);
+    return addin_seller_message_status( 404, esc_html__('The products is not found!', 'addin.sg'), $response);
   }
 }
 

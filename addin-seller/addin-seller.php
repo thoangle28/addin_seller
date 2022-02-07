@@ -16,6 +16,16 @@ require_once('inc/rest_attribute.php');
 require_once('inc/rest_category.php');
 require_once('inc/rest_user.php');
 require_once('inc/rest_product.php');
+require_once('inc/uid.php');
+
+function addin_seller_custom_roles() {
+  if ( get_option( 'addin_seller_role_version' ) < 1.1 ) {
+    remove_role('seller_Portal');
+    add_role( 'seller_portal', 'Seller Portal', get_role( 'shop_manager' )->capabilities );
+    update_option( 'addin_seller_role_version', 1.1 );
+  }
+}
+add_action( 'init', 'addin_seller_custom_roles' );
 
 
 add_action( 'rest_api_init', 'addin_seller_register_rest_api' );
