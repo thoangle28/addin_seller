@@ -33,20 +33,26 @@ const registrationSchema = Yup.object().shape({
     .max(50, 'Maximum 50 symbols')
     .required('Last name is required'),
   password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(8, 'Minimum 8 symbols')
     .max(50, 'Maximum 50 symbols')
-    .required('Password is required'),
+    .required('Password is required')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+      "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character"
+    ),
   changepassword: Yup.string()
     .required('Password confirmation is required')
     .when('password', {
       is: (val: string) => (val && val.length > 0 ? true : false),
-      then: Yup.string().oneOf([Yup.ref('password')], "Password and Confirm Password didn't match"),
+      then: Yup.string().oneOf([Yup.ref('password')], "Password and confirm password didn't match"),
     }),
   acceptTerms: Yup.bool().required('You must accept the terms and conditions'),
 })
 
 export function Registration() {
   const [loading, setLoading] = useState(false)
+  const [alert, setAlert] = useState('danger')
+
   const dispatch = useDispatch()
   const formik = useFormik({
     initialValues,
@@ -55,13 +61,31 @@ export function Registration() {
       setLoading(true)
       setTimeout(() => {
         register(values.email, values.firstname, values.lastname, values.password)
-          .then(({data: {accessToken}}) => {
-            setLoading(false)
-            dispatch(auth.actions.login(accessToken))
+          .then((response) => { //{data: {accessToken}}            
+            setLoading(false)            
+            //const data = response.data
+            const { code, message } = response.data
+            if( code === 409 ) {
+              setStatus(message)
+              setSubmitting(false)
+              setAlert('danger')
+            } else if( code === 200) {
+              setSubmitting(true)
+              setStatus(message)
+              setAlert('success')
+              //reset
+              initialValues.acceptTerms = false
+              initialValues.changepassword = ''
+              initialValues.password = ''
+              initialValues.firstname = ''
+              initialValues.lastname = ''
+            }
+            //dispatch(auth.actions.login(accessToken))
           })
           .catch(() => {
             setLoading(false)
             setSubmitting(false)
+            setAlert('danger')
             setStatus('Registration process has broken')
           })
       }, 1000)
@@ -110,12 +134,14 @@ export function Registration() {
       </div>
 
       {formik.status && (
-        <div className='mb-lg-15 alert alert-danger'>
+        <div className={`mb-lg-15 alert alert-${alert}`}>
           <div className='alert-text font-weight-bold'>{formik.status}</div>
         </div>
       )}
 
       {/* begin::Form group Firstname */}
+      { alert !== 'success' && (
+      <>
       <div className='row fv-row mb-7'>
         <div className='col-xl-6'>
           <label className='form-label fw-bolder text-dark fs-6'>First name</label>
@@ -171,7 +197,7 @@ export function Registration() {
           </div>
           {/* end::Form group */}
         </div>
-      </div>
+      </div>     
       {/* end::Form group */}
 
       {/* begin::Form group Email */}
@@ -198,9 +224,7 @@ export function Registration() {
           </div>
         )}
       </div>
-      {/* end::Form group */}
-
-      
+      {/* end::Form group */}      
       <div className="row">
         <div className="col-12 col-md-6"> 
         {/* begin::Form group Password */}
@@ -333,6 +357,8 @@ export function Registration() {
         </div>
       </div>
       {/* end::Form group */}
+      </>) 
+      }
     </form>
   )
 }

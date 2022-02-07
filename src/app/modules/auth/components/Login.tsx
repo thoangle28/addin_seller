@@ -48,7 +48,7 @@ export function Login() {
           } else {
             setLoading(false)
             setSubmitting(false)   
-            setStatus('errors')
+            setStatus(message)
             setErrors(data);
           }
         })
@@ -73,7 +73,11 @@ export function Login() {
         <h1 className='text-dark mb-3'>Sign In to Seller Portal</h1>      
       </div>
       {/* begin::Heading */}
-
+      {formik.status && (
+        <div className={`mb-lg-15 alert alert-danger`}>
+          <div className='alert-text font-weight-bold'>{formik.status}</div>
+        </div>
+      )}
       {/* begin::Form group */}
       <div className='fv-row mb-10'>
         <label className='form-label fs-6 fw-bolder text-dark'>Email/Username</label>
