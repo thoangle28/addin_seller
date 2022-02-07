@@ -7,6 +7,7 @@ type Props = {
   className: string
   dataList: any | []
   isHome: boolean | false
+  isPageLoading?: boolean | true
   FallbackView?: any
   onChange?: (p:any, s: any) => void
 }
@@ -51,22 +52,18 @@ const formatToCurrency = (amount: number) => {
   return  (amount > 0) ? formatter.format(amount) : '';
 };
 
-
-
-
-const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = () => undefined}: Props) => {
-
-  const {productsList, currentPage, totalPages, totalProducts} = dataList
+const TablesWidget14 = ({className, dataList, isHome, isPageLoading, FallbackView, onChange = () => undefined}: Props) => {
+  
+  const {productsList, currentPage, totalPages, totalProducts} = dataList;
 
   const listPages = find_page_begin_end(currentPage, totalPages)
-
   const [newPageSize, setPageSize] = useState(10)
-  const [isLoading, setLoading] = useState(true)
   const [isPaginate, setPaginate] = useState(false)
 
   const onChangePageSize = ( s: any ) => {
     setPageSize(s)
     onChange(-1, s)
+    setPaginate(true)
   }
   
   useEffect(() => {   
@@ -74,7 +71,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
     return () => {
       clearTimeout(timer);
     };
-  }, [currentPage])
+  }, [currentPage, dataList])
 
   return (
     <div className={`card card-products ${className}`}>
@@ -83,7 +80,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
         <h3 className='card-title align-items-start flex-column'>
           <span className='card-label fw-bolder fs-3 mb-1'>Products Listing</span>
           <span className='text-muted mt-1 fw-bold fs-7'>
-            { totalProducts && (<>Over {totalProducts} product(s)</>)}
+            { totalProducts && (<>Over {totalProducts} product(s)</>) || ''}
           </span>
         </h3>
         <div
@@ -124,8 +121,7 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
             <tbody>
               {
                 (!!productsList && productsList.length > 0) ? (
-                productsList.map((ele: any, index: number) => {
-       
+                productsList.map((ele: any, index: number) => {       
                   return (
                     <tr key={index}>
                       <td className='text-center'>{ele.product_id}</td>
@@ -205,15 +201,15 @@ const TablesWidget14 = ({className, dataList, isHome, FallbackView, onChange = (
               ) : (
                 <tr>
                   <td className='text-center' colSpan={8}>
-                    {(typeof productsList === 'undefined' || (!!productsList && productsList.length === 0)) 
-                    ? <>No products here / Loadding</> 
-                    : (
-                      <div className='card mb-0 mb-xl-8 loading-wrapper'>
-                        <div className='card-body py-3 loading-body'>
-                          <FallbackView />
+                    {
+                      (typeof productsList === 'undefined') ? (
+                        <div className='card mb-0 mb-xl-8 loading-wrapper'>
+                          <div className='card-body py-3 loading-body'>
+                            <FallbackView />
+                          </div>
                         </div>
-                      </div>
-                    ) }
+                      ) : (<>No products here</>)
+                    }                   
                   </td>
                 </tr>
               )}

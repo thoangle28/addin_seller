@@ -19,32 +19,46 @@ const ProductList: FC<PropsFromRedux> = (props) => {
   let initLoad = {
     currentPage: 1,
     pageSize: 10,
-    userId: 0,
+    userId: currentUserId,
   }  
 
-  const [isLoading, setLoading] = useState(true)
-  const [isPageLoading, setPageLoading] = useState(false)
-
+  const [isPageLoading, setPageLoading] = useState(true);
+  
   useEffect(() => {
-    initLoad.userId = currentUserId;
-    dispatch(product.actions.getProductList(initLoad));
-    //setLoading    
+    //initLoad.userId = currentUserId;    
+    const getProductsListing = () => {
+      return new Promise((resolve, reject) => { 
+        dispatch(product.actions.getProductList(initLoad));        
+        resolve(true)
+      });
+    }    
+
+    getProductsListing().then((data: any) => {       
+      setPageLoading(!data);
+    });
     // eslint-disable-next-line
-  }, [])
+  }, [product])
   
   const onChangeNextPage = (pageNumber:number, newPageSize: number) => {   
-    const { pageSize, userId } = data
+    const { pageSize, userId } = data;
 
     initLoad.currentPage = (pageNumber < 0 ) ? 1 : pageNumber; 
     initLoad.pageSize = (newPageSize && pageSize !== newPageSize && newPageSize > 0) ? newPageSize : pageSize;
-    initLoad.userId = userId;
-    
-    dispatch(product.actions.getProductNextPage(initLoad));
+    initLoad.userId = userId;    
+
+    setPageLoading(true);
+    const getProductsListing = () => {
+      return new Promise((resolve, reject) => { 
+        dispatch(product.actions.getProductNextPage(initLoad));
+        resolve(true)
+      });
+    }    
+
+    getProductsListing().then(() => {      
+      setPageLoading(false);
+    });
   }   
 
-  useEffect(() => {
-    setPageLoading(false)
-  }, [data, initLoad])
   return (
     <>
      <TablesWidget14  
@@ -53,6 +67,7 @@ const ProductList: FC<PropsFromRedux> = (props) => {
       dataList={data} 
       isHome={false} 
       onChange={onChangeNextPage} 
+      isPageLoading={isPageLoading}
      />
     </>
   )
