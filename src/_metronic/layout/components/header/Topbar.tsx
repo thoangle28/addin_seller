@@ -116,7 +116,7 @@ const Topbar: FC = () => {
             data-kt-menu-flip='bottom'
           >
             <img
-              className='h-25px w-25px rounded'
+              className='h-45px w-45px rounded'
               src={toAbsoluteUrl('/media/avatars/150-25.jpg')}
               alt='metronic'
             />

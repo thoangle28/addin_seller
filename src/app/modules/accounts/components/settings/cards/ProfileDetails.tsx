@@ -81,7 +81,7 @@ const ProfileDetails: React.FC = () => {
                   style={{backgroundImage: `url(${toAbsoluteUrl('/media/avatars/blank.png')})`}}
                 >
                   <div
-                    className='image-input-wrapper w-125px h-125px'
+                    className='image-input-wrapper w-100px h-100px'
                     style={{backgroundImage: `url(${toAbsoluteUrl(data.avatar)})`}}
                   ></div>
                 </div>
