@@ -64,3 +64,9 @@ export function getUserByAccessToken( token: string, user_id: number ) {
   // Check common redux folder => setupAxios
   return axios.post<any | UserModel>(API_END_POINT_URL + '/verify_token', { access_token: token, user_id: user_id })
 }
+
+export function getTermsAndConditions() {
+  // Authorization head should be fulfilled in interceptor.
+  // Check common redux folder => setupAxios
+  return axios.get<any>(API_END_POINT_URL + '/terms-and-conditions')
+}

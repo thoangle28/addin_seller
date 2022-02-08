@@ -34,7 +34,9 @@ export function AuthPage() {
         </a>
         {/* end::Logo */}
         {/* begin::Wrapper */}
-        <div className={`w-lg-${withForm}px bg-white rounded shadow-sm p-10 p-lg-15 mx-auto`}>
+        <div 
+        className={`w-lg-${withForm}px bg-white rounded shadow-sm p-10 p-lg-15 mx-auto`}
+        style={{ minHeight: '475px'}}>
           <Switch>
             <Route path='/auth/login' component={Login} />
             <Route path='/auth/registration' component={Registration} />

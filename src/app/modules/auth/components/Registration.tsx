@@ -1,13 +1,14 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {useDispatch} from 'react-redux'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
 import clsx from 'clsx'
 import * as auth from '../redux/AuthRedux'
-import {register} from '../redux/AuthCRUD'
+import {register, getTermsAndConditions} from '../redux/AuthCRUD'
 import {Link} from 'react-router-dom'
-import {toAbsoluteUrl} from '../../../../_metronic/helpers'
+import {KTSVG, toAbsoluteUrl} from '../../../../_metronic/helpers'
+import {Modal} from 'react-bootstrap-v5'
 
 const initialValues = {
   firstname: '',
@@ -20,38 +21,40 @@ const initialValues = {
 
 const registrationSchema = Yup.object().shape({
   firstname: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('First name is required'),
+    .min(3, 'Minimum 3 symbols.')
+    .max(50, 'Maximum 50 symbols.')
+    .required('First name is required.'),
   email: Yup.string()
-    .email('Wrong email format')
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Email is required'),
+    .email('Wrong email format.')
+    .min(3, 'Minimum 3 symbols.')
+    .max(50, 'Maximum 50 symbols.')
+    .required('Email is required.'),
   lastname: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Last name is required'),
+    .min(3, 'Minimum 3 symbols.')
+    .max(50, 'Maximum 50 symbols.')
+    .required('Last name is required.'),
   password: Yup.string()
-    .min(8, 'Minimum 8 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Password is required')
+    .min(8, 'Minimum 8 symbols.')
+    .max(50, 'Maximum 50 symbols.')
+    .required('Password is required.')
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
-      "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character"
+      "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character."
     ),
   changepassword: Yup.string()
     .required('Password confirmation is required')
     .when('password', {
       is: (val: string) => (val && val.length > 0 ? true : false),
-      then: Yup.string().oneOf([Yup.ref('password')], "Password and confirm password didn't match"),
+      then: Yup.string().oneOf([Yup.ref('password')], "Password and confirm password didn't match."),
     }),
-  acceptTerms: Yup.bool().required('You must accept the terms and conditions'),
+  acceptTerms: Yup.bool().required('You must accept the terms and conditions.'),
 })
 
 export function Registration() {
   const [loading, setLoading] = useState(false)
   const [alert, setAlert] = useState('danger')
+  const [showModal, setShowModal] = useState(false)
+  const [termsConditions, setTermsConditions] = useState('')
 
   const dispatch = useDispatch()
   const formik = useFormik({
@@ -86,13 +89,33 @@ export function Registration() {
             setLoading(false)
             setSubmitting(false)
             setAlert('danger')
-            setStatus('Registration process has broken')
+            setStatus('Registration process has broken.')
           })
       }, 1000)
     },
   })
 
+  const handleShowModal = (event: any) => {
+    event.preventDefault()
+    setShowModal(true)
+  }
+  
+  const handleHideModal = (event: any) => {
+    event.preventDefault()
+    setShowModal(false)
+  }
+
+  const terms_and_contiditons = 'React Router ships with a few hooks that let you access the state of the router and perform navigation from inside your components.'
+  useEffect(() => {
+    getTermsAndConditions().then((response) => {
+      const { data, message, code } = response.data
+      console.log(response);
+      setTermsConditions(data)
+    })
+  }, [])
+  
   return (
+    <>
     <form
       className='form w-100 fv-plugins-bootstrap5 fv-plugins-framework'
       noValidate
@@ -102,7 +125,7 @@ export function Registration() {
       {/* begin::Heading */}
       <div className='mb-10 text-center'>
         {/* begin::Title */}
-        <h1 className='text-dark mb-3'>Create an Account</h1>
+        <h1 className='text-dark mb-3'>Create New Account</h1>
         {/* end::Title */}
 
         {/* begin::Link */}
@@ -142,7 +165,7 @@ export function Registration() {
       {/* begin::Form group Firstname */}
       { alert !== 'success' && (
       <>
-      <div className='row fv-row mb-7'>
+      <div className='row fv-row mb-5'>
         <div className='col-xl-6'>
           <label className='form-label fw-bolder text-dark fs-6'>First name</label>
           <input
@@ -201,7 +224,7 @@ export function Registration() {
       {/* end::Form group */}
 
       {/* begin::Form group Email */}
-      <div className='fv-row mb-7'>
+      <div className='fv-row mb-5'>
         <label className='form-label fw-bolder text-dark fs-6'>Email</label>
         <input
           placeholder='Email'
@@ -302,11 +325,10 @@ export function Registration() {
             className='form-check-label fw-bold text-gray-700 fs-6'
             htmlFor='kt_login_toc_agree'
           >
-            I Agree the{' '}
+            I agree to the{' '}
             <Link 
-              to={{
-                pathname: 'https://addin.sg/terms-conditions/'                
-              }} 
+              to='#' 
+              onClick={handleShowModal}
               target = '_blank'
               className='ms-1 link-primary'>
               terms and conditions
@@ -360,5 +382,42 @@ export function Registration() {
       </>) 
       }
     </form>
+    <Modal
+      id='kt_modal_terms_conditions'
+      tabIndex={-1}
+      aria-hidden='true'
+      dialogClassName='modal-dialog-centered mw-700px h-auto'
+      show={showModal}
+    >
+      <div className='container-xxl px-10 py-10'>
+        <div className='modal-header d-flex border-0 p-0'>
+            <h2>Terms and Conditions</h2>
+            {/* begin::Close */}
+            <div 
+              className='btn btn-icon btn-sm btn-light-primary'
+              onClick={handleHideModal}
+            >
+              <KTSVG className='svg-icon-2' path='/media/icons/duotune/arrows/arr061.svg' />
+            </div>
+            {/* end::Close */}
+        </div>
+
+        <div className='modal-body px-0 py-0 pt-5'>
+            {/*begin::Stepper */}
+            <div
+            className='stepper stepper-1 d-flex flex-column flex-xl-row flex-row-fluid'
+            id='kt_modal_body'
+            >
+            {/*begin::Aside */}
+            <div className='w-100' style={{ overflowY: "auto", height: "600px"}}>
+              <div dangerouslySetInnerHTML={{ __html: termsConditions }} />
+            </div>
+            {/*end::Content */}
+            </div>
+            {/* end::Stepper */}
+        </div>
+    </div>
+    </Modal>
+    </>
   )
 }
