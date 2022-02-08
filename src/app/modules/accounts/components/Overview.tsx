@@ -23,23 +23,28 @@ export function Overview() {
           </Link>
         </div>
 
-        <div className='card-body p-9'>
-          <div className='row mb-7'>
-            <label className='col-lg-4 fw-bold text-muted'>Full Name</label>
-
-            <div className='col-lg-8'>
-              <span className='fw-bolder fs-6 text-dark'>Max Smith</span>
-            </div>
-          </div>
+        <div className='card-body p-9'>        
 
           <div className='row mb-7'>
-            <label className='col-lg-4 fw-bold text-muted'>Company / Brand Name</label>
+            <label className='col-lg-4 fw-bold text-muted'>Brand Name</label>
 
             <div className='col-lg-8 fv-row'>
               <span className='fw-bold fs-6'>Keenthemes</span>
             </div>
+          </div>         
+          <div className='row mb-7'>
+            <label className='col-lg-4 fw-bold text-muted'>
+              Full Name
+              <i
+                className='fas fa-exclamation-circle ms-1 fs-7'
+                data-bs-toggle='tooltip'
+                title='Full name is contact person name'
+              ></i>
+            </label>
+            <div className='col-lg-8'>
+              <span className='fw-bolder fs-6 text-dark'>Max Smith</span>
+            </div>
           </div>
-
           <div className='row mb-7'>
             <label className='col-lg-4 fw-bold text-muted'>
               Contact Phone
@@ -57,7 +62,14 @@ export function Overview() {
           </div>
 
           <div className='row mb-7'>
-            <label className='col-lg-4 fw-bold text-muted'>Email Addres</label>
+            <label className='col-lg-4 fw-bold text-muted'>
+              Contact Email
+              <i
+                className='fas fa-exclamation-circle ms-1 fs-7'
+                data-bs-toggle='tooltip'
+                title='Email address must be active'
+              ></i>
+              </label>
             <div className='col-lg-8'>
               <span className='fw-bolder fs-6 me-2'>demo@admin.com</span>
               <span className='badge badge-success'>Verified</span>
@@ -71,7 +83,7 @@ export function Overview() {
             </div>
           </div>
 
-          <div className='row mb-7'>
+         {/*  <div className='row mb-7'>
             <label className='col-lg-4 fw-bold text-muted'>
               Country
               <i
@@ -84,7 +96,7 @@ export function Overview() {
             <div className='col-lg-8'>
               <span className='fw-bolder fs-6 text-dark'>Germany</span>
             </div>
-          </div>
+          </div> */}
 
           <div className='row mb-7'>
             <label className='col-lg-4 fw-bold text-muted'>Communication</label>
