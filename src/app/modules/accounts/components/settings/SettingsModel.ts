@@ -4,7 +4,8 @@ export interface IProfileDetails {
   lName: string
   company: string
   contactPhone: string
-  companySite: string
+  contactEmail: string
+  address: string
   country: string
   language: string
   timeZone: string
@@ -76,7 +77,8 @@ export const profileDetailsInitValues: IProfileDetails = {
   lName: 'Smith',
   company: 'Keenthemes',
   contactPhone: '044 3276 454 935',
-  companySite: 'keenthemes.com',
+  contactEmail: 'support@keenthemes.com',
+  address: 'keenthemes.com',
   country: '',
   language: '',
   timeZone: '',

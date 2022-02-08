@@ -1,13 +1,13 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React from 'react'
 import {Link} from 'react-router-dom'
-import {KTSVG} from '../../../../_metronic/helpers'
+/* import {KTSVG} from '../../../../_metronic/helpers'
 import {
   ChartsWidget1,
   TablesWidget1,
   ListsWidget5,
   TablesWidget5,
-} from '../../../../_metronic/partials/widgets'
+} from '../../../../_metronic/partials/widgets' */
 
 export function Overview() {
   return (
@@ -18,7 +18,7 @@ export function Overview() {
             <h3 className='fw-bolder m-0'>Profile Details</h3>
           </div>
 
-          <Link to='/crafted/account/settings' className='btn btn-primary align-self-center'>
+          <Link to='/account/settings' className='btn btn-primary align-self-center'>
             Edit Profile
           </Link>
         </div>
@@ -33,7 +33,7 @@ export function Overview() {
           </div>
 
           <div className='row mb-7'>
-            <label className='col-lg-4 fw-bold text-muted'>Company</label>
+            <label className='col-lg-4 fw-bold text-muted'>Company / Brand Name</label>
 
             <div className='col-lg-8 fv-row'>
               <span className='fw-bold fs-6'>Keenthemes</span>
@@ -52,18 +52,22 @@ export function Overview() {
 
             <div className='col-lg-8 d-flex align-items-center'>
               <span className='fw-bolder fs-6 me-2'>044 3276 454 935</span>
-
               <span className='badge badge-success'>Verified</span>
             </div>
           </div>
 
           <div className='row mb-7'>
-            <label className='col-lg-4 fw-bold text-muted'>Company Site</label>
-
+            <label className='col-lg-4 fw-bold text-muted'>Email Addres</label>
             <div className='col-lg-8'>
-              <a href='#' className='fw-bold fs-6 text-dark text-hover-primary'>
-                keenthemes.com
-              </a>
+              <span className='fw-bolder fs-6 me-2'>demo@admin.com</span>
+              <span className='badge badge-success'>Verified</span>
+            </div>
+          </div>
+
+          <div className='row mb-7'>
+            <label className='col-lg-4 fw-bold text-muted'>Address</label>
+            <div className='col-lg-8'>
+              <span className='fw-bolder fs-6 me-2'>51C Hai Ba Trung, Hue, Thua Thien Hue, Vietnam</span>
             </div>
           </div>
 
@@ -98,7 +102,7 @@ export function Overview() {
             </div>
           </div>
 
-          <div className='notice d-flex bg-light-warning rounded border-warning border border-dashed p-6'>
+          {/* <div className='notice d-flex bg-light-warning rounded border-warning border border-dashed p-6'>
             <KTSVG
               path='icons/duotune/general/gen044.svg'
               className='svg-icon-2tx svg-icon-warning me-4'
@@ -116,11 +120,11 @@ export function Overview() {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
-      <div className='row gy-10 gx-xl-10'>
+      {/* <div className='row gy-10 gx-xl-10'>
         <div className='col-xl-6'>
           <ChartsWidget1 className='card-xxl-stretch mb-5 mb-xl-10' />
         </div>
@@ -138,7 +142,7 @@ export function Overview() {
         <div className='col-xl-6'>
           <TablesWidget5 className='card-xxl-stretch mb-5 mb-xl-10' />
         </div>
-      </div>
+      </div> */}
     </>
   )
 }

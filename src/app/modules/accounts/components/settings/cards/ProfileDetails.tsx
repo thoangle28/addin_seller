@@ -5,15 +5,29 @@ import * as Yup from 'yup'
 import {useFormik} from 'formik'
 
 const profileDetailsSchema = Yup.object().shape({
-  fName: Yup.string().required('First name is required'),
-  lName: Yup.string().required('Last name is required'),
-  company: Yup.string().required('Company name is required'),
+  fName: Yup.string()
+        .min(3, 'Minimum 3 symbols.')
+        .max(50, 'Maximum 50 symbols.')
+        .required('First name is required'),
+  lName: Yup.string()
+        .min(3, 'Minimum 3 symbols.')
+        .max(50, 'Maximum 50 symbols.')
+        .required('Last name is required'),
+  company: Yup.string()
+        .min(3, 'Minimum 3 symbols.')
+        .max(50, 'Maximum 50 symbols.')
+        .required('Company name is required'),
   contactPhone: Yup.string().required('Contact phone is required'),
-  companySite: Yup.string().required('Company site is required'),
-  country: Yup.string().required('Country is required'),
-  language: Yup.string().required('Language is required'),
-  timeZone: Yup.string().required('Time zone is required'),
-  currency: Yup.string().required('Currency is required'),
+  contactEmail: Yup.string()
+        .email('Wrong email format.')
+        .min(3, 'Minimum 3 symbols.')
+        .max(50, 'Maximum 50 symbols.')
+        .required('Contact email is required.'),
+  address: Yup.string().required('Company site is required'),
+  //country: Yup.string().required('Country is required'),
+  //language: Yup.string().required('Language is required'),
+  //timeZone: Yup.string().required('Time zone is required'),
+  //currency: Yup.string().required('Currency is required'),
 })
 
 const ProfileDetails: React.FC = () => {
@@ -59,7 +73,7 @@ const ProfileDetails: React.FC = () => {
         <form onSubmit={formik.handleSubmit} noValidate className='form'>
           <div className='card-body border-top p-9'>
             <div className='row mb-6'>
-              <label className='col-lg-4 col-form-label fw-bold fs-6'>Avatar</label>
+              <label className='col-lg-4 col-form-label fw-bold fs-6'>Brand Logo</label>
               <div className='col-lg-8'>
                 <div
                   className='image-input image-input-outline'
@@ -111,8 +125,7 @@ const ProfileDetails: React.FC = () => {
             </div>
 
             <div className='row mb-6'>
-              <label className='col-lg-4 col-form-label required fw-bold fs-6'>Company</label>
-
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>Brand Name</label>
               <div className='col-lg-8 fv-row'>
                 <input
                   type='text'
@@ -147,28 +160,45 @@ const ProfileDetails: React.FC = () => {
                 )}
               </div>
             </div>
-
             <div className='row mb-6'>
               <label className='col-lg-4 col-form-label fw-bold fs-6'>
-                <span className='required'>Company Site</span>
+                <span className='required'>Contact Email</span>
+              </label>
+              <div className='col-lg-8 fv-row'>
+                <input
+                  type='tel'
+                  className='form-control form-control-lg form-control-solid'
+                  placeholder='Email address'
+                  {...formik.getFieldProps('contactEmail')}
+                />
+                {formik.touched.contactEmail && formik.errors.contactEmail && (
+                  <div className='fv-plugins-message-container'>
+                    <div className='fv-help-block'>{formik.errors.contactEmail}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label fw-bold fs-6'>
+                <span className='required'>Address</span>
               </label>
 
               <div className='col-lg-8 fv-row'>
                 <input
                   type='text'
                   className='form-control form-control-lg form-control-solid'
-                  placeholder='Company website'
-                  {...formik.getFieldProps('companySite')}
+                  placeholder='Address'
+                  {...formik.getFieldProps('address')}
                 />
-                {formik.touched.companySite && formik.errors.companySite && (
+                {formik.touched.address && formik.errors.address && (
                   <div className='fv-plugins-message-container'>
-                    <div className='fv-help-block'>{formik.errors.companySite}</div>
+                    <div className='fv-help-block'>{formik.errors.address}</div>
                   </div>
                 )}
               </div>
             </div>
 
-            <div className='row mb-6'>
+          {/*   <div className='row mb-6'>
               <label className='col-lg-4 col-form-label fw-bold fs-6'>
                 <span className='required'>Country</span>
               </label>
@@ -433,9 +463,9 @@ const ProfileDetails: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
-            <div className='row mb-6'>
+            {/* <div className='row mb-6'>
               <label className='col-lg-4 col-form-label required fw-bold fs-6'>Language</label>
               <div className='col-lg-8 fv-row'>
                 <select
@@ -696,7 +726,7 @@ const ProfileDetails: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
 
             <div className='row mb-6'>
               <label className='col-lg-4 col-form-label fw-bold fs-6'>Communication</label>
