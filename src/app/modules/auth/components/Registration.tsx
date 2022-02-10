@@ -104,12 +104,10 @@ export function Registration() {
     event.preventDefault()
     setShowModal(false)
   }
-
-  const terms_and_contiditons = 'React Router ships with a few hooks that let you access the state of the router and perform navigation from inside your components.'
+  
   useEffect(() => {
     getTermsAndConditions().then((response) => {
-      const { data, message, code } = response.data
-      console.log(response);
+      const { data} = response.data
       setTermsConditions(data)
     })
   }, [])

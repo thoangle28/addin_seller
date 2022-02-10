@@ -1,7 +1,7 @@
 export interface IProfileDetails {
   avatar: string
-  fName: string
-  lName: string
+  firstname: string
+  lastname: string
   company: string
   contactPhone: string
   contactEmail: string
@@ -73,8 +73,8 @@ export interface IDeactivateAccount {
 
 export const profileDetailsInitValues: IProfileDetails = {
   avatar: '/media/avatars/150-2.jpg',
-  fName: 'Max',
-  lName: 'Smith',
+  firstname: 'Max',
+  lastname: 'Smith',
   company: 'Keenthemes',
   contactPhone: '044 3276 454 935',
   contactEmail: 'support@keenthemes.com',
