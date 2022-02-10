@@ -1,10 +1,11 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {toAbsoluteUrl} from '../../../../../../_metronic/helpers'
 import {IProfileDetails, profileDetailsInitValues as initialValues} from '../SettingsModel'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import { handleFileUpload,  UploadImageField } from '../../../../../../_metronic/partials/content/upload/UploadFile'
 import clsx from 'clsx'
+import { getBrandDetail, updateUserProfile, getUserProfile } from '../server/api'
 
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
 
@@ -20,7 +21,7 @@ const profileDetailsSchema = Yup.object().shape({
   company: Yup.string()
     .min(3, 'Minimum 3 symbols.')
     .max(50, 'Maximum 50 symbols.')
-    .required('Company name is required'),
+    .required('Brand name is required'),
   contactPhone: Yup.string()
     .min(1, 'Minimum 10 symbols.')
     .max(20, 'Maximum 20 symbols.')
@@ -47,6 +48,12 @@ const ProfileDetails: React.FC = () => {
 
   const [loading, setLoading] = useState(false)
   const [newBrandLogo, setNewBrandLogo] = useState('')
+
+  useEffect(() =>{
+    getUserProfile(234324).then(() => {
+
+    }).catch(() => {})
+  }, [])
 
   const formik = useFormik<IProfileDetails>({
     initialValues,
@@ -135,7 +142,11 @@ const ProfileDetails: React.FC = () => {
                   </div>
                 )}
               </div>
-            </div>
+              <input
+                type='hidden'
+                {...formik.getFieldProps('brand_id')}
+              />
+            </div>          
             <div className='row mb-6'>
               <label className='col-lg-4 col-form-label required fw-bold fs-6'>Full Name</label>
 
