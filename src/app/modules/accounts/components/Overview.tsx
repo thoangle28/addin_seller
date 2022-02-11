@@ -17,7 +17,6 @@ import {
 export function Overview() {
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
   const { accessToken, user } = auth
-  const userProfile: IProfileDetails = {...defaultValues}
 
   const [loading, setLoading] = useState(true)
   const [initialValues, setInitialValues] = useState({...defaultValues})
@@ -32,9 +31,8 @@ export function Overview() {
       })
     }
 
-    loadUserProfile().then((data) => {
-      UpdateProfileDetails(userProfile, data);
-      setInitialValues(userProfile);
+    loadUserProfile().then((data: any) => {
+      setInitialValues(data);
       setLoading(false)
     })
     
