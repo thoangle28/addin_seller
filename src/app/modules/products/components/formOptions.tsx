@@ -288,11 +288,11 @@ export const UploadImageField = (props: any) => {
 export const FallbackView = () => {
   return (
     <div className='text-center w-100'>
-      <img src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
+      <img className='h-40px' src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
       <div className='mt-5 text-center d-flex justify-content-center'>
         <div className='loadding'>
-          <span>Loading ...</span>
-          <div className="balls mt-3">
+          {/* <span>Loading ...</span> */}
+          <div className="balls">
             <div></div>
             <div></div>
             <div></div>

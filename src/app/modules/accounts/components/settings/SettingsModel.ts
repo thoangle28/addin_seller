@@ -3,7 +3,7 @@ export interface IProfileDetails {
   firstname: string
   lastname: string
   company: string
-  brand_id: number
+  brand: { id: number, name: string, logo: string }
   contactPhone: string
   contactEmail: string
   address: string
@@ -77,7 +77,9 @@ export const profileDetailsInitValues: IProfileDetails = {
   firstname: 'Max',
   lastname: 'Smith',
   company: 'Keenthemes',
-  brand_id: 0,
+  brand: {
+    id: 122, name: 'Test Brand Name', logo: '/media/avatars/150-2.jpg'
+  },
   contactPhone: '044 3276 454 935',
   contactEmail: 'support@keenthemes.com',
   address: 'keenthemes.com',
