@@ -1,12 +1,38 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {KTSVG, toAbsoluteUrl} from '../../../_metronic/helpers'
 import {Link} from 'react-router-dom'
 import {Dropdown1} from '../../../_metronic/partials'
 import {useLocation} from 'react-router'
+import { shallowEqual, useSelector } from 'react-redux'
+import { RootState } from '../../../setup'
+import { IProfileDetails, profileDetailsInitValues as defaultValues } from './components/settings/SettingsModel'
+import { getUserProfile } from './components/settings/server/api'
 
 const AccountHeader: React.FC = () => {
   const location = useLocation()
+  const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
+  const { accessToken, user } = auth
+  //const userProfile: IProfileDetails = {...defaultValues}
+  const [initialValues, setInitialValues] = useState({...defaultValues})
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadUserProfile = () => {
+      return new Promise((resolve, reject) => {
+        getUserProfile({ user_id: user.ID, user_email: user.user_email}).then((response) => {
+          const userData = response.data;
+          resolve(userData.data);
+        }).catch(() => {})
+      })
+    }
+
+    loadUserProfile().then((data: any) => {
+      setInitialValues(data);
+      setLoading(false)
+    })
+    
+  }, [user, setLoading]) 
 
   return (
     <div className='card mb-5 mb-xl-10'>
@@ -24,14 +50,15 @@ const AccountHeader: React.FC = () => {
               <div className='d-flex flex-column'>
                 <div className='d-flex align-items-center mb-2'>
                   <a href='#' className='text-gray-800 text-hover-primary fs-2 fw-bolder me-1'>
-                    Max Smith
+                  {initialValues.firstname + ' ' + initialValues.lastname}
                   </a>
+                  { (initialValues.firstname || initialValues.lastname) &&
                   <a href='#'>
                     <KTSVG
                       path='/media/icons/duotune/general/gen026.svg'
                       className='svg-icon-1 svg-icon-primary'
                     />
-                  </a>
+                  </a> }
                  {/*  <a
                     href='#'
                     className='btn btn-sm btn-light-success fw-bolder ms-2 fs-8 py-1 px-3'
@@ -51,7 +78,7 @@ const AccountHeader: React.FC = () => {
                       path='/media/icons/duotune/communication/com006.svg'
                       className='svg-icon-4 me-1'
                     />
-                    Seller
+                    {initialValues.company}
                   </a>
                   <a
                     href='#'
@@ -61,7 +88,7 @@ const AccountHeader: React.FC = () => {
                       path='/media/icons/duotune/general/gen018.svg'
                       className='svg-icon-4 me-1'
                     />
-                    51C Hai Ba Trung, Hue, Vietnam
+                    {initialValues.address}
                   </a>
                   <a
                     href='#'
@@ -71,7 +98,7 @@ const AccountHeader: React.FC = () => {
                       path='/media/icons/duotune/communication/com011.svg'
                       className='svg-icon-4 me-1'
                     />
-                    admin@demo.com
+                    {initialValues.contactEmail}
                   </a>
                 </div>
               </div>
@@ -111,7 +138,7 @@ const AccountHeader: React.FC = () => {
               </div> */}
             </div>
 
-            <div className='d-flex flex-wrap flex-stack d-none'>
+           {/*  <div className='d-flex flex-wrap flex-stack d-none'>
               <div className='d-flex flex-column flex-grow-1 pe-8'>
                 <div className='d-flex flex-wrap'>
                   <div className='border border-gray-300 border-dashed rounded min-w-125px py-3 px-4 me-6 mb-3'>
@@ -165,7 +192,7 @@ const AccountHeader: React.FC = () => {
                   ></div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

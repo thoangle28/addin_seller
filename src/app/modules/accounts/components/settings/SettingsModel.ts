@@ -73,16 +73,16 @@ export interface IDeactivateAccount {
 }
 
 export const profileDetailsInitValues: IProfileDetails = {
-  avatar: '/media/avatars/150-2.jpg',
-  firstname: 'Max',
-  lastname: 'Smith',
-  company: 'Keenthemes',
+  avatar: '',
+  firstname: '',
+  lastname: '',
+  company: '',
   brand: {
-    id: 122, name: 'Test Brand Name', logo: '/media/avatars/150-2.jpg'
+    id: 0, name: '', logo: ''
   },
-  contactPhone: '044 3276 454 935',
-  contactEmail: 'support@keenthemes.com',
-  address: 'keenthemes.com',
+  contactPhone: '',
+  contactEmail: '',
+  address: '',
   country: '',
   language: '',
   timeZone: '',
