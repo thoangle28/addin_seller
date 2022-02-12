@@ -34,6 +34,17 @@ function addin_seller_register_api_hooks() {
       'permission_callback' => '__return_true'
     )
   );
+
+  register_rest_route(
+    NAME_SPACE . VERSION,
+    '/terms-and-conditions',
+    array(
+      'methods'  => 'GET',
+      'callback' => 'addin_seller_get_terms_conditions',
+      'permission_callback' => '__return_true'
+    )
+  );
+
 }
 
 function addin_seller_user_login(WP_REST_Request $request){
@@ -45,7 +56,7 @@ function addin_seller_user_login(WP_REST_Request $request){
   $creds['remember'] = true;
 
   if ( !$creds['user_login'] ||  !$creds['user_password'] || !$creds['user_login_time']) {
-    return addin_seller_message_status( 400, esc_html__( 'Bad Request', 'addin.sg' ), null );
+    return addin_seller_message_status( 400, esc_html__( 'Please enter all required information.', 'addin.sg' ), null );
   }
   
   //find user
@@ -58,13 +69,14 @@ function addin_seller_user_login(WP_REST_Request $request){
   //The account is not registered on this site. If you are unsure of your username, try your email address instead
   if( !$user ) {
     $data = [ 'email' => 'The username/email is incorrect.', 'password' => ''];
-    return addin_seller_message_status( 400, esc_html__( 'Bad Request', 'addin.sg' ), $data );
+    $message = 'The account is not registered on this site. If you are unsure of your username, try your email address instead.';
+    return addin_seller_message_status( 400, esc_html__( $message, 'addin.sg' ), $data );
   }
 
   $hash = wp_hash_password($creds['user_password']);
   if( !wp_check_password( $creds['user_password'], $user->data->user_pass, $user->ID ) ) {
     $data =  [ 'email' => '', 'password' => 'The password is incorrect.'];
-    return addin_seller_message_status( 400, esc_html__( 'Bad Request', 'addin.sg' ), $data );
+    return addin_seller_message_status( 400, esc_html__( 'The password is incorrect.', 'addin.sg' ), $data );
   }
   //check user roles, only: customer, seller_portal access
   $roles = $user->roles;
@@ -108,13 +120,13 @@ function addin_seller_user_verify_token(WP_REST_Request $request) {
   $user_id = $request->get_param("user_id");
 
   if ( !$verify_token || $user_id < 0) {
-    return addin_seller_message_status( 401, esc_html__( 'The access token is not exists', 'addin.sg' ), $verify_token );
+    return addin_seller_message_status( 401, esc_html__( 'The access token is not exists.', 'addin.sg' ), $verify_token );
   }
 
   $access_token = get_user_meta($user_id, 'addin_seller_access_token', true );
 
   if( $access_token != $verify_token){
-    return addin_seller_message_status( 401, esc_html__( 'Not validate', 'addin.sg' ), $access_token );
+    return addin_seller_message_status( 401, esc_html__( 'Not validate.', 'addin.sg' ), $access_token );
   }
 
   $user = get_user_by( 'id', $user_id );
@@ -161,8 +173,8 @@ function addin_seller_user_register(WP_REST_Request $request) {
     $user_id = wp_insert_user( $userdata );
     if( !is_wp_error($user_id) ) {     
       //wp_new_user_notification($user_id, $data['user_pass'], 'user');
-      wp_new_user_end_mail($user_id, $password);
-      return addin_seller_message_status(200, 'Your account has been created successfully, please wait administrator approve!', null);
+      wp_new_user_send_mail($user_id, $password);
+      return addin_seller_message_status(200, 'Your account has been created successfully, please wait the administrator approve.', null);
     } else {
       return addin_seller_message_status(409, $user_id->get_error_message(), null);
     }
@@ -171,11 +183,11 @@ function addin_seller_user_register(WP_REST_Request $request) {
   }
 }
 
-function wp_new_user_end_mail($user_id, $pass) {
+function wp_new_user_send_mail($user_id, $pass) {
 
   $user = get_user_by('id', $user_id);
   $message = 'Dear User,'. "\r\n\r\n";
-  $message .= 'Your account has been created successfully, please wait administrator approve!'. "\r\n\r\n";
+  $message .= 'Your account has been created successfully, please wait the administrator approve.'. "\r\n\r\n";
   $message .= sprintf( __( 'Username: %s' ), $user->user_login ) . "\r\n\r\n";
   $message .= sprintf( __( 'Password: %s' ), $pass ) . "\r\n\r\n";
   $message .= __( 'To set your password, go to https://seller.addin.sg/auth/login and then click on "Forgot password?"' ) . "\r\n\r\n";
@@ -196,4 +208,16 @@ function wp_new_user_end_mail($user_id, $pass) {
       $wp_new_user_notification_email['headers']
   );
 
+}
+
+/**
+ * return terms_conditions
+ */
+function addin_seller_get_terms_conditions() {
+  $page = get_page_by_path('terms-conditions');
+  if( $page ) {
+    $content = apply_filters('the_content', $page->post_content);
+    return addin_seller_message_status(200, '', wpautop($page->post_content));
+  }
+  return addin_seller_message_status(404, 'Not found', null);
 }

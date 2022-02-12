@@ -42,7 +42,7 @@ const registrationSchema = Yup.object().shape({
       "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character."
     ),
   changepassword: Yup.string()
-    .required('Password confirmation is required')
+    .required('Password confirmation is required.')
     .when('password', {
       is: (val: string) => (val && val.length > 0 ? true : false),
       then: Yup.string().oneOf([Yup.ref('password')], "Password and confirm password didn't match."),
@@ -104,12 +104,10 @@ export function Registration() {
     event.preventDefault()
     setShowModal(false)
   }
-
-  const terms_and_contiditons = 'React Router ships with a few hooks that let you access the state of the router and perform navigation from inside your components.'
+  
   useEffect(() => {
     getTermsAndConditions().then((response) => {
-      const { data, message, code } = response.data
-      console.log(response);
+      const { data } = response.data
       setTermsConditions(data)
     })
   }, [])

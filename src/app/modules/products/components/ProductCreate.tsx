@@ -57,7 +57,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     });
     
     productInfo.then((response: any) => { 
-      const { code, message, data } = response     
+      const { data } = response     
       setProductDetail({...data})
     })    
 
@@ -162,7 +162,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       attributes: formValues.attributes, 
       type: 'attr'})
     .then((response: any) =>{
-      const { code, message, data } = response.data 
+      const { message } = response.data 
       setSaveAttr({loading: false,  error: message})
       setTimeout(() => {
         setSaveAttr({loading: false,  error: ''})
@@ -181,7 +181,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       variations: formValues.variations, 
       type: 'var'})
     .then((response: any) => {      
-      const { code, message, data } = response.data     
+      const { message } = response.data     
       setSaveVar({loading: false,  error: message})
       //console.log(data)
       setTimeout(() => {
