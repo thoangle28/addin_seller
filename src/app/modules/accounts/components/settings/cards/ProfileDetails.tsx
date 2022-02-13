@@ -204,7 +204,7 @@ const ProfileDetails: React.FC = () => {
                 <div className='col-lg-8 fv-row'>
                   <input
                     type='text'
-                    placeholder='Company name'
+                    placeholder='Brand name'
                     {...formik.getFieldProps('company')}
                     onBlur={(event) => {
                       formik.setFieldValue('brand.name', formik.values.company)
