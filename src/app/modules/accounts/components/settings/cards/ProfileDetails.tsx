@@ -9,6 +9,10 @@ import { UpdateProfileDetails, UpdateUserProfile, UserProfile, getUserProfile } 
 import {RootState} from '../../../../../../setup'
 import { shallowEqual, useSelector } from 'react-redux'
 import { FallbackView } from '../../../../products/components/formOptions'
+import { confirmAlert } from 'react-confirm-alert'
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
+import { useHistory } from 'react-router-dom'
+import { userInfo } from 'os'
 
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
 
@@ -35,7 +39,7 @@ const profileDetailsSchema = Yup.object().shape({
     .min(3, 'Minimum 3 symbols.')
     .max(50, 'Maximum 50 symbols.')
     .required('Contact email is required.'),
-  address: Yup.string().required('Company site is required'),
+  address: Yup.string().required('Address is required'),
   //country: Yup.string().required('Country is required'),
   //language: Yup.string().required('Language is required'),
   //timeZone: Yup.string().required('Time zone is required'),
@@ -44,7 +48,8 @@ const profileDetailsSchema = Yup.object().shape({
 
 const ProfileDetails: React.FC = () => {
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
-  const { accessToken, user } = auth
+  const { accessToken, user } = auth 
+
   const initialValues: IProfileDetails = {...defaultValues}
 
   const [data, setData] = useState<IProfileDetails>(initialValues)
@@ -74,20 +79,54 @@ const ProfileDetails: React.FC = () => {
     
   }, [user, initialValues])
 
+  const updateUserProfile = (formValues: any, userInfo: any) => {
+    return new Promise((resolve, reject) => {
+      UpdateUserProfile(formValues, userInfo).then((response) => {
+        const { code, message, data } = response.data
+        resolve(response)
+      }).catch(() => {})
+    })
+  }
+
+  const history = useHistory();
+  const confirmRequest = (message: string) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="custom-ui">
+            <h3 style={{color: '#fff'}}>Update Profile</h3>
+            <p>{message}</p>           
+            <button
+              className='btn btn-sm btn-success'
+              onClick={() => {
+                history.push("/account/overview");
+                onClose()
+              }}
+            >
+              Close
+            </button>
+          </div>
+        )
+      }
+    })
+  }
+
   const formik = useFormik<IProfileDetails>({
     initialValues,
     validationSchema: profileDetailsSchema,
     onSubmit: (values) => {
-      const response = UpdateUserProfile(values, accessToken);
-      setLoading(true)
-     /*  setTimeout(() => {
-        values.communications.email = data.communications.email
-        values.communications.phone = data.communications.phone
-        values.allowMarketing = data.allowMarketing
-        const updatedData = Object.assign(data, values)
-        setData(updatedData)
-        setLoading(false)
-      }, 1000) */
+      setLoading(true)     
+      const userInfo = { userEmail: user.user_email, accessToken: accessToken }
+
+      updateUserProfile(values, userInfo).then((response: any) => {        
+        const { code, message, data } = response.data
+        console.log(data);
+        if(code === 200 && message === 'DONE') {
+          //console.log(response);
+          confirmRequest('Your profile has been updated successfully.')
+          setLoading(false)
+        }
+      })
     },
   })
   
@@ -118,22 +157,43 @@ const ProfileDetails: React.FC = () => {
           <form onSubmit={formik.handleSubmit} noValidate className='form'>
             <div className='card-body border-top p-9'>
               <div className='row mb-6'>
-                <label className='col-lg-4 col-form-label fw-bold fs-6'>Brand Logo</label>
+                <label className='col-lg-4 col-form-label fw-bold fs-6 required'>Brand Logo</label>
                 <div className='col-lg-8'>
                   <div className='d-flex align-items-end'>
                     <div
-                      className='image-input image-input-outline me-2'
+                      className='image-input image-input-outline me-5'
                       data-kt-image-input='true'
                     >
                       <div className='image-input-wrapper h-65px w-auto'>
-                        <img style={{ height: '100%', width: 'auto' }} src={ newBrandLogo ? newBrandLogo : formik.values.avatar} /> 
+                        <img style={{ height: '100%', width: 'auto', maxWidth: '200px' }} src={ newBrandLogo ? newBrandLogo : formik.values.avatar} /> 
                       </div>
+                      <span
+                        className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                        data-kt-image-input-action='remove'
+                        data-bs-toggle='tooltip'
+                        title='Remove Image'
+                        id="remove_image"
+                        ref={(span) => {
+                          if (span) {
+                            span.style.setProperty("width", "20px", "important");
+                            span.style.setProperty("height", "20px", "important");
+                          }
+                        }}
+                        onClick={(event) => {
+                          //removeVariationThumbnail('galleries', image.image_id, values)
+                          setNewBrandLogo('')
+                          formik.setFieldValue('brand.logo', '')
+                          formik.handleChange(event)
+                        }}
+                      >
+                        <i className='bi bi-x fs-2' id="remove_x"></i>
+                      </span>
                     </div>
 
                     <UploadImageField
                       setFileToState={setNewBrandLogo}
                       setFieldValue={formik.setFieldValue}
-                      fileName='brand_logo'
+                      fileName={'brand.logo'}
                       isMultiple={false}
                     />
                   </div>
@@ -146,6 +206,10 @@ const ProfileDetails: React.FC = () => {
                     type='text'
                     placeholder='Company name'
                     {...formik.getFieldProps('company')}
+                    onBlur={(event) => {
+                      formik.setFieldValue('brand.name', formik.values.company)
+                      formik.handleChange(event)
+                    }}
                     className={clsx(
                       'form-control form-control-lg form-control-solid',
                       {

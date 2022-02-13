@@ -39,9 +39,11 @@ const AccountHeader: React.FC = () => {
       <div className='card-body pt-9 pb-0'>
         <div className='d-flex flex-wrap flex-sm-nowrap mb-3'>
           <div className='me-7 mb-4'>
-            <div className='symbol symbol-100px symbol-lg-100px symbol-fixed position-relative'>
-              <img src={toAbsoluteUrl('/media/avatars/150-2.jpg')} alt='Metronic' />
-              <div className='position-absolute translate-middle bottom-0 start-100 mb-6 bg-success rounded-circle border border-4 border-white h-20px w-20px'></div>
+            <div className='symbol symbol-100px symbol-lg-100px symbol-fixed position-relative h-70px d-flex align-items-center border border-2'>
+              { initialValues.avatar && (
+              <><img className='w-100 h-50px' src={toAbsoluteUrl(initialValues.avatar)} alt='Metronic' />
+              <div className='position-absolute translate-middle bottom-0 mb-3 start-100 bg-success rounded-circle border border-4 border-white h-20px w-20px'></div>
+              </>)}
             </div>
           </div>
 

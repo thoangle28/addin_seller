@@ -12,8 +12,8 @@ export function getUserProfile( user: any) {
     return axios.post<any>(API_END_POINT_URL + '/user/profile', {user: user})
 }
 
-export function updateUserProfile( user: IProfileDetails, accessToken: string) {
-    return axios.post<any>(API_END_POINT_URL + '/user/profile/update', {...user})
+export function UpdateUserProfile( profileInfo: IProfileDetails, userInfo: any) {
+    return axios.post<any>(API_END_POINT_URL + '/user/profile/update', { profile: profileInfo, userInfo: userInfo })
 }
 
 //get user info
@@ -22,16 +22,9 @@ export const UserProfile = ( UserInfo: any, accessToken: string ) => {
         return response.data;
     }).catch(() => {})
 }
-//values, accessToken
-export const UpdateUserProfile = ( UserInfo: IProfileDetails, accessToken: string ) => {
-    console.log(UserInfo)
-    console.log(accessToken)
-    /* updateUserProfile(UserInfo, accessToken).then((response) => {
-        return response.data;
-    }).catch(() => {}) */
-}
 
 export const UpdateProfileDetails = (formValues: IProfileDetails, UserInfo: any) => {    
+    formValues.email = UserInfo.email
     formValues.firstname = UserInfo.firstname;
     formValues.lastname = UserInfo.lastname;
     formValues.contactEmail = UserInfo.contactEmail;
