@@ -12,6 +12,8 @@ export interface UserModel {
   first_name: string
   last_name: string
   fullname?: string
+  avatar?: string
+  display_name?:string
   occupation?: string
   companyName?: string
   phone?: string
