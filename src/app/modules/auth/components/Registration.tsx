@@ -17,22 +17,27 @@ const initialValues = {
   password: '',
   changepassword: '',
   acceptTerms: false,
+  brand: ''
 }
 
 const registrationSchema = Yup.object().shape({
   firstname: Yup.string()
     .min(3, 'Minimum 3 symbols.')
     .max(50, 'Maximum 50 symbols.')
-    .required('First name is required.'),
+    .required('First name is required.'), 
+  lastname: Yup.string()
+    .min(3, 'Minimum 3 symbols.')
+    .max(50, 'Maximum 50 symbols.')
+    .required('Last name is required.'),
   email: Yup.string()
     .email('Wrong email format.')
     .min(3, 'Minimum 3 symbols.')
     .max(50, 'Maximum 50 symbols.')
     .required('Email is required.'),
-  lastname: Yup.string()
+  brand: Yup.string()
     .min(3, 'Minimum 3 symbols.')
     .max(50, 'Maximum 50 symbols.')
-    .required('Last name is required.'),
+    .required('Brand name is required.'),
   password: Yup.string()
     .min(8, 'Minimum 8 symbols.')
     .max(50, 'Maximum 50 symbols.')
@@ -63,11 +68,13 @@ export function Registration() {
     onSubmit: (values, {setStatus, setSubmitting}) => {
       setLoading(true)
       setTimeout(() => {
-        register(values.email, values.firstname, values.lastname, values.password)
+        register(values.email, values.firstname, 
+          values.lastname, values.password, values.brand)
           .then((response) => { //{data: {accessToken}}            
             setLoading(false)            
             //const data = response.data
             const { code, message } = response.data
+     
             if( code === 409 ) {
               setStatus(message)
               setSubmitting(false)
@@ -82,6 +89,7 @@ export function Registration() {
               initialValues.password = ''
               initialValues.firstname = ''
               initialValues.lastname = ''
+              initialValues.brand = ''
             }
             //dispatch(auth.actions.login(accessToken))
           })
@@ -220,8 +228,31 @@ export function Registration() {
         </div>
       </div>     
       {/* end::Form group */}
-
-      {/* begin::Form group Email */}
+      {/* begin::Form group Brand */}
+      <div className='fv-row mb-5'>
+        <label className='form-label fw-bolder text-dark fs-6'>Brand name</label>
+        <input
+          placeholder='Brand name'
+          type='text'
+          autoComplete='off'
+          {...formik.getFieldProps('brand')}
+          className={clsx(
+            'form-control form-control-lg form-control-solid',
+            {'is-invalid': formik.touched.brand && formik.errors.brand},
+            {
+              'is-valid': formik.touched.brand && !formik.errors.brand,
+            }
+          )}
+        />
+        {formik.touched.email && formik.errors.brand && (
+          <div className='fv-plugins-message-container invalid-feedback'>
+            <div className='fv-help-block'>
+              <span role='alert'>{formik.errors.brand}</span>
+            </div>
+          </div>
+        )}
+      </div>        
+      {/* begin::Form group Brand */}
       <div className='fv-row mb-5'>
         <label className='form-label fw-bolder text-dark fs-6'>Email</label>
         <input

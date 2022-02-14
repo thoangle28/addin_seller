@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {Redirect, Route, Switch} from 'react-router-dom'
 import {PageLink, PageTitle} from '../../../_metronic/layout/core'
 import {Overview} from './components/Overview'
@@ -21,9 +21,18 @@ const accountBreadCrumbs: Array<PageLink> = [
 ]
 
 const AccountPage: React.FC = () => {
+  
+  const [reload, setReloadPageHeader] = useState(0)
+  const onReloadHeader = (status: boolean) => {
+    if( status ) {
+      const time = new Date().getTime()
+      setReloadPageHeader(time)
+    }
+  }
+
   return (
     <>
-      <AccountHeader />
+      <AccountHeader reload={reload} />
       <Switch>
         <Route path='/account/overview'>
           <PageTitle breadcrumbs={accountBreadCrumbs}>Overview</PageTitle>
@@ -31,7 +40,7 @@ const AccountPage: React.FC = () => {
         </Route>
         <Route path='/account/settings'>
           <PageTitle breadcrumbs={accountBreadCrumbs}>Settings</PageTitle>
-          <Settings />
+          <Settings onChangeStatus={onReloadHeader} />
         </Route>
 
         <Redirect from='/account' exact={true} to='/account/overview' />

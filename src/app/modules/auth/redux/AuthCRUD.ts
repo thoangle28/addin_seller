@@ -35,13 +35,10 @@ export function login(email: string, password: string) {
     password,
   })
 } */
-export function register(email: string, firstname: string, lastname: string, password: string) {
-  return axios.post<any>(API_END_POINT_URL+ '/register', {
-    email,
-    firstname,
-    lastname,
-    password,
-  })
+export function register(email: string, firstname: string, 
+  lastname: string, password: string, brand: string) {
+  const params = { email, firstname, lastname, password, brand }
+  return axios.post<any>(API_END_POINT_URL+ '/register', params)
 }
 // Server should return object => { result: boolean } (Is Email in DB)
 export function requestPassword(email: string) {

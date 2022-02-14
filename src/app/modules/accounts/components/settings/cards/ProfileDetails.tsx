@@ -31,8 +31,7 @@ const profileDetailsSchema = Yup.object().shape({
     .required('Brand name is required'),
   contactPhone: Yup.string()
     .min(1, 'Minimum 10 symbols.')
-    .max(20, 'Maximum 20 symbols.')
-    .matches(phoneRegEx, 'Phone number is not valid')
+    .max(20, 'Maximum 20 symbols.') //.matches(phoneRegEx, 'Phone number is not valid')    
     .required('Contact phone is required'),
   contactEmail: Yup.string()
     .email('Wrong email format.')
@@ -46,7 +45,12 @@ const profileDetailsSchema = Yup.object().shape({
   //currency: Yup.string().required('Currency is required'),
 })
 
-const ProfileDetails: React.FC = () => {
+type Props = {
+  onUpdateProfile?: (s: boolean) => void
+}
+
+
+const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) => undefined } : Props) => {
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
   const { accessToken, user } = auth 
 
@@ -88,6 +92,10 @@ const ProfileDetails: React.FC = () => {
     })
   }
 
+  const reloadHeader = (s: boolean) => {
+    onUpdateProfile(s)
+  }
+
   const history = useHistory();
   const confirmRequest = (message: string) => {
     confirmAlert({
@@ -99,6 +107,7 @@ const ProfileDetails: React.FC = () => {
             <button
               className='btn btn-sm btn-success'
               onClick={() => {
+                reloadHeader(true)
                 history.push("/account/overview");
                 onClose()
               }}
@@ -120,7 +129,7 @@ const ProfileDetails: React.FC = () => {
 
       updateUserProfile(values, userInfo).then((response: any) => {        
         const { code, message, data } = response.data
-        console.log(data);
+   
         if(code === 200 && message === 'DONE') {
           //console.log(response);
           confirmRequest('Your profile has been updated successfully.')
@@ -164,32 +173,41 @@ const ProfileDetails: React.FC = () => {
                       className='image-input image-input-outline me-5'
                       data-kt-image-input='true'
                     >
-                      <div className='image-input-wrapper h-65px w-auto'>
-                        <img style={{ height: '100%', width: 'auto', maxWidth: '200px' }} src={ newBrandLogo ? newBrandLogo : formik.values.avatar} /> 
-                      </div>
-                      <span
-                        className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
-                        data-kt-image-input-action='remove'
-                        data-bs-toggle='tooltip'
-                        title='Remove Image'
-                        id="remove_image"
-                        ref={(span) => {
-                          if (span) {
-                            span.style.setProperty("width", "20px", "important");
-                            span.style.setProperty("height", "20px", "important");
-                          }
-                        }}
-                        onClick={(event) => {
-                          //removeVariationThumbnail('galleries', image.image_id, values)
-                          setNewBrandLogo('')
-                          formik.setFieldValue('brand.logo', '')
-                          formik.handleChange(event)
-                        }}
-                      >
-                        <i className='bi bi-x fs-2' id="remove_x"></i>
-                      </span>
+                      {(newBrandLogo || formik.values.avatar) && (
+                      <>
+                        <div className='image-input-wrapper h-65px w-auto'>
+                          <img className='symbol'
+                            style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
+                            src={ newBrandLogo ? newBrandLogo : formik.values.avatar} /> 
+                        </div>
+                        <span
+                          className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                          data-kt-image-input-action='remove'
+                          data-bs-toggle='tooltip'
+                          title='Remove Image'
+                          id="remove_image"
+                          ref={(span) => {
+                            if (span) {
+                              span.style.setProperty("width", "20px", "important");
+                              span.style.setProperty("height", "20px", "important");
+                            }
+                          }}
+                          onClick={(event) => {
+                            //removeVariationThumbnail('galleries', image.image_id, values)
+                            setNewBrandLogo('')
+                            formik.setFieldValue('brand.logo', '')
+                            formik.handleChange(event)
+                          }}
+                        >
+                          <i className='bi bi-x fs-2' id="remove_x"></i>
+                        </span>
+                      </>
+                      ) || (
+                        <img style={{opacity: 0.5}} 
+                        className='symbol w-auto h-70px' 
+                        src={toAbsoluteUrl('/media/avatars/blank.png')} />
+                      )}
                     </div>
-
                     <UploadImageField
                       setFileToState={setNewBrandLogo}
                       setFieldValue={formik.setFieldValue}
@@ -290,7 +308,7 @@ const ProfileDetails: React.FC = () => {
                 <div className='col-lg-8 fv-row'>
                   <input
                     type='tel'
-                    placeholder='+00 (000) 000 0000'
+                    placeholder='+00 (00) 0000000'
                     {...formik.getFieldProps('contactPhone')}
                     className={clsx(
                       'form-control form-control-lg form-control-solid',
