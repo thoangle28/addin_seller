@@ -128,8 +128,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
       const userInfo = { userEmail: user.user_email, accessToken: accessToken }
 
       updateUserProfile(values, userInfo).then((response: any) => {        
-        const { code, message, data } = response.data
-   
+        const { code, message, data } = response.data   
         if(code === 200 && message === 'DONE') {
           //console.log(response);
           confirmRequest('Your profile has been updated successfully.')
