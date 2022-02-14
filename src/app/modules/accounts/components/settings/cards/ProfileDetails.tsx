@@ -39,6 +39,7 @@ const profileDetailsSchema = Yup.object().shape({
     .max(50, 'Maximum 50 symbols.')
     .required('Contact email is required.'),
   address: Yup.string().required('Address is required'),
+  new_avatar: Yup.string().required('Brand logo is required'),
   //country: Yup.string().required('Country is required'),
   //language: Yup.string().required('Language is required'),
   //timeZone: Yup.string().required('Time zone is required'),
@@ -179,6 +180,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                             style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
                             src={ newBrandLogo ? newBrandLogo : formik.values.avatar} /> 
                         </div>
+                        { newBrandLogo && (
                         <span
                           className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
                           data-kt-image-input-action='remove'
@@ -192,14 +194,16 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                             }
                           }}
                           onClick={(event) => {
-                            //removeVariationThumbnail('galleries', image.image_id, values)
                             setNewBrandLogo('')
+                            const new_avatar = formik.values.avatar ? formik.values.avatar : ''
+                            formik.setFieldValue('new_avatar', new_avatar)
                             formik.setFieldValue('brand.logo', '')
                             formik.handleChange(event)
                           }}
                         >
                           <i className='bi bi-x fs-2' id="remove_x"></i>
                         </span>
+                        ) }
                       </>
                       ) || (
                         <img style={{opacity: 0.5}} 
@@ -208,11 +212,32 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                       )}
                     </div>
                     <UploadImageField
-                      setFileToState={setNewBrandLogo}
+                      setFileToState={setNewBrandLogo}                      
                       setFieldValue={formik.setFieldValue}
                       fileName={'brand.logo'}
-                      isMultiple={false}
-                    />
+                      isMultiple={false}     
+                      setFieldToInput={formik.setFieldValue}   
+                      inputName={"new_avatar"}              
+                    />                   
+                  </div>
+                  <div>
+                    <input type="hidden" 
+                      {...formik.getFieldProps('new_avatar')}
+                      className={clsx(
+                        'form-control form-control-lg form-control-solid',
+                        {
+                          'is-invalid': formik.touched.new_avatar && formik.errors.new_avatar,
+                        },
+                        {
+                          'is-valid': formik.touched.new_avatar && !formik.errors.new_avatar,
+                        }
+                      )}
+                    />                   
+                    {formik.touched.avatar && formik.errors.avatar && (
+                      <div className='fv-plugins-message-container invalid-feedback'>
+                        <div className='fv-help-block'>{formik.errors.avatar}</div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

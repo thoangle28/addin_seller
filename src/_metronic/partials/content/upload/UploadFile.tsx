@@ -16,7 +16,7 @@ export const handleFileUpload = (files: any) => {
   }
   
 export const UploadImageField = (props: any) => {
-    const {setFileToState, setFieldValue, fileName, isMultiple = true} = props
+    const {setFileToState, setFieldValue, fileName, isMultiple = true, setFieldToInput, inputName} = props
     return (
       <>
         <div className='form-group mt-1'>
@@ -28,6 +28,7 @@ export const UploadImageField = (props: any) => {
                   (images) => {
                     setFileToState && setFileToState(images)
                     setFieldValue(fileName, images)
+                    setFieldToInput && setFieldToInput(inputName, images[0])
                   },
                   (error) => {
                     console.error(error)

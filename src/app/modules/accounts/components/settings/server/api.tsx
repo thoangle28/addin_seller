@@ -33,5 +33,6 @@ export const UpdateProfileDetails = (formValues: IProfileDetails, UserInfo: any)
     formValues.communications = UserInfo.communications;
     formValues.brand = UserInfo.brand;
     formValues.company = UserInfo.brand.name;
-    formValues.avatar = UserInfo.avatar;
+    formValues.avatar = UserInfo.avatar ?  UserInfo.avatar : '';
+    formValues.new_avatar = UserInfo.avatar ?  UserInfo.avatar : '';
 }
