@@ -2,7 +2,7 @@
 import React from 'react'
 import {useIntl} from 'react-intl'
 //import {KTSVG} from '../../../helpers'
-//import {AsideMenuItemWithSub} from './AsideMenuItemWithSub'
+import {AsideMenuItemWithSub} from './AsideMenuItemWithSub'
 import {AsideMenuItem} from './AsideMenuItem'
 
 export function AsideMenuMain() {
@@ -35,12 +35,16 @@ export function AsideMenuMain() {
         title='Sale Reports'
         fontIcon='bi-layers'
       />
-      <AsideMenuItem
-        to='/logout'
-        title='Sign out'
-        icon='/media/icons/duotune/communication/com006.svg'
+      <AsideMenuItemWithSub
+        to='#'
+        title='Support Tickets'
+        icon='/media/icons/duotune/communication/com007.svg'
         fontIcon='bi-person'
-      ></AsideMenuItem>     
+      >
+        <AsideMenuItem to='/support/ticket/create' title='Create New Ticket' hasBullet={true} />
+        <AsideMenuItem to='/support/ticket/listing' title='Tickets Listing' hasBullet={true} />
+        <AsideMenuItem to='/support/orders/listing' title='Orders Listing' hasBullet={true} />
+      </AsideMenuItemWithSub>     
     </>
   )
 }
