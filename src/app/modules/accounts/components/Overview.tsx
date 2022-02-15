@@ -131,10 +131,18 @@ export function Overview() {
             </div> */}
 
             <div className='row mb-7'>
-              <label className='col-lg-4 fw-bold text-muted'>Communication</label>
+              <label className='col-lg-4 fw-bold text-muted'>Communications</label>
 
               <div className='col-lg-8'>
-                <span className='fw-bolder fs-6 text-dark'>Email, Phone</span>
+                <span className='fw-bolder fs-6 text-dark'>
+                  {
+                    (initialValues.communications.email 
+                    && initialValues.communications.phone) 
+                    ? 'Email, Phone' 
+                    : (initialValues.communications.email && 'Email' 
+                    || initialValues.communications.phone && 'Phone')
+                  }
+                </span>
               </div>
             </div>
 

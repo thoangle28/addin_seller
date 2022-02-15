@@ -3,7 +3,7 @@ import {toAbsoluteUrl} from '../../../../../../_metronic/helpers'
 import {IProfileDetails, profileDetailsInitValues as defaultValues} from '../SettingsModel'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
-import { handleFileUpload,  UploadImageField } from '../../../../../../_metronic/partials/content/upload/UploadFile'
+import { UploadImageField } from '../../../../../../_metronic/partials/content/upload/UploadFile'
 import clsx from 'clsx'
 import { UpdateProfileDetails, UpdateUserProfile, UserProfile, getUserProfile } from '../server/api'
 import {RootState} from '../../../../../../setup'
@@ -12,7 +12,6 @@ import { FallbackView } from '../../../../products/components/formOptions'
 import { confirmAlert } from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import { useHistory } from 'react-router-dom'
-import { userInfo } from 'os'
 
 const phoneRegEx = /^(\+\d{1,2}\s)?\(?\d{3}\)?[\s.-]\d{3}[\s.-]\d{4}$/;
 
@@ -40,6 +39,10 @@ const profileDetailsSchema = Yup.object().shape({
     .required('Contact email is required.'),
   address: Yup.string().required('Address is required'),
   new_avatar: Yup.string().required('Brand logo is required'),
+  communications: Yup.array().transform((value, obj) => {
+    if( obj.email || obj.phone) return [ obj.email || obj.phone ];
+  }).required("At least email / phone is choosed")
+  //country: Yup.string().required('Country is require)
   //country: Yup.string().required('Country is required'),
   //language: Yup.string().required('Language is required'),
   //timeZone: Yup.string().required('Time zone is required'),
@@ -56,13 +59,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
   const { accessToken, user } = auth 
 
   const initialValues: IProfileDetails = {...defaultValues}
-
   const [data, setData] = useState<IProfileDetails>(initialValues)
-  const updateData = (fieldsToUpdate: Partial<IProfileDetails>): void => {
-    const updatedData = Object.assign(data, fieldsToUpdate)
-    setData(updatedData)
-  }
-
   const [forLoading, setFormLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [newBrandLogo, setNewBrandLogo] = useState('')
@@ -77,7 +74,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
       })
     }
 
-    loadUserProfile().then((data) => {
+    loadUserProfile().then((data) => {      
       UpdateProfileDetails(initialValues, data);
       setFormLoading(false)
     })
@@ -87,7 +84,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
   const updateUserProfile = (formValues: any, userInfo: any) => {
     return new Promise((resolve, reject) => {
       UpdateUserProfile(formValues, userInfo).then((response) => {
-        const { code, message, data } = response.data
+        //const { code, message, data } = response.data
         resolve(response)
       }).catch(() => {})
     })
@@ -126,12 +123,10 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
     validationSchema: profileDetailsSchema,
     onSubmit: (values) => {
       setLoading(true)     
-      const userInfo = { userEmail: user.user_email, accessToken: accessToken }
-
+      const userInfo = { userEmail: user.user_email, accessToken: accessToken }  
       updateUserProfile(values, userInfo).then((response: any) => {        
         const { code, message, data } = response.data   
         if(code === 200 && message === 'DONE') {
-          //console.log(response);
           confirmRequest('Your profile has been updated successfully.')
           setLoading(false)
         }
@@ -413,17 +408,10 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                     <label className='form-check form-check-inline form-check-solid me-5'>
                       <input
                         className='form-check-input'
-                        name='communication[]'
+                        name='communications.email'
                         type='checkbox'
                         defaultChecked={data.communications?.email}
                         onChange={(event) => {
-                          updateData({
-                            communications: {
-                              email: !data.communications?.email,
-                              phone: data.communications?.phone,
-                            },
-                          })
-
                           formik.handleChange(event)
                         }}
                       />
@@ -433,22 +421,22 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                     <label className='form-check form-check-inline form-check-solid'>
                       <input
                         className='form-check-input'
-                        name='communication[]'
+                        name='communications.phone'
                         type='checkbox'
                         defaultChecked={data.communications?.phone}
-                        onChange={(event) => {
-                          updateData({
-                            communications: {
-                              email: data.communications?.email,
-                              phone: !data.communications?.phone,
-                            },
-                          })
-
+                        onChange={(event) => {   
                           formik.handleChange(event)
                         }}
                       />
                       <span className='fw-bold ps-2 fs-6'>Phone</span>
                     </label>
+                  </div>
+                  <div className='mt-2'>
+                  {formik.touched.communications && (
+                    <div className='fv-plugins-message-container invalid-feedback d-block'>
+                      <div className='fv-help-block'>{formik.errors.communications}</div>
+                    </div>
+                  )}
                   </div>
                 </div>
               </div>
@@ -484,7 +472,6 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                   </span>
                 )}
               </button>
-              {/* <button onClick={formik.handleChange} className='btn btn-primary'>Test Submit</button> */}
             </div>
           </form>
         </div>
