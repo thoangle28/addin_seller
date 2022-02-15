@@ -7,7 +7,8 @@ export function PrivateRoutes() {
   
   const ProductPage = lazy(() => import('../modules/products/ProductPage'))
   const ReportPage = lazy(() => import('../modules/sale/ReportPage'))
-  
+  const AccountPage = lazy(() => import('../modules/accounts/AccountPage'))
+
   return (
     <Suspense fallback={<FallbackView />}>
       <Switch>
@@ -16,6 +17,8 @@ export function PrivateRoutes() {
         <Route path='/product/create' component={ProductPage} />
         <Route path='/product/update/:id' component={ProductPage} />
         <Route path='/sale-report' component={ReportPage} />
+        <Route path='/account/overview' component={AccountPage} />
+        <Route path='/account/settings' component={AccountPage} />
         <Redirect from='/auth' to='/dashboard' />
         <Redirect exact from='/' to='/dashboard' />
         <Redirect to='error/404' />        

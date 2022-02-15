@@ -1,20 +1,25 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {ProfileDetails} from './cards/ProfileDetails'
 import {SignInMethod} from './cards/SignInMethod'
-import {ConnectedAccounts} from './cards/ConnectedAccounts'
-import {EmailPreferences} from './cards/EmailPreferences'
-import {Notifications} from './cards/Notifications'
 import {DeactivateAccount} from './cards/DeactivateAccount'
 
-export function Settings() {
+type Props = {
+  onChangeStatus?: (s: boolean) => void
+}
+
+export const Settings = ({onChangeStatus = (s: boolean) => undefined}: Props) => {
+  const changeUpdateProfile = (status: boolean) => {
+    onChangeStatus(status)
+  }
+
   return (
     <>
-      <ProfileDetails />
-      <SignInMethod />
-      <ConnectedAccounts />
+      <ProfileDetails onUpdateProfile={changeUpdateProfile}/>
+      {/* <SignInMethod /> */}
+      {/* <ConnectedAccounts />
       <EmailPreferences />
-      <Notifications />
-      <DeactivateAccount />
+      <Notifications /> */}
+      {/* <DeactivateAccount /> */}
     </>
   )
 }

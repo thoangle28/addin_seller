@@ -56,7 +56,7 @@ export function ForgotPassword() {
           {/* end::Title */}
 
           {/* begin::Link */}
-          <div className='text-gray-400 fw-bold fs-4'>Enter your email to reset your password.</div>
+          <div className='text-gray-400 fs-6'>Enter your email to reset your password.</div>
           {/* end::Link */}
         </div>
 
@@ -93,7 +93,7 @@ export function ForgotPassword() {
             )}
           />
           {formik.touched.email && formik.errors.email && (
-            <div className='fv-plugins-message-container'>
+            <div className='fv-plugins-message-container  invalid-feedback'>
               <div className='fv-help-block'>
                 <span role='alert'>{formik.errors.email}</span>
               </div>

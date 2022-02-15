@@ -27,15 +27,19 @@ export function login(email: string, password: string) {
 }
 
 // Server should return AuthModel
-export function register(email: string, firstname: string, lastname: string, password: string) {
-  return axios.post<AuthModel>(REGISTER_URL, {
+/* export function register(email: string, firstname: string, lastname: string, password: string) {
+  return axios.post<AuthModel>(API_END_POINT_URL+ '/register', {
     email,
     firstname,
     lastname,
     password,
   })
+} */
+export function register(email: string, firstname: string, 
+  lastname: string, password: string, brand: string) {
+  const params = { email, firstname, lastname, password, brand }
+  return axios.post<any>(API_END_POINT_URL+ '/register', params)
 }
-
 // Server should return object => { result: boolean } (Is Email in DB)
 export function requestPassword(email: string) {
   return axios.get<{result: boolean}>(REQUEST_PASSWORD_URL, {
@@ -56,4 +60,10 @@ export function getUserByAccessToken( token: string, user_id: number ) {
   // Authorization head should be fulfilled in interceptor.
   // Check common redux folder => setupAxios
   return axios.post<any | UserModel>(API_END_POINT_URL + '/verify_token', { access_token: token, user_id: user_id })
+}
+
+export function getTermsAndConditions() {
+  // Authorization head should be fulfilled in interceptor.
+  // Check common redux folder => setupAxios
+  return axios.get<any>(API_END_POINT_URL + '/terms-and-conditions')
 }

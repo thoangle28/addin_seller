@@ -25,17 +25,17 @@ const HeaderUserMenu: FC = () => {
       <div className='menu-item px-3'>
         <div className='menu-content d-flex align-items-center px-3'>
           <div className='symbol symbol-50px me-5'>
-            <img alt='Logo' src={toAbsoluteUrl('/media/avatars/150-25.jpg')} />
+            <img alt='Logo' src={toAbsoluteUrl('/media/avatars/blank.png')} />
           </div>
 
           <div className='d-flex flex-column'>
             <div className='fw-bolder d-flex align-items-center fs-5'>
-              {user.first_name} {user.last_name}
-              <span className='badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2'>Pro</span>
+              {user.display_name}{/*  {user.last_name} */}
+              {/* <span className='badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2'>Pro</span> */}
             </div>
-            <a href='#' className='fw-bold text-muted text-hover-primary fs-7'>
+           {/*  <a href='#' className='fw-bold text-muted text-hover-primary fs-7'>
               {user.email}
-            </a>
+            </a> */}
           </div>
         </div>
       </div>
@@ -43,12 +43,12 @@ const HeaderUserMenu: FC = () => {
       <div className='separator my-2'></div>
 
       <div className='menu-item px-5'>
-        <Link to={'/crafted/pages/profile'} className='menu-link px-5'>
+        <Link to={'/account/overview'} className='menu-link px-5'>
           My Profile
         </Link>
       </div>
 
-      <div className='menu-item px-5'>
+      {/* <div className='menu-item px-5'>
         <a href='#' className='menu-link px-5'>
           <span className='menu-text'>My Projects</span>
           <span className='menu-badge'>
@@ -125,18 +125,18 @@ const HeaderUserMenu: FC = () => {
 
       <div className='separator my-2'></div>
 
-      <Languages />
+      <Languages /> */}
 
       <div className='menu-item px-5 my-1'>
-        <Link to='/crafted/account/settings' className='menu-link px-5'>
+        <Link to='/account/settings' className='menu-link px-5'>
           Account Settings
         </Link>
       </div>
 
       <div className='menu-item px-5'>
-        <a onClick={logout} className='menu-link px-5'>
+        <Link to="/logout" className='menu-link px-5'>
           Sign Out
-        </a>
+        </Link>
       </div>
     </div>
   )

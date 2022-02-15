@@ -48,7 +48,7 @@ export function Login() {
           } else {
             setLoading(false)
             setSubmitting(false)   
-            setStatus('errors')
+            setStatus(message)
             setErrors(data);
           }
         })
@@ -69,11 +69,23 @@ export function Login() {
       id='kt_login_signin_form'
     >
       {/* begin::Heading */}
-      <div className='text-center mb-10'>
-        <h1 className='text-dark mb-3'>Sign In to Addin SG</h1>      
+      <div className='text-center mb-5'>
+        <h1 className='text-dark mb-3'>Sign In to Seller Portal</h1>      
       </div>
+      {/* begin::Link */}
+      <div className='text-gray-400 fw-normal fs-6 text-center mb-10'>
+        New Here?&nbsp;<Link 
+          to='/auth/registration' 
+          className='link-primary fs-6 fw-normal'>
+          Create New Account
+        </Link>
+      </div>     
       {/* begin::Heading */}
-
+      {formik.status && (
+        <div className={`mb-lg-15 alert alert-danger`}>
+          <div className='alert-text font-weight-bold'>{formik.status}</div>
+        </div>
+      )}
       {/* begin::Form group */}
       <div className='fv-row mb-10'>
         <label className='form-label fs-6 fw-bolder text-dark'>Email/Username</label>
@@ -149,13 +161,16 @@ export function Login() {
           )}
         </button>
         {/* begin::Link */}
+        {/* <Link 
+          to='/auth/registration' 
+          className='link-primary fs-6 fw-normal'>
+          Create New Account
+        </Link>&nbsp;&nbsp;|&nbsp;&nbsp; */}
         <Link
-            to={{ pathname: 'https://addin.sg/my-account/lost-password/'}}
-            className='link-primary fs-7 fw-normal'
-            style={{marginLeft: '5px'}}
-            target="_blank" 
+            to='/auth/forgot-password'
+            className='link-primary fs-6 fw-normal'
           >
-            Forgot password?
+            Forgot Password?
           </Link>
         {/* end::Link */}
       </div>

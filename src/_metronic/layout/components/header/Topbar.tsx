@@ -9,9 +9,14 @@ const toolbarButtonMarginClass = 'ms-1 ms-lg-3',
   toolbarButtonIconSizeClass = 'svg-icon-1'
 
 const Topbar: FC = () => {
+
+  const showTags = false;
+  
   return (
     <div className='d-flex align-items-stretch flex-shrink-0'>
       <div className='topbar d-flex align-items-stretch flex-shrink-0'>
+        { showTags && (
+        <>
         {/* Search */}
         <div className={clsx('d-flex align-items-stretch', toolbarButtonMarginClass)}>
           <Search />
@@ -96,7 +101,7 @@ const Topbar: FC = () => {
           <HeaderNotificationsMenu />
           {/* end::Menu wrapper */}
         </div>
-
+        </>)}
         {/* begin::User */}
         <div
           className={clsx('d-flex align-items-center', toolbarButtonMarginClass)}
@@ -111,8 +116,8 @@ const Topbar: FC = () => {
             data-kt-menu-flip='bottom'
           >
             <img
-              className='h-25px w-25px rounded'
-              src={toAbsoluteUrl('/media/avatars/150-25.jpg')}
+              className='h-30px w-30px rounded'
+              src={toAbsoluteUrl('/media/avatars/blank.png')}
               alt='metronic'
             />
           </div>

@@ -5,8 +5,13 @@ import {Registration} from './components/Registration'
 import {ForgotPassword} from './components/ForgotPassword'
 import {Login} from './components/Login'
 import {toAbsoluteUrl} from '../../../_metronic/helpers'
+import { useHistory ,useLocation } from 'react-router-dom';
 
 export function AuthPage() {
+
+  const location = useLocation()
+  const withForm = (location.pathname === '/auth/registration') ? 600 : 500;
+
   useEffect(() => {
     document.body.classList.add('bg-white')
     return () => {
@@ -29,7 +34,9 @@ export function AuthPage() {
         </a>
         {/* end::Logo */}
         {/* begin::Wrapper */}
-        <div className='w-lg-500px bg-white rounded shadow-sm p-10 p-lg-15 mx-auto'>
+        <div 
+        className={`w-lg-${withForm}px bg-white rounded shadow-sm p-10 p-lg-15 mx-auto`}
+        style={{ minHeight: '475px'}}>
           <Switch>
             <Route path='/auth/login' component={Login} />
             <Route path='/auth/registration' component={Registration} />
