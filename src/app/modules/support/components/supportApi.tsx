@@ -2,30 +2,30 @@ import * as supportDB from './supportDB'
 
 export interface iTicket {
     subject: string
-    messages: string
-    customer: number | null
+    message: string
+    customer: number | string
     category: string
-    orderId: number | null
-    productId: number | null
-    attachments: [string] | []
-    sellerId: number | null
+    orderId: string
+    productId: string
+    attachments: Array<string>| []
+    sellerId: string
 }
 ////////////////////////////////
 export const defaultValues: iTicket = {
     subject: '',
-    messages: '',
-    customer: 0,
+    message: '',
+    customer: '',
     category: '',
-    orderId: 0,
-    productId: 0,
+    orderId: '',
+    productId: '',
     attachments: [],
-    sellerId: 0
+    sellerId: ''
 }
 
 ////////////////////////////////
 export const GetTicketsListing = (params: any) => {
     return new Promise((resolve, reject) => {
-        supportDB.getTicketsListing(params)
+        supportDB.GetTicketsListing(params)
         .then((response) => {
             const result = response.data ? response.data : [1,2,3,4,5,6,7,8,9,10,11,12]
             resolve(result)
@@ -33,24 +33,28 @@ export const GetTicketsListing = (params: any) => {
             resolve([1,2,3,4,5,6,7,8,9,10,11,12])
             reject(error.message)
         })
-        /* setTimeout(() => {
-            resolve('OK')
-        }, 3000) */
     })
 }
 
-export const CreateNewTicket = (params: any) => {
+export const CreateNewTicket = (params: iTicket, userInfo: any) => {
     return new Promise((resolve, reject) => {
-        supportDB.getTicketsListing(params)
+        supportDB.CreateTicket(params, userInfo)
         .then((response) => {
-            const result = response.data ? response.data : [1,2,3,4,5,6,7,8,9,10,11,12]
-            resolve(result)
+            resolve(response.data)
         }).catch((error) => {
-            resolve([1,2,3,4,5,6,7,8,9,10,11,12])
             reject(error.message)
         })
-        /* setTimeout(() => {
-            resolve('OK')
-        }, 3000) */
+    })
+}
+
+
+export const GetProductsByOrder = (orderId: number) => {
+    return new Promise((resolve, reject) => {
+        supportDB.GetProductsByOrder(orderId)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
     })
 }

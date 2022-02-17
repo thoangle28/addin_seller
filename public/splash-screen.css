@@ -195,7 +195,11 @@ body {
   color: #7fbc02;
 }
 
-
 .card-products {
   min-height: 100vh;
+}
+
+.ticket_detail_preview {
+  -webkit-mask-image: linear-gradient(180deg,#000 0%,transparent);
+  mask-image: linear-gradient(180deg,#000 0%,transparent);
 }

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { AnyRecord } from 'dns';
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT
 
@@ -10,7 +11,7 @@ type Params = {
     pageSize: number
 }
 
-export function getTicketsListing( params: Params) { 
+export function GetTicketsListing( params: Params) { 
   const args = { 
     user_id : params.userId ?  params.userId : 0,
     page_size :  params.pageSize ?  params.pageSize : 10,
@@ -21,68 +22,21 @@ export function getTicketsListing( params: Params) {
   return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/listing', args)
 }
 
-/* export function getProductDetail(userId: number, product_id: number | 0) {
-  const args =  { product_id: product_id, author_id : userId }
-  return axios.post<{result: any}>(API_END_POINT_URL+ '/product', args)
+type iTicket = {
+  subject: string
+  message: string
+  customer: number | string
+  category: string
+  orderId: string
+  productId: string
+  attachments: Array<string>| []
+  sellerId: string
+}
+export function CreateTicket( params: iTicket, userInfo: any) {   
+  const args = { ...params, ...userInfo }
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/create', args)
 }
 
-export function getShippingClass() {
-  return axios.get<any>(API_END_POINT_URL+ '/shipping-classes')
+export function GetProductsByOrder( orderId: number) { 
+  return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/product-by-order', { orderId: orderId})
 }
-
-
-export function getCategoires() {
-  return axios.get<any>(API_END_POINT_URL+ '/product/categories')
-}
-
-export function getAttributes() {
-  return axios.get<any>(API_END_POINT_URL+ '/product/attribute')
-}
-
-export function getAttributesNoChild() {
-  return axios.get<any>(API_END_POINT_URL+ '/product/attribute/parents')
-}
-
-export function getSubAttributes(slug: string) {
-  return axios.post<any>(API_END_POINT_URL+ '/product/attribute-list', { 'name' : slug })
-}
-
-
-export function getProductsList( userId: number) {  
-  
-  const args = { 
-    user_id : userId ? userId : 0,
-    page_size : -1,
-    current_page : 1 
-  };
-
-  return axios.post<any>(API_END_POINT_URL+ '/products-by-user', args)
-}
-
-
-export function getProductInfoDetail(userId: number, product_id: number | 0) {
-  const args =  { product_id: product_id, author_id : userId }
-  return axios.post<any>(API_END_POINT_URL+ '/product', args)
-}
-
-
-export function saveProductToDB(params: any, token: string) {
-  return axios.post<{result: any}>(API_END_POINT_URL+ '/create-product', { product_info: params, accessToken: token }) 
-}
-
-//accessToken: string, product_id: number, params: any, type: string
-export function updateProductAttr(obj: any) {
-  const url = (obj.type === 'attr') ? '/product/create-attributes' : '/product/create-variations'
-  return axios.post<any>(API_END_POINT_URL+ url, {data: obj })
-}
-
-export function getProductsListing( userId: number, currentPage: number, pageSize: number) {  
-  
-  const args = { 
-    user_id : userId ? userId : 0,
-    page_size : pageSize ? pageSize : 10,
-    current_page : currentPage ? currentPage : 1 
-  };
-
-  return axios.post<any>(API_END_POINT_URL+ '/products-by-user', args);
-} */
