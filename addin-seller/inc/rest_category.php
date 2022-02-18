@@ -124,8 +124,12 @@ function addin_seller_get_product($request)
     $product = get_post($params['product_id']);
 
     if ($product) {
-      
-      if ($product->post_author === $params['author_id']) {
+      //get user brand
+      $brand_id = get_user_meta($params['author_id'], 'seller_brand', true);
+      $brand_post_id = get_post_meta($params['product_id'], 'product_brand', true);
+
+      if( $brand_id === $brand_post_id) {
+        //$product->post_author === $params['author_id']) {
         $data_products = wc_get_product($params['product_id']);
         $data = [];
         $variation = [];
@@ -235,12 +239,12 @@ function addin_seller_get_product($request)
         
       } else {
         $code = 401;
-        $message = esc_html__('No permission.Author of product is:'.$product->post_author, 'addin.sg');
+        $message = esc_html__('No permission. The product does not belong to your brand, please contact the administrator', 'addin.sg');
       }
 
     } else {
       $code = 404;
-      $message = esc_html__('No product found.Please check product_id again', 'addin.sg');
+      $message = esc_html__('No product found. Please check try again', 'addin.sg');
     }
 
   } else {
