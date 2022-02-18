@@ -19,9 +19,9 @@ const TicketsList = () => {
     const loadTicketsListing = GetTicketsListing(initialParams)
 
     useEffect(() => {
-        loadTicketsListing.then((data: any) => {
-            console.log(data)
-            setTicketsListing(data)
+        loadTicketsListing.then((response: any) => {
+            console.log(response.data)
+            setTicketsListing(response.data)
             setLoading(false)
         })
     }, [])
@@ -102,9 +102,10 @@ const TicketsList = () => {
                             {/* begin:: Row Ticket */}
                             <div id="tickets_listing_wrapper" className="dataTables_wrapper dt-bootstrap4 ">
                                 {
-                                ticketsListing && ticketsListing.map((ticket, i) => {
+                                    ( ticketsListing  && ticketsListing.length > 0) 
+                                    && ticketsListing.map((ticket: any, i) => {
                                     return (
-                                        <div className="ticket-block mt-2 shadow-sm p-5 mb-5 bg-body rounded">
+                                        <div key={i} className="ticket-block mt-2 shadow-sm p-5 mb-5 bg-body rounded">
                                             <div className="row">                                    
                                                 <div className="col-12">
                                                     <div className="ticket-container">
@@ -112,11 +113,11 @@ const TicketsList = () => {
                                                             <h4>
                                                                <Link 
                                                                to={{
-                                                                    pathname: '/support/ticket/details',
-                                                                    hash: '#' + i,
-                                                                    state: { ticketId: i }
+                                                                    pathname: '/ticket/details',
+                                                                    hash: '#' + ticket.id,
+                                                                    state: { ticketId: ticket.id }
                                                                }}>
-                                                                   Subject for question - Furniture {i}
+                                                                   {ticket.subject}
                                                                 </Link>
                                                             </h4>
                                                         </div>

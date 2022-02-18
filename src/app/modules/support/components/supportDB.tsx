@@ -19,7 +19,7 @@ export function GetTicketsListing( params: Params) {
     accessToken:  params.accessToken
   };
 
-  return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/listing', args)
+  return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/list', args)
 }
 
 type iTicket = {
@@ -38,5 +38,5 @@ export function CreateTicket( params: iTicket, userInfo: any) {
 }
 
 export function GetProductsByOrder( orderId: number) { 
-  return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/product-by-order', { orderId: orderId})
+  return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/get-products-from-order', { order_id: orderId})
 }

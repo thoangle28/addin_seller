@@ -30,19 +30,21 @@ const validationTicket =  Yup.object().shape({
             then: Yup.number().required('Order Id is required')
         }
     ),
-    /* productId: Yup.number()
-        .when('orderId', {
-            is: (orderId: number) => { return orderId > 0 },
-            then: Yup.number().required('Product is required')
+    productId: Yup.number()    
+        .when(['orderId', 'category'], {
+            is: (orderId: number, category: string) => { 
+                return (!isNaN(orderId) && orderId > 0 && category === 'order')
+            },
+            then: Yup.number().required('Products is required')
         }
-    ), */
+    ),
     subject: Yup.string()
         .required('Subject is required'),
     message: Yup.string()
-        .test('message', 'Messages is required', value => {
+        .test('message', 'Description is required', value => {
             return (typeof value !== undefined && value !== '<p><br></p>')
         })
-        .required('Messages is required'),
+        .required('Description is required'),
 })
 
 const CreateTicket = () => {
@@ -54,6 +56,7 @@ const CreateTicket = () => {
 
     const [isLoading, setLoading] = useState(true)
     const [orderRequired, setOrderRequired] = useState(false)
+    const [productRequired, setProductRequired] = useState(false)
     const [productsList, setProductsList] = useState([])
     
     const history = useHistory();
@@ -212,11 +215,19 @@ const CreateTicket = () => {
                                 </div>
                                 <div className="mb-10 fv-row fv-plugins-icon-container products">
                                     {/*begin::Label*/}
-                                    <label className="form-label">Products</label>
+                                    <label className={(orderRequired ? 'required ' : '') + 'form-label'}>Products</label>
                                     {/*end::Label*/}
                                     {/*begin::Input*/}
                                     <select 
-                                        className="form-select create_ticket_category" 
+                                        className={clsx(
+                                            'form-select form-control-lg',
+                                            {
+                                            'is-invalid': formik.touched.productId && formik.errors.productId,
+                                            },
+                                            {
+                                            'is-valid': formik.touched.productId && !formik.errors.productId,
+                                            }
+                                        )}
                                         {...formik.getFieldProps('productId')}
                                         placeholder="Select a product">
                                         {productsList.length > 0 && (<option key={0} value=''>Select a product</option>)}
@@ -227,6 +238,11 @@ const CreateTicket = () => {
                                                 )
                                             }))}                                        
                                     </select>
+                                    {formik.touched.productId && formik.errors.productId && (
+                                        <div className='fv-plugins-message-container invalid-feedback'>
+                                            <div className='fv-help-block'>{formik.errors.productId}</div>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                             <div className="row row-cols-1 row-cols-md-2 row-cols-lg-1 g-9">
