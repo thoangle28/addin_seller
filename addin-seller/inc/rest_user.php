@@ -301,10 +301,7 @@ function addin_seller_user_profile(WP_REST_Request $request) {
       'language' => '',
       'timeZone' => '',
       'currency' => '',
-      'communications' => [
-        'email' => true,
-        'phone' => true,
-      ],
+      'communications' => get_user_meta($currentUser->ID, 'seller_communications', true),
       'allowMarketing' => false,
       'email' => $currentUser->user_email
     ];
@@ -372,6 +369,10 @@ function addin_seller_update_user_profile(WP_REST_Request $request) {
     update_user_meta($currentUser->ID, 'seller_contact_email', $profileInfo->contactEmail);
     update_user_meta($currentUser->ID, 'seller_contact_phone', $profileInfo->contactPhone);
     update_user_meta($currentUser->ID, 'seller_contact_address', $profileInfo->address);
+    $comContact = [];
+    $comContact['email'] = $profileInfo->communications->email ? true : false;
+    $comContact['phone'] = $profileInfo->communications->phone ? true : false;
+    update_user_meta($currentUser->ID, 'seller_communications', $comContact);
 
     return addin_seller_message_status(200, 'DONE', $currentUser);
   } else 

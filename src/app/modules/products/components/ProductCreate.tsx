@@ -45,7 +45,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [isAttributeAdded, setAttritesAdded] = useState(false)
   const [isSaveAttr, setSaveAttr] = useState({loading: false, error: ''})
   const [isSaveVar, setSaveVar] = useState({loading: false, error: ''})
-  //---------------------------------------------------------------------------
+  const [formStatus, setFormStatus] = useState({ error: 200, message: ''})
+
   const tabDefault: any = useRef(null)
   //Get All Properties  
   const promise = fetchProfileData( currentUserId );
@@ -59,6 +60,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     productInfo.then((response: any) => { 
       const { code, message, data } = response     
       setProductDetail({...data})
+      setFormStatus({ error: code, message: message})
     })    
 
   }, [reloadPage]);
