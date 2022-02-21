@@ -93,7 +93,8 @@ export function Registration() {
             }
             //dispatch(auth.actions.login(accessToken))
           })
-          .catch(() => {
+          .catch((error) => {
+            //console.log(error)
             setLoading(false)
             setSubmitting(false)
             setAlert('danger')
@@ -173,7 +174,7 @@ export function Registration() {
       <>
       <div className='row fv-row mb-5'>
         <div className='col-xl-6'>
-          <label className='form-label fw-bolder text-dark fs-6'>First name</label>
+          <label className='form-label fw-bolder text-dark fs-6 required'>First name</label>
           <input
             placeholder='First name'
             type='text'
@@ -200,7 +201,7 @@ export function Registration() {
         <div className='col-xl-6'>
           {/* begin::Form group Lastname */}
           <div className='fv-row'>
-            <label className='form-label fw-bolder text-dark fs-6'>Last name</label>
+            <label className='form-label fw-bolder text-dark fs-6 required'>Last name</label>
             <input
               placeholder='Last name'
               type='text'
@@ -228,61 +229,67 @@ export function Registration() {
         </div>
       </div>     
       {/* end::Form group */}
-      {/* begin::Form group Brand */}
-      <div className='fv-row mb-5'>
-        <label className='form-label fw-bolder text-dark fs-6'>Brand name</label>
-        <input
-          placeholder='Brand name'
-          type='text'
-          autoComplete='off'
-          {...formik.getFieldProps('brand')}
-          className={clsx(
-            'form-control form-control-lg form-control-solid',
-            {'is-invalid': formik.touched.brand && formik.errors.brand},
-            {
-              'is-valid': formik.touched.brand && !formik.errors.brand,
-            }
-          )}
-        />
-        {formik.touched.email && formik.errors.brand && (
-          <div className='fv-plugins-message-container invalid-feedback'>
-            <div className='fv-help-block'>
-              <span role='alert'>{formik.errors.brand}</span>
+      <div className="row">
+        <div className="col-12 col-md-6">
+          {/* begin::Form group Brand */}
+          <div className='fv-row mb-5'>
+            <label className='form-label fw-bolder text-dark fs-6 required'>Brand name</label>
+            <input
+              placeholder='Brand name'
+              type='text'
+              autoComplete='off'
+              {...formik.getFieldProps('brand')}
+              className={clsx(
+                'form-control form-control-lg form-control-solid',
+                {'is-invalid': formik.touched.brand && formik.errors.brand},
+                {
+                  'is-valid': formik.touched.brand && !formik.errors.brand,
+                }
+              )}
+            />
+            {formik.touched.email && formik.errors.brand && (
+              <div className='fv-plugins-message-container invalid-feedback'>
+                <div className='fv-help-block'>
+                  <span role='alert'>{formik.errors.brand}</span>
+                </div>
+              </div>
+            )}
+          </div>    
+        </div>
+        <div className="col-12 col-md-6">
+          {/* begin::Form group Email */}
+            <div className='fv-row mb-5'>
+              <label className='form-label fw-bolder text-dark fs-6 required'>Email</label>
+              <input
+                placeholder='Email'
+                type='email'
+                autoComplete='off'
+                {...formik.getFieldProps('email')}
+                className={clsx(
+                  'form-control form-control-lg form-control-solid',
+                  {'is-invalid': formik.touched.email && formik.errors.email},
+                  {
+                    'is-valid': formik.touched.email && !formik.errors.email,
+                  }
+                )}
+              />
+              {formik.touched.email && formik.errors.email && (
+                <div className='fv-plugins-message-container invalid-feedback'>
+                  <div className='fv-help-block'>
+                    <span role='alert'>{formik.errors.email}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
-        )}
-      </div>        
-      {/* begin::Form group Brand */}
-      <div className='fv-row mb-5'>
-        <label className='form-label fw-bolder text-dark fs-6'>Email</label>
-        <input
-          placeholder='Email'
-          type='email'
-          autoComplete='off'
-          {...formik.getFieldProps('email')}
-          className={clsx(
-            'form-control form-control-lg form-control-solid',
-            {'is-invalid': formik.touched.email && formik.errors.email},
-            {
-              'is-valid': formik.touched.email && !formik.errors.email,
-            }
-          )}
-        />
-        {formik.touched.email && formik.errors.email && (
-          <div className='fv-plugins-message-container invalid-feedback'>
-            <div className='fv-help-block'>
-              <span role='alert'>{formik.errors.email}</span>
-            </div>
-          </div>
-        )}
-      </div>
+      </div>    
       {/* end::Form group */}      
       <div className="row">
         <div className="col-12 col-md-6"> 
         {/* begin::Form group Password */}
           <div className='mb-10 fv-row' data-kt-password-meter='true'>
             <div className='mb-1'>
-              <label className='form-label fw-bolder text-dark fs-6'>Password</label>
+              <label className='form-label fw-bolder text-dark fs-6 required'>Password</label>
               <div className='position-relative mb-3'>
                 <input
                   type='password'
@@ -314,7 +321,7 @@ export function Registration() {
         <div className="col-12 col-md-6"> 
           {/* begin::Form group Confirm password */}
           <div className='fv-row mb-5'>
-            <label className='form-label fw-bolder text-dark fs-6'>Confirm Password</label>
+            <label className='form-label fw-bolder text-dark fs-6 required'>Confirm Password</label>
             <input
               type='password'
               placeholder='Password confirmation'
@@ -351,7 +358,7 @@ export function Registration() {
             {...formik.getFieldProps('acceptTerms')}
           />
           <label
-            className='form-check-label fw-bold text-gray-700 fs-6'
+            className='form-check-label fw-bold text-gray-700 fs-6 required'
             htmlFor='kt_login_toc_agree'
           >
             I agree to the{' '}

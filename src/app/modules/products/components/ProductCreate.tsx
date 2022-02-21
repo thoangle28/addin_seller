@@ -45,7 +45,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [isAttributeAdded, setAttritesAdded] = useState(false)
   const [isSaveAttr, setSaveAttr] = useState({loading: false, error: ''})
   const [isSaveVar, setSaveVar] = useState({loading: false, error: ''})
-  //---------------------------------------------------------------------------
+  const [formStatus, setFormStatus] = useState({ error: 204, message: ''})
+
   const tabDefault: any = useRef(null)
   //Get All Properties  
   const promise = fetchProfileData( currentUserId );
@@ -59,6 +60,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     productInfo.then((response: any) => { 
       const { code, message, data } = response     
       setProductDetail({...data})
+      setFormStatus({ error: code, message: message})
     })    
 
   }, [reloadPage]);
@@ -81,7 +83,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         setNewProduct(true)
         setProductType('simple')
         setLoading(false)
-      }      
+      } else {
+        setTimeout(() => {
+          setLoading(false)
+        }, 2000)        
+      }
     }
   }, [product, productId])
 
@@ -399,7 +405,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   return (
     <>
-      {loading ? (
+      {(loading && formStatus.error == 204) ? (
         <div className='card mb-5 mb-xl-8 loading-wrapper'>
           <div className='card-body py-3 loading-body'>
             <FallbackView />
@@ -413,6 +419,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
             </h3>
           </div>
           <div className='card-body py-3'>
+            {(formStatus && formStatus.error === 401) ? (
+              <div  style={{height: '91vh'}} >
+                <div className="alert alert-danger">
+                  {formStatus.message}
+                </div>
+              </div>
+            ) : (
             <Formik
               initialValues={isNewProduct ? {...initialFormValues} : {...initialForm}}
               validationSchema={ValidationSchema}
@@ -1681,6 +1694,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 </form>
               )}
             </Formik>
+            )}
           </div>
         </div>
       )}

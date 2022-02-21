@@ -121,13 +121,17 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
   const formik = useFormik<IProfileDetails>({
     initialValues,
     validationSchema: profileDetailsSchema,
-    onSubmit: (values) => {
+    onSubmit: (values, {setStatus}) => {
       setLoading(true)     
       const userInfo = { userEmail: user.user_email, accessToken: accessToken }  
       updateUserProfile(values, userInfo).then((response: any) => {        
         const { code, message, data } = response.data   
         if(code === 200 && message === 'DONE') {
           confirmRequest('Your profile has been updated successfully.')
+          setLoading(false)
+          setStatus('')
+        } else {
+          setStatus(message)
           setLoading(false)
         }
       })
@@ -160,6 +164,15 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
         <div id='kt_account_profile_details' className='collapse show'>
           <form onSubmit={formik.handleSubmit} noValidate className='form'>
             <div className='card-body border-top p-9'>
+              {formik.status && (
+                <div className='row mb-2'>
+                  <div className='col-lg-12'>
+                    <div className="alert alert-danger">
+                      <div className='alert-text font-weight-bold'>{formik.status}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
               <div className='row mb-6'>
                 <label className='col-lg-4 col-form-label fw-bold fs-6 required'>Brand Logo</label>
                 <div className='col-lg-8'>

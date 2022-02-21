@@ -23,6 +23,7 @@ function create_or_update_product_basic_info($product_id, $data) {
 		$product_id = wp_update_post( $arg );	
 		$product =  wc_get_product($product_id);
 	}
+
 	//create or update
 	$status = addin_seller_product_update_general($product, $data);
 
@@ -33,6 +34,9 @@ function addin_seller_product_update_general($product, $data) {
 	
 	$product_id = $product->get_id();	
 	
+	//update brand 
+	addin_seller_update_brand($product_id);
+
 	if(isset($data->name) && $data->name) 
 		$product->set_name(wp_strip_all_tags($data->name));
 
@@ -466,5 +470,17 @@ function update_product_type($product_id, $product, $data) {
 	if( $data->type_product != $old_product_type) {		
 		wp_remove_object_terms( $product_id, $old_product_type, 'product_type');
 		wp_set_object_terms( $product_id, $data->type_product, 'product_type', true ); 
+	}
+}
+
+function addin_seller_update_brand($product_id) {	
+	
+	$author_id = get_post_field ('post_author', $product_id);
+	$brand = get_user_meta($author_id, 'seller_brand', true);
+	update_post_meta($product_id, 'product_brand', $brand);
+
+	if( function_exists('acf_get_field')) {
+		$field = acf_get_field( 'seller_brand' );
+		update_user_meta($product_id, '_product_brand', $field['key']);
 	}
 }

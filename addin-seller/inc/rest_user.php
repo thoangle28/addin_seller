@@ -184,7 +184,19 @@ function addin_seller_user_register(WP_REST_Request $request) {
   $firstname = $request->get_param("firstname");
   $lastname = $request->get_param("lastname");
   $brand = $request->get_param("brand");
-  //----------------------------------------------------------------
+
+  //check term name 
+  $existed_brand = get_term_by('name', $brand, 'pa_brand');
+  
+  if( $existed_brand ) {
+    global $wpdb;
+    $SQL = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}usermeta WHERE meta_key=%s AND meta_value=%d", 'seller_brand', $existed_brand->term_id);
+    $result = $wpdb->get_row($SQL);
+    if( $result ) {
+      return addin_seller_message_status(409, 'The '.$brand.' brand is existed and assigned to other Seller', null);
+    }
+  }
+
   $user_id = username_exists( $email );
  
   if ( ! $user_id && false == email_exists( $email ) ) {
@@ -202,14 +214,23 @@ function addin_seller_user_register(WP_REST_Request $request) {
 
     $user_id = wp_insert_user( $userdata );
     if( !is_wp_error($user_id) ) {     
-      $term_brand = wp_insert_term($brand, 'pa_brand');
-      if( $term_brand ) {        
-        update_user_meta($user_id, 'seller_brand', $term_brand['term_id']);
+
+      $term_id = 0;
+      if( $existed_brand ) 
+        $term_id = $existed_brand->term_id;
+      else {
+        $term_brand = wp_insert_term($brand, 'pa_brand');
+        $term_id = $term_brand['term_id'];
+      }
+      //set seller with brand
+      if( $term_id > 0 ) {        
+        update_user_meta($user_id, 'seller_brand', $term_id);
         if( function_exists('acf_get_field')) {
           $field = acf_get_field( 'seller_brand' );
           update_user_meta($user_id, '_seller_brand', $field['key']);
         }
       }
+      
       wp_new_user_send_mail($user_id, $password);
       return addin_seller_message_status(200, 'Your account has been created successfully, please wait the administrator approve.', null);
     } else {
@@ -301,10 +322,7 @@ function addin_seller_user_profile(WP_REST_Request $request) {
       'language' => '',
       'timeZone' => '',
       'currency' => '',
-      'communications' => [
-        'email' => true,
-        'phone' => true,
-      ],
+      'communications' => get_user_meta($currentUser->ID, 'seller_communications', true),
       'allowMarketing' => false,
       'email' => $currentUser->user_email
     ];
@@ -336,6 +354,11 @@ function addin_seller_update_user_profile(WP_REST_Request $request) {
     //update term logo  
     $brand_id = $profileInfo->brand->id;
     $brand_name = ($profileInfo->brand->name) ? $profileInfo->brand->name : $profileInfo->company;
+
+    $old_brand = get_term_by('name', $brand_name, 'pa_brand');    
+    if( $old_brand && $brand_id !== $old_brand->term_id && $old_brand->name === $brand_name ) {
+      return addin_seller_message_status(401, 'The '.$brand_name.' brand is existed', null);
+    }
     //create new brand
     if($profileInfo->brand->id <= 0 ) {      
       $new_brand = wp_insert_term($brand_name, 'pa_brand');
@@ -372,6 +395,10 @@ function addin_seller_update_user_profile(WP_REST_Request $request) {
     update_user_meta($currentUser->ID, 'seller_contact_email', $profileInfo->contactEmail);
     update_user_meta($currentUser->ID, 'seller_contact_phone', $profileInfo->contactPhone);
     update_user_meta($currentUser->ID, 'seller_contact_address', $profileInfo->address);
+    $comContact = [];
+    $comContact['email'] = $profileInfo->communications->email ? true : false;
+    $comContact['phone'] = $profileInfo->communications->phone ? true : false;
+    update_user_meta($currentUser->ID, 'seller_communications', $comContact);
 
     return addin_seller_message_status(200, 'DONE', $currentUser);
   } else 

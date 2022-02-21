@@ -106,6 +106,7 @@ function addin_seller_get_shipping( $request) {
  * API get product by id, sku, price... of user
  */
 function addin_seller_get_all_products_by_user($request) {
+
   $page_size = $request->get_param("page_size");
   $page_size = ($page_size > -2) ? $page_size : 10;
 
@@ -118,7 +119,28 @@ function addin_seller_get_all_products_by_user($request) {
     return addin_seller_message_status( 400, 'Not Authorize', null );
   }
 
+  $brand = get_user_meta($user_id, 'seller_brand', true);
+
+  $brands = [];
+  $brands[] = $brand;
+
   $args = array(
+    'post_type'       => 'product',
+    'post_status'     => ['draft', 'publish', 'pending'],    
+    'posts_per_page'  => $page_size,
+    'page'            => $current_page,
+    'meta_query'      => array(
+        array(
+            'key'     => 'product_brand',
+            'value'   => $brands,
+            'compare' => 'IN'
+        )
+    )
+  );
+
+  $products_brand = new WP_Query($args);
+
+  /* $args = array(
     'limit'  => -1,
     'status' => ['draft', 'publish', 'pending'],
     'author' =>  $user_id,
@@ -127,20 +149,26 @@ function addin_seller_get_all_products_by_user($request) {
     'orderby' => 'date',
     'page' => $current_page,
     'paginate' => false
-  );
+  ); */
   
   //get total page
-  $args['paginate'] = true;
-  $paginate = wc_get_products($args);
+  //$args['paginate'] = true;
+  //$paginate = wc_get_products($args);
   
   //get list
-  $args['paginate'] = false;
-  $products_list = wc_get_products($args);
+  //$args['paginate'] = false;
+  //$products_list = wc_get_products($args);
 
   $products = [];
-  if ($products_list) {
+  if ($products_brand->have_posts()) {
 
-    foreach($products_list as $key => $value){      
+    //foreach($products_list as $key => $value){      
+    while($products_brand->have_posts()) {
+
+      $products_brand->the_post();
+      $product_id = get_the_ID();
+      $value = wc_get_product( $product_id );
+
       $product = [];
       $price_for_display = floatval($value->regular_price);
       $price_sale_display = floatval($value->sale_price);
@@ -174,11 +202,13 @@ function addin_seller_get_all_products_by_user($request) {
 
       $products[] = $product;
     }
+    
+    wp_reset_query();
   }
 
   $response = [
-    'totalPages' => $paginate->max_num_pages,
-    'totalProducts' => $paginate->total,
+    'totalPages' => $products_brand->max_num_pages,
+    'totalProducts' => $products_brand->found_posts,
     'currentPage' =>  $current_page,
     'pageSize' =>   $page_size,
     'productsList' =>  $products
