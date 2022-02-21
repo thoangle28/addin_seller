@@ -42,3 +42,20 @@ export function CreateTicket( params: iTicket, userInfo: any) {
 export function GetProductsByOrder( orderId: number) { 
   return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/get-products-from-order', { order_id: orderId})
 }
+
+export function GetOrdersListOfCustomer( params: any) { 
+  const args  = {
+    customer_id: params.customerId, 
+    current_page: params.currentPage, 
+    page_size: params.pageSize
+  }
+
+  return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/get-list-order-by-customer', args )
+}
+
+
+export function GetTicketDetails( params: iTicket, userInfo: any) {   
+  const args = { ...params, ...userInfo }
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/details', args)
+}
+

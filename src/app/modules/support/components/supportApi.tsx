@@ -27,10 +27,10 @@ export const GetTicketsListing = (params: any) => {
     return new Promise((resolve, reject) => {
         supportDB.GetTicketsListing(params)
         .then((response) => {
-            const result = response.data ? response.data : [1,2,3,4,5,6,7,8,9,10,11,12]
+            const result = response.data ? response.data : []
             resolve(result)
         }).catch((error) => {
-            resolve([1,2,3,4,5,6,7,8,9,10,11,12])
+            resolve([])
             reject(error.message)
         })
     })
@@ -39,6 +39,18 @@ export const GetTicketsListing = (params: any) => {
 export const CreateNewTicket = (params: iTicket, userInfo: any) => {
     return new Promise((resolve, reject) => {
         supportDB.CreateTicket(params, userInfo)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
+    })
+}
+
+
+export const GetTicketDetails = (params: iTicket, userInfo: any) => {
+    return new Promise((resolve, reject) => {
+        supportDB.GetTicketDetails(params, userInfo)
         .then((response) => {
             resolve(response.data)
         }).catch((error) => {
@@ -58,6 +70,20 @@ export const GetProductsByOrder = (orderId: number) => {
         })
     })
 }
+
+
+export const GetOrdersListOfCustomer = (params: any) => {
+    return new Promise((resolve, reject) => {
+        supportDB.GetOrdersListOfCustomer(params)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
+    })
+}
+
+
 
 export const CreatePagination = (currentPage: number, maxPage: number) => {
     const step = 5

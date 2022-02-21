@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { shallowEqual, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { RootState } from '../../../../setup';
+//import { toAbsoluteUrl } from '../../../../_metronic/helpers';
 import { FallbackView } from '../../products/components/formOptions';
+import { GetTicketsListing, CreatePagination } from './supportApi';
 
 const TicketDetails = () => {
 
@@ -10,6 +15,7 @@ const TicketDetails = () => {
             setLoading(false)
         }, 3000)
     })
+    
     return (
         <>
         {isLoading && (

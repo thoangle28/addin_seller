@@ -174,7 +174,7 @@ const TicketsList = () => {
 																															<Link 
 																															className="fs-4 fw-bold"
 																															to={{
-																																	pathname: '/ticket/details',
+																																	pathname: '/support/ticket/details',
 																																	hash: '#' + ticket.id,
 																																	state: { ticketId: ticket.id }
 																															}}>
@@ -185,18 +185,16 @@ const TicketsList = () => {
 																											<div className="ticket-requests">                                                
 																													{ticket.message_content}
 																											</div>
-																											<ul className="list-inline mt-5 mb-0">
+																											<ul className="list-inline mt-5 mb-0">																												
 																													<li className="list-inline-item me-5">
-																															<i className="feather icon-calendar f-14"></i>Updated: {ticket.created}</li>
+																															From: {ticket.customer}</li>                                           
 																													<li className="list-inline-item me-5">
-																															<i className="feather icon-user f-14"></i>Customer A</li>                                                
-																													<li className="list-inline-item me-5">
-																															Replied: 10</li>
+																															Replied: {ticket.count_ticket}</li>
 																													<li className="list-inline-item me-5">
 																														<Link 
 																															className="mr-3 view"
 																															to={{
-																																	pathname: '/ticket/details',
+																																	pathname: '/support/ticket/details',
 																																	hash: '#' + ticket.id,
 																																	state: { ticketId: ticket.id }
 																															}}>View Ticket</Link></li>
@@ -204,9 +202,12 @@ const TicketsList = () => {
 																															<a href="#" className="mr-3 delete badge badge-light-danger">
 																																	<img src={toAbsoluteUrl("/media/icons/duotune/general/gen027.svg")} 
 																																	className="h-15px w-auto me-2" />Delete</a></li> */}
-																													<li className="list-inline-item">
-																															<span className={`mr-3 badge badge-light-${statusTicket.status}`}>{statusTicket.text}</span>
+																													<li className="list-inline-item me-5">
+																														<span className="me-2">Status: </span>
+																														<span className={`me-3 badge badge-light-${statusTicket.status}`}>{statusTicket.text}</span>
 																													</li>
+																													<li className="list-inline-item me-5">
+																															<i className="feather icon-calendar f-14"></i>Updated: {ticket.created}</li>
 																											</ul>
 																									</div>
 																							</div>
