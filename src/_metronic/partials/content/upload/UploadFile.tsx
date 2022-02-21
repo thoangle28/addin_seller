@@ -16,7 +16,8 @@ export const handleFileUpload = (files: any) => {
   }
   
 export const UploadImageField = (props: any) => {
-    const {setFileToState, setFieldValue, fileName, isMultiple = true, setFieldToInput, inputName} = props
+    const {setFileToState, setFieldValue, fileName, isMultiple = true, setFieldToInput, inputName, textLabel} = props
+    const textNoticed = textLabel ? textLabel : "Click here to change."
     return (
       <>
         <div className='form-group mt-1'>
@@ -48,7 +49,7 @@ export const UploadImageField = (props: any) => {
                     <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                     <div className='ms-4'>
                       <span className='fs-8 text-gray-normal mb-1'>
-                        Click here to change.
+                        {textNoticed}
                       </span>
                     </div>
                   </div>
