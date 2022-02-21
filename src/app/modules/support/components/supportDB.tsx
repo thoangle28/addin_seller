@@ -9,13 +9,15 @@ type Params = {
     accessToken: string
     currentPage: number
     pageSize: number
+    status: string | ''
 }
 
 export function GetTicketsListing( params: Params) { 
   const args = { 
-    user_id : params.userId ?  params.userId : 0,
+    customer_id : params.userId ?  params.userId : 0,
     page_size :  params.pageSize ?  params.pageSize : 10,
     current_page :  params.currentPage ?  params.currentPage : 1,
+    status :  params.status ?  params.status : '',
     accessToken:  params.accessToken
   };
 
