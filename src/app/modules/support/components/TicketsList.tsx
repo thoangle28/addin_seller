@@ -15,8 +15,8 @@ type props = {
 }
 
 const TicketsList = () => {
-		const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
-		const currentUserId = user ? user.ID : 0
+		const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
+		const currentUserId = (auth && auth.user) ? auth.user.ID : 0
 
     const [loading, setLoading] = useState(true)
 		const [ticketStatus, setTicketStatus] = useState('')
@@ -25,7 +25,7 @@ const TicketsList = () => {
 
     const initialParams = {
         userId: currentUserId,
-        accessToken: 'string',
+        accessToken: auth.accessToken,
         currentPage: 1,
         pageSize: 10,
 				totalPages: 0,
