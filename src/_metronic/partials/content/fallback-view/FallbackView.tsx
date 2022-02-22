@@ -8,3 +8,21 @@ export function FallbackView() {
     </div>
   )
 }
+
+export const AddinLoading = () => {
+  return (
+    <div className='text-center w-100'>
+      <img className='h-40px' src={toAbsoluteUrl('/media/logos/logo-v5-200.png')} alt='Addin Seller Portal' />
+      <div className='mt-5 text-center d-flex justify-content-center'>
+        <div className='loadding'>
+          {/* <span>Loading ...</span> */}
+          <div className="balls">
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
