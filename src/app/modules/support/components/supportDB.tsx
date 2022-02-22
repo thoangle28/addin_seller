@@ -54,8 +54,8 @@ export function GetOrdersListOfCustomer( params: any) {
 }
 
 
-export function GetTicketDetails( params: iTicket, userInfo: any) {   
-  const args = { ...params, ...userInfo }
-  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/details', args)
+export function GetTicketDetails( ticketId: number, userInfo: any) {   
+  //const args = { ...ticketId, ...userInfo }
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/ticket-detail',  {ticket_id: ticketId} )
 }
 

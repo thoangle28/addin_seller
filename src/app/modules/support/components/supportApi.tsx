@@ -48,9 +48,9 @@ export const CreateNewTicket = (params: iTicket, userInfo: any) => {
 }
 
 
-export const GetTicketDetails = (params: iTicket, userInfo: any) => {
+export const GetTicketDetails = (ticketID: number, userInfo: any) => {
     return new Promise((resolve, reject) => {
-        supportDB.GetTicketDetails(params, userInfo)
+        supportDB.GetTicketDetails(ticketID, userInfo)
         .then((response) => {
             resolve(response.data)
         }).catch((error) => {
