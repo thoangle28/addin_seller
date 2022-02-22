@@ -14,7 +14,7 @@ type Params = {
 
 export function GetTicketsListing( params: Params) { 
   const args = { 
-    customer_id : params.userId ?  params.userId : 0,
+    id : params.userId ?  params.userId : 0,
     page_size :  params.pageSize ?  params.pageSize : 10,
     current_page :  params.currentPage ?  params.currentPage : 1,
     status :  params.status ?  params.status : '',
