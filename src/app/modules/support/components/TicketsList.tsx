@@ -31,7 +31,7 @@ const TicketsList = () => {
   })
 
   const initialParams = {
-    userId: 5902, //currentUserId,
+    userId: currentUserId,
     accessToken: auth.accessToken,
     currentPage: 1,
     pageSize: 10,

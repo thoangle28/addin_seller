@@ -83,6 +83,17 @@ export const GetOrdersListOfCustomer = (params: any) => {
     })
 }
 
+export const CreateMesssageTicket = (params: any) => {
+    return new Promise((resolve, reject) => {
+        supportDB.CreateMesssageTicket(params)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
+    })
+}
+
 
 
 export const CreatePagination = (currentPage: number, maxPage: number) => {

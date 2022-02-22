@@ -59,3 +59,13 @@ export function GetTicketDetails( ticketId: number, userInfo: any) {
   return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/ticket-detail',  {ticket_id: ticketId} )
 }
 
+export function CreateMesssageTicket( params: any) {   
+  const args = {
+    author_id: params.userId,
+    ticket_id: params.ticketId,
+    message: params.message,
+    attachment_image: params.attachments,
+    closed: params.closed
+}
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/create-message-for-ticket',  args )
+}
