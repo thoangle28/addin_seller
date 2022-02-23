@@ -4,8 +4,8 @@ import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import {FallbackView} from '../../products/components/formOptions'
 import {confirmAlert} from 'react-confirm-alert'
-import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
-import {useHistory} from 'react-router-dom'
+import 'react-confirm-alert/src/react-confirm-alert.css'
+import {useHistory, useLocation} from 'react-router-dom'
 import {CreateNewTicket, iTicket, defaultValues, GetProductsByOrder, GetBrands} from './supportApi'
 import {UploadImageField} from '../../../../_metronic/partials/content/upload/UploadFile'
 import SunEditor from 'suneditor-react'
@@ -58,7 +58,9 @@ const CreateTicket = () => {
   const [attachFiles, setAttachFiles] = useState([])
   const [orderError, setOrderError] = useState(false)
 
+  const location: any = useLocation()
   const history = useHistory()
+
   const confirmRequest = (message: string) => {
     confirmAlert({
       customUI: ({onClose}) => {
@@ -83,8 +85,15 @@ const CreateTicket = () => {
 
   const SetDefaultValues = () => {
     if (user) {
+
       initialValues.customer = user.display_name
       initialValues.customer_id = user.ID
+      if( location && location.state.orderId > 0) {
+        initialValues.orderId = location.state.orderId
+        initialValues.category = 'order'
+        setOrderRequired(true)
+        getProductsListFromOrder(location.state.orderId, 'order')
+      }
     }
   }
 
@@ -92,7 +101,7 @@ const CreateTicket = () => {
     initialValues,
     validationSchema: validationTicket,
     onSubmit: (values, {resetForm}) => {
-      console.log(values)
+      //console.log(values)
       setIsSubmitting(true)
       const userInfo = {userEmail: user.user_email, accessToken: accessToken}
       CreateNewTicket(values, userInfo).then((response: any) => {
@@ -124,10 +133,11 @@ const CreateTicket = () => {
       .then((result: any) => {
         const productsList: any = result.data
         const {code, message, data} = result
+       
         if (code === 200) {
           productsList &&
             productsList.map((product: any) => {
-              products.push({value: product.Id, label: product.title})
+              products.push({value: product.id, label: '--> ' + product.name})
             })
           setProductsList(products)
           setOrderError(false)
@@ -210,6 +220,7 @@ const CreateTicket = () => {
                     <select
                       className='form-select create_ticket_category'
                       placeholder='Select a Category'
+                      value={formik.values.category}
                       onChange={(event) => {
                         const value = event.target.value
                         formik.setFieldValue('category', value)
