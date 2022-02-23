@@ -63,9 +63,9 @@ export const GetTicketDetails = (ticketID: number, userInfo: any) => {
 }
 
 
-export const GetProductsByOrder = (orderId: number) => {
+export const GetProductsByOrder = (params: any) => {
     return new Promise((resolve, reject) => {
-        supportDB.GetProductsByOrder(orderId)
+        supportDB.GetProductsByOrder(params)
         .then((response) => {
             resolve(response.data)
         }).catch((error) => {
@@ -73,7 +73,6 @@ export const GetProductsByOrder = (orderId: number) => {
         })
     })
 }
-
 
 export const GetOrdersListOfCustomer = (params: any) => {
     return new Promise((resolve, reject) => {

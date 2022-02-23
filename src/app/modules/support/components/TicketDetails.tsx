@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import {shallowEqual, useSelector} from 'react-redux'
-import {Link, useLocation} from 'react-router-dom'
+import {Link, useHistory, useLocation} from 'react-router-dom'
 import {RootState} from '../../../../setup'
 import {AddinLoading} from '../../../../_metronic/partials/content/fallback-view/FallbackView'
 import {GetTicketDetails, CreateMesssageTicket} from './supportApi'
@@ -23,6 +23,8 @@ const TicketDetails = () => {
   const [ticketInfo, setTicketInfo] = useState<any>()
   const [isProcessing, setIsProcessing] = useState(false)
 
+  const history = useHistory()
+  
   useEffect(() => {
     loadTicketDetails()
   }, [])
@@ -45,7 +47,7 @@ const TicketDetails = () => {
             subject: response.subject,
             messages: response.ticket_message,
           })
-					setLoading(false)
+          setLoading(false)
         })
         .catch(() => {})
     }
@@ -61,8 +63,9 @@ const TicketDetails = () => {
             <button
               className='btn btn-sm btn-success'
               onClick={() => {
-								setLoading(true)
-                loadTicketDetails()
+                setLoading(true)
+                //oadTicketDetails()
+                history.push('/support/ticket/listing')
                 onClose()
               }}
             >
@@ -92,8 +95,8 @@ const TicketDetails = () => {
     attachments: [],
     closed: false,
   }
-	
-	const initialValues = {...defaultValues}
+
+  const initialValues = {...defaultValues}
 
   const validationTicket = Yup.object().shape({
     message: Yup.string()
@@ -106,17 +109,17 @@ const TicketDetails = () => {
   const formik = useFormik<iTicket>({
     initialValues,
     validationSchema: validationTicket,
-		enableReinitialize: true,
+    enableReinitialize: true,
     onSubmit: (values, {setSubmitting, resetForm}) => {
       setIsProcessing(true)
       CreateMesssageTicket(values).then((response: any) => {
-        const { code, message, data } = response   
-				if(code === 200 && message === 'DONE') {
-					confirmRequest('Your ticket has been created successfully.')
-					setIsProcessing(false)
-					resetForm()
-					setSubmitting(false);
-				}
+        const {code, message, data} = response
+        if (code === 200 && message === 'DONE') {
+          confirmRequest('Your ticket has been created successfully.')
+          setIsProcessing(false)
+          resetForm()
+          setSubmitting(false)
+        }
       })
     },
   })
@@ -128,32 +131,32 @@ const TicketDetails = () => {
   }
 
   const ShowAttachments = (attachments: any) => {
-    return (attachments && attachments.length > 0 && (
-      <div className='files pt-3'>
-        <div>
-          <span className='fw-bold'>Attachments: </span>
-        </div>
+    return (
+      attachments &&
+      attachments.length > 0 && (
         <div className='files pt-3'>
-          {attachments.map((image: any, index: number) => {
-            return (
-              <Link
-                to={{
-                  pathname: image.path,
-                }}
-                target='_blank'
-                rel='noopener'
-                key={index}
-              >
-                <img
-                  src={image.path}
-                  className='h-50px w-auto me-3'
-                />
-              </Link>
-            )
-          })}
+          <div>
+            <span className='fw-bold'>Attachments: </span>
+          </div>
+          <div className='files pt-3'>
+            {attachments.map((image: any, index: number) => {
+              return (
+                <Link
+                  to={{
+                    pathname: image.path,
+                  }}
+                  target='_blank'
+                  rel='noopener'
+                  key={index}
+                >
+                  <img src={image.path} className='h-50px w-auto me-3' />
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      </div>
-    ))
+      )
+    )
   }
   return (
     <>
@@ -210,68 +213,80 @@ const TicketDetails = () => {
                       {ticketInfo && ticketInfo.messages && (
                         <>
                           <div className='ticket_detail'>
-                            <div className='py-5' dangerouslySetInnerHTML={{__html: ticketInfo.messages[0].ticket_message}} />
+                            <div
+                              className='py-5'
+                              dangerouslySetInnerHTML={{
+                                __html: ticketInfo.messages[0].ticket_message,
+                              }}
+                            />
                           </div>
-                          { ShowAttachments(ticketInfo.messages[0].attchment_image) }
+                          {ShowAttachments(ticketInfo.messages[0].attchment_image)}
                         </>
                       )}
                     </div>
                     <div className='separator my-6' />
                   </div>
                 </div>
-								<div className='overflow-auto' 
-								style={{	
-									position: 'relative',
-									maxHeight: '500px',
-									overflow: 'scroll',
-									width: 'auto',
-									paddingRight: '15px'}} >
-                {!!ticketInfo.messages &&
-                  ticketInfo.messages.map((message: any, index: number) => {
-                    const attachments = message.attchment_image
-                    return (index > 0 && (
-                      <div className='row' key={index}>
-                        <div className='message_wrapper col-12'>
-                          <div className='d-flex flex-wrap gap-2 flex-stack cursor-pointer'>
-                            <div className='d-flex align-items-center'>
-                              <div className='pe-5'>
-                                <div className='d-flex align-items-center flex-wrap gap-1 mb-3'>
-                                  <span className='fw-bolder text-dark text-hover-primary'>
-                                    {message.author_name}
-                                  </span>
-                                  <span className='svg-icon svg-icon-7 svg-icon-success mx-3'>
-                                    <svg
-                                      xmlns='http://www.w3.org/2000/svg'
-                                      width='24px'
-                                      height='24px'
-                                      viewBox='0 0 24 24'
-                                      version='1.1'
-                                    >
-                                      <circle fill='#000000' cx={12} cy={12} r={8} />
-                                    </svg>
-                                  </span>
-                                  <span className='text-muted text-end me-3'>
-                                    {message.ticket_created_on}
-                                  </span>
-                                </div>
-                                <div className='collapse show'>
-                                  <div className='message' dangerouslySetInnerHTML={{__html: message.ticket_message}} />
-                                  { ShowAttachments(attachments) }                                 
+                <div
+                  className='overflow-auto'
+                  style={{
+                    position: 'relative',
+                    maxHeight: '500px',
+                    overflow: 'scroll',
+                    width: 'auto',
+                    paddingRight: '15px',
+                  }}
+                >
+                  {!!ticketInfo.messages &&
+                    ticketInfo.messages.map((message: any, index: number) => {
+                      const attachments = message.attchment_image
+                      return (
+                        index > 0 && (
+                          <div className='row' key={index}>
+                            <div className='message_wrapper col-12'>
+                              <div className='d-flex flex-wrap gap-2 flex-stack cursor-pointer'>
+                                <div className='d-flex align-items-center'>
+                                  <div className='pe-5'>
+                                    <div className='d-flex align-items-center flex-wrap gap-1 mb-3'>
+                                      <span className='fw-bolder text-dark text-hover-primary'>
+                                        {message.author_name}
+                                      </span>
+                                      <span className='svg-icon svg-icon-7 svg-icon-success mx-3'>
+                                        <svg
+                                          xmlns='http://www.w3.org/2000/svg'
+                                          width='24px'
+                                          height='24px'
+                                          viewBox='0 0 24 24'
+                                          version='1.1'
+                                        >
+                                          <circle fill='#000000' cx={12} cy={12} r={8} />
+                                        </svg>
+                                      </span>
+                                      <span className='text-muted text-end me-3'>
+                                        {message.ticket_created_on}
+                                      </span>
+                                    </div>
+                                    <div className='collapse show'>
+                                      <div
+                                        className='message'
+                                        dangerouslySetInnerHTML={{__html: message.ticket_message}}
+                                      />
+                                      {ShowAttachments(attachments)}
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
+                              <div className='separator my-6' />
                             </div>
                           </div>
-                          <div className='separator my-6' />
-                        </div>
-                      </div>
-                    ))
-                  })
-								}
-								</div>
+                        )
+                      )
+                    })}
+                </div>
                 <form onSubmit={formik.handleSubmit} noValidate className='form'>
                   <div className='row'>
                     <div className='col-12'>
-											<hr />
+                      <hr />
                       <h3 className='mb-5'>New Message</h3>
                       <div className='min-h-200px mb-5'>
                         <label className='required form-label'>Reply / Request</label>

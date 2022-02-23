@@ -20,7 +20,7 @@ const validationTicket = Yup.object().shape({
     .max(50, 'Maximum 50 symbols.')
     .required('Customer is required'),
   category: Yup.string().required('Category is required'),
-	sellerId: Yup.string().required('Brand is required'),
+  sellerId: Yup.string().required('Brand is required'),
   orderId: Yup.number()
     .min(1, 'Order Id is great then 0')
     .when('category', {
@@ -48,14 +48,15 @@ const CreateTicket = () => {
   const {accessToken, user} = auth
 
   const initialValues: iTicket = {...defaultValues}
-	
+
   const [isLoading, setLoading] = useState(true)
-	const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderRequired, setOrderRequired] = useState(false)
   const [productRequired, setProductRequired] = useState(false)
   const [productsList, setProductsList] = useState([])
-	const [brandsList, setBrandsList] = useState([])
-	const [attachFiles, setAttachFiles] = useState([])
+  const [brandsList, setBrandsList] = useState([])
+  const [attachFiles, setAttachFiles] = useState([])
+  const [orderError, setOrderError] = useState(false)
 
   const history = useHistory()
   const confirmRequest = (message: string) => {
@@ -80,26 +81,26 @@ const CreateTicket = () => {
     })
   }
 
-	const SetDefaultValues = () => {
-		if(user) {
-			initialValues.customer = user.display_name
-			initialValues.customer_id = user.ID
-		}
-	}
+  const SetDefaultValues = () => {
+    if (user) {
+      initialValues.customer = user.display_name
+      initialValues.customer_id = user.ID
+    }
+  }
 
   const formik = useFormik<iTicket>({
     initialValues,
     validationSchema: validationTicket,
-    onSubmit: (values, { resetForm }) => {
+    onSubmit: (values, {resetForm}) => {
       console.log(values)
       setIsSubmitting(true)
       const userInfo = {userEmail: user.user_email, accessToken: accessToken}
       CreateNewTicket(values, userInfo).then((response: any) => {
         const {code, message, data} = response.data
         if (code === 200 && message === 'DONE') {
-          confirmRequest('Your ticket has been created successfully.')        
-					setIsSubmitting(true)
-					resetForm()
+          confirmRequest('Your ticket has been created successfully.')
+          setIsSubmitting(true)
+          resetForm()
         }
       })
     },
@@ -107,44 +108,51 @@ const CreateTicket = () => {
 
   useEffect(() => {
     setLoading(false)
-		GetBrandsList()
-		SetDefaultValues()
+    GetBrandsList()
+    SetDefaultValues()
   }, [setLoading])
 
-  const getProductsListFromOrder = (orderId: string) => {
-    const products: any = [
-      {value: 1, label: 'Test Product 1'},
-      {value: 2, label: 'Test Product 2'},
-      {value: 3, label: 'Test Product 3'},
-      {value: 4, label: 'Test Product 4'},
-      {value: 5, label: 'Test Product 5'},
-    ]
+  const getProductsListFromOrder = (orderId: number, category: string) => {
+    const products: any = []
+		if( !orderId && category !== 'order') {
+			setOrderError(false)
+			setProductsList([])
+			return
+		} 
 
-    GetProductsByOrder(parseInt(orderId))
+    GetProductsByOrder({orderId: orderId, userId: user.ID})
       .then((result: any) => {
         const productsList: any = result.data
-        productsList &&
-          productsList.map((product: any) => {
-            products.push({value: product.Id, label: product.title})
-          })
-        setProductsList(products)
+        const {code, message, data} = result
+        if (code === 200) {
+          productsList &&
+            productsList.map((product: any) => {
+              products.push({value: product.Id, label: product.title})
+            })
+          setProductsList(products)
+          setOrderError(false)
+        } else {
+          setProductsList([])
+          setOrderError(message)
+        }
       })
       .catch(() => {})
   }
 
-	const GetBrandsList = () => {
-		const params: any = null
-		GetBrands(params).then((response: any) => {
-			const list: any = response.data
-			const brands: any = []
-			list && list.map((brand: any) => {
-				brands.push({value: brand.user_id, label: brand.name})
-			})
-			setBrandsList(brands)
-		})
-	}
+  const GetBrandsList = () => {
+    const params: any = null
+    GetBrands(params).then((response: any) => {
+      const list: any = response.data
+      const brands: any = []
+      list &&
+        list.map((brand: any) => {
+          brands.push({value: brand.user_id, label: brand.name})
+        })
+      setBrandsList(brands)
+    })
+  }
 
-	const clearAllFiles = (e: any) => {
+  const clearAllFiles = (e: any) => {
     e.preventDefault()
     setAttachFiles([])
     formik.setFieldValue('attachments', [])
@@ -178,7 +186,7 @@ const CreateTicket = () => {
                     <input
                       type='text'
                       placeholder='Customer'
-											readOnly
+                      readOnly
                       {...formik.getFieldProps('customer')}
                       className={clsx(
                         'form-control form-control-lg',
@@ -206,19 +214,24 @@ const CreateTicket = () => {
                         const value = event.target.value
                         formik.setFieldValue('category', value)
                         setOrderRequired(value === 'order')
+												if(value !== 'order') {
+													setOrderError(false)
+													//is ok
+													if( orderError ) setProductsList([])
+												}
                       }}
                     >
                       <option value='general'>General Enquiry</option>
                       <option value='order'>Order Enquiry</option>
                     </select>
                   </div>
-									<div className='mb-5 col-md-4 fv-plugins-icon-container'>
-										{/*begin::Label*/}
+                  <div className='mb-5 col-md-4 fv-plugins-icon-container'>
+                    {/*begin::Label*/}
                     <label className='required form-label'>Brand</label>
                     <select
-                      placeholder='Select a brand'                     
+                      placeholder='Select a brand'
                       {...formik.getFieldProps('sellerId')}
-											className={clsx(
+                      className={clsx(
                         'form-select form-control-lg',
                         {
                           'is-invalid': formik.touched.sellerId && formik.errors.sellerId,
@@ -229,19 +242,21 @@ const CreateTicket = () => {
                       )}
                     >
                       <option value=''>Select a brand</option>
-											{ brandsList && brandsList.map((item: any, index: number) => {
-												return (
-													<option key={index} value={item.value}>{item.label}</option>
-												)
-											})}
-                      
+                      {brandsList &&
+                        brandsList.map((item: any, index: number) => {
+                          return (
+                            <option key={index} value={item.value}>
+                              {item.label}
+                            </option>
+                          )
+                        })}
                     </select>
-										{formik.touched.sellerId && formik.errors.sellerId && (
+                    {formik.touched.sellerId && formik.errors.sellerId && (
                       <div className='fv-plugins-message-container invalid-feedback'>
                         <div className='fv-help-block'>{formik.errors.sellerId}</div>
                       </div>
                     )}
-									</div>
+                  </div>
                 </div>
                 <div className='row'>
                   <div className='mb-5 col-md-4 fv-plugins-icon-container order-number'>
@@ -258,19 +273,19 @@ const CreateTicket = () => {
                       className={clsx(
                         'form-control form-control-lg',
                         {
-                          'is-invalid': formik.touched.orderId && formik.errors.orderId,
+                          'is-invalid': (formik.touched.orderId && formik.errors.orderId || orderError),
                         },
                         {
                           'is-valid': formik.touched.orderId && !formik.errors.orderId,
                         }
                       )}
                       onBlur={(event: any) => {
-                        getProductsListFromOrder(formik.values.orderId)
+                        getProductsListFromOrder(parseInt(formik.values.orderId), formik.values.category)
                       }}
                     />
-                    {formik.touched.orderId && formik.errors.orderId && (
+                    {((formik.touched.orderId && formik.errors.orderId) || orderError) && (
                       <div className='fv-plugins-message-container invalid-feedback'>
-                        <div className='fv-help-block'>{formik.errors.orderId}</div>
+                        <div className='fv-help-block'>{ formik.errors.orderId ? formik.errors.orderId : orderError}</div>
                       </div>
                     )}
                   </div>
@@ -381,7 +396,7 @@ const CreateTicket = () => {
                         'is-valid': formik.touched.message && !formik.errors.message,
                       }
                     )}
-                  >                
+                  >
                     Set a description to the question.
                   </div>
                   {formik.touched.message && formik.errors.message && (
@@ -392,20 +407,20 @@ const CreateTicket = () => {
                   {/*end::Description*/}
                 </div>
                 {/*end::Input group*/}
-								<div className='row'>
-									<div className='mb-2 col-md-4'>
-										<label className='form-label'>Select attachments:</label>
-										<UploadImageField
-											setFileToState={setAttachFiles}
-											setFieldValue={formik.setFieldValue}
-											fileName={'attachments'}
-											isMultiple={true}
-											textLabel='Please choose your files'
-										/>
-									</div>
-									<div className='mb-2 col-md-8'>
-										<div className='mt-2'>
-											{attachFiles && attachFiles.length > 0 && (
+                <div className='row'>
+                  <div className='mb-2 col-md-4'>
+                    <label className='form-label'>Select attachments:</label>
+                    <UploadImageField
+                      setFileToState={setAttachFiles}
+                      setFieldValue={formik.setFieldValue}
+                      fileName={'attachments'}
+                      isMultiple={true}
+                      textLabel='Please choose your files'
+                    />
+                  </div>
+                  <div className='mb-2 col-md-8'>
+                    <div className='mt-2'>
+                      {attachFiles && attachFiles.length > 0 && (
                         <>
                           <label className='form-label'>Files selected:</label>
                           <div className='attachments-list d-flex mb-2'>
@@ -427,13 +442,12 @@ const CreateTicket = () => {
                           </a>
                         </>
                       )}
-										</div>
-									</div>
-								</div>
-                
+                    </div>
+                  </div>
+                </div>
 
                 <div className='d-flex justify-content-end mt-5'>
-                  <button type='submit' className='btn btn-primary btn-md' disabled={isSubmitting}>
+                  <button type='submit' className='btn btn-primary btn-md' disabled={isSubmitting || orderError}>
                     {!isSubmitting && 'Submit Ticket'}
                     {isSubmitting && (
                       <span className='indicator-progress' style={{display: 'block'}}>
