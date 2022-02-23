@@ -28,15 +28,29 @@ type iTicket = {
   subject: string
   message: string
   customer: number | string
+  customer_id: number
   category: string
   orderId: string
   productId: string
-  attachments: Array<string>| []
+  attachments: Array<string> | []
   sellerId: string
+  accessToken?: string | ''
 }
+
 export function CreateTicket( params: iTicket, userInfo: any) {   
-  const args = { ...params, ...userInfo }
-  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/create', args)
+  const args = {
+    subject: params.subject,
+    categories: params.category,
+    product_id: params.productId,
+    order_id: params.orderId,
+    status: 'open',
+    message: params.subject,
+    author_id: params.customer_id,
+    brand_id: params.sellerId,
+    attachment_image: params.attachments,
+    accessToken: userInfo.accessToken
+  }
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/create-ticket', args)
 }
 
 export function GetProductsByOrder( orderId: number) { 
@@ -68,4 +82,8 @@ export function CreateMesssageTicket( params: any) {
     closed: params.closed
 }
   return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/create-message-for-ticket',  args )
+}
+
+export function GetBrands(params: any) {   
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/brands', params)
 }

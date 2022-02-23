@@ -6,7 +6,7 @@ import {FallbackView} from '../../products/components/formOptions'
 import {confirmAlert} from 'react-confirm-alert'
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {useHistory} from 'react-router-dom'
-import {CreateNewTicket, iTicket, defaultValues, GetProductsByOrder} from './supportApi'
+import {CreateNewTicket, iTicket, defaultValues, GetProductsByOrder, GetBrands} from './supportApi'
 import {UploadImageField} from '../../../../_metronic/partials/content/upload/UploadFile'
 import SunEditor from 'suneditor-react'
 import 'suneditor/dist/css/suneditor.min.css'
@@ -20,6 +20,7 @@ const validationTicket = Yup.object().shape({
     .max(50, 'Maximum 50 symbols.')
     .required('Customer is required'),
   category: Yup.string().required('Category is required'),
+	sellerId: Yup.string().required('Brand is required'),
   orderId: Yup.number()
     .min(1, 'Order Id is great then 0')
     .when('category', {
@@ -47,11 +48,14 @@ const CreateTicket = () => {
   const {accessToken, user} = auth
 
   const initialValues: iTicket = {...defaultValues}
-
+	
   const [isLoading, setLoading] = useState(true)
+	const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderRequired, setOrderRequired] = useState(false)
   const [productRequired, setProductRequired] = useState(false)
   const [productsList, setProductsList] = useState([])
+	const [brandsList, setBrandsList] = useState([])
+	const [attachFiles, setAttachFiles] = useState([])
 
   const history = useHistory()
   const confirmRequest = (message: string) => {
@@ -76,18 +80,26 @@ const CreateTicket = () => {
     })
   }
 
+	const SetDefaultValues = () => {
+		if(user) {
+			initialValues.customer = user.display_name
+			initialValues.customer_id = user.ID
+		}
+	}
+
   const formik = useFormik<iTicket>({
     initialValues,
     validationSchema: validationTicket,
-    onSubmit: (values) => {
+    onSubmit: (values, { resetForm }) => {
       console.log(values)
-      setLoading(true)
+      setIsSubmitting(true)
       const userInfo = {userEmail: user.user_email, accessToken: accessToken}
       CreateNewTicket(values, userInfo).then((response: any) => {
         const {code, message, data} = response.data
         if (code === 200 && message === 'DONE') {
-          confirmRequest('Your ticket has been created successfully.')
-          setLoading(false)
+          confirmRequest('Your ticket has been created successfully.')        
+					setIsSubmitting(true)
+					resetForm()
         }
       })
     },
@@ -95,6 +107,8 @@ const CreateTicket = () => {
 
   useEffect(() => {
     setLoading(false)
+		GetBrandsList()
+		SetDefaultValues()
   }, [setLoading])
 
   const getProductsListFromOrder = (orderId: string) => {
@@ -118,6 +132,24 @@ const CreateTicket = () => {
       .catch(() => {})
   }
 
+	const GetBrandsList = () => {
+		const params: any = null
+		GetBrands(params).then((response: any) => {
+			const list: any = response.data
+			const brands: any = []
+			list && list.map((brand: any) => {
+				brands.push({value: brand.user_id, label: brand.name})
+			})
+			setBrandsList(brands)
+		})
+	}
+
+	const clearAllFiles = (e: any) => {
+    e.preventDefault()
+    setAttachFiles([])
+    formik.setFieldValue('attachments', [])
+  }
+
   return (
     <>
       {(isLoading && (
@@ -137,8 +169,8 @@ const CreateTicket = () => {
             <form onSubmit={formik.handleSubmit} noValidate className='form'>
               <div className='card-body pt-0'>
                 {/*begin::Input group*/}
-                <div className='row row-cols-1 row-cols-md-2 row-cols-lg-1 row-cols-xl-2 g-9 customer'>
-                  <div className='mb-10 fv-row fv-plugins-icon-container'>
+                <div className='row customer'>
+                  <div className='mb-5 col-md-4 fv-plugins-icon-container'>
                     {/*begin::Label*/}
                     <label className='required form-label'>Customer</label>
                     {/*end::Label*/}
@@ -146,6 +178,7 @@ const CreateTicket = () => {
                     <input
                       type='text'
                       placeholder='Customer'
+											readOnly
                       {...formik.getFieldProps('customer')}
                       className={clsx(
                         'form-control form-control-lg',
@@ -163,8 +196,7 @@ const CreateTicket = () => {
                       </div>
                     )}
                   </div>
-
-                  <div className='mb-10 fv-row fv-plugins-icon-container category'>
+                  <div className='mb-5 col-md-4 fv-plugins-icon-container category'>
                     {/*begin::Label*/}
                     <label className='required form-label'>Category</label>
                     <select
@@ -175,15 +207,44 @@ const CreateTicket = () => {
                         formik.setFieldValue('category', value)
                         setOrderRequired(value === 'order')
                       }}
-                      //{...formik.getFieldProps('category')}
                     >
                       <option value='general'>General Enquiry</option>
                       <option value='order'>Order Enquiry</option>
                     </select>
                   </div>
+									<div className='mb-5 col-md-4 fv-plugins-icon-container'>
+										{/*begin::Label*/}
+                    <label className='required form-label'>Brand</label>
+                    <select
+                      placeholder='Select a brand'                     
+                      {...formik.getFieldProps('sellerId')}
+											className={clsx(
+                        'form-select form-control-lg',
+                        {
+                          'is-invalid': formik.touched.sellerId && formik.errors.sellerId,
+                        },
+                        {
+                          'is-valid': formik.touched.sellerId && !formik.errors.sellerId,
+                        }
+                      )}
+                    >
+                      <option value=''>Select a brand</option>
+											{ brandsList && brandsList.map((item: any, index: number) => {
+												return (
+													<option key={index} value={item.value}>{item.label}</option>
+												)
+											})}
+                      
+                    </select>
+										{formik.touched.sellerId && formik.errors.sellerId && (
+                      <div className='fv-plugins-message-container invalid-feedback'>
+                        <div className='fv-help-block'>{formik.errors.sellerId}</div>
+                      </div>
+                    )}
+									</div>
                 </div>
-                <div className='row row-cols-1 row-cols-md-2 row-cols-lg-1 row-cols-xl-2 g-9 '>
-                  <div className='mb-10 fv-row fv-plugins-icon-container order-number'>
+                <div className='row'>
+                  <div className='mb-5 col-md-4 fv-plugins-icon-container order-number'>
                     {/*begin::Label*/}
                     <label className={(orderRequired ? 'required ' : '') + 'form-label'}>
                       Order Number
@@ -213,7 +274,7 @@ const CreateTicket = () => {
                       </div>
                     )}
                   </div>
-                  <div className='mb-10 fv-row fv-plugins-icon-container products'>
+                  <div className='mb-5  col-md-8 fv-plugins-icon-container products'>
                     {/*begin::Label*/}
                     <label className={(orderRequired ? 'required ' : '') + 'form-label'}>
                       Products
@@ -255,7 +316,7 @@ const CreateTicket = () => {
                   </div>
                 </div>
                 <div className='row row-cols-1 row-cols-md-2 row-cols-lg-1 g-9'>
-                  <div className='col-12 mb-10 fv-row fv-plugins-icon-container'>
+                  <div className='col-12 mb-5 fv-row fv-plugins-icon-container'>
                     <label className='required form-label'>Subject</label>
                     <input
                       type='text'
@@ -320,9 +381,8 @@ const CreateTicket = () => {
                         'is-valid': formik.touched.message && !formik.errors.message,
                       }
                     )}
-                  >
-                    {' '}
-                    Set a description to the product for better visibility. {formik.values.message}
+                  >                
+                    Set a description to the question.
                   </div>
                   {formik.touched.message && formik.errors.message && (
                     <div className='fv-plugins-message-container invalid-feedback'>
@@ -332,22 +392,52 @@ const CreateTicket = () => {
                   {/*end::Description*/}
                 </div>
                 {/*end::Input group*/}
-                <div className='mb-2'>
-                  <label className='form-label'>Attachments</label>
-                  <UploadImageField
-                    setFileToState={() => {}}
-                    setFieldValue={formik.setFieldValue}
-                    fileName={'attachments'}
-                    isMultiple={true}
-                    textLabel='Please choose your files'
-                  />
-                </div>
+								<div className='row'>
+									<div className='mb-2 col-md-4'>
+										<label className='form-label'>Select attachments:</label>
+										<UploadImageField
+											setFileToState={setAttachFiles}
+											setFieldValue={formik.setFieldValue}
+											fileName={'attachments'}
+											isMultiple={true}
+											textLabel='Please choose your files'
+										/>
+									</div>
+									<div className='mb-2 col-md-8'>
+										<div className='mt-2'>
+											{attachFiles && attachFiles.length > 0 && (
+                        <>
+                          <label className='form-label'>Files selected:</label>
+                          <div className='attachments-list d-flex mb-2'>
+                            {attachFiles.map((file: any, index: number) => {
+                              return (
+                                <div className='w-50px overflow-hidden me-2' key={index}>
+                                  <img src={file} className='h-50px w-auto me-3' />
+                                </div>
+                              )
+                            })}
+                          </div>
+                          <a
+                            href='#'
+                            onClick={(event) => {
+                              clearAllFiles(event)
+                            }}
+                          >
+                            Clear files
+                          </a>
+                        </>
+                      )}
+										</div>
+									</div>
+								</div>
+                
+
                 <div className='d-flex justify-content-end mt-5'>
-                  <button type='submit' className='btn btn-primary btn-sm' disabled={isLoading}>
-                    {!isLoading && 'Submit Ticket'}
-                    {isLoading && (
+                  <button type='submit' className='btn btn-primary btn-md' disabled={isSubmitting}>
+                    {!isSubmitting && 'Submit Ticket'}
+                    {isSubmitting && (
                       <span className='indicator-progress' style={{display: 'block'}}>
-                        Please wait...{' '}
+                        Please wait, processing...{' '}
                         <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                       </span>
                     )}

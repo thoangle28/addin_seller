@@ -4,17 +4,20 @@ export interface iTicket {
     subject: string
     message: string
     customer: number | string
+    customer_id: number
     category: string
     orderId: string
     productId: string
     attachments: Array<string>| []
     sellerId: string
+    accessToken?: string
 }
 ////////////////////////////////
 export const defaultValues: iTicket = {
     subject: '',
     message: '',
     customer: '',
+    customer_id: 0,
     category: '',
     orderId: '',
     productId: '',
@@ -94,8 +97,19 @@ export const CreateMesssageTicket = (params: any) => {
     })
 }
 
+export const GetBrands = (params: any) => {
+    return new Promise((resolve, reject) => {
+        supportDB.GetBrands(params)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
+    })
+}
 
 
+////////////////////////////////
 export const CreatePagination = (currentPage: number, maxPage: number) => {
     const step = 5
     let beginBlock = 1

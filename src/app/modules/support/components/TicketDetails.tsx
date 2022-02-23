@@ -40,7 +40,7 @@ const TicketDetails = () => {
               order_id: response.order_id,
               created: created[0],
               time: created[1],
-              assigned: 'Assigned',
+              assigned: response.assigned,
             },
             subject: response.subject,
             messages: response.ticket_message,
@@ -127,6 +127,34 @@ const TicketDetails = () => {
     formik.setFieldValue('attachments', [])
   }
 
+  const ShowAttachments = (attachments: any) => {
+    return (attachments && attachments.length > 0 && (
+      <div className='files pt-3'>
+        <div>
+          <span className='fw-bold'>Attachments: </span>
+        </div>
+        <div className='files pt-3'>
+          {attachments.map((image: any, index: number) => {
+            return (
+              <Link
+                to={{
+                  pathname: image.path,
+                }}
+                target='_blank'
+                rel='noopener'
+                key={index}
+              >
+                <img
+                  src={image.path}
+                  className='h-50px w-auto me-3'
+                />
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+    ))
+  }
   return (
     <>
       {(isLoading && (
@@ -180,9 +208,12 @@ const TicketDetails = () => {
                         <h4>{ticketInfo.subject}</h4>
                       </div>
                       {ticketInfo && ticketInfo.messages && (
-                        <div className='ticket_detail'>
-                          <div className='py-5' dangerouslySetInnerHTML={{__html: ticketInfo.messages[0].ticket_message}} />
-                        </div>
+                        <>
+                          <div className='ticket_detail'>
+                            <div className='py-5' dangerouslySetInnerHTML={{__html: ticketInfo.messages[0].ticket_message}} />
+                          </div>
+                          { ShowAttachments(ticketInfo.messages[0].attchment_image) }
+                        </>
                       )}
                     </div>
                     <div className='separator my-6' />
@@ -198,7 +229,7 @@ const TicketDetails = () => {
                 {!!ticketInfo.messages &&
                   ticketInfo.messages.map((message: any, index: number) => {
                     const attachments = message.attchment_image
-                    return (
+                    return (index > 0 && (
                       <div className='row' key={index}>
                         <div className='message_wrapper col-12'>
                           <div className='d-flex flex-wrap gap-2 flex-stack cursor-pointer'>
@@ -225,32 +256,7 @@ const TicketDetails = () => {
                                 </div>
                                 <div className='collapse show'>
                                   <div className='message' dangerouslySetInnerHTML={{__html: message.ticket_message}} />
-                                  {attachments && attachments.length > 0 && (
-                                    <div className='files pt-3'>
-                                      <div>
-                                        <span className='fw-bold'>Attachments: </span>
-                                      </div>
-                                      <div className='files pt-3'>
-                                        {attachments.map((image: any, index: number) => {
-                                          return (
-                                            <Link
-                                              to={{
-                                                pathname: image.path,
-                                              }}
-                                              target='_blank'
-                                              rel='noopener'
-                                              key={index}
-                                            >
-                                              <img
-                                                src={image.path}
-                                                className='h-75px w-auto me-3'
-                                              />
-                                            </Link>
-                                          )
-                                        })}
-                                      </div>
-                                    </div>
-                                  )}
+                                  { ShowAttachments(attachments) }                                 
                                 </div>
                               </div>
                             </div>
@@ -258,7 +264,7 @@ const TicketDetails = () => {
                           <div className='separator my-6' />
                         </div>
                       </div>
-                    )
+                    ))
                   })
 								}
 								</div>
@@ -340,7 +346,7 @@ const TicketDetails = () => {
                     <div className='col-5'>
                       {attachFiles && attachFiles.length > 0 && (
                         <>
-                          <label className='form-label'>Files choosen:</label>
+                          <label className='form-label'>Files selected:</label>
                           <div className='attachments-list d-flex mb-2'>
                             {attachFiles.map((file: any, index: number) => {
                               return (

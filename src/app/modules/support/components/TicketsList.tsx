@@ -31,7 +31,7 @@ const TicketsList = () => {
   })
 
   const initialParams = {
-    userId: 5902,//currentUserId,
+    userId: currentUserId,
     accessToken: auth.accessToken,
     currentPage: 1,
     pageSize: 10,
@@ -222,7 +222,7 @@ const TicketsList = () => {
                                     </Link>
                                   </h4>
                                 </div>
-                                <div className='ticket-requests'>{ticket.message_content}</div>
+                                <div className='ticket-requests' dangerouslySetInnerHTML={{__html: ticket.message_content}} />
                                 <ul className='list-inline mt-5 mb-0'>
                                   <li className='list-inline-item me-5'>From: {ticket.customer}</li>
                                   <li className='list-inline-item me-5'>
