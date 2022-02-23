@@ -31,18 +31,13 @@ const TicketsList = () => {
   })
 
   const initialParams = {
-    userId: currentUserId,
+    userId: 5902,//currentUserId,
     accessToken: auth.accessToken,
     currentPage: 1,
     pageSize: 10,
     totalPages: 0,
     status: '',
   }
-
-  const [isPaginate, setPaginate] = useState(false)
-  const [listPages, setListPages] = useState<any>({})
-
-  //const loadTicketsListing = GetTicketsListing(initialParams)
 
   useEffect(() => {
     loadTicketListing(initialParams)
@@ -76,9 +71,7 @@ const TicketsList = () => {
       })
 
       const listPagination = CreatePagination(data.current_page, data.total_pages)
-      setListPages(listPagination)
       setLoading(false)
-      setPaginate(false)
     })
   }
 
@@ -142,7 +135,6 @@ const TicketsList = () => {
                     className='form-select form-select-solid form-select-sm'
                     value={ticketStatus}
                     onChange={(e) => {
-                      setPaginate(true)
                       onChangeStaus(e.target.value)
                     }}
                   >

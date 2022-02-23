@@ -24,18 +24,12 @@ const TicketDetails = () => {
   const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false)
-    }, 3000)
-  })
-
-  useEffect(() => {
     loadTicketDetails()
   }, [])
 
   const loadTicketDetails = () => {
     if (typeof ticketLocation !== 'undefined') {
-      const detail = GetTicketDetails(1, null)
+      const detail = GetTicketDetails(ticketId, null)
       detail
         .then((response: any) => {
           const created = response.created.split(' ')
@@ -51,6 +45,7 @@ const TicketDetails = () => {
             subject: response.subject,
             messages: response.ticket_message,
           })
+					setLoading(false)
         })
         .catch(() => {})
     }
@@ -66,7 +61,8 @@ const TicketDetails = () => {
             <button
               className='btn btn-sm btn-success'
               onClick={() => {
-                //history.push('/ticket/list')
+								setLoading(true)
+                loadTicketDetails()
                 onClose()
               }}
             >
@@ -89,13 +85,15 @@ const TicketDetails = () => {
   }
 
   const [attachFiles, setAttachFiles] = useState<any>([])
-  const initialValues: iTicket = {
+  const defaultValues: iTicket = {
     userId: userId,
     ticketId: ticketId,
     message: '',
     attachments: [],
     closed: false,
   }
+	
+	const initialValues = {...defaultValues}
 
   const validationTicket = Yup.object().shape({
     message: Yup.string()
@@ -108,15 +106,16 @@ const TicketDetails = () => {
   const formik = useFormik<iTicket>({
     initialValues,
     validationSchema: validationTicket,
-    onSubmit: (values) => {
-      console.log(values)
+		enableReinitialize: true,
+    onSubmit: (values, {setSubmitting, resetForm}) => {
       setIsProcessing(true)
       CreateMesssageTicket(values).then((response: any) => {
-        //console.log(response)
-        const { code, message, data } = response.data   
+        const { code, message, data } = response   
 				if(code === 200 && message === 'DONE') {
 					confirmRequest('Your ticket has been created successfully.')
 					setIsProcessing(false)
+					resetForm()
+					setSubmitting(false);
 				}
       })
     },
@@ -189,6 +188,13 @@ const TicketDetails = () => {
                     <div className='separator my-6' />
                   </div>
                 </div>
+								<div className='overflow-auto' 
+								style={{	
+									position: 'relative',
+									maxHeight: '500px',
+									overflow: 'scroll',
+									width: 'auto',
+									paddingRight: '15px'}} >
                 {!!ticketInfo.messages &&
                   ticketInfo.messages.map((message: any, index: number) => {
                     const attachments = message.attchment_image
@@ -253,13 +259,16 @@ const TicketDetails = () => {
                         </div>
                       </div>
                     )
-                  })}
+                  })
+								}
+								</div>
                 <form onSubmit={formik.handleSubmit} noValidate className='form'>
                   <div className='row'>
                     <div className='col-12'>
+											<hr />
                       <h3 className='mb-5'>New Message</h3>
                       <div className='min-h-200px mb-5'>
-                        <label className='required form-label'>Message</label>
+                        <label className='required form-label'>Reply / Request</label>
                         <div className='ql-editor ql-blank'>
                           <SunEditor
                             name='message'
