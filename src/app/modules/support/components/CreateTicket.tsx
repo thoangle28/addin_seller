@@ -85,10 +85,12 @@ const CreateTicket = () => {
 
   const SetDefaultValues = () => {
     if (user) {
-
       initialValues.customer = user.display_name
       initialValues.customer_id = user.ID
-      if( location && location.state.orderId > 0) {
+
+      if( typeof location !== 'undefined' 
+        && typeof location.state !== 'undefined' 
+        && location.state.orderId > 0) {
         initialValues.orderId = location.state.orderId
         initialValues.category = 'order'
         setOrderRequired(true)

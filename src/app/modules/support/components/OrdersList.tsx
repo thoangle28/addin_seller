@@ -31,7 +31,7 @@ const OrdersList = () => {
   const [listPages, setListPages] = useState<any>({})
 
   const initialParams = {
-    customerId: 5902, //currentUserId,
+    customerId: currentUserId,
     accessToken: auth.accessToken,
     currentPage: 1,
     pageSize: 10,
@@ -138,7 +138,7 @@ const OrdersList = () => {
                     })) || (
                     <tr>
                       <td className='text-center' colSpan={5}>
-                        There is not the order found!
+                        No orders found! 
                       </td>
                     </tr>
                   )}

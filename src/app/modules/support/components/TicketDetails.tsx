@@ -195,7 +195,7 @@ const TicketDetails = () => {
                   </tr>
                   <tr className='odd'>
                     <td className='ticket_detail_td_title'>Order</td>
-                    <td className='fw-bold'>{ticketInfo.head.order_id}</td>
+                    <td className='fw-bold'>#{ticketInfo.head.order_id}</td>
                     <td className='ticket_detail_td_title'>
                       <i className='far fa-clock'></i>Time
                     </td>
