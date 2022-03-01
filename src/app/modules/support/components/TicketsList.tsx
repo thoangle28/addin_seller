@@ -56,21 +56,24 @@ const TicketsList = () => {
     loadTicketListing(params)
   }
 
+
   const loadTicketListing = (initialParams: any) => {
     const loadTicketsListing = GetTicketsListing(initialParams)
     loadTicketsListing.then((response: any) => {
       const {data} = response
-
-      setTicketsListing(data.ticket_list)
-      setTicketInfo({
-        totalTicket: data.total_ticket,
-        totalPages: data.total_pages,
-        currentPage: data.current_page,
-        pageSize: data.page_size,
-        status: ticketInfo.status,
-      })
-
-      const listPagination = CreatePagination(data.current_page, data.total_pages)
+      
+      setTicketsListing(data && data.ticket_list || [])
+      const ticketInit: any = { totalTicket: 0, totalPages: 0, currentPage: 1, pageSize: 10, status: ''}
+   
+      if( data ) {
+        ticketInit.totalTicket = data.total_ticket;
+        ticketInit.totalPages = data.total_pages;
+        ticketInit.currentPage = data.current_page;
+        ticketInit.pageSize = data.page_size;
+        ticketInit.status = ticketInfo.status;
+      }
+      setTicketInfo( ticketInit )
+      //const listPagination = CreatePagination(data.current_page, data.total_pages)
       setLoading(false)
     })
   }
@@ -225,6 +228,9 @@ const TicketsList = () => {
                                 <div className='ticket-requests' dangerouslySetInnerHTML={{__html: ticket.message_content}} />
                                 <ul className='list-inline mt-5 mb-0'>
                                   <li className='list-inline-item me-5'>From: {ticket.customer}</li>
+                                  <li className='list-inline-item me-5'>
+                                    Order No.: {ticket.order_id ? '#' +  ticket.order_id: ''}
+                                  </li>
                                   <li className='list-inline-item me-5'>
                                     Replied: {ticket.count_ticket}
                                   </li>

@@ -15,19 +15,17 @@ import {RootState} from '../../../../setup'
 
 const validationTicket = Yup.object().shape({
   customer: Yup.string()
-    .nullable()
     .min(3, 'Minimum 3 symbols.')
     .max(50, 'Maximum 50 symbols.')
     .required('Customer is required'),
   category: Yup.string().required('Category is required'),
   sellerId: Yup.string().required('Brand is required'),
-  orderId: Yup.number()
-    .min(1, 'Order Id is great then 0')
+  orderId: Yup.number()    
     .when('category', {
       is: (category: string) => {
         return category === 'order'
       },
-      then: Yup.number().required('Order Id is required'),
+      then: Yup.number().min(1, 'Order Number is great then 0').required('Order Number is required'),
     }),
   productId: Yup.number().when(['orderId', 'category'], {
     is: (orderId: number, category: string) => {
@@ -55,6 +53,7 @@ const CreateTicket = () => {
   const [productRequired, setProductRequired] = useState(false)
   const [productsList, setProductsList] = useState([])
   const [brandsList, setBrandsList] = useState([])
+  const [brandsListBk, setBrandsListBk] = useState([])
   const [attachFiles, setAttachFiles] = useState([])
   const [orderError, setOrderError] = useState(false)
 
@@ -71,7 +70,7 @@ const CreateTicket = () => {
             <button
               className='btn btn-sm btn-success'
               onClick={() => {
-                history.push('/ticket/list')
+                history.push('/support/ticket/listing')
                 onClose()
               }}
             >
@@ -103,11 +102,11 @@ const CreateTicket = () => {
     initialValues,
     validationSchema: validationTicket,
     onSubmit: (values, {resetForm}) => {
-      //console.log(values)
+      
       setIsSubmitting(true)
       const userInfo = {userEmail: user.user_email, accessToken: accessToken}
       CreateNewTicket(values, userInfo).then((response: any) => {
-        const {code, message, data} = response.data
+        const {code, message, data} = response
         if (code === 200 && message === 'DONE') {
           confirmRequest('Your ticket has been created successfully.')
           setIsSubmitting(true)
@@ -124,27 +123,41 @@ const CreateTicket = () => {
   }, [setLoading])
 
   const getProductsListFromOrder = (orderId: number, category: string) => {
-    const products: any = []
-		if( !orderId && category !== 'order') {
+    const proOptions: any = []
+		if( !orderId && category !== 'order') {      
 			setOrderError(false)
 			setProductsList([])
+      setBrandsList(brandsListBk)
 			return
 		} 
 
     GetProductsByOrder({orderId: orderId, userId: user.ID})
       .then((result: any) => {
-        const productsList: any = result.data
+       
         const {code, message, data} = result
        
-        if (code === 200) {
-          productsList &&
-            productsList.map((product: any) => {
-              products.push({value: product.id, label: '--> ' + product.name})
+        if (code === 200 && data) {
+          
+          const products: any = data.list_products
+          const brandsList: any = data.list_brands
+
+          products &&
+          products.map((product: any) => {
+              proOptions.push({value: product.id, label: '--> ' + product.name})
             })
-          setProductsList(products)
+          setProductsList(proOptions)
           setOrderError(false)
+          
+          const list: any = []
+          brandsList &&
+          brandsList.map((brand: any) => {
+            list.push({value: brand.user_id, label: brand.name})
+          })
+          setBrandsList(list)
+
         } else {
           setProductsList([])
+          setBrandsList(brandsListBk)
           setOrderError(message)
         }
       })
@@ -161,6 +174,7 @@ const CreateTicket = () => {
           brands.push({value: brand.user_id, label: brand.name})
         })
       setBrandsList(brands)
+      setBrandsListBk(brands)
     })
   }
 
@@ -219,30 +233,46 @@ const CreateTicket = () => {
                   <div className='mb-5 col-md-4 fv-plugins-icon-container category'>
                     {/*begin::Label*/}
                     <label className='required form-label'>Category</label>
-                    <select
-                      className='form-select create_ticket_category'
-                      placeholder='Select a Category'
-                      value={formik.values.category}
+                    <select                     
+                      placeholder='Select category'                      
+                      {...formik.getFieldProps('category')}
                       onChange={(event) => {
                         const value = event.target.value
+                       
                         formik.setFieldValue('category', value)
                         setOrderRequired(value === 'order')
 												if(value !== 'order') {
 													setOrderError(false)
-													//is ok
-													if( orderError ) setProductsList([])
+													setProductsList([])
+                          setBrandsList(brandsListBk)
+                          formik.setFieldValue('orderId', '')
 												}
                       }}
+                      className={clsx(
+                        'form-select',
+                        {
+                          'is-invalid': formik.touched.category && formik.errors.category,
+                        },
+                        {
+                          'is-valid': formik.touched.category && !formik.errors.category,
+                        }
+                      )}
                     >
+                      <option value=''>Select category</option>
                       <option value='general'>General Enquiry</option>
                       <option value='order'>Order Enquiry</option>
                     </select>
+                    {formik.touched.category && formik.errors.category && (
+                      <div className='fv-plugins-message-container invalid-feedback'>
+                        <div className='fv-help-block'>{formik.errors.category}</div>
+                      </div>
+                    )}
                   </div>
                   <div className='mb-5 col-md-4 fv-plugins-icon-container'>
                     {/*begin::Label*/}
                     <label className='required form-label'>Brand</label>
                     <select
-                      placeholder='Select a brand'
+                      placeholder='Select Brand'
                       {...formik.getFieldProps('sellerId')}
                       className={clsx(
                         'form-select form-control-lg',
@@ -254,7 +284,7 @@ const CreateTicket = () => {
                         }
                       )}
                     >
-                      <option value=''>Select a brand</option>
+                      <option value=''>Select Brand</option>
                       {brandsList &&
                         brandsList.map((item: any, index: number) => {
                           return (
@@ -271,7 +301,8 @@ const CreateTicket = () => {
                     )}
                   </div>
                 </div>
-                <div className='row'>
+                
+                <div className='row' style={{'display': (orderRequired ? '' : 'none') }}>
                   <div className='mb-5 col-md-4 fv-plugins-icon-container order-number'>
                     {/*begin::Label*/}
                     <label className={(orderRequired ? 'required ' : '') + 'form-label'}>
@@ -292,8 +323,9 @@ const CreateTicket = () => {
                           'is-valid': formik.touched.orderId && !formik.errors.orderId,
                         }
                       )}
-                      onBlur={(event: any) => {
-                        getProductsListFromOrder(parseInt(formik.values.orderId), formik.values.category)
+                      onBlur={(event: any) => {                       
+                        const orderId: any = (formik.values.orderId) ? formik.values.orderId : 0;                     
+                        getProductsListFromOrder(orderId, formik.values.category)
                       }}
                     />
                     {((formik.touched.orderId && formik.errors.orderId) || orderError) && (
@@ -343,6 +375,7 @@ const CreateTicket = () => {
                     )}
                   </div>
                 </div>
+             
                 <div className='row row-cols-1 row-cols-md-2 row-cols-lg-1 g-9'>
                   <div className='col-12 mb-5 fv-row fv-plugins-icon-container'>
                     <label className='required form-label'>Subject</label>
@@ -428,7 +461,8 @@ const CreateTicket = () => {
                       setFieldValue={formik.setFieldValue}
                       fileName={'attachments'}
                       isMultiple={true}
-                      textLabel='Please choose your files'
+                      maxFiles={5}
+                      textLabel='Please choose files (maximum 5 files)'
                     />
                   </div>
                   <div className='mb-2 col-md-8'>

@@ -40,7 +40,7 @@ export const GetTicketsListing = (params: any) => {
 }
 
 export const CreateNewTicket = (params: iTicket, userInfo: any) => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {   
         supportDB.CreateTicket(params, userInfo)
         .then((response) => {
             resolve(response.data)
@@ -99,6 +99,17 @@ export const CreateMesssageTicket = (params: any) => {
 export const GetBrands = (params: any) => {
     return new Promise((resolve, reject) => {
         supportDB.GetBrands(params)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
+    })
+}
+
+export const GetBrandsByOrder = (orderId: number) => {
+    return new Promise((resolve, reject) => {
+        supportDB.GetBrandsByOrder(orderId)
         .then((response) => {
             resolve(response.data)
         }).catch((error) => {

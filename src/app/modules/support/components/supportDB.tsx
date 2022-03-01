@@ -44,12 +44,13 @@ export function CreateTicket( params: iTicket, userInfo: any) {
     product_id: params.productId,
     order_id: params.orderId,
     status: 'open',
-    message: params.subject,
+    message: params.message,
     author_id: params.customer_id,
     brand_id: params.sellerId,
     attachment_image: params.attachments,
     accessToken: userInfo.accessToken
   }
+  
   return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/create-ticket', args)
 }
 
@@ -88,4 +89,8 @@ export function CreateMesssageTicket( params: any) {
 
 export function GetBrands(params: any) {   
   return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/brands', params)
+}
+
+export function GetBrandsByOrder(orderId: number) {   
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '//ticket/brands-by-product-in-order', {order_id: orderId})
 }

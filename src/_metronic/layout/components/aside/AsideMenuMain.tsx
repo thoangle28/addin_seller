@@ -56,8 +56,9 @@ export function AsideMenuMain() {
       
       <AsideMenuItem to='/support/ticket/create' title='Create New Ticket' hasBullet={true} />
       <AsideMenuItem to='/support/ticket/listing' title='Tickets Listing' hasBullet={true} />
+      {user && user.role === 'customer' && (
       <AsideMenuItem to='/support/orders/listing' title='Orders Listing' hasBullet={true} />
-
+      )}
       {/*  <AsideMenuItemWithSub
         to='#'
         title='Support Tickets'

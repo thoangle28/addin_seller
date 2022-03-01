@@ -3,7 +3,7 @@ import {shallowEqual, useSelector} from 'react-redux'
 import {Link, useHistory, useLocation} from 'react-router-dom'
 import {RootState} from '../../../../setup'
 import {AddinLoading} from '../../../../_metronic/partials/content/fallback-view/FallbackView'
-import {GetTicketDetails, CreateMesssageTicket} from './supportApi'
+import {GetTicketDetails, CreateMesssageTicket, GetProductsByOrder} from './supportApi'
 import {UploadImageField} from '../../../../_metronic/partials/content/upload/UploadFile'
 import SunEditor from 'suneditor-react'
 import 'suneditor/dist/css/suneditor.min.css'
@@ -18,7 +18,7 @@ const TicketDetails = () => {
 
   const ticketLocation: any = useLocation()
   const ticketId = (ticketLocation && ticketLocation.state.ticketId) || 0
-
+  const [productsList, setProductsList] = useState([])
   const [isLoading, setLoading] = useState(true)
   const [ticketInfo, setTicketInfo] = useState<any>()
   const [isProcessing, setIsProcessing] = useState(false)
@@ -27,7 +27,7 @@ const TicketDetails = () => {
   
   useEffect(() => {
     loadTicketDetails()
-  }, [])
+  }, [isLoading, setTicketInfo])
 
   const loadTicketDetails = () => {
     if (typeof ticketLocation !== 'undefined') {
@@ -35,6 +35,7 @@ const TicketDetails = () => {
       detail
         .then((response: any) => {
           const created = response.created.split(' ')
+          //find product in order of creation      
           setTicketInfo({
             head: {
               customer: response.customer_name,
@@ -43,10 +44,38 @@ const TicketDetails = () => {
               created: created[0],
               time: created[1],
               assigned: response.assigned,
+              products: ''
             },
             subject: response.subject,
             messages: response.ticket_message,
           })
+
+          if( response.order_id > 0 ) {
+            GetProductsByOrder({orderId: response.order_id, userId: userId})
+            .then((result: any) => {
+              const {code, message, data} = result
+              const updaetTicketInfo: any = { ...ticketInfo }  
+
+              if (code === 200 && data) {
+                console.log(data.list_products)
+                const products: any = []
+                products.push('#' + response.order_id)
+
+                data.list_products &&
+                data.list_products.map((product: any) => {
+                  products.push('- ' + product.name)
+                })
+                           
+                updaetTicketInfo.head.products = products.join('<br />')  
+              } else {
+                updaetTicketInfo.head.products = '#' + response.order_id                
+              }          
+              
+              setTicketInfo(updaetTicketInfo)    
+            })
+            .catch(() => {})
+          }
+          
           setLoading(false)
         })
         .catch(() => {})
@@ -135,9 +164,9 @@ const TicketDetails = () => {
       attachments &&
       attachments.length > 0 && (
         <div className='files pt-3'>
-          <div>
+         {/*  <div>
             <span className='fw-bold'>Attachments: </span>
-          </div>
+          </div> */}
           <div className='files pt-3'>
             {attachments.map((image: any, index: number) => {
               return (
@@ -185,21 +214,25 @@ const TicketDetails = () => {
                   </tr>
                   <tr className='even'>
                     <td className='ticket_detail_td_title'>
-                      <i className='far fa-envelope'></i> Contact
+                      Contact
                     </td>
                     <td className='fw-bold'>{ticketInfo.head.email}</td>
                     <td className='ticket_detail_td_title'>
-                      <i className='fas fa-calendar-week'></i> Created
+                      Created
                     </td>
                     <td className='fw-bold'>{ticketInfo.head.created}</td>
                   </tr>
                   <tr className='odd'>
-                    <td className='ticket_detail_td_title'>Order</td>
-                    <td className='fw-bold'>#{ticketInfo.head.order_id}</td>
-                    <td className='ticket_detail_td_title'>
-                      <i className='far fa-clock'></i>Time
+                    <td className='ticket_detail_td_title' style={{ 'verticalAlign': 'top'}}>Order</td>
+                    <td className='fw-bold' style={{ 'verticalAlign': 'top'}} 
+                      dangerouslySetInnerHTML={{
+                        __html: ticketInfo.head.products,
+                      }}>                    
                     </td>
-                    <td className='fw-bold'>{ticketInfo.head.time}</td>
+                    <td className='ticket_detail_td_title' style={{ 'verticalAlign': 'top'}}>
+                      Time
+                    </td>
+                    <td className='fw-bold' style={{ 'verticalAlign': 'top'}}>{ticketInfo.head.time}</td>
                   </tr>
                 </tbody>
               </table>
@@ -354,7 +387,8 @@ const TicketDetails = () => {
                           setFieldValue={formik.setFieldValue}
                           fileName={'attachments'}
                           isMultiple={true}
-                          textLabel='Add attachments to message'
+                          maxFiles={5}
+                          textLabel='Please choose files (maximum 5 files)'
                         />
                       </div>
                     </div>
