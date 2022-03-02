@@ -8,7 +8,8 @@ export function PrivateRoutes() {
   const ProductPage = lazy(() => import('../modules/products/ProductPage'))
   const ReportPage = lazy(() => import('../modules/sale/ReportPage'))
   const AccountPage = lazy(() => import('../modules/accounts/AccountPage'))
-
+  const SupportTicketPage = lazy(() => import('../modules/support/SupportTicket'))
+  
   return (
     <Suspense fallback={<FallbackView />}>
       <Switch>
@@ -17,8 +18,15 @@ export function PrivateRoutes() {
         <Route path='/product/create' component={ProductPage} />
         <Route path='/product/update/:id' component={ProductPage} />
         <Route path='/sale-report' component={ReportPage} />
+        {/* Account */}
         <Route path='/account/overview' component={AccountPage} />
         <Route path='/account/settings' component={AccountPage} />
+        {/* Support Ticket */}
+        <Route path='/support/ticket/create' component={SupportTicketPage} />
+        <Route path='/support/ticket/listing' component={SupportTicketPage} />
+        <Route path='/support/ticket/details' component={SupportTicketPage} />
+        <Route path='/support/orders/listing' component={SupportTicketPage} />
+        
         <Redirect from='/auth' to='/dashboard' />
         <Redirect exact from='/' to='/dashboard' />
         <Redirect to='error/404' />        
