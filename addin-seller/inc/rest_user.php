@@ -124,7 +124,10 @@ function addin_seller_user_login(WP_REST_Request $request){
     } else 
       $avatar_url = get_option('z_taxonomy_image'.$brand_id);
   }
-
+  
+  $role_name = 'customer';
+  if( in_array("seller_portal", $roles, true) ) $role_name = 'seller';
+      
   $response = [
     "user" => [
       'ID' => $user->data->ID,
@@ -132,6 +135,7 @@ function addin_seller_user_login(WP_REST_Request $request){
       'user_email' => $user->data->user_email,
       'user_registered' => $user->data->user_registered,
       'display_name' => $user->data->display_name,
+      'role' => $role_name,
       'avatar' => $avatar_url
     ],
     "expire_time" => $expire_time,
@@ -159,7 +163,14 @@ function addin_seller_user_verify_token(WP_REST_Request $request) {
   }
 
   $user = get_user_by( 'id', $user_id );
-  return addin_seller_message_status(200, null, $user->data);
+  $roles = $user->roles;
+  $role_name = 'customer';
+  if( in_array("seller_portal", $roles, true) ) $role_name = 'seller';
+  
+  $user_data = $user->data;
+  $user_data->role = $role_name;
+
+  return addin_seller_message_status(200, null, $user_data);
 }
 
 function addin_seller_check_user_login($access_token) {
