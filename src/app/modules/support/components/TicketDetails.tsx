@@ -44,37 +44,11 @@ const TicketDetails = () => {
               created: created[0],
               time: created[1],
               assigned: response.assigned,
-              products: ''
+              products: '#' + response.order_id + '<br />- ' + response.product_name
             },
             subject: response.subject,
             messages: response.ticket_message,
           })
-
-          if( response.order_id > 0 ) {
-            GetProductsByOrder({orderId: response.order_id, userId: userId})
-            .then((result: any) => {
-              const {code, message, data} = result
-              const updaetTicketInfo: any = { ...ticketInfo }  
-
-              if (code === 200 && data) {
-                console.log(data.list_products)
-                const products: any = []
-                products.push('#' + response.order_id)
-
-                data.list_products &&
-                data.list_products.map((product: any) => {
-                  products.push('- ' + product.name)
-                })
-                           
-                updaetTicketInfo.head.products = products.join('<br />')  
-              } else {
-                updaetTicketInfo.head.products = '#' + response.order_id                
-              }          
-              
-              setTicketInfo(updaetTicketInfo)    
-            })
-            .catch(() => {})
-          }
           
           setLoading(false)
         })
