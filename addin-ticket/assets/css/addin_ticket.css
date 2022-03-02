@@ -1,0 +1,319 @@
+@font-face {
+  font-family: 'porto';
+  src: url('../fonts/porto.eot');
+  src: url('../fonts/porto-font/porto.eot');
+  src: url('../fonts/porto-font/porto.eot') format('embedded-opentype'),
+       url('../fonts/porto-font/porto.woff2') format('woff2'),
+       url('../fonts/porto-font/porto.woff') format('woff'),
+       url('../fonts/porto-font/porto.ttf') format('truetype'),
+       url('../fonts/porto-font/porto.svg') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+.single_ticket_container {
+  border: 1px solid #d1d1d1;
+  margin: 20px 0px;
+}
+.create-support-ticket {
+  border: 1px solid #d1d1d1;
+}
+.ticket_subject {
+  /* background-color: #f2f2f2; */
+  background-color: #748d91;
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 20px;
+}
+.ticket_subject_text {
+  padding: 20px 0px;
+  /* color: #000000; */
+  color: #fff;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: bold;
+}
+.customer_ticket_message_content,.admin_ticket_message_content {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 20px;
+  margin-bottom: 20px;
+}
+.customer_ticket_message_text,.admin_ticket_message_text {
+  background-color: #f2f2f2;
+  padding: 20px 20px;
+  margin: 10px 0px;
+  flex: 1;
+}
+.customer_ticket_message_detail  {
+  padding: 10px 20px;
+}
+.reply_message {
+  padding: 0px 20px;
+}
+.ticket_status {
+  font-size: 14px;
+  padding: 10px 20px;
+  /* background: #f2f2f2 none repeat scroll 0 0; */
+  background: #3d554e1f  none repeat scroll 0 0;
+  display: block;
+  margin-bottom: 15px;
+  color: #646473;
+}
+.attachments_container {
+  border-top: 1px solid #e3e3e3;
+  display: block;
+  margin-top: 20px;
+  padding-top: 10px;
+}
+.single_attachment {
+  border: 1px solid #d3d3d3;
+  display: inline-block;
+  float: left;
+  margin-right: 10px;
+  margin-top: 2px;
+  padding: 10px;
+}
+.customer_ticket_message_text.admin_reply {
+  order:2;
+}
+.collapse_button,.add_new_message_button {
+  background: #7fbc02 none repeat scroll 0 0;
+  border: 2px solid #7fbc02;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  margin: 14px 0px;
+}
+button.collapse_button:focus {
+  outline: none;
+}
+.message_box {
+  display: none;
+  transition: all 1s ease-out;
+  opacity:0;
+}
+.ticket_subject.show_content ~ .message_box_show
+{
+  display: block;
+  opacity: 1;
+  transition:all 1s ease-out;
+}
+.new_reply_message {
+  display: none;
+}
+
+.dashicons, .dashicons-before:before {
+  font-family: dashicons;
+  display: inline-block;
+  line-height: 1;
+  font-weight: 400;
+  font-style: normal;
+  speak: never;
+  text-decoration: inherit;
+  text-transform: none;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  vertical-align: top;
+  text-align: center;
+  transition: color .1s ease-in;
+}
+.dashicons-paperclip:before {
+  content: "\f546";
+}
+.categories, .order-number-list {
+  float: left;
+  width: 40%;
+}
+.brand-list {
+  float: right;
+  width: 55%;
+}
+/* .brand-list {
+  display: none;
+} */
+/* .order-number {
+  clear: both;
+} */
+.order-number-list {
+  display: none;
+}
+.product-list {
+  display: none;
+  clear: both;
+}
+.tickets_container label {
+  margin-top: 20px;
+}
+.category, .product-list-order, .order-number,.brand-name {
+  display: block;
+  width: 100%;
+}
+/* select.product-list-order {
+  background: none;
+  height: 75px;
+} */
+.error {
+  color:red;
+}
+.validate-error,.product-list.validate-error {
+  color:red;
+}
+.new_ticket_subject, .new_ticket_message,#file-attachment,.new_ticket_message,.customer_file,.files-data {
+  display: block;
+  width: 100%;
+}
+.add-ticket {
+  margin-top: 20px;
+}
+.pop-up-success {
+  position: absolute;
+  z-index: 100;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #7fbc02;
+  color: white;
+  padding: 60px 20px;
+  display: none;
+}
+.pop-up-success p {
+  font-size:20px;
+  margin-bottom:0px;
+}
+.pop-up-success .close {
+  position: absolute;
+  right: 3px;
+  top: 0;
+}
+.pop-up-background {
+  background: #cdc6c6;
+  position: fixed;;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  opacity: 0.4;
+  display:none;
+}
+.ticket_status_open {
+  padding: 2px 10px 4px 10px;
+  background-color: #7fbc02;
+  color: #ffffff;
+  border-radius: 10px;
+  margin-right: 10px;
+}
+.ticket_status_closed {
+  padding: 2px 10px 4px 10px;
+  background-color: red;
+  color: #ffffff;
+  border-radius: 10px;
+}
+input[type="text"].new_ticket_subject {
+  font-size: 16px;
+}
+.attchement-images {
+  height: 50px;
+  width: auto;
+  margin-right: 5px;
+}
+
+.ticket_list_pag_loading {
+  padding: 20px;
+}
+.ticket-universal-pagination ul {
+  margin: 0; 
+  padding: 0;
+  float: right;
+}
+.ticket-universal-pagination ul li {
+  display: inline;
+  margin: 3px; 
+  padding: 4px 8px;
+  background: #FFF; 
+  border: 1px solid #ccc;
+  border-radius: 0;
+  color: #7b858a;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 2.1em;
+  min-width: 2.2em;
+  height: 2.2em;
+  text-decoration: none;
+  text-align: center;
+}
+.ticket-universal-pagination ul li.active:hover {
+  cursor: pointer; 
+  background: #7fbc02; 
+  color: white; 
+}
+.ticket-universal-pagination ul li.inactive {
+  background: #3025891a;
+}
+.ticket-universal-pagination ul li.selected {
+  background: #7fbc02; 
+  color: white;
+}
+
+.ticket-universal-pagination ul li.next-ticket::before,.ticket-universal-pagination ul li.previous-ticket::before {
+  font-family: "porto";
+  font-size: 20px;
+  font-weight: normal;
+  line-height: 30px;
+}
+.ticket-universal-pagination ul li.next-ticket::before {
+  content: "";
+}
+.ticket-universal-pagination ul li.previous-ticket::before {
+  content: "";
+}
+
+.success-create-ticket-container {
+    margin: auto;
+    padding: 20px 14px;
+    line-height: 1.4;
+    position: absolute;
+    text-align: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border-top: 4px solid #7fbc02;
+    width: 350px;
+    height: 100px;
+    z-index: 1000;
+    background: #fff;
+    box-shadow: 0 0 5px rgb(0 0 0 / 50%);
+}
+.ticket-background-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 50;
+  opacity: .5;
+  background-color: #cdc6c6;
+}
+.after-loading-success-create-ticket{
+  display: block;
+  border-top: 4px solid #7fbc02;
+  font-size: 1.1em;
+  position: fixed;
+  text-align: center;
+  z-index: 20002;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+.success-create-ticket-container .message-success {
+  font-size: 24px;
+  margin: 5px 0 10px;
+  color: #7fbc02;
+}

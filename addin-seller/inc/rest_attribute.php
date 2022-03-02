@@ -128,7 +128,7 @@ function addin_seller_get_all_products_by_user($request) {
     'post_type'       => 'product',
     'post_status'     => ['draft', 'publish', 'pending'],    
     'posts_per_page'  => $page_size,
-    'page'            => $current_page,
+    'paged'            => $current_page,
     'meta_query'      => array(
         array(
             'key'     => 'product_brand',
