@@ -1,5 +1,7 @@
 export interface IProfileDetails {
   email: string
+  personal_photo: string
+  new_personal_photo: string
   avatar: string
   new_avatar: string
   firstname: string
@@ -76,6 +78,8 @@ export interface IDeactivateAccount {
 
 export const profileDetailsInitValues: IProfileDetails = {
   email: '',
+  personal_photo: '',
+  new_personal_photo: '',
   avatar: '',
   new_avatar: '',
   firstname: '',

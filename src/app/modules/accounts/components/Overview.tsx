@@ -6,18 +6,12 @@ import { RootState } from '../../../../setup'
 import { getUserProfile, UpdateProfileDetails } from './settings/server/api'
 import { IProfileDetails, profileDetailsInitValues as defaultValues } from './settings/SettingsModel'
 import { FallbackView } from '../../products/components/formOptions'
-/* import {KTSVG} from '../../../../_metronic/helpers'
-import {
-  ChartsWidget1,
-  TablesWidget1,
-  ListsWidget5,
-  TablesWidget5,
-} from '../../../../_metronic/partials/widgets' */
+import { toAbsoluteUrl } from '../../../../_metronic/helpers'
 
 export function Overview() {
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
   const { accessToken, user } = auth
-  const userProfile: IProfileDetails = {...defaultValues}
+  //const userProfile: IProfileDetails = {...defaultValues}
 
   const [loading, setLoading] = useState(true)
   const [initialValues, setInitialValues] = useState({...defaultValues})
@@ -58,12 +52,43 @@ export function Overview() {
         ) : (
           <div className='card-body p-9'> 
             <div className='row mb-7'>
+              <label className='col-lg-4 fw-bold text-muted'>Avatar</label>
+              <div className='col-lg-8 fv-row'>
+                <div
+                  className='image-input image-input-outline me-5'
+                  data-kt-image-input='true'
+                >
+                  <div className='image-input-wrapper h-65px w-auto'>
+                    <img className='symbol'
+                      style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
+                      src={ initialValues.personal_photo ? initialValues.personal_photo : toAbsoluteUrl('/media/avatars/blank.png')} /> 
+                  </div>
+                </div>
+              </div>
+            </div>  
+            <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>Brand Name</label>
 
               <div className='col-lg-8 fv-row'>
                 <span className='fw-bold fs-6'>{initialValues.company}</span>
               </div>
-            </div>         
+            </div>    
+            <div className='row mb-7'>
+              <label className='col-lg-4 fw-bold text-muted'>Brand Logo</label>
+
+              <div className='col-lg-8 fv-row'>
+              <div
+                  className='image-input image-input-outline me-5'
+                  data-kt-image-input='true'
+                >
+                  <div className='image-input-wrapper h-65px w-auto'>
+                    <img className='symbol'
+                      style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
+                      src={ initialValues.avatar ? initialValues.avatar : toAbsoluteUrl('/media/avatars/blank.png')} /> 
+                  </div>
+                </div>
+              </div>
+            </div>       
             <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>
                 Full Name

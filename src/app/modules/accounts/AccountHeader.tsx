@@ -44,8 +44,8 @@ const AccountHeader: React.FC<Props> = ({reload} : Props) => {
           <div className='me-7 mb-4'>
             <div 
               className='symbol symbol-100px symbol-lg-100px symbol-fixed position-relative h-70px d-flex align-items-center border border-2 overflow-hidden;'>
-              { initialValues.avatar && (
-              <><img className='w-100 h-50px' src={toAbsoluteUrl(initialValues.avatar)} />
+              { initialValues.personal_photo && (
+              <><img className='w-auto h-75px' src={toAbsoluteUrl(initialValues.personal_photo)} />
               <div className='position-absolute translate-middle bottom-0 mb-3 start-100 bg-success rounded-circle border border-4 border-white h-20px w-20px'></div>
               </>) || (
                 <img style={{opacity: 0.5}} className='w-auto h-70px' src={toAbsoluteUrl('/media/avatars/blank.png')} />
