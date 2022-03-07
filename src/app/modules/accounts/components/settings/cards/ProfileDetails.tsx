@@ -39,6 +39,7 @@ const profileDetailsSchema = Yup.object().shape({
     .required('Contact email is required.'),
   address: Yup.string().required('Address is required'),
   new_avatar: Yup.string().required('Brand logo is required'),
+  //new_personal_photo: Yup.string().required('Personal photo is required'),
   communications: Yup.array().transform((value, obj) => {
     if( obj.email || obj.phone) return [ obj.email || obj.phone ];
   }).required("At least email / phone is choosed")
@@ -63,6 +64,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
   const [forLoading, setFormLoading] = useState(true)
   const [loading, setLoading] = useState(false)
   const [newBrandLogo, setNewBrandLogo] = useState('')
+  const [newPersonalPhoto, setNewPersonalPhoto] = useState('')
   
   useEffect(() => {
     const loadUserProfile = () => {
@@ -122,10 +124,12 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
     initialValues,
     validationSchema: profileDetailsSchema,
     onSubmit: (values, {setStatus}) => {
+      
       setLoading(true)     
       const userInfo = { userEmail: user.user_email, accessToken: accessToken }  
-      updateUserProfile(values, userInfo).then((response: any) => {        
+        updateUserProfile(values, userInfo).then((response: any) => {        
         const { code, message, data } = response.data   
+        
         if(code === 200 && message === 'DONE') {
           confirmRequest('Your profile has been updated successfully.')
           setLoading(false)
@@ -173,6 +177,84 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
                   </div>
                 </div>
               )}
+                <div className='row mb-6'>
+                <label className='col-lg-4 col-form-label fw-bold fs-6'>Personal Photo</label>
+                <div className='col-lg-8'>
+                  <div className='d-flex align-items-end'>
+                    <div
+                      className='image-input image-input-outline me-5'
+                      data-kt-image-input='true'
+                    >
+                      {(newPersonalPhoto || formik.values.personal_photo) && (
+                      <>
+                        <div className='image-input-wrapper h-65px w-auto'>
+                          <img className='symbol'
+                            style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
+                            src={ newPersonalPhoto ? newPersonalPhoto : formik.values.personal_photo} /> 
+                        </div>
+                        { (newPersonalPhoto || formik.values.personal_photo) && (
+                        <span
+                          className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                          data-kt-image-input-action='remove'
+                          data-bs-toggle='tooltip'
+                          title='Remove Image'
+                          id="remove_image"
+                          ref={(span) => {
+                            if (span) {
+                              span.style.setProperty("width", "20px", "important");
+                              span.style.setProperty("height", "20px", "important");
+                            }
+                          }}
+                          onClick={(event) => {
+                            setNewPersonalPhoto('')
+                            const remove = (newPersonalPhoto) ? '' : 'remove'
+                            formik.setFieldValue('new_personal_photo', remove)
+
+                            if( !newPersonalPhoto ) formik.setFieldValue('personal_photo', '')
+
+                            formik.handleChange(event)
+                          }}
+                        >
+                          <i className='bi bi-x fs-2' id="remove_x"></i>
+                        </span>
+                        ) }
+                      </>
+                      ) || (
+                        <img style={{opacity: 0.5}} 
+                        className='symbol w-auto h-70px' 
+                        src={toAbsoluteUrl('/media/avatars/blank.png')} />
+                      )}
+                    </div>
+                    <UploadImageField
+                      setFileToState={setNewPersonalPhoto}                      
+                      setFieldValue={formik.setFieldValue}
+                      fileName={'photo'}
+                      isMultiple={false}     
+                      setFieldToInput={formik.setFieldValue}   
+                      inputName={"new_personal_photo"}              
+                    />                   
+                  </div>
+                  <div>
+                    <input type="hidden" 
+                      {...formik.getFieldProps('new_personal_photo')}
+                      className={clsx(
+                        'form-control form-control-lg form-control-solid',
+                        {
+                          'is-invalid': formik.touched.new_personal_photo && formik.errors.new_personal_photo,
+                        },
+                        {
+                          'is-valid': formik.touched.new_personal_photo && !formik.errors.new_personal_photo,
+                        }
+                      )}
+                    />                   
+                    {formik.touched.new_personal_photo && formik.errors.new_personal_photo && (
+                      <div className='fv-plugins-message-container invalid-feedback'>
+                        <div className='fv-help-block'>{formik.errors.new_personal_photo}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
               <div className='row mb-6'>
                 <label className='col-lg-4 col-form-label fw-bold fs-6 required'>Brand Logo</label>
                 <div className='col-lg-8'>
