@@ -36,6 +36,8 @@ const TicketDetails = () => {
         .then((response: any) => {
           const created = response.created.split(' ')
           //find product in order of creation      
+          const productInfo = (response.order_id ? '#' + response.order_id : '')  
+                              + ( response.product_name ? '<br />- ' + response.product_name : '');
           setTicketInfo({
             head: {
               customer: response.customer_name,
@@ -44,7 +46,7 @@ const TicketDetails = () => {
               created: created[0],
               time: created[1],
               assigned: response.assigned,
-              products: '#' + response.order_id + '<br />- ' + response.product_name
+              products: productInfo
             },
             subject: response.subject,
             messages: response.ticket_message,

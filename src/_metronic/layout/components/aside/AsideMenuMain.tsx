@@ -39,15 +39,17 @@ export function AsideMenuMain() {
             icon='/media/icons/duotune/communication/com012.svg'
             title='Sale Reports'
             fontIcon='bi-layers'
-          />
-          <div className='menu-item'>
-            <div className='menu-content'>
-              <div className='separator mx-1 my-4'></div>
-            </div>
+          />       
+
+           <div className='menu-item'>
+              <div className='menu-content'>
+                <div className='separator mx-1 my-4'></div>
+              </div>
           </div>
         </>
       )}
-        
+
+     
       <div className='menu-item'>
         <div className='menu-content'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Support Tickets</span>
@@ -59,16 +61,6 @@ export function AsideMenuMain() {
       {user && user.role === 'customer' && (
       <AsideMenuItem to='/support/orders/listing' title='Orders Listing' hasBullet={true} />
       )}
-      {/*  <AsideMenuItemWithSub
-        to='#'
-        title='Support Tickets'
-        icon='/media/icons/duotune/communication/com007.svg'
-        fontIcon='bi-person'
-      >
-        <AsideMenuItem to='/support/ticket/create' title='Create New Ticket' hasBullet={true} />
-        <AsideMenuItem to='/support/ticket/listing' title='Tickets Listing' hasBullet={true} />
-        <AsideMenuItem to='/support/orders/listing' title='Orders Listing' hasBullet={true} />
-      </AsideMenuItemWithSub>      */}
     </>
   )
 }
