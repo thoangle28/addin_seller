@@ -454,6 +454,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   function uploadPlugin(editor: any) {
+
+    editor.editing.view.change( (writer: any) => {
+      writer.setStyle( 'height', '400px', editor.editing.view.document.getRoot() );
+    } );
+
     editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
       return uploadAdapter(loader);
     };
@@ -567,6 +572,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                           data="Test"
                           name='content'
                           {...props}
+                          style={{minHeight: "500px"}}
                         />
                         {/* 
                         <SunEditor
@@ -612,6 +618,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               <div className='col-md-12'>
                                 <div className='form-group mt-1'>
                                   <Dropzone
+                                    maxFiles={1024*1024}
+                                    maxSize={5}
                                     onDrop={(acceptedFiles) => {
                                       if (acceptedFiles && acceptedFiles !== undefined) {
                                         handleFileUpload(acceptedFiles).then(
