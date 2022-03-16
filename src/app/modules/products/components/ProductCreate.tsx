@@ -406,6 +406,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   //CKeditor
+  const [isUploading, setUploading] = useState(false)
+
   const convertImageToBase64 = (file: any) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
@@ -417,28 +419,32 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const uploadAdapter = (loader: any) => {
     return {
       upload: () => {
-        return new Promise((resolve, reject) => {
-         
+        return new Promise((resolve, reject) => {        
+          setUploading(true) 
           loader.file.then((file: any) => {
-
             const  maxFileSize = 1024*1024/2; //500Kb
             if( file.size > 1024*1024/2 ) {
               reject("Couldn't upload file with file size is greater than 500Kb")
+              setUploading(false)
             } else {
               convertImageToBase64(file).then((result) => {
                 const file_upload = {
                   fileBase64: result,
                   fileName: file.name
                 }
+
                 uploadImage(file_upload).then((response) => {
-                  const {data} = response
-              
+                  const {data} = response              
                   if( data && data.data) {
+                    setUploading(false)
                     resolve({
                       default: data.data
                     });
                   }
-                })             
+                }).catch((err) => {
+                  setUploading(false)
+                  reject(err)
+                })  
               });
             }
           });
@@ -1751,7 +1757,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <button
                           type='submit'
                           className='btn btn-lg btn-success w-50 me-3'
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isUploading}
                         >
                           { isSubmitting 
                           ? (<>Processing... <span className='spinner-border spinner-border-sm align-middle ms-2'></span></>) 
