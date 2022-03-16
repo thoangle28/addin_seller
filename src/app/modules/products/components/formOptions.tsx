@@ -427,3 +427,8 @@ const convertToList = (data: any) => {
 export const saveProductProperties = async (params: any) => {
   return common.updateProductAttr(params)
 }
+
+
+export const uploadImage = async (params: any) => {
+  return common.uploadImage(params)
+}

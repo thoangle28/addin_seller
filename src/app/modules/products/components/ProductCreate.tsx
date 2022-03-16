@@ -14,8 +14,10 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import {  initialForm,  styles,  TaxClass,  initialFormValues, saveProductProperties,
   StockStatus,  handleFileUpload,  UploadImageField,  FallbackView,  fetchProfileData,  postProduct,  mapValuesToForm,
-  getProduct,  loadSubAttrOptions,  loadAttributeOptions,  loadCategoriesOptions,  loadProducts,} from './formOptions'
+  getProduct,  loadSubAttrOptions,  loadAttributeOptions,  loadCategoriesOptions,  loadProducts, uploadImage} from './formOptions'
 
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
@@ -403,6 +405,58 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
+  //CKeditor
+  const convertImageToBase64 = (file: any) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
+  }
+  const uploadAdapter = (loader: any) => {
+    return {
+      upload: () => {
+        return new Promise((resolve, reject) => {
+         
+          loader.file.then((file: any) => {
+
+            const  maxFileSize = 1024*1024/2; //500Kb
+            if( file.size > 1024*1024/2 ) {
+              reject("Couldn't upload file with file size is greater than 500Kb")
+            } else {
+              convertImageToBase64(file).then((result) => {
+                const file_upload = {
+                  fileBase64: result,
+                  fileName: file.name
+                }
+                uploadImage(file_upload).then((response) => {
+                  const {data} = response
+              
+                  if( data && data.data) {
+                    resolve({
+                      default: data.data
+                    });
+                  }
+                })             
+              });
+            }
+          });
+        });
+      }
+    };
+  }
+
+  function uploadPlugin(editor: any) {
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
+      return uploadAdapter(loader);
+    };
+  }
+
+  const configCKEditor = {
+    extraPlugins: [uploadPlugin]
+  }
+
   return (
     <>
       {(loading && formStatus.error == 204) ? (
@@ -494,6 +548,21 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                           Product Content
                         </label>
+                        <CKEditor
+                          required
+                          config={configCKEditor}
+                          editor={ClassicEditor}
+                          onReady={(editor: any) => {}}
+                          onBlur={(event: any, editor: any) => {}}
+                          onFocus={(event: any, editor: any) => {}}
+                          onChange={(event: any, editor: any) => {
+                            setFieldValue('content', editor.getData());
+                          }}
+                          data="Test"
+                          name='content'
+                          {...props}
+                        />
+                        {/* 
                         <SunEditor
                           name='content'
                           placeholder="Please type here..."
@@ -520,7 +589,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               //['fullScreen', 'showBlocks', 'preview', 'print', 'save', 'template'],
                             ],
                           }}
-                        />
+                        /> */}
                        {/*  {touched.content && errors.content ? (
                           <div className='text-danger'>{errors.content}</div>
                         ) : null} */}                    
