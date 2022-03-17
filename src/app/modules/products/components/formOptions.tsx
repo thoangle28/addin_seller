@@ -51,6 +51,7 @@ export const initialDefaultForm = {
   linked_products_upsell: [],
   linked_products_cross_sell: [],
   selectedAttr: '',
+  usePhoto: false
 }
 
 export const initialFormValues = { ...initialDefaultForm }
@@ -70,7 +71,7 @@ export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.thumbnail = productValues.thumbnail
   initialValues.new_thumbnail = ''
   initialValues.photo_galleries = productValues.photo_galleries
-  initialValues.new_photo_galleries = productValues.new_photo_galleries
+  initialValues.new_photo_galleries = [];//productValues.new_photo_galleries
   initialValues.general_price = productValues.general_price
   initialValues.general_regular_price = productValues.general_regular_price
   initialValues.general_sale_price = productValues.general_sale_price
