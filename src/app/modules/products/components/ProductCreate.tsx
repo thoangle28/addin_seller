@@ -3,8 +3,6 @@ import {Formik} from 'formik'
 import {shallowEqual, useSelector, connect, ConnectedProps} from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
-import SunEditor from 'suneditor-react'
-import 'suneditor/dist/css/suneditor.min.css'
 import {useHistory, useLocation} from 'react-router'
 import * as detail from '../redux/CreateProductRedux'
 import {RootState} from '../../../../setup'
@@ -14,8 +12,10 @@ import { confirmAlert } from 'react-confirm-alert'; // Import
 import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import {  initialForm,  styles,  TaxClass,  initialFormValues, saveProductProperties,
   StockStatus,  handleFileUpload,  UploadImageField,  FallbackView,  fetchProfileData,  postProduct,  mapValuesToForm,
-  getProduct,  loadSubAttrOptions,  loadAttributeOptions,  loadCategoriesOptions,  loadProducts,} from './formOptions'
+  getProduct,  loadSubAttrOptions,  loadAttributeOptions,  loadCategoriesOptions,  loadProducts, uploadImage} from './formOptions'
 
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
@@ -46,6 +46,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [isSaveAttr, setSaveAttr] = useState({loading: false, error: ''})
   const [isSaveVar, setSaveVar] = useState({loading: false, error: ''})
   const [formStatus, setFormStatus] = useState({ error: 204, message: ''})
+  const [usePhotoFromContent, setUsePhotoFromContent] = useState([])
+  const [usePhoto, setUsePhoto] = useState(false)
 
   const tabDefault: any = useRef(null)
   //Get All Properties  
@@ -108,6 +110,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const onChangeVar = (option: any) => {
     setSelectedVar(option)
+  }
+
+  const onChangeUsePhoto = (event: any, formValues: any) => {
+    const value = event.target.checked
+    setUsePhoto(value)
+    if(value && usePhotoFromContent.length > 0) {
+      setNewPhotoGalleries(usePhotoFromContent)  
+    } else setNewPhotoGalleries([])  
+    //clear form
+    formValues.new_photo_galleries = []      
   }
 
   /* Add more Attributes */
@@ -334,18 +346,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       customUI: ({ onClose }) => {
         return (
           <div className="custom-ui">
-            <p>{message}</p>
-            {/* <button
-              className='btn btn-sm btn-success'
-              onClick={() => {
-                //clear product, productId
-                history.push({
-                  hash: '#' + product_id,
-                  pathname: '/product/update/' + product_id,
-                  state: { productId: product_id},
-                });
-                onClose()
-              }}>Still on this page</button> */}
+            <p>{message}</p>          
             <button
               className='btn btn-sm btn-danger'
               onClick={() => {
@@ -367,11 +368,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         formValues.variations.find((x: any) => { return x.id === id }).thumbnail = { image_id: false, src: ''}   
         break;
       case 'galleries':
-        const index = formValues.photo_galleries.findIndex((x: any) => { return x.image_id === id })
-        formValues.photo_galleries[index] = { image_id: false, src: ''}   
+        const newGalleries = formValues.photo_galleries.filter((x: any, index: number) => { return parseInt(x.image_id) !==  id })    
+        formValues.photo_galleries = newGalleries   
         break;
       case 'new_galleries':
-        if( formValues.new_photo_galleries[id] ) formValues.new_photo_galleries[id] = ''
+        const tempGalleries = newPhotoGalleries.filter((x: any, index: number) => { return index !== id });
+        formValues.new_photo_galleries = tempGalleries;
+        setNewPhotoGalleries(tempGalleries)
+
+        const tempPhotos = formValues.new_photo_galleries.filter((x: any, index: number) => { return index !== id });
+        formValues.photo_galleries = tempPhotos;
+        console.log(formValues.photo_galleries)
         break;
       case 'thumbnail':
         formValues.thumbnail = { image_id: false, src: ''}   
@@ -390,7 +397,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const ValidationSchema = () => {
     return Yup.object().shape({
-      name: Yup.string().max(250, 'Must be 250 characters or less').required('Pls enter the product title'),    
+      name: Yup.string().max(250, 'Must be 250 characters or less').required('Please enter the product title'),    
      /*  variations: Yup.array().of(
         Yup.object().shape({
           regular_price: Yup.number().test("regularPrice", "Invalid number", (value) => {
@@ -401,6 +408,76 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
     })
+  }
+
+  //CKeditor
+  
+  const  maxFileSize = 1024*1024*0.65; //650Kb
+  const [isUploading, setUploading] = useState(false)
+
+  const convertImageToBase64 = (file: any) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = (error) => reject(error)
+    })
+  }
+
+  const uploadAdapter = (loader: any, userPhoto: any) => {
+    const newGalleries: any = usePhotoFromContent
+    return {
+      upload: () => {
+        return new Promise((resolve, reject) => {        
+          setUploading(true) 
+          loader.file.then((file: any) => {            
+            if( file.size > maxFileSize ) {
+              reject("Couldn't upload file with file size is greater than 650Kb")
+              setUploading(false)
+            } else {
+              convertImageToBase64(file).then((result) => {
+                const file_upload = {
+                  fileBase64: result,
+                  fileName: file.name
+                }
+
+                uploadImage(file_upload).then((response) => {
+                  const {data} = response              
+                  if( data && data.data) {
+                    setUploading(false)
+                    const { attach_url, attach_id } = data.data 
+                    newGalleries.push({ image: attach_url, image_id: attach_id})
+                    //setNewPhotoGalleries(newGalleries)
+                    setUsePhotoFromContent(newGalleries)
+                    resolve({
+                      default: attach_url
+                    });
+                  }
+                }).catch((err) => {
+                  setUploading(false)
+                  reject(err)
+                })  
+              });
+            }
+          });
+        });
+      }
+    };
+  }
+
+  function uploadPlugin(editor: any) {
+
+    editor.editing.view.change( (writer: any) => {
+      writer.setStyle( 'height', '400px', editor.editing.view.document.getRoot() );
+    } );
+
+    editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
+      return uploadAdapter(loader, usePhotoFromContent);
+    };
+  }
+
+  const configCKEditor = {
+    extraPlugins: [uploadPlugin]
   }
 
   return (
@@ -431,9 +508,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
               validationSchema={ValidationSchema}
               enableReinitialize={true}
               onSubmit={(values, {setSubmitting}) => {
-                //save to DB
-                setSubmitting(true)
+                //save to DB                
+                if(values.usePhoto && usePhotoFromContent.length > 0) {
+                  values.photo_galleries = usePhotoFromContent;
+                }
                 //console.log(values)
+                //setSubmitting(false) 
+                setSubmitting(true)                
                 postProduct(values, accessToken).then((product: any) => {
                   const { code, message, data } = product
                   initialFormValues.attributes = [] //clear
@@ -448,7 +529,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   setSubmitting(false) //done
                 }).catch(() => {
                   //setSubmitting(false) //error
-                })              
+                })
               }}
             >
               {({
@@ -494,33 +575,21 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                           Product Content
                         </label>
-                        <SunEditor
+                        <CKEditor
+                          required
+                          config={configCKEditor}
+                          editor={ClassicEditor}
+                          onReady={(editor: any) => {}}
+                          onBlur={(event: any, editor: any) => {}}
+                          onFocus={(event: any, editor: any) => {}}
+                          onChange={(event: any, editor: any) => {
+                            setFieldValue('content', editor.getData());
+                          }}
+                          data={values.content}
                           name='content'
-                          placeholder="Please type here..."
-                          autoFocus={false}
-                          onChange={(event) => {
-                            setFieldValue('content', event)
-                          }}
-                          defaultValue={values.content}
-                          setContents={values.content}
-                          width='100%'
-                          height='500px'
-                          setDefaultStyle={''}
-                          setOptions={{
-                            buttonList: [
-                              //['undo', 'redo'],
-                              ['font', 'fontSize', 'formatBlock'],
-                              //['paragraphStyle', 'blockquote'],
-                              ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                              ['fontColor',  'textStyle'], //'hiliteColor',
-                              //['removeFormat', 'outdent', 'indent'],
-                              ['align', 'horizontalRule', 'list'], //, 'lineHeight'
-                              ['table', 'link', 'image'], //[, 'video', 'audio']
-                              ['codeView'],
-                              //['fullScreen', 'showBlocks', 'preview', 'print', 'save', 'template'],
-                            ],
-                          }}
-                        />
+                          {...props}
+                          style={{minHeight: "500px"}}
+                        />                        
                        {/*  {touched.content && errors.content ? (
                           <div className='text-danger'>{errors.content}</div>
                         ) : null} */}                    
@@ -533,17 +602,44 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
                               <span className='no-required'>Photo Gallery</span>
                             </label>
+                            <div className='form-check form-check-custom form-check-solid mb-3'>
+                              <label className='form-check-label ms-0 d-flex align-items-center'>
+                                <input
+                                  type='checkbox'
+                                  name="usePhoto"
+                                  className='form-check-input me-2 fs-7'
+                                  checked={values.usePhoto}
+                                  onChange={(event) => {                                    
+                                    onChangeUsePhoto(event, values)
+                                    handleChange(event)
+                                  }}
+                                />
+                                Recommanded - Use the photos from the content.
+                              </label>
+                            </div>                            
                             <div className='row'>
-                              <div className='col-md-12'>
+                            { !usePhoto && (
+                              <div className='col-md-4'>
                                 <div className='form-group mt-1'>
                                   <Dropzone
-                                    onDrop={(acceptedFiles) => {
+                                    maxFiles={10}
+                                    maxSize={maxFileSize}
+                                    onDrop={(acceptedFiles) => {         
+                                      if(acceptedFiles.length <= 0) {
+                                        alert('Number of files exceeded limit, 10 files is allow!')
+                                        return
+                                      }       
+
                                       if (acceptedFiles && acceptedFiles !== undefined) {
                                         handleFileUpload(acceptedFiles).then(
                                           (images) => {
-                                            /* Once all promises are resolved, update state with image URI array */
-                                            setNewPhotoGalleries(images)
-                                            setFieldValue('new_photo_galleries', images)
+                                            //setNewPhotoGalleries(images)
+                                            const newPhotos: any = [];
+                                            images.map((item: any) => {
+                                              newPhotos.push({ image: item, image_id: 0})
+                                            })
+                                            setNewPhotoGalleries(newPhotos)
+                                            setFieldValue('new_photo_galleries', newPhotos)
                                           },
                                           (error) => {
                                             console.error(error)
@@ -567,7 +663,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                                             <div className='ms-4'>
                                               <span className='fs-8 text-gray-normal mb-1'>
-                                                Add more photos, drop files here or click to upload.
+                                                Add more photos (max: 10 files)
                                               </span>
                                             </div>
                                           </div>
@@ -577,7 +673,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   </Dropzone>
                                 </div>
                               </div>
-                              <div className='col-md-12'>
+                            )}
+                              <div className='col-md-8'>
                                 <div className='photo-galleries'>
                                   {
                                     values.photo_galleries &&
@@ -609,14 +706,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                   }
                                   {
                                     newPhotoGalleries && 
-                                    newPhotoGalleries.map((src: string, i: number) => {
-                                      return src && (
+                                    newPhotoGalleries.map((item: any, i: number) => {
+                                      return item && (
                                         <div
-                                          className='form-group image-input image-input-outline'
+                                          className='form-group image-input image-input-outline new-photo'
                                           key={'image_' + i}
                                         >
                                           <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
-                                            <img className='h-100' src={src} alt='' />
+                                            <img className='h-100' src={item.image} alt='' />
                                           </div>
                                           <span
                                             className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
@@ -1682,7 +1779,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         <button
                           type='submit'
                           className='btn btn-lg btn-success w-50 me-3'
-                          disabled={isSubmitting}
+                          disabled={isSubmitting || isUploading}
                         >
                           { isSubmitting 
                           ? (<>Processing... <span className='spinner-border spinner-border-sm align-middle ms-2'></span></>) 

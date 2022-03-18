@@ -79,3 +79,8 @@ export function getProductsListing( userId: number, currentPage: number, pageSiz
 
   return axios.post<any>(API_END_POINT_URL+ '/products-by-user', args);
 }
+
+export function uploadImage(file: any) {
+  const url = '/upload-file';
+  return axios.post<any>(API_END_POINT_URL+ url, {file: file })
+}
