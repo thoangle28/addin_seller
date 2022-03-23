@@ -11,6 +11,7 @@ import axios from 'axios'
 import { RootState } from '../../../../../../setup'
 import { useHistory } from 'react-router-dom'
 import { changePassword } from '../server/api'
+import clsx from 'clsx'
 
 const emailFormValidationSchema = Yup.object().shape({
   newEmail: Yup.string()
@@ -26,15 +27,19 @@ const emailFormValidationSchema = Yup.object().shape({
 
 const passwordFormValidationSchema = Yup.object().shape({
   old_password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(6, 'Minimum 6 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required'),
   new_password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(8, 'Minimum 8 symbols')
     .max(50, 'Maximum 50 symbols')
-    .required('Password is required'),
+    .required('Password is required')
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+      "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character."
+    ),
   password_confirm: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(8, 'Minimum 8 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required')
     .oneOf([Yup.ref('new_password'), null], 'Passwords must match'),
@@ -71,17 +76,17 @@ const SignInMethod: React.FC = () => {
   })
   const history = useHistory();
 
-  const confirmRequest = (message: string) => {
+  const confirmRequest = (code: number, message: string) => {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
           <div className="custom-ui">
             <h3 style={{ color: '#fff' }}>Change Password</h3>
-            <p>{message}</p>
+            <p className="mt-5">{message}</p>
             <button
-              className='btn btn-sm btn-success'
+              className={`btn btn-sm ${code === 200 ? 'btn-success' : 'btn-danger'}`}
               onClick={() => {
-                history.push("/logout");
+                if( code === 200) history.push("/logout");
                 onClose()
               }}
             >
@@ -107,12 +112,8 @@ const SignInMethod: React.FC = () => {
       }
       changePassword('change-password', payload).then(res => {
         const { code, message } = res.data
-        if (code === 200 && message === "Password changed successfully") {
-          setLoading2(false)
-          confirmRequest(message)
-        } else {
-          setLoading2(true)
-        }
+        setLoading2(false)
+        confirmRequest(code, message)
       }).catch(err => console.log(err))
     },
   })
@@ -132,7 +133,7 @@ const SignInMethod: React.FC = () => {
 
       <div id='kt_account_signin_method' className='collapse show'>
         <div className='card-body border-top p-9'>
-          <div className='d-flex flex-wrap align-items-center'>
+          {/* <div className='d-flex flex-wrap align-items-center'>
             <div id='kt_signin_email' className={' ' + (showEmailForm && 'd-none')}>
               <div className='fs-6 fw-bolder mb-1'>Email Address</div>
               <div className='fw-bold text-gray-600'>support@keenthemes.com</div>
@@ -230,7 +231,7 @@ const SignInMethod: React.FC = () => {
             </div>
           </div>
 
-          <div className='separator separator-dashed my-6'></div>
+          <div className='separator separator-dashed my-6'></div> */}
 
           <div className='d-flex flex-wrap align-items-center mb-10'>
             <div id='kt_signin_password' className={' ' + (showPasswordForm && 'd-none')}>
@@ -255,13 +256,21 @@ const SignInMethod: React.FC = () => {
                         Current Password
                       </label>
                       <input
-                        type='password'
-                        className='form-control form-control-lg form-control-solid '
+                        type='text'                      
                         id='old_password'
                         {...formik2.getFieldProps('old_password')}
+                        className={clsx(
+                          'form-control form-control-lg form-control-solid',
+                          {
+                            'is-invalid': formik2.touched.old_password && formik2.errors.old_password,
+                          },
+                          {
+                            'is-valid': formik2.touched.old_password && !formik2.errors.old_password,
+                          }
+                        )}
                       />
                       {formik2.touched.old_password && formik2.errors.old_password && (
-                        <div className='fv-plugins-message-container'>
+                        <div className='fv-plugins-message-container invalid-feedback'>
                           <div className='fv-help-block'>{formik2.errors.old_password}</div>
                         </div>
                       )}
@@ -274,13 +283,21 @@ const SignInMethod: React.FC = () => {
                         New Password
                       </label>
                       <input
-                        type='password'
-                        className='form-control form-control-lg form-control-solid '
+                        type='text'
                         id='new_password'
                         {...formik2.getFieldProps('new_password')}
+                        className={clsx(
+                          'form-control form-control-lg form-control-solid',
+                          {
+                            'is-invalid': formik2.touched.new_password && formik2.errors.new_password,
+                          },
+                          {
+                            'is-valid': formik2.touched.new_password && !formik2.errors.new_password,
+                          }
+                        )}
                       />
                       {formik2.touched.new_password && formik2.errors.new_password && (
-                        <div className='fv-plugins-message-container'>
+                        <div className='fv-plugins-message-container invalid-feedback'>
                           <div className='fv-help-block'>{formik2.errors.new_password}</div>
                         </div>
                       )}
@@ -293,13 +310,21 @@ const SignInMethod: React.FC = () => {
                         Confirm New Password
                       </label>
                       <input
-                        type='password'
-                        className='form-control form-control-lg form-control-solid '
+                        type='text'                       
                         id='password_confirm'
                         {...formik2.getFieldProps('password_confirm')}
+                        className={clsx(
+                          'form-control form-control-lg form-control-solid',
+                          {
+                            'is-invalid': formik2.touched.password_confirm && formik2.errors.password_confirm,
+                          },
+                          {
+                            'is-valid': formik2.touched.password_confirm && !formik2.errors.password_confirm,
+                          }
+                        )}
                       />
                       {formik2.touched.password_confirm && formik2.errors.password_confirm && (
-                        <div className='fv-plugins-message-container'>
+                        <div className='fv-plugins-message-container invalid-feedback'>
                           <div className='fv-help-block'>{formik2.errors.password_confirm}</div>
                         </div>
                       )}
@@ -307,8 +332,11 @@ const SignInMethod: React.FC = () => {
                   </div>
                 </div>
 
-                <div className='form-text mb-5'>
-                  Password must be at least 8 character and contain symbols
+                <div className='form-text mb-5 mt-5'>
+                  Note:<span className='invalid-feedback d-flex'>
+                  Password must be at least 8 characters, included: 
+                  <br />one uppercase, one lowercase, one number and one special case character.</span>
+                  {/* Password must be at least 8 character and contain symbols */}
                 </div>
 
                 <div className='d-flex'>
