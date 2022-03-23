@@ -26,15 +26,15 @@ const emailFormValidationSchema = Yup.object().shape({
 
 const passwordFormValidationSchema = Yup.object().shape({
   old_password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(8, 'Minimum 8 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required'),
   new_password: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(8, 'Minimum 8 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required'),
   password_confirm: Yup.string()
-    .min(3, 'Minimum 3 symbols')
+    .min(8, 'Minimum 8 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required')
     .oneOf([Yup.ref('new_password'), null], 'Passwords must match'),
