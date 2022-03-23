@@ -1,9 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState} from 'react'
-import {KTSVG} from '../../../../../../_metronic/helpers'
+import React, { useState, useEffect } from 'react'
+import { KTSVG } from '../../../../../../_metronic/helpers'
 import * as Yup from 'yup'
-import {useFormik} from 'formik'
-import {IUpdatePassword, IUpdateEmail, updatePassword, updateEmail} from '../SettingsModel'
+import { useFormik } from 'formik'
+import { shallowEqual, useSelector } from 'react-redux'
+import { IUpdatePassword, IUpdateEmail, updatePassword, updateEmail } from '../SettingsModel'
+import { confirmAlert } from 'react-confirm-alert'
+
+import axios from 'axios'
+import { RootState } from '../../../../../../setup'
+import { useHistory } from 'react-router-dom'
+import { changePassword } from '../server/api'
 
 const emailFormValidationSchema = Yup.object().shape({
   newEmail: Yup.string()
@@ -18,22 +25,26 @@ const emailFormValidationSchema = Yup.object().shape({
 })
 
 const passwordFormValidationSchema = Yup.object().shape({
-  currentPassword: Yup.string()
+  old_password: Yup.string()
     .min(3, 'Minimum 3 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required'),
-  newPassword: Yup.string()
+  new_password: Yup.string()
     .min(3, 'Minimum 3 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required'),
-  passwordConfirmation: Yup.string()
+  password_confirm: Yup.string()
     .min(3, 'Minimum 3 symbols')
     .max(50, 'Maximum 50 symbols')
     .required('Password is required')
-    .oneOf([Yup.ref('newPassword'), null], 'Passwords must match'),
+    .oneOf([Yup.ref('new_password'), null], 'Passwords must match'),
 })
 
 const SignInMethod: React.FC = () => {
+  // Declares selector 
+  const auth: any = useSelector<RootState>(({ auth }) => auth, shallowEqual)
+  const { user } = auth
+  // Declare States
   const [emailUpdateData, setEmailUpdateData] = useState<IUpdateEmail>(updateEmail)
   const [passwordUpdateData, setPasswordUpdateData] = useState<IUpdatePassword>(updatePassword)
 
@@ -41,6 +52,8 @@ const SignInMethod: React.FC = () => {
   const [showPasswordForm, setPasswordForm] = useState<boolean>(false)
 
   const [loading1, setLoading1] = useState(false)
+  const [loading2, setLoading2] = useState(false)
+
 
   const formik1 = useFormik<IUpdateEmail>({
     initialValues: {
@@ -56,8 +69,29 @@ const SignInMethod: React.FC = () => {
       }, 1000)
     },
   })
+  const history = useHistory();
 
-  const [loading2, setLoading2] = useState(false)
+  const confirmRequest = (message: string) => {
+    confirmAlert({
+      customUI: ({ onClose }) => {
+        return (
+          <div className="custom-ui">
+            <h3 style={{ color: '#fff' }}>Change Password</h3>
+            <p>{message}</p>
+            <button
+              className='btn btn-sm btn-success'
+              onClick={() => {
+                history.push("/logout");
+                onClose()
+              }}
+            >
+              Close
+            </button>
+          </div>
+        )
+      }
+    })
+  }
 
   const formik2 = useFormik<IUpdatePassword>({
     initialValues: {
@@ -65,12 +99,21 @@ const SignInMethod: React.FC = () => {
     },
     validationSchema: passwordFormValidationSchema,
     onSubmit: (values) => {
+      const userInfo = { user_id: user.ID }
       setLoading2(true)
-      setTimeout((values) => {
-        setPasswordUpdateData(values)
-        setLoading2(false)
-        setPasswordForm(false)
-      }, 1000)
+      const payload = {
+        ...values,
+        ...userInfo
+      }
+      changePassword('change-password', payload).then(res => {
+        const { code, message } = res.data
+        if (code === 200 && message === "Password changed successfully") {
+          setLoading2(false)
+          confirmRequest(message)
+        } else {
+          setLoading2(true)
+        }
+      }).catch(err => console.log(err))
     },
   })
 
@@ -155,7 +198,7 @@ const SignInMethod: React.FC = () => {
                   >
                     {!loading1 && 'Update Email'}
                     {loading1 && (
-                      <span className='indicator-progress' style={{display: 'block'}}>
+                      <span className='indicator-progress' style={{ display: 'block' }}>
                         Please wait...{' '}
                         <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                       </span>
@@ -208,18 +251,18 @@ const SignInMethod: React.FC = () => {
                 <div className='row mb-1'>
                   <div className='col-lg-4'>
                     <div className='fv-row mb-0'>
-                      <label htmlFor='currentpassword' className='form-label fs-6 fw-bolder mb-3'>
+                      <label htmlFor='old_password' className='form-label fs-6 fw-bolder mb-3'>
                         Current Password
                       </label>
                       <input
                         type='password'
                         className='form-control form-control-lg form-control-solid '
-                        id='currentpassword'
-                        {...formik2.getFieldProps('currentPassword')}
+                        id='old_password'
+                        {...formik2.getFieldProps('old_password')}
                       />
-                      {formik2.touched.currentPassword && formik2.errors.currentPassword && (
+                      {formik2.touched.old_password && formik2.errors.old_password && (
                         <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik2.errors.currentPassword}</div>
+                          <div className='fv-help-block'>{formik2.errors.old_password}</div>
                         </div>
                       )}
                     </div>
@@ -227,18 +270,18 @@ const SignInMethod: React.FC = () => {
 
                   <div className='col-lg-4'>
                     <div className='fv-row mb-0'>
-                      <label htmlFor='newpassword' className='form-label fs-6 fw-bolder mb-3'>
+                      <label htmlFor='new_password' className='form-label fs-6 fw-bolder mb-3'>
                         New Password
                       </label>
                       <input
                         type='password'
                         className='form-control form-control-lg form-control-solid '
-                        id='newpassword'
-                        {...formik2.getFieldProps('newPassword')}
+                        id='new_password'
+                        {...formik2.getFieldProps('new_password')}
                       />
-                      {formik2.touched.newPassword && formik2.errors.newPassword && (
+                      {formik2.touched.new_password && formik2.errors.new_password && (
                         <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik2.errors.newPassword}</div>
+                          <div className='fv-help-block'>{formik2.errors.new_password}</div>
                         </div>
                       )}
                     </div>
@@ -246,18 +289,18 @@ const SignInMethod: React.FC = () => {
 
                   <div className='col-lg-4'>
                     <div className='fv-row mb-0'>
-                      <label htmlFor='confirmpassword' className='form-label fs-6 fw-bolder mb-3'>
+                      <label htmlFor='password_confirm' className='form-label fs-6 fw-bolder mb-3'>
                         Confirm New Password
                       </label>
                       <input
                         type='password'
                         className='form-control form-control-lg form-control-solid '
-                        id='confirmpassword'
-                        {...formik2.getFieldProps('passwordConfirmation')}
+                        id='password_confirm'
+                        {...formik2.getFieldProps('password_confirm')}
                       />
-                      {formik2.touched.passwordConfirmation && formik2.errors.passwordConfirmation && (
+                      {formik2.touched.password_confirm && formik2.errors.password_confirm && (
                         <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik2.errors.passwordConfirmation}</div>
+                          <div className='fv-help-block'>{formik2.errors.password_confirm}</div>
                         </div>
                       )}
                     </div>
@@ -276,7 +319,7 @@ const SignInMethod: React.FC = () => {
                   >
                     {!loading2 && 'Update Password'}
                     {loading2 && (
-                      <span className='indicator-progress' style={{display: 'block'}}>
+                      <span className='indicator-progress' style={{ display: 'block' }}>
                         Please wait...{' '}
                         <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                       </span>
@@ -311,7 +354,7 @@ const SignInMethod: React.FC = () => {
             </div>
           </div>
 
-         {/*  <div className='notice d-flex bg-light-primary rounded border-primary border border-dashed p-6'>
+          {/*  <div className='notice d-flex bg-light-primary rounded border-primary border border-dashed p-6'>
             <KTSVG
               path='/media/icons/duotune/general/gen048.svg'
               className='svg-icon-2tx svg-icon-primary me-4'
@@ -340,4 +383,4 @@ const SignInMethod: React.FC = () => {
   )
 }
 
-export {SignInMethod}
+export { SignInMethod }

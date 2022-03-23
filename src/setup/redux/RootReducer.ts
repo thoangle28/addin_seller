@@ -1,5 +1,5 @@
-import {all} from 'redux-saga/effects'
-import {combineReducers} from 'redux'
+import { all } from 'redux-saga/effects'
+import { combineReducers } from 'redux'
 
 import * as auth from '../../app/modules/auth'
 import * as product from '../../app/modules/products'

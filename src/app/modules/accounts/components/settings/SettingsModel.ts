@@ -28,9 +28,15 @@ export interface IUpdateEmail {
 }
 
 export interface IUpdatePassword {
-  currentPassword: string
-  newPassword: string
-  passwordConfirmation: string
+  old_password: string
+  new_password: string
+  password_confirm: string
+}
+export interface IChangePasswordPayload {
+  old_password: string
+  new_password: string
+  password_confirm: string
+  user_id: string
 }
 
 export interface IConnectedAccounts {
@@ -108,9 +114,9 @@ export const updateEmail: IUpdateEmail = {
 }
 
 export const updatePassword: IUpdatePassword = {
-  currentPassword: '',
-  newPassword: '',
-  passwordConfirmation: '',
+  old_password: '',
+  new_password: '',
+  password_confirm: '',
 }
 
 export const connectedAccounts: IConnectedAccounts = {
