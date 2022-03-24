@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useState} from 'react'
-import {useDispatch} from 'react-redux'
+import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import * as Yup from 'yup'
 import clsx from 'clsx'
-import {Link} from 'react-router-dom'
-import {useFormik} from 'formik'
+import { Link } from 'react-router-dom'
+import { useFormik } from 'formik'
 import * as auth from '../redux/AuthRedux'
-import {login, signup} from '../redux/AuthCRUD'
+import { login, signup } from '../redux/AuthCRUD'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()    //.email('Wrong email format')
@@ -36,27 +36,27 @@ export function Login() {
   const formik = useFormik({
     initialValues,
     validationSchema: loginSchema,
-    onSubmit: (values, {setStatus, setErrors, setSubmitting}) => {
+    onSubmit: (values, { setStatus, setErrors, setSubmitting }) => {
       setLoading(true)
-      setTimeout(() => {    
+      setTimeout(() => {
         signup(values.email, values.password)
-        .then((response) => {   
-          const { data, message, code } = response.data        
-          if(data && code === 200) {
-            setLoading(false)            
-            dispatch(auth.actions.signup(data.access_token, data.expire_time, data.user))
-          } else {
+          .then((response) => {
+            const { data, message, code } = response.data
+            if (data && code === 200) {
+              setLoading(false)
+              dispatch(auth.actions.signup(data.access_token, data.expire_time, data.user))
+            } else {
+              setLoading(false)
+              setSubmitting(false)
+              setStatus(message)
+              setErrors(data);
+            }
+          })
+          .catch(() => {
             setLoading(false)
-            setSubmitting(false)   
-            setStatus(message)
-            setErrors(data);
-          }
-        })
-        .catch(() => {
-          setLoading(false)
-          setSubmitting(false)
-          setStatus('The login detail is incorrect')
-        })
+            setSubmitting(false)
+            setStatus('The login detail is incorrect')
+          })
       }, 1000)
     },
   })
@@ -70,16 +70,16 @@ export function Login() {
     >
       {/* begin::Heading */}
       <div className='text-center mb-5'>
-        <h1 className='text-dark mb-3'>Sign In to Seller Portal</h1>      
+        <h1 className='text-dark mb-3'>Sign In to Seller Portal</h1>
       </div>
       {/* begin::Link */}
       <div className='text-gray-400 fw-normal fs-6 text-center mb-10'>
-        New Here?&nbsp;<Link 
-          to='/auth/registration' 
+        New Here?&nbsp;<Link
+          to='/auth/registration'
           className='link-primary fs-6 fw-normal'>
           Create New Account
         </Link>
-      </div>     
+      </div>
       {/* begin::Heading */}
       {formik.status && (
         <div className={`mb-lg-15 alert alert-danger`}>
@@ -94,7 +94,7 @@ export function Login() {
           {...formik.getFieldProps('email')}
           className={clsx(
             'form-control form-control-lg form-control-solid',
-            {'is-invalid': formik.touched.email && formik.errors.email},
+            { 'is-invalid': formik.touched.email && formik.errors.email },
             {
               'is-valid': formik.touched.email && !formik.errors.email,
             }
@@ -117,7 +117,7 @@ export function Login() {
           <div className='d-flex flex-stack mb-2'>
             {/* begin::Label */}
             <label className='form-label fw-bolder text-dark fs-6 mb-0'>Password</label>
-            {/* end::Label */}          
+            {/* end::Label */}
           </div>
         </div>
         <input
@@ -154,7 +154,7 @@ export function Login() {
         >
           {!loading && <span className='indicator-label'>Continue</span>}
           {loading && (
-            <span className='indicator-progress' style={{display: 'block'}}>
+            <span className='indicator-progress' style={{ display: 'block' }}>
               Please wait...
               <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
             </span>
@@ -167,11 +167,11 @@ export function Login() {
           Create New Account
         </Link>&nbsp;&nbsp;|&nbsp;&nbsp; */}
         <Link
-            to='/auth/forgot-password'
-            className='link-primary fs-6 fw-normal'
-          >
-            Forgot Password?
-          </Link>
+          to='/auth/forgot-password'
+          className='link-primary fs-6 fw-normal'
+        >
+          Forgot Password?
+        </Link>
         {/* end::Link */}
       </div>
       {/* end::Action */}

@@ -7,7 +7,6 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { IUpdatePassword, IUpdateEmail, updatePassword, updateEmail } from '../SettingsModel'
 import { confirmAlert } from 'react-confirm-alert'
 
-import axios from 'axios'
 import { RootState } from '../../../../../../setup'
 import { useHistory } from 'react-router-dom'
 import { changePassword } from '../server/api'
@@ -86,8 +85,10 @@ const SignInMethod: React.FC = () => {
             <button
               className={`btn btn-sm ${code === 200 ? 'btn-success' : 'btn-danger'}`}
               onClick={() => {
-                if( code === 200) history.push("/logout");
-                onClose()
+                if (code === 200) {
+                  history.push("/logout");
+                  onClose()
+                }
               }}
             >
               Close
@@ -256,7 +257,7 @@ const SignInMethod: React.FC = () => {
                         Current Password
                       </label>
                       <input
-                        type='text'                      
+                        type='text'
                         id='old_password'
                         {...formik2.getFieldProps('old_password')}
                         className={clsx(
@@ -310,7 +311,7 @@ const SignInMethod: React.FC = () => {
                         Confirm New Password
                       </label>
                       <input
-                        type='text'                       
+                        type='text'
                         id='password_confirm'
                         {...formik2.getFieldProps('password_confirm')}
                         className={clsx(
@@ -334,8 +335,8 @@ const SignInMethod: React.FC = () => {
 
                 <div className='form-text mb-5 mt-5'>
                   Note:<span className='invalid-feedback d-flex'>
-                  Password must be at least 8 characters, included: 
-                  <br />one uppercase, one lowercase, one number and one special case character.</span>
+                    Password must be at least 8 characters, including:
+                    <br />one uppercase, one lowercase, one number and one special case character.</span>
                   {/* Password must be at least 8 character and contain symbols */}
                 </div>
 
