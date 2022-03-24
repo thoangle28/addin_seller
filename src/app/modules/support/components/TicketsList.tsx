@@ -1,11 +1,14 @@
+import { stat } from 'fs'
 import React, {useEffect, useState} from 'react'
 import {shallowEqual, useSelector} from 'react-redux'
-import {Link} from 'react-router-dom'
+import {Link, useHistory} from 'react-router-dom'
 import {RootState} from '../../../../setup'
+import { toAbsoluteUrl } from '../../../../_metronic/helpers'
 import { Pagination } from '../../../../_metronic/partials/content/pagination/Paginaton'
 //import { toAbsoluteUrl } from '../../../../_metronic/helpers';
 import {FallbackView} from '../../products/components/formOptions'
 import {GetTicketsListing, CreatePagination} from './supportApi'
+import { CloseTicket } from './supportDB'
 //import { useReducer } from "react";
 type props = {
   totalTicket: number
@@ -31,6 +34,8 @@ const TicketsList = () => {
     status: '',
   })
 
+  const history = useHistory()
+  
   const initialParams = {
     userId: currentUserId,
     accessToken: auth.accessToken,
@@ -58,9 +63,10 @@ const TicketsList = () => {
   }
 
   const onChangeSort = (ticketSort: string) => {
-    const params = {...initialParams, orderBy: ticketSort}
+    const params = {...initialParams, order_by: ticketSort}
     setTicketSortBy(ticketSort)
     params.currentPage = 1
+    console.log(params)
     loadTicketListing(params)
   }
 
@@ -82,6 +88,19 @@ const TicketsList = () => {
       setTicketInfo( ticketInit )
       //const listPagination = CreatePagination(data.current_page, data.total_pages)
       setLoading(false)
+    })
+  }
+
+  const onCloseTicket = (e: any, id:number) => {
+    e.preventDefault();
+    //userId: currentUserId,
+    const closeTicket = CloseTicket(id)
+    closeTicket.then((response: any) => {
+      const {code, data, message } = response.data
+      if( code == 200) {
+        alert(message)
+        loadTicketListing(initialParams)
+      }
     })
   }
 
@@ -271,13 +290,9 @@ const TicketsList = () => {
                                         state: {ticketId: ticket.id},
                                       }}
                                     >
-                                      View Ticket
+                                      View
                                     </Link>
-                                  </li>
-                                  {/*  <li className="list-inline-item me-5">
-																															<a href="#" className="mr-3 delete badge badge-light-danger">
-																																	<img src={toAbsoluteUrl("/media/icons/duotune/general/gen027.svg")} 
-																																	className="h-15px w-auto me-2" />Delete</a></li> */}
+                                  </li>                                 
                                   <li className='list-inline-item me-5'>
                                     <span className='me-2'>Status: </span>
                                     <span
@@ -290,6 +305,16 @@ const TicketsList = () => {
                                     <i className='feather icon-calendar f-14'></i>Updated:{' '}
                                     {ticket.created}
                                   </li>
+                                  { (statusTicket.text !== 'Closed') &&
+                                  (<li className="list-inline-item me-5">
+                                    <Link to={{ pathname: '#'}}
+                                    onClick= {(event) => {
+                                      onCloseTicket(event, ticket.id)
+                                    }}
+                                    className="mr-3 delete badge badge-light-danger">
+                                    <img src={toAbsoluteUrl("/media/icons/duotune/general/gen027.svg")} 
+                                    className="h-15px w-auto me-2" />Close</Link>
+                                  </li>)}
                                 </ul>
                               </div>
                             </div>

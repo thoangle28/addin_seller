@@ -10,6 +10,7 @@ type Params = {
     currentPage: number
     pageSize: number
     status: string | ''
+    order_by: string | ''
 }
 
 export function GetTicketsListing( params: Params) { 
@@ -18,7 +19,8 @@ export function GetTicketsListing( params: Params) {
     page_size :  params.pageSize ?  params.pageSize : 10,
     current_page :  params.currentPage ?  params.currentPage : 1,
     status :  params.status ?  params.status : '',
-    accessToken:  params.accessToken
+    accessToken:  params.accessToken,
+    order_by: params.order_by
   };
 
   return axios.post<{result: any}>(API_END_POINT_URL+ '/ticket/list', args)
@@ -92,5 +94,9 @@ export function GetBrands(params: any) {
 }
 
 export function GetBrandsByOrder(orderId: number) {   
-  return axios.post<AnyRecord>(API_END_POINT_URL+ '//ticket/brands-by-product-in-order', {order_id: orderId})
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/brands-by-product-in-order', {order_id: orderId})
+}
+
+export function CloseTicket(ticketId: number) {   
+  return axios.post<AnyRecord>(API_END_POINT_URL+ '/ticket/check-closed', {  check_closed: "closed", ticket_id: ticketId})
 }
