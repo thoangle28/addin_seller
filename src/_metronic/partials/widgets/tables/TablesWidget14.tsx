@@ -60,7 +60,7 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
   const [newPageSize, setPageSize] = useState<number>(10)
   const [isPaginate, setPaginate] = useState<boolean>(false)
   const [searchTerms, setSearchTerms] = useState<string>('')
-  const [filterOption, setFilterOption] = useState<string>('publish')
+  const [filterOption, setFilterOption] = useState<string>('')
 
   const onChangePageSize = (s: any) => {
     setPageSize(s)
@@ -101,12 +101,13 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
           data-bs-trigger='hover'
           title='Click to add a product'
         >
-          <input type="text" name="searchTerm" className='px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
-          <select className='py-2 px-3 me-3' onChange={(e) => setFilterOption(e.target.value)} value={filterOption}>
+          <input value={searchTerms} style={{ width: "auto" }} type="text" name="searchTerm" className='form-control px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
+          <select style={{ width: "auto" }} className='form-control form-control-sm py-2 px-3 me-3' value={filterOption} onChange={(e) => setFilterOption(e.target.value)} value={filterOption}>
+            <option value="">All</option>
             <option value="draft">Draft</option>
             <option value="publish">Publish</option>
           </select>
-          <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Search</button>
+          <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Apply</button>
           <Link to='/product/create' className='btn btn-sm btn-light-primary'>
             <KTSVG path='/media/icons/duotune/arrows/arr075.svg' className='svg-icon-3' />
             New Product
