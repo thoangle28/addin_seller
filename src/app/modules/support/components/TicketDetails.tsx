@@ -5,12 +5,12 @@ import {RootState} from '../../../../setup'
 import {AddinLoading} from '../../../../_metronic/partials/content/fallback-view/FallbackView'
 import {GetTicketDetails, CreateMesssageTicket, GetProductsByOrder} from './supportApi'
 import {UploadImageField} from '../../../../_metronic/partials/content/upload/UploadFile'
-import SunEditor from 'suneditor-react'
-import 'suneditor/dist/css/suneditor.min.css'
 import {useFormik} from 'formik'
 import * as Yup from 'yup'
 import clsx from 'clsx'
 import {confirmAlert} from 'react-confirm-alert'
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const TicketDetails = () => {
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
@@ -163,6 +163,25 @@ const TicketDetails = () => {
       )
     )
   }
+
+  function uploadPlugin(editor: any) {
+
+    editor.editing.view.change( (writer: any) => {
+      writer.setStyle( 'height', '300px', editor.editing.view.document.getRoot() );
+    } );
+
+    /* editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
+      return uploadAdapter(loader, usePhotoFromContent);
+    }; */
+  }
+  const configCKEditor = {
+    extraPlugins: [uploadPlugin],     
+    toolbar: 
+      ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 
+      '|', 'numberedList', 'bulletedList', '|', 'undo', 'redo']
+      /* 'imageUpload', 'insertTable','tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed',  */
+  }
+
   return (
     <>
       {(isLoading && (
@@ -299,37 +318,20 @@ const TicketDetails = () => {
                       <h3 className='mb-5'>New Message</h3>
                       <div className='min-h-200px mb-5'>
                         <label className='required form-label'>Reply / Request</label>
-                        <div className='ql-editor ql-blank'>
-                          <SunEditor
+                        <div className='ql-editor ql-blank'>                        
+                          <CKEditor
+                            required
+                            config={configCKEditor}
+                            editor={ClassicEditor}
+                            onReady={(editor: any) => {}}
+                            onBlur={(event: any, editor: any) => {}}
+                            onFocus={(event: any, editor: any) => {}}
+                            onChange={(event: any, editor: any) => {
+                              formik.setFieldValue('message', editor.getData());
+                            }}
+                            data={formik.values.message}
                             name='message'
-                            placeholder='Please type here...'
-                            autoFocus={false}
-                            onChange={(event: any) => {
-                              formik.setFieldValue('message', event)
-                              formik.handleChange(event)
-                            }}
-                            defaultValue={formik.values.message}
-                            setContents={formik.values.message}
-                            width='100%'
-                            height='300px'
-                            setDefaultStyle={''}
-                            setOptions={{
-                              buttonList: [
-                                ['font', 'fontSize', 'formatBlock'],
-                                [
-                                  'bold',
-                                  'underline',
-                                  'italic',
-                                  'strike',
-                                  'subscript',
-                                  'superscript',
-                                ],
-                                ['fontColor', 'textStyle'],
-                                ['align', 'list'],
-                                ['table', 'link'],
-                              ],
-                            }}
-                          />
+                          />              
                         </div>
                         <div
                           className={clsx(
