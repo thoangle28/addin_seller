@@ -334,7 +334,7 @@ const SignInMethod: React.FC = () => {
 
                 <div className='form-text mb-5 mt-5'>
                   Note:<span className='invalid-feedback d-flex'>
-                  Password must be at least 8 characters, included: 
+                  Password must be at least 8 characters, including: 
                   <br />one uppercase, one lowercase, one number and one special case character.</span>
                   {/* Password must be at least 8 character and contain symbols */}
                 </div>
