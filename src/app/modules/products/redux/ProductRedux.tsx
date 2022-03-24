@@ -1,5 +1,5 @@
 
-import {Action} from '@reduxjs/toolkit'
+import { Action } from '@reduxjs/toolkit'
 import { put, takeLatest, delay } from 'redux-saga/effects'
 import { getProductsListTable } from './ProductsList'
 import { persistReducer } from 'redux-persist'
@@ -17,7 +17,7 @@ export const actions = {
     type: actionTypes.productsList,
     payload: data
   }),
-  fillProductList: ( data: IProductsList ) => ({     
+  fillProductList: (data: IProductsList) => ({
     type: actionTypes.getProductsListSuccess,
     payload: data
   }),
@@ -50,7 +50,8 @@ export interface IProductsList {
   currentPage?: number
   pageSize?: number
   userId?: number
-  totalPages?: number
+  totalPages?: number,
+  terms?: string
 }
 
 export interface ActionWithPayload<T> extends Action {
@@ -58,22 +59,20 @@ export interface ActionWithPayload<T> extends Action {
 }
 
 export const reducer = persistReducer(
-  {storage, key: 'produdcts-list', whitelist: ['productsList', 'currentPage', 'pageSize', 'userId', 'totalPages', 'totalProducts']},
+  { storage, key: 'produdcts-list', whitelist: ['productsList', 'currentPage', 'pageSize', 'userId', 'totalPages', 'totalProducts'] },
   (state: IProductsList = initialProductsState, action: ActionWithPayload<IProductsList>) => {
-    
-    switch(action.type) {
 
-      case actionTypes.productsList: {      
+    switch (action.type) {
+
+      case actionTypes.productsList: {
         return { ...action.payload }
-      }    
-
-      case actionTypes.getProductsListSuccess: {         
-        return {...state, ...action.payload}
-      }  
-
+      }
+      case actionTypes.getProductsListSuccess: {
+        return { ...state, ...action.payload }
+      }
       case actionTypes.nextPage: {
         return { ...state, ...action.payload }
-      }    
+      }
 
       default:
         return state;
@@ -81,10 +80,10 @@ export const reducer = persistReducer(
   }
 )
 
-function* sagaGetProductList(action : any) {      
-  const { userId, currentPage, pageSize } = action.payload 
-  const { data: data } = yield getProductsListTable(userId, currentPage, pageSize)      
-  yield delay(100)    
+function* sagaGetProductList(action: any) {
+  const { userId, currentPage, pageSize, terms, filterOption } = action.payload
+  const { data: data } = yield getProductsListTable(userId, currentPage, pageSize, terms, filterOption)
+  yield delay(100)
   yield put(actions.fillProductList(data.data))
 }
 
