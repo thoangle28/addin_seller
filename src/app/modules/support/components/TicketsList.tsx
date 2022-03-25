@@ -23,6 +23,7 @@ const TicketsList = () => {
   const currentUserId = auth && auth.user ? auth.user.ID : 0
 
   const [loading, setLoading] = useState(true)
+  const [loadingFilter, setLoadingFilter] = useState(true)
   const [ticketStatus, setTicketStatus] = useState('')
   const [ticketSortBy, setTicketSortBy] = useState('newest')
   const [ticketsListing, setTicketsListing] = useState<any>({})
@@ -52,21 +53,23 @@ const TicketsList = () => {
   const onChangePage = (pageSize: number = 10, currentPage: number = 1) => {
     initialParams.pageSize = pageSize
     initialParams.currentPage = currentPage
-    loadTicketListing(initialParams)
+    const params = {...initialParams, status: ticketStatus, order_by: ticketSortBy}
+    loadTicketListing(params)
   }
 
   const onChangeStaus = (ticketStatus: string) => {
-    const params = {...initialParams, status: ticketStatus}
+    const params = {...initialParams, status: ticketStatus, order_by: ticketSortBy}
     setTicketStatus(ticketStatus)
     params.currentPage = 1
+    setLoadingFilter(true)
     loadTicketListing(params)
   }
 
   const onChangeSort = (ticketSort: string) => {
-    const params = {...initialParams, order_by: ticketSort}
+    const params = {...initialParams, order_by: ticketSort, status: ticketStatus}
     setTicketSortBy(ticketSort)
     params.currentPage = 1
-    console.log(params)
+    setLoadingFilter(true)
     loadTicketListing(params)
   }
 
@@ -88,6 +91,7 @@ const TicketsList = () => {
       setTicketInfo( ticketInit )
       //const listPagination = CreatePagination(data.current_page, data.total_pages)
       setLoading(false)
+      setLoadingFilter(false)
     })
   }
 
@@ -116,13 +120,13 @@ const TicketsList = () => {
         <div className='card card-xxl-stretch mb-5 mb-xxl-8'>
           {/* begin::Header */}
           <div className='card-header border-0 pt-5'>
-            <h3 className='card-title align-items-start flex-column'  style={{flex: 1}}>
+            <h3 className='card-title align-items-start flex-column'>
               <span className='card-label fw-bolder fs-3 mb-1'>Tickets Listing</span>
               <span className='text-muted mt-1 fw-bold fs-7'>
                 {(ticketInfo.totalTicket && <>Over {ticketInfo.totalTicket} ticket(s)</>) || ''}
               </span>
             </h3>
-            <div className='card-toolbar' style={{flex: 1}}>
+            <div className='card-toolbar'>
               <div className='d-flex align-items-center'>
                 <div className='me-4 my-1 d-none'>
                   <div className='d-flex align-items-center position-relative my-1'>
@@ -188,9 +192,16 @@ const TicketsList = () => {
                       <option value=''>All</option>
                       <option value='processing'>Processing</option>
                       <option value='closed'>Closed</option>
-                      <option value='open'>Opening</option>
+                      <option value='open'>Open</option>
                     </select>
                   </div>
+                </div>
+                <div className='me-4 my-1'>&nbsp;
+                {loadingFilter && (
+                  <span className='ms-5 indicator-progress' style={{display: 'block'}}>                    
+                    <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                  </span>
+                )}&nbsp;
                 </div>
                 <div className='me-4 my-1'>
                   <Link to='/support/ticket/create' className='btn btn-sm btn-light btn-primary'>
