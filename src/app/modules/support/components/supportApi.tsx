@@ -118,6 +118,16 @@ export const GetBrandsByOrder = (orderId: number) => {
     })
 }
 
+export const CloseTicket = (ticketId: number) => {
+    return new Promise((resolve, reject) => {
+        supportDB.CloseTicket(ticketId)
+        .then((response) => {
+            resolve(response.data)
+        }).catch((error) => {
+            reject(error.message)
+        })
+    })
+}
 
 ////////////////////////////////
 export const CreatePagination = (currentPage: number, maxPage: number) => {

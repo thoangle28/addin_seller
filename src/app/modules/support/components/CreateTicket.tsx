@@ -8,10 +8,10 @@ import 'react-confirm-alert/src/react-confirm-alert.css'
 import {useHistory, useLocation} from 'react-router-dom'
 import {CreateNewTicket, iTicket, defaultValues, GetProductsByOrder, GetBrands} from './supportApi'
 import {UploadImageField} from '../../../../_metronic/partials/content/upload/UploadFile'
-import SunEditor from 'suneditor-react'
-import 'suneditor/dist/css/suneditor.min.css'
 import {shallowEqual, useSelector} from 'react-redux'
 import {RootState} from '../../../../setup'
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 const validationTicket = Yup.object().shape({
   customer: Yup.string()
@@ -182,6 +182,24 @@ const CreateTicket = () => {
     e.preventDefault()
     setAttachFiles([])
     formik.setFieldValue('attachments', [])
+  }
+  
+  function uploadPlugin(editor: any) {
+
+    editor.editing.view.change( (writer: any) => {
+      writer.setStyle( 'height', '300px', editor.editing.view.document.getRoot() );
+    } );
+
+    /* editor.plugins.get("FileRepository").createUploadAdapter = (loader: any) => {
+      return uploadAdapter(loader, usePhotoFromContent);
+    }; */
+  }
+  const configCKEditor = {
+    extraPlugins: [uploadPlugin],     
+    toolbar: 
+      ['heading', '|', 'bold', 'italic', 'blockQuote', 'link', 
+      '|', 'numberedList', 'bulletedList', '|', 'undo', 'redo']
+      /* 'imageUpload', 'insertTable','tableColumn', 'tableRow', 'mergeTableCells', 'mediaEmbed',  */
   }
 
   return (
@@ -403,34 +421,20 @@ const CreateTicket = () => {
                 {/*end::Input group*/}
                 <div className='min-h-200px mb-5'>
                   <label className='required form-label'>Description</label>
-                  <div className='ql-editor ql-blank'>
-                    <SunEditor
+                  <div className='ql-editor ql-blank'>                   
+                    <CKEditor
+                      required
+                      config={configCKEditor}
+                      editor={ClassicEditor}
+                      onReady={(editor: any) => {}}
+                      onBlur={(event: any, editor: any) => {}}
+                      onFocus={(event: any, editor: any) => {}}
+                      onChange={(event: any, editor: any) => {
+                        formik.setFieldValue('message', editor.getData());
+                      }}
+                      data={formik.values.message}
                       name='message'
-                      placeholder='Please type here...'
-                      autoFocus={false}
-                      onChange={(event: any) => {
-                        formik.setFieldValue('message', event)
-                        formik.handleChange(event)
-                      }}
-                      /*onBlur={(event: any) => {
-                                            formik.setFieldValue('message', event);
-                                            formik.handleChange(event)
-                                        }} */
-                      defaultValue={formik.values.message}
-                      setContents={formik.values.message}
-                      width='100%'
-                      height='300px'
-                      setDefaultStyle={''}
-                      setOptions={{
-                        buttonList: [
-                          ['font', 'fontSize', 'formatBlock'],
-                          ['bold', 'underline', 'italic', 'strike', 'subscript', 'superscript'],
-                          ['fontColor', 'textStyle'],
-                          ['align', 'list'],
-                          ['table', 'link'],
-                        ],
-                      }}
-                    />
+                    />                 
                   </div>
                   <div
                     className={clsx(
@@ -462,7 +466,7 @@ const CreateTicket = () => {
                       fileName={'attachments'}
                       isMultiple={true}
                       maxFiles={5}
-                      textLabel='Please choose files (maximum 5 files)'
+                      textLabel='Your files (maximum 5 files)'
                     />
                   </div>
                   <div className='mb-2 col-md-8'>
