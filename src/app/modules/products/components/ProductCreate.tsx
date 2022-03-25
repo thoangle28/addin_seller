@@ -410,6 +410,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
+  const handleAddNewAttributes = () => {
+    alert(3434);
+  }
+
+  const handleAddNewValuesAttr = () => {
+    alert(5454);
+  }
   //CKeditor
   
   const  maxFileSize = 1024*1024*0.65; //650Kb
@@ -1119,7 +1126,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         </label>
                                       </div>
                                     </div>
-                                    <div className='col-md-8 mb-5'>
+                                    <div className='col-md-7 mb-5'>
                                       <div className='d-flex align-items-center'>                                       
                                         <AsyncPaginate
                                           placeholder='Select attribute value...'
@@ -1138,7 +1145,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       { isAttributeAdded && 
                                       (<div className='text-danger fs-9'>The attribute has added, pls choose other item...!</div>)}
                                     </div>
-                                    <div className='col-md-4 mb-5'>
+                                    <div className='col-md-5 mb-5'>
                                       <button
                                         onClick={(event) => {
                                           handleAddMoreAttributes(values)
@@ -1149,6 +1156,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         name='add-more-attr'
                                       >
                                         Add more
+                                      </button>
+                                      <button
+                                        onClick={(event) => {
+                                          handleAddNewAttributes()
+                                          //handleChange(event)
+                                        }}
+                                        type='button'
+                                        className='btn btn-sm btn-link ms-5'
+                                        name='add-new-attr'
+                                      >
+                                        Add New
                                       </button>
                                     </div>
                                   </div>
@@ -1255,6 +1273,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                       loadingMessage={() => 'Loading data, please wait...'} 
                                                       className="fs-7"
                                                     />
+                                                    <button
+                                                      onClick={(event) => {
+                                                        handleAddNewValuesAttr()
+                                                        //handleChange(event)
+                                                      }}
+                                                      type='button'
+                                                      className='btn btn-sm btn-link mt-2'
+                                                      name='add-new-attr'
+                                                    >
+                                                      Add New Value
+                                                    </button>
                                                   </div>
                                                 </div>
                                               </div>
