@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { KTSVG } from '../../../helpers'
 import { Link } from 'react-router-dom'
 
@@ -101,15 +101,21 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
           data-bs-trigger='hover'
           title='Click to add a product'
         >
-          <input value={searchTerms} style={{ width: "auto" }} type="text" name="searchTerm" className='form-control px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
-          <select style={{ width: "auto" }} className='form-select form-control-sm py-2 px-3 me-3' 
-          value={filterOption} onChange={(e) => setFilterOption(e.target.value)}>
-            <option value="">All</option>
-            <option value="draft">Draft</option>
-            <option value="pendding">Pendding</option>
-            <option value="publish">Publish</option>
-          </select>
-          <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Apply</button>
+          <div className='me-4 my-1'>
+            <input value={searchTerms} style={{ width: "auto" }} type="text" name="searchTerm" className='form-control px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
+          </div>
+          <div className='me-4 my-1'>
+            <select className='form-select form-select-solid form-select-sm me-3'
+              value={filterOption} onChange={(e) => setFilterOption(e.target.value)}>
+              <option value="">All</option>
+              <option value="draft">Draft</option>
+              <option value="pendding">Pendding</option>
+              <option value="publish">Publish</option>
+            </select>
+          </div>
+          <div className='my-1'>
+            <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Apply</button>
+          </div>
           <Link to='/product/create' className='btn btn-sm btn-light-primary'>
             <KTSVG path='/media/icons/duotune/arrows/arr075.svg' className='svg-icon-3' />
             New Product
