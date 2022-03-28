@@ -17,6 +17,8 @@ import {  initialForm,  styles,  TaxClass,  initialFormValues, saveProductProper
 import { CKEditor } from "@ckeditor/ckeditor5-react";
 import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
+import ModelAttr from './Modal'
+
 const mapState = (state: RootState) => ({productDetail: state.productDetail})
 const connector = connect(mapState, detail.actions)
 type PropsFromRedux = ConnectedProps<typeof connector>
@@ -48,6 +50,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [formStatus, setFormStatus] = useState({ error: 204, message: ''})
   const [usePhotoFromContent, setUsePhotoFromContent] = useState([])
   const [usePhoto, setUsePhoto] = useState(false)
+
+  const [showModalAttr, setShowModalAttr] = useState(false)
 
   const tabDefault: any = useRef(null)
   //Get All Properties  
@@ -102,8 +106,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     setProductType(value)
   }
 
-  const onChangeAttr = (newOption: any) => {
-    
+  const onChangeAttr = (newOption: any) => {    
     setAttritesAdded(false)
     setSelectedAttr(newOption)
   }
@@ -151,6 +154,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     //reset
     setSelectedAttr({value: '', label: ''})
     mapValuesToForm(initialForm, formValues)
+  }
+
+  const onCloseModal = () => {
+    setShowModalAttr(false)
   }
 
   /**
@@ -410,12 +417,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
-  const handleAddNewAttributes = () => {
-    alert(3434);
+  const handleAddNewAttributes = () => {  
+    setShowModalAttr(true)
   }
 
   const handleAddNewValuesAttr = () => {
-    alert(5454);
+    setShowModalAttr(true)
   }
   //CKeditor
   
@@ -510,6 +517,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 </div>
               </div>
             ) : (
+            <>
             <Formik
               initialValues={isNewProduct ? {...initialFormValues} : {...initialForm}}
               validationSchema={ValidationSchema}
@@ -1820,6 +1828,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 </form>
               )}
             </Formik>
+            <ModelAttr showModal={showModalAttr} onCloseModal={onCloseModal} /></>
             )}
           </div>
         </div>
