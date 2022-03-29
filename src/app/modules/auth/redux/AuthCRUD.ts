@@ -4,6 +4,12 @@ import { UserModel } from '../models/UserModel'
 
 const API_URL = process.env.REACT_APP_API_URL
 
+interface IRequestPasswordValidation {
+  new_password: string;
+  password_confirm: string;
+  reset_token: string;
+}
+
 export const GET_USER_BY_ACCESSTOKEN_URL = `${API_URL}/verify_token`
 export const LOGIN_URL = `${API_URL}/login`
 export const REGISTER_URL = `${API_URL}/register`
@@ -42,7 +48,7 @@ export function register(email: string, firstname: string,
 }
 // Server should return object => { result: boolean } (Is Email in DB)
 export const requestPassword = (user_email: string) => axios.post<{ result: boolean }>(API_END_POINT_URL + "/user/profile/send-mail-forgot-password", { user_email })
-
+export const requestValidatePassword = (payload: IRequestPasswordValidation) => axios.post(API_END_POINT_URL + '/user/profile/password-recovery', payload)
 export function getUserByToken() {
   // Authorization head should be fulfilled in interceptor.
   // Check common redux folder => setupAxios
