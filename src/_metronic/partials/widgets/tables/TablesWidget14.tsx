@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect, useState} from 'react'
-import {KTSVG} from '../../../helpers'
-import {Link} from 'react-router-dom'
+import React, { useEffect, useState } from 'react'
+import { KTSVG } from '../../../helpers'
+import { Link } from 'react-router-dom'
 
 type Props = {
   className: string
@@ -29,7 +29,7 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
 
   const listPages = []
   //fist
-  listPages.push({label: '«', page: 1, class: 'btn-light-primary'})
+  listPages.push({ label: '«', page: 1, class: 'btn-light-primary' })
   //previous
   listPages.push({
     label: '‹',
@@ -38,7 +38,7 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
   })
   //list page with 5 items
   for (let index = begin; index <= end; index++) {
-    listPages.push({label: index, page: index, class: currentPage === index ? 'active' : ''})
+    listPages.push({ label: index, page: index, class: currentPage === index ? 'active' : '' })
   }
   //next
   listPages.push({
@@ -47,7 +47,7 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
     class: 'btn-light-primary',
   })
   //last
-  listPages.push({label: '»', page: maxPage, class: 'btn-light-primary'})
+  listPages.push({ label: '»', page: maxPage, class: 'btn-light-primary' })
 
   return listPages
 }
@@ -68,7 +68,7 @@ const TablesWidget14 = ({
   FallbackView,
   onChange = () => undefined,
 }: Props) => {
-  const {productsList, currentPage, totalPages, totalProducts} = dataList
+  const { productsList, currentPage, totalPages, totalProducts } = dataList
 
   const listPages = find_page_begin_end(currentPage, totalPages)
   const [newPageSize, setPageSize] = useState<number>(10)
@@ -89,7 +89,7 @@ const TablesWidget14 = ({
     }
   }, [currentPage, dataList])
 
-  const searchEvent = ( e: any, key: string, status: string) => {
+  const searchEvent = (e: any, key: string, status: string) => {
     e.preventDefault()
     setPaginate(true)
     onChangePageSize(newPageSize, key, status)
@@ -97,7 +97,7 @@ const TablesWidget14 = ({
 
   const onEnterKeyDown = (event: any) => {
     if (event.key === 'Enter') {
-      searchEvent(event, searchTerms,  filterOption)
+      searchEvent(event, searchTerms, filterOption)
     }
   }
 
@@ -117,10 +117,10 @@ const TablesWidget14 = ({
           data-bs-toggle='tooltip'
           data-bs-placement='top'
           data-bs-trigger='hover'
-         /*  title='Click to add a product' */
+        /*  title='Click to add a product' */
         >
           {isPaginate && (
-            <span className='me-2 ms-5 indicator-progress' style={{display: 'block'}}>
+            <span className='me-2 ms-5 indicator-progress' style={{ display: 'block' }}>
               Loading...
               <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
             </span>
@@ -128,7 +128,7 @@ const TablesWidget14 = ({
           <div className='me-4 my-1'>
             <input
               value={searchTerms}
-              style={{width: '200px'}}
+              style={{ width: '200px' }}
               type='text'
               name='searchTerm'
               className='form-control px-2 py-2 me-3'
@@ -146,9 +146,9 @@ const TablesWidget14 = ({
               value={filterOption}
               onChange={(e) => {
                 setFilterOption(e.target.value)
-                searchEvent(e, searchTerms, e.target.value )
+                searchEvent(e, searchTerms, e.target.value)
               }}
-              style={{width: '120px'}}
+              style={{ width: '120px' }}
             >
               <option value=''>All</option>
               <option value='draft'>Draft</option>
@@ -160,7 +160,7 @@ const TablesWidget14 = ({
             <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>
               Apply
             </button>
-          </div>*/}   
+          </div>*/}
           <Link to='/product/create' className='btn btn-sm btn-light-primary'>
             <KTSVG path='/media/icons/duotune/arrows/arr075.svg' className='svg-icon-3' />
             New Product
@@ -228,7 +228,7 @@ const TablesWidget14 = ({
                             <br />
                             <small
                               className='me-2'
-                              style={{color: '#999', textDecoration: 'line-through'}}
+                              style={{ color: '#999', textDecoration: 'line-through' }}
                             >
                               {formatToCurrency(ele.price)}
                             </small>
@@ -253,7 +253,7 @@ const TablesWidget14 = ({
                             to={{
                               hash: '#' + ele.product_id,
                               pathname: '/product/update/' + ele.product_id /*/product/create*/,
-                              state: {productId: ele.product_id},
+                              state: { productId: ele.product_id },
                             }}
                             className='btn btn-icon btn-bg-light btn-hover-primary btn-sm me-1'
                           >
@@ -323,7 +323,7 @@ const TablesWidget14 = ({
                       Displaying {currentPage} of {totalPages} pages
                     </span>
                     {isPaginate && (
-                      <span className='ms-5 indicator-progress' style={{display: 'block'}}>
+                      <span className='ms-5 indicator-progress' style={{ display: 'block' }}>
                         Loading...
                         <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                       </span>
@@ -367,4 +367,4 @@ const TablesWidget14 = ({
   )
 }
 
-export {TablesWidget14}
+export { TablesWidget14 }

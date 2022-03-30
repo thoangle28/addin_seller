@@ -23,7 +23,6 @@ export function getShippingClass() {
   return axios.get<any>(API_END_POINT_URL + '/shipping-classes')
 }
 
-
 export function getCategoires() {
   return axios.get<any>(API_END_POINT_URL + '/product/categories')
 }
@@ -39,7 +38,6 @@ export function getAttributesNoChild() {
 export function getSubAttributes(slug: string) {
   return axios.post<any>(API_END_POINT_URL + '/product/attribute-list', { 'name': slug })
 }
-
 
 export function getProductsList(userId: number) {
 
@@ -84,3 +82,7 @@ export function uploadImage(file: any) {
   const url = '/upload-file';
   return axios.post<any>(API_END_POINT_URL + url, { file: file })
 }
+
+export const createProductAttributeBrand = (payload: any) => axios.post(API_END_POINT_URL + '/product/create-product-attributes-brand', payload)
+
+export const createTermsProductAttribute = (payload: any) => axios.post(API_END_POINT_URL + '/product/create-terms-product-attribute', payload)
