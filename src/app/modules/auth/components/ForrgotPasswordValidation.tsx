@@ -25,13 +25,13 @@ const forgotPasswordSchema = Yup.object().shape({
     password_confirm: Yup.string()
         .min(3, 'Minimum 3 symbols')
         .max(50, 'Maximum 50 symbols')
-        .required('Confirm Password is required')
+        .required('Confirm password is required')
         .matches(
             /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
             "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character."
         )
-        .oneOf([Yup.ref('new_password'), null], 'Confirm Password have to match'),
-    reset_token: Yup.string().required('Token Is Required!')
+        .oneOf([Yup.ref('new_password'), null], 'Confirm password have to match'),
+    reset_token: Yup.string().required('The token is required!')
 })
 
 export function ForgotPasswordValidation() {
@@ -98,7 +98,7 @@ export function ForgotPasswordValidation() {
 
                 {hasErrors === false && (
                     <div className='mb-10 bg-light-info p-8 rounded'>
-                        <div className='text-info text-center'>your password have been reset successfully! this page will be redirect automatically in a few seconds.</div>
+                        <div className='text-info text-center'>Your password have been reset successfully. This page will be redirect automatically in a few seconds.</div>
                     </div>
                 )}
                 {/* end::Title */}
@@ -164,7 +164,7 @@ export function ForgotPasswordValidation() {
                 </div>
                 <div className='mb-10 fv-row' data-kt-password-meter='true'>
                     <div className='mb-1'>
-                        <label className='form-label fw-bolder text-dark fs-6 required'>Reset Token</label>
+                        <label className='form-label fw-bolder text-dark fs-6 required'>Reset token</label>
                         <div className='position-relative mb-3'>
                             <input
                                 type='text'
