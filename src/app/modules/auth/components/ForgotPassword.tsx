@@ -4,6 +4,7 @@ import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { requestPassword } from '../redux/AuthCRUD'
+import { useHistory } from 'react-router-dom'
 
 const initialValues = {
   email: '',
@@ -20,25 +21,35 @@ const forgotPasswordSchema = Yup.object().shape({
 export function ForgotPassword() {
   const [loading, setLoading] = useState(false)
   const [hasErrors, setHasErrors] = useState<boolean | undefined>(undefined)
+  const [message, setMessage] = useState<string>()
+  const history = useHistory();
+
   const formik = useFormik({
     initialValues,
     validationSchema: forgotPasswordSchema,
     onSubmit: (values, { setStatus, setSubmitting }) => {
       setLoading(true)
       setHasErrors(undefined)
-      setTimeout(() => {
-        requestPassword(values.email)
-          .then(({ data: { result } }) => {
+      requestPassword(values.email)
+        .then(res => {
+          const { message, code } = res.data
+          if (code === 200) {
+            setLoading(false)
             setHasErrors(false)
+            setTimeout(() => {
+              history.push('/auth/login')
+            }, 5000);
+          } else {
             setLoading(false)
-          })
-          .catch(() => {
-            setHasErrors(true)
-            setLoading(false)
-            setSubmitting(false)
-            setStatus('The login detail is incorrect')
-          })
-      }, 1000)
+            setMessage(message)
+          }
+        })
+        .catch(() => {
+          setHasErrors(true)
+          setLoading(false)
+          setSubmitting(false)
+          setStatus('The login detail is incorrect')
+        })
     },
   })
 
@@ -59,6 +70,12 @@ export function ForgotPassword() {
           <div className='text-gray-400 fs-6'>Enter your email to reset your password.</div>
           {/* end::Link */}
         </div>
+        {message && (<div className='mb-lg-15 alert alert-danger'>
+          <div className='alert-text font-weight-bold'>
+            {message}
+          </div>
+        </div>)}
+
 
         {/* begin::Title */}
         {hasErrors === true && (
@@ -71,7 +88,7 @@ export function ForgotPassword() {
 
         {hasErrors === false && (
           <div className='mb-10 bg-light-info p-8 rounded'>
-            <div className='text-info text-center'>Code have been sent. Please check your email !</div>
+            <div className='text-info text-center'>Activation code has been sent to your email, please check. This page will be redirect in a few seconds</div>
           </div>
         )}
         {/* end::Title */}
@@ -108,6 +125,7 @@ export function ForgotPassword() {
             type='submit'
             id='kt_password_reset_submit'
             className='btn btn-lg btn-primary fw-bolder me-4'
+            disabled={formik.isSubmitting || !formik.isValid}
           >
             <span className='indicator-label'>Submit</span>
             {loading && (
