@@ -88,7 +88,7 @@ export function ForgotPassword() {
 
         {hasErrors === false && (
           <div className='mb-10 bg-light-info p-8 rounded'>
-            <div className='text-info text-center'>Code have been sent. Please check your email ! this page will be redirect in a few seconds</div>
+            <div className='text-info text-center'>Activation code has been sent to your email, please check. This page will be redirect in a few seconds</div>
           </div>
         )}
         {/* end::Title */}
