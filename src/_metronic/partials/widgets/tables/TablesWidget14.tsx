@@ -31,13 +31,21 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
   //fist
   listPages.push({ label: '«', page: 1, class: 'btn-light-primary' })
   //previous
-  listPages.push({ label: '‹', page: (currentPage - 1) <= 0 ? 1 : currentPage - 1, class: 'btn-light-primary' })
+  listPages.push({
+    label: '‹',
+    page: currentPage - 1 <= 0 ? 1 : currentPage - 1,
+    class: 'btn-light-primary',
+  })
   //list page with 5 items
   for (let index = begin; index <= end; index++) {
-    listPages.push({ label: index, page: index, class: (currentPage === index ? 'active' : '') })
+    listPages.push({ label: index, page: index, class: currentPage === index ? 'active' : '' })
   }
   //next
-  listPages.push({ label: '›', page: (currentPage + 1) > maxPage ? maxPage : currentPage + 1, class: 'btn-light-primary' })
+  listPages.push({
+    label: '›',
+    page: currentPage + 1 > maxPage ? maxPage : currentPage + 1,
+    class: 'btn-light-primary',
+  })
   //last
   listPages.push({ label: '»', page: maxPage, class: 'btn-light-primary' })
 
@@ -48,13 +56,19 @@ const formatToCurrency = (amount: number) => {
   let formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  });
-  return (amount > 0) ? formatter.format(amount) : '';
-};
+  })
+  return amount > 0 ? formatter.format(amount) : ''
+}
 
-const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackView, onChange = () => undefined }: Props) => {
-
-  const { productsList, currentPage, totalPages, totalProducts } = dataList;
+const TablesWidget14 = ({
+  className,
+  dataList,
+  isHome,
+  isPageLoading,
+  FallbackView,
+  onChange = () => undefined,
+}: Props) => {
+  const { productsList, currentPage, totalPages, totalProducts } = dataList
 
   const listPages = find_page_begin_end(currentPage, totalPages)
   const [newPageSize, setPageSize] = useState<number>(10)
@@ -62,23 +76,29 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
   const [searchTerms, setSearchTerms] = useState<string>('')
   const [filterOption, setFilterOption] = useState<string>('')
 
-  const onChangePageSize = (s: any) => {
+  const onChangePageSize = (s: any, key?: string, status?: string) => {
     setPageSize(s)
-    onChange(-1, s, searchTerms, filterOption)
+    onChange(-1, s, key, status)
     setPaginate(true)
   }
 
-
   useEffect(() => {
-    let timer = setTimeout(() => setPaginate(false), 2000);
+    let timer = setTimeout(() => setPaginate(false), 2000)
     return () => {
-      clearTimeout(timer);
-    };
+      clearTimeout(timer)
+    }
   }, [currentPage, dataList])
 
-  const searchEvent = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    onChangePageSize(newPageSize)
+  const searchEvent = (e: any, key: string, status: string) => {
+    e.preventDefault()
+    setPaginate(true)
+    onChangePageSize(newPageSize, key, status)
+  }
+
+  const onEnterKeyDown = (event: any) => {
+    if (event.key === 'Enter') {
+      searchEvent(event, searchTerms, filterOption)
+    }
   }
 
   return (
@@ -88,7 +108,7 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
         <h3 className='card-title align-items-start flex-column'>
           <span className='card-label fw-bolder fs-3 mb-1'>Products Listing</span>
           <span className='text-muted mt-1 fw-bold fs-7'>
-            {totalProducts && (<>Over {totalProducts} product(s)</>) || ''}
+            {(totalProducts && <>Over {totalProducts} product(s)</>) || ''}
           </span>
         </h3>
 
@@ -97,26 +117,50 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
           data-bs-toggle='tooltip'
           data-bs-placement='top'
           data-bs-trigger='hover'
-          title='Click to add a product'
+        /*  title='Click to add a product' */
         >
-          {(!isHome) && (
-            <>
-              <div className='me-4 my-1'>
-                <input value={searchTerms} style={{ width: "auto" }} type="text" name="searchTerm" className='form-control px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
-              </div>
-              <div className='me-4 my-1'>
-                <select className='form-select form-select-solid form-select-sm me-3'
-                  value={filterOption} onChange={(e) => setFilterOption(e.target.value)}>
-                  <option value="">All</option>
-                  <option value="draft">Draft</option>
-                  <option value="pendding">Pendding</option>
-                  <option value="publish">Publish</option>
-                </select>
-              </div>
-              <div className='my-1'>
-                <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Apply</button>
-              </div>
-            </>)}
+          {isPaginate && (
+            <span className='me-2 ms-5 indicator-progress' style={{ display: 'block' }}>
+              Loading...
+              <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+            </span>
+          )}
+          <div className='me-4 my-1'>
+            <input
+              value={searchTerms}
+              style={{ width: '200px' }}
+              type='text'
+              name='searchTerm'
+              className='form-control px-2 py-2 me-3'
+              id='searchTerm'
+              placeholder='Search'
+              onChange={(e) => {
+                setSearchTerms(e.target.value)
+              }}
+              onKeyDown={(e) => { onEnterKeyDown(e) }}
+            />
+          </div>
+          <div className='me-4 my-1'>
+            <select
+              className='form-select form-select-solid form-select-sm me-3'
+              value={filterOption}
+              onChange={(e) => {
+                setFilterOption(e.target.value)
+                searchEvent(e, searchTerms, e.target.value)
+              }}
+              style={{ width: '120px' }}
+            >
+              <option value=''>All</option>
+              <option value='draft'>Draft</option>
+              <option value='pending'>Pending</option>
+              <option value='publish'>Publish</option>
+            </select>
+          </div>
+          {/* <div className='my-1'>
+            <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>
+              Apply
+            </button>
+          </div>*/}
           <Link to='/product/create' className='btn btn-sm btn-light-primary'>
             <KTSVG path='/media/icons/duotune/arrows/arr075.svg' className='svg-icon-3' />
             New Product
@@ -146,69 +190,79 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
             {/* end::Table head */}
             {/* begin::Table body */}
             <tbody>
-              {
-                (!!productsList && productsList.length > 0) ? (
-                  productsList.map((ele: any, index: number) => {
-                    return (
-                      <tr key={index}>
-                        <td className='text-center'>{ele.product_id}</td>
-                        <td>
-                          <div className='d-flex align-items-center'>
-                            <div className='symbol symbol-45px me-5'>
-                              <img src={ele.thumbnail ? ele.thumbnail : 'https://via.placeholder.com/75x75/f0f0f0'} alt='' />
-                            </div>
-                            <div className='d-flex justify-content-start flex-column'>
-                              <a
-                                target='blank'
-                                href={ele.preview}
-                                className='text-dark fw-bolder text-hover-primary fs-6'
-                              >
-                                {ele.product_name}
-                              </a>
-                              <span className='text-muted d-block fs-7'>{ele.category}</span>
-                            </div>
+              {!!productsList && productsList.length > 0 ? (
+                productsList.map((ele: any, index: number) => {
+                  return (
+                    <tr key={index}>
+                      <td className='text-center'>{ele.product_id}</td>
+                      <td>
+                        <div className='d-flex align-items-center'>
+                          <div className='symbol symbol-45px me-5'>
+                            <img
+                              src={
+                                ele.thumbnail
+                                  ? ele.thumbnail
+                                  : 'https://via.placeholder.com/75x75/f0f0f0'
+                              }
+                              alt=''
+                            />
                           </div>
-                        </td>
-                        <td className='text-center'>{ele.type}</td>
-                        <td className='text-center'>{ele.sku}</td>
-                        <td className='text-end'>
-
-                          {(ele.sale_price > 0 && ele.sale_price < ele.price) ? (
-                            <>
-                              <span>{formatToCurrency(ele.sale_price)}</span><br />
-                              <small className='me-2' style={{ color: '#999', textDecoration: 'line-through' }}>
-                                {formatToCurrency(ele.price)}
-                              </small>
-                            </>
-                          ) : (
-                            <span>{formatToCurrency(ele.price)}</span>
-                          )}
-
-                        </td>
-                        <td className='text-end'>{ele.posted_date}</td>
-                        <td className='text-center'>
-                          {ele.status === 'publish' ? (
-                            <span className='badge badge-light-success'>Approved</span>
-                          ) : (
-                            <span className='badge badge-light-warning'>Pending</span>
-                          )}
-                        </td>
-                        <td>
-                          <div className='d-flex justify-content-end flex-shrink-0'>
-                            <Link
-                              to={{
-                                hash: '#' + ele.product_id,
-                                pathname: '/product/update/' + ele.product_id, /*/product/create*/
-                                state: { productId: ele.product_id },
-                              }}
-                              className='btn btn-icon btn-bg-light btn-hover-primary btn-sm me-1'
+                          <div className='d-flex justify-content-start flex-column'>
+                            <a
+                              target='blank'
+                              href={ele.preview}
+                              className='text-dark fw-bolder text-hover-primary fs-6'
                             >
-                              <KTSVG
-                                path='/media/icons/duotune/art/art005.svg'
-                                className='svg-icon-3'
-                              />
-                            </Link>
-                            {/* <Link
+                              {ele.product_name}
+                            </a>
+                            <span className='text-muted d-block fs-7'>{ele.category}</span>
+                          </div>
+                        </div>
+                      </td>
+                      <td className='text-center'>{ele.type}</td>
+                      <td className='text-center'>{ele.sku}</td>
+                      <td className='text-end'>
+                        {ele.sale_price > 0 && ele.sale_price < ele.price ? (
+                          <>
+                            <span>{formatToCurrency(ele.sale_price)}</span>
+                            <br />
+                            <small
+                              className='me-2'
+                              style={{ color: '#999', textDecoration: 'line-through' }}
+                            >
+                              {formatToCurrency(ele.price)}
+                            </small>
+                          </>
+                        ) : (
+                          <span>{formatToCurrency(ele.price)}</span>
+                        )}
+                      </td>
+                      <td className='text-end'>{ele.posted_date}</td>
+                      <td className='text-center'>
+                        {ele.status === 'publish' ? (
+                          <span className='badge badge-light-success'>Approved</span>
+                        ) : (
+                          <span className={`badge badge-light-${ele.status === 'pending' ? 'warning' : 'info'}`}>
+                            {ele.status === 'pending' ? 'Pending' : 'Draft'}
+                          </span>
+                        )}
+                      </td>
+                      <td>
+                        <div className='d-flex justify-content-end flex-shrink-0'>
+                          <Link
+                            to={{
+                              hash: '#' + ele.product_id,
+                              pathname: '/product/update/' + ele.product_id /*/product/create*/,
+                              state: { productId: ele.product_id },
+                            }}
+                            className='btn btn-icon btn-bg-light btn-hover-primary btn-sm me-1'
+                          >
+                            <KTSVG
+                              path='/media/icons/duotune/art/art005.svg'
+                              className='svg-icon-3'
+                            />
+                          </Link>
+                          {/* <Link
                             to={{hash: '#del-' + ele.product_id}}
                             onClick={(id) => {
                               alert(id)
@@ -220,26 +274,26 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
                               className='svg-icon-3'
                             />
                           </Link> */}
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  })
-                ) : (
-                  <tr>
-                    <td className='text-center' colSpan={8}>
-                      {
-                        (typeof productsList === 'undefined') ? (
-                          <div className='card mb-0 mb-xl-8 loading-wrapper'>
-                            <div className='card-body py-3 loading-body'>
-                              <FallbackView />
-                            </div>
-                          </div>
-                        ) : (<>No products here</>)
-                      }
-                    </td>
-                  </tr>
-                )}
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })
+              ) : (
+                <tr>
+                  <td className='text-center' colSpan={8}>
+                    {typeof productsList === 'undefined' ? (
+                      <div className='card mb-0 mb-xl-8 loading-wrapper'>
+                        <div className='card-body py-3 loading-body'>
+                          <FallbackView />
+                        </div>
+                      </div>
+                    ) : (
+                      <>No products here</>
+                    )}
+                  </td>
+                </tr>
+              )}
             </tbody>
             {/* end::Table body */}
           </table>
@@ -252,7 +306,10 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
                   <div className='d-flex align-items-center py-3'>
                     <span className='text-muted me-3'>Showing</span>
                     <select
-                      onChange={(e) => { onChangePageSize(e.target.value) }} value={newPageSize}
+                      onChange={(e) => {
+                        onChangePageSize(e.target.value)
+                      }}
+                      value={newPageSize}
                       className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
                     >
                       <option value='10'>10</option>
@@ -265,26 +322,33 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
                     <span className='text-muted ms-5'>
                       Displaying {currentPage} of {totalPages} pages
                     </span>
-                    {isPaginate &&
-                      (<span className='ms-5 indicator-progress' style={{ display: 'block' }}>
+                    {isPaginate && (
+                      <span className='ms-5 indicator-progress' style={{ display: 'block' }}>
                         Loading...
                         <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                      </span>)}
+                      </span>
+                    )}
                   </div>
                   <div className='d-flex flex-wrap py-2 mr-3'>
-                    {
-                      listPages &&
+                    {listPages &&
                       listPages.map((item, index) => {
-                        return (<a key={index}
-                          href={'#' + item.page} onClick={() => {
-                            setPaginate(true)
-                            onChange(item.page, -1, searchTerms, filterOption)
-                          }
-                          }
-                          className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}
-                        >{item.label}</a>)
-                      })
-                    }
+                        return (
+                          <a
+                            key={index}
+                            href={'#' + item.page}
+                            onClick={() => {
+                              setPaginate(true)
+                              onChange(item.page, -1, searchTerms, filterOption)
+                            }}
+                            className={
+                              'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' +
+                              item.class
+                            }
+                          >
+                            {item.label}
+                          </a>
+                        )
+                      })}
                   </div>
                 </div>
               </>
@@ -299,7 +363,7 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
         {/* end::Table container */}
       </div>
       {/* begin::Body */}
-    </div >
+    </div>
   )
 }
 
