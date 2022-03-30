@@ -81,8 +81,6 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
     onChangePageSize(newPageSize)
   }
 
-  console.log(filterOption)
-
   return (
     <div className={`card card-products ${className}`}>
       {/* begin::Header */}
@@ -101,24 +99,24 @@ const TablesWidget14 = ({ className, dataList, isHome, isPageLoading, FallbackVi
           data-bs-trigger='hover'
           title='Click to add a product'
         >
-        {(!isHome) && (
-          <>
-          <div className='me-4 my-1'>
-            <input value={searchTerms} style={{ width: "auto" }} type="text" name="searchTerm" className='form-control px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
-          </div>
-          <div className='me-4 my-1'>
-            <select className='form-select form-select-solid form-select-sm me-3'
-              value={filterOption} onChange={(e) => setFilterOption(e.target.value)}>
-              <option value="">All</option>
-              <option value="draft">Draft</option>
-              <option value="pendding">Pendding</option>
-              <option value="publish">Publish</option>
-            </select>
-          </div>
-          <div className='my-1'>
-            <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Apply</button>
-          </div>
-          </>)}
+          {(!isHome) && (
+            <>
+              <div className='me-4 my-1'>
+                <input value={searchTerms} style={{ width: "auto" }} type="text" name="searchTerm" className='form-control px-2 py-2 me-3' id="" placeholder='Search' onChange={(e) => setSearchTerms(e.target.value)} />
+              </div>
+              <div className='me-4 my-1'>
+                <select className='form-select form-select-solid form-select-sm me-3'
+                  value={filterOption} onChange={(e) => setFilterOption(e.target.value)}>
+                  <option value="">All</option>
+                  <option value="draft">Draft</option>
+                  <option value="pendding">Pendding</option>
+                  <option value="publish">Publish</option>
+                </select>
+              </div>
+              <div className='my-1'>
+                <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>Apply</button>
+              </div>
+            </>)}
           <Link to='/product/create' className='btn btn-sm btn-light-primary'>
             <KTSVG path='/media/icons/duotune/arrows/arr075.svg' className='svg-icon-3' />
             New Product
