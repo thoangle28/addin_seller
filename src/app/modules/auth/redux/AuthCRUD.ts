@@ -47,7 +47,7 @@ export function register(email: string, firstname: string,
   return axios.post<any>(API_END_POINT_URL + '/register', params)
 }
 // Server should return object => { result: boolean } (Is Email in DB)
-export const requestPassword = (user_email: string) => axios.post<{ result: boolean }>(API_END_POINT_URL + "/user/profile/send-mail-forgot-password", { user_email })
+export const requestPassword = (user_email: string) => axios.post(API_END_POINT_URL + "/user/profile/send-mail-forgot-password", { user_email })
 export const requestValidatePassword = (payload: IRequestPasswordValidation) => axios.post(API_END_POINT_URL + '/user/profile/password-recovery', payload)
 export function getUserByToken() {
   // Authorization head should be fulfilled in interceptor.
