@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import { requestPassword } from '../redux/AuthCRUD'
 import { useHistory } from 'react-router-dom'
+import AlertMessage from '../../../../_metronic/partials/common/alert'
 
 const initialValues = {
   email: '',
@@ -30,17 +31,20 @@ export function ForgotPassword() {
     onSubmit: (values, { setStatus, setSubmitting }) => {
       setLoading(true)
       setHasErrors(undefined)
+      setMessage('please wait for a while, your request is sending !')
       requestPassword(values.email)
         .then(res => {
           const { message, code } = res.data
           if (code === 200) {
             setLoading(false)
             setHasErrors(false)
+            setMessage(message + "! This page will be redirected automatically in a few seconds. ")
             setTimeout(() => {
               history.push('/auth/login')
             }, 5000);
           } else {
             setLoading(false)
+            setHasErrors(true)
             setMessage(message)
           }
         })
@@ -52,6 +56,7 @@ export function ForgotPassword() {
         })
     },
   })
+  const alertClass = `${hasErrors ? 'mb-lg-8 alert alert-danger' : 'mb-lg-8 p-8 alert-success'}`
 
   return (
     <>
@@ -70,28 +75,7 @@ export function ForgotPassword() {
           <div className='text-gray-400 fs-6'>Enter your email to reset your password.</div>
           {/* end::Link */}
         </div>
-        {message && (<div className='mb-lg-15 alert alert-danger'>
-          <div className='alert-text font-weight-bold'>
-            {message}
-          </div>
-        </div>)}
-
-
-        {/* begin::Title */}
-        {hasErrors === true && (
-          <div className='mb-lg-15 alert alert-danger'>
-            <div className='alert-text font-weight-bold'>
-              Sorry, looks like there are some errors detected, please try again.
-            </div>
-          </div>
-        )}
-
-        {hasErrors === false && (
-          <div className='mb-10 bg-light-info p-8 rounded'>
-            <div className='text-info text-center'>Activation code has been sent to your email, please check. This page will be redirect in a few seconds</div>
-          </div>
-        )}
-        {/* end::Title */}
+        {message && <AlertMessage alertClass={alertClass} message={message} />}
 
         {/* begin::Form group */}
         <div className='fv-row mb-10'>
@@ -125,7 +109,7 @@ export function ForgotPassword() {
             type='submit'
             id='kt_password_reset_submit'
             className='btn btn-lg btn-primary fw-bolder me-4'
-            disabled={formik.isSubmitting || !formik.isValid}
+            disabled={formik.isSubmitting && !formik.isValid}
           >
             <span className='indicator-label'>Submit</span>
             {loading && (
@@ -140,7 +124,7 @@ export function ForgotPassword() {
               type='button'
               id='kt_login_password_reset_form_cancel_button'
               className='btn btn-lg btn-light-primary fw-bolder'
-              disabled={formik.isSubmitting || !formik.isValid}
+              disabled={formik.isSubmitting && !formik.isValid}
             >
               Cancel
             </button>
