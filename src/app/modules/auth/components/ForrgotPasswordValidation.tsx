@@ -6,6 +6,7 @@ import { useFormik } from 'formik'
 import { useHistory } from 'react-router-dom'
 
 import { requestValidatePassword } from '../redux/AuthCRUD'
+import AlertMessage from '../../../../_metronic/partials/common/alert'
 
 const initialValues = {
     new_password: '',
@@ -31,19 +32,20 @@ const forgotPasswordSchema = Yup.object().shape({
             "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character."
         )
         .oneOf([Yup.ref('new_password'), null], 'Confirm password have to match'),
-    reset_token: Yup.string().required('The token is required!')
+    reset_token: Yup.string().required('The token is required')
 })
 
 export function ForgotPasswordValidation() {
     const history = useHistory();
     const [loading, setLoading] = useState(false)
-    const [hasErrors, setHasErrors] = useState<boolean | undefined>(undefined)
+    const [hasErrors, setHasErrors] = useState<boolean>(false)
+    const [message, setMessage] = useState<string>('')
     const formik = useFormik({
         initialValues,
         validationSchema: forgotPasswordSchema,
         onSubmit: (values, { setStatus, setSubmitting }) => {
             setLoading(true)
-            setHasErrors(undefined)
+            setHasErrors(false)
             const payload = {
                 ...values
             }
@@ -53,10 +55,13 @@ export function ForgotPasswordValidation() {
                     setLoading(true)
                     if (code === 200) {
                         setLoading(false)
+                        setHasErrors(false)
+                        setMessage(message + " ! This page will be redirected automatically in a few seconds.")
                         setTimeout(() => {
                             history.push('/auth/login')
                         }, 3500);
                     } else {
+                        setMessage(message)
                         setHasErrors(true)
                     }
                 })
@@ -68,6 +73,8 @@ export function ForgotPasswordValidation() {
                 })
         },
     })
+
+    const alertClass = `${hasErrors ? 'mb-lg-15 alert alert-danger' : 'mb-lg-8 p-8 alert-success'}`
 
     return (
         <>
@@ -86,23 +93,7 @@ export function ForgotPasswordValidation() {
                     <div className='text-gray-400 fs-6'>Enter your email to reset your password.</div>
                     {/* end::Link */}
                 </div>
-
-                {/* begin::Title */}
-                {hasErrors === true && (
-                    <div className='mb-lg-15 alert alert-danger'>
-                        <div className='alert-text font-weight-bold'>
-                            Sorry, looks like there are some errors detected, please try again.
-                        </div>
-                    </div>
-                )}
-
-                {hasErrors === false && (
-                    <div className='mb-10 bg-light-info p-8 rounded'>
-                        <div className='text-info text-center'>Your password have been reset successfully. This page will be redirect automatically in a few seconds.</div>
-                    </div>
-                )}
-                {/* end::Title */}
-
+                {message && <AlertMessage alertClass={alertClass} message={message} />}
                 {/* begin::Form group */}
                 <div className='mb-10 fv-row' data-kt-password-meter='true'>
                     <div className='mb-1'>
