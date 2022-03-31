@@ -8,19 +8,18 @@ import { useState } from 'react'
 
 const ModalAttr = (Props: any) => {
   const [formMessage, setFormMessage] = useState<string>('')
-  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
+  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy, } = Props
   const initialFormValues: any = {
     taxonomy,
     term_name: '',
-    description: ''
   }
   const initialFormAttr: any = {
     user_id,
     label_name: ''
   }
   const handleHideModal = () => {
-    onCloseModal(false)
     setFormMessage('')
+    onCloseModal(false)
   }
   const productAttributesBrand = (values: any) => {
     const payload = {
@@ -29,11 +28,9 @@ const ModalAttr = (Props: any) => {
     }
     createProductAttributeBrand(payload).then(res => {
       const { code, message } = res.data
-      if (code === 200) {
-        handleHideModal()
-        setFormMessage('')
-      }
       setFormMessage(message)
+      if (code === 200)
+        handleHideModal()
     }).catch(err => console.log(err))
   }
 
@@ -41,15 +38,13 @@ const ModalAttr = (Props: any) => {
     const payload = {
       taxonomy,
       term_name: values.name,
-      description: values.description
     }
     createTermsProductAttribute(payload).then(res => {
       const { code, message } = res.data
+      setFormMessage(message)
       if (code === 200) {
         handleHideModal()
-        setFormMessage('')
       }
-      setFormMessage(message)
     }).catch(err => console.log(err))
   }
 
@@ -63,7 +58,7 @@ const ModalAttr = (Props: any) => {
     >
       <div className='container-xxl px-10 py-10'>
         <div className='modal-header d-flex border-0 p-0'>
-          <h3>{isAddAttr ? 'Creat New/Update Attribute' : 'Create New/Update Value'}</h3>
+          <h3>{isAddAttr ? 'Create New/Update Attribute' : 'Create New/Update Value'}</h3>
           <div
             className='btn btn-icon btn-sm btn-light-primary'
             onClick={handleHideModal}
@@ -110,7 +105,7 @@ const ModalAttr = (Props: any) => {
                     <div className="form-group row">
                       <div className='col-md-12 mb-5'>
                         <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
-                          <span>{isAddAttr ? 'Attrite Name' : 'Value Name'}</span>
+                          <span>{isAddAttr ? 'Attribute Name' : 'Value Name'}</span>
                         </label>
                         <input
                           type='text'
@@ -123,20 +118,6 @@ const ModalAttr = (Props: any) => {
                           data-bs-placement='top'
                         />
                       </div>
-                      {!isAddAttr && <div className='col-md-12 mb-5'>
-                        <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
-                          <span>Description</span>
-                        </label>
-                        <textarea
-                          className='form-control'
-                          name='description'
-                          onChange={handleChange}
-                          value={values.description}
-                          placeholder='description'
-                          data-bs-toggle='tooltip'
-                          data-bs-placement='top'
-                        />
-                      </div>}
                     </div>
                     <div className="form-group row">
                       <div className='col-xs-12 text-center'>

@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from 'react'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
 import { Formik } from 'formik'
 import { shallowEqual, useSelector, connect, ConnectedProps } from 'react-redux'
 import * as Yup from 'yup'
@@ -60,7 +60,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   //Get All Properties  
   const promise = fetchProfileData(currentUserId);
   const productInfo = getProduct(currentUserId, productId)
-
   useEffect(() => {
     promise.then((data: any) => {
       setShippingClass(data.shippingClass)
@@ -104,6 +103,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    * The events on the form
    * @param event
    */
+
   const onChangeProducType = (event: any) => {
     const value = event.target.value
     setProductType(value)
@@ -131,7 +131,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const handleAddMoreAttributes = (formValues: any) => {
     if (!selectedAttr || !selectedAttr.value) return
-    console.log(formValues);
     const value: any = { ...selectedAttr }
     const isAdded = formValues.attributes.some((x: any) => x.id === value.id)
 
@@ -1192,6 +1191,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <div className='accordion' id='product_attribute'>
                                         {(values.attributes &&
                                           values.attributes.map((attr: any, i: number | string) => {
+                                            console.log(attr)
                                             return (
                                               <div
                                                 className='accordion-item'
@@ -1281,7 +1281,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           isMulti
                                                           styles={styles}
                                                           closeMenuOnSelect={false}
-                                                          value={attr.options}
+                                                          value={attr.options.value}
                                                           loadOptions={() => { return loadSubAttrOptions(attr.name) }}
                                                           onChange={(event) => {
                                                             setFieldValue(`attributes[${i}].options`, event)
@@ -1290,6 +1290,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           noOptionsMessage={() => 'No value(s) found'}
                                                           loadingMessage={() => 'Loading data, please wait...'}
                                                           className="fs-7"
+
                                                         />
                                                         <button
                                                           onClick={(event) => {
@@ -1802,7 +1803,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             closeMenuOnSelect={false}
                                             value={values.categories}
                                             loadOptions={() => { return loadCategoriesOptions() }}
-                                            onChange={(selectedOption) => {
+                                            onChange={(selectedOption: any) => {
                                               let event = {
                                                 target: { name: 'categories', value: selectedOption },
                                               }

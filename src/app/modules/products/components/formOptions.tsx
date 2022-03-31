@@ -1,5 +1,5 @@
 import Dropzone from 'react-dropzone'
-import {toAbsoluteUrl} from '../../../../_metronic/helpers'
+import { toAbsoluteUrl } from '../../../../_metronic/helpers'
 import * as common from '../redux/ProductsList'
 
 export interface IAttribute {
@@ -22,7 +22,7 @@ export const initialDefaultForm = {
   variations: [],
   variations_attr: [],
   attributes: [],
-  thumbnail: { src: '', image_id: ''},  
+  thumbnail: { src: '', image_id: '' },
   new_thumbnail: '',
   photo_galleries: [],
   new_photo_galleries: [],
@@ -90,16 +90,16 @@ export const mapValuesToForm = (initialValues: any, productValues: any) => {
 }
 
 export const TaxClass: any = [
-  {value: 'parent', label: 'Same as parent'},
-  {value: '', label: 'Standard'},
-  {value: 'reduced-rate', label: 'Reduced rate'},
-  {value: 'zero-rate', label: 'Zero rate'},
+  { value: 'parent', label: 'Same as parent' },
+  { value: '', label: 'Standard' },
+  { value: 'reduced-rate', label: 'Reduced rate' },
+  { value: 'zero-rate', label: 'Zero rate' },
 ]
 
 export const StockStatus: any = [
-  {value: 'instock', label: 'In stock'},
-  {value: 'outofstock', label: 'Out of stock'},
-  {value: 'onbackorder', label: 'On backorder'},
+  { value: 'instock', label: 'In stock' },
+  { value: 'outofstock', label: 'Out of stock' },
+  { value: 'onbackorder', label: 'On backorder' },
 ]
 
 export const styles = {
@@ -123,13 +123,13 @@ export const ShippingClass = () => {
   common
     .getShippingClass()
     .then((response) => {
-      const {data} = response.data
+      const { data } = response.data
       data &&
         data.forEach((e: any) => {
-          termsList.push({value: e.term_id, label: e.name})
+          termsList.push({ value: e.term_id, label: e.name })
         })
     })
-    .catch(() => {})
+    .catch(() => { })
 
   return termsList
 }
@@ -139,13 +139,13 @@ export const Categoies = () => {
   common
     .getCategoires()
     .then((response) => {
-      const {data} = response.data
+      const { data } = response.data
       data &&
         data.forEach((e: any) => {
-          termsList.push({value: e.term_id, label: e.name})
+          termsList.push({ value: e.term_id, label: e.name })
         })
     })
-    .catch(() => {})
+    .catch(() => { })
 
   return termsList
 }
@@ -157,7 +157,7 @@ export const Attributes = () => {
   common
     .getAttributes()
     .then((response) => {
-      const {data} = response.data
+      const { data } = response.data
 
       data &&
         data.forEach((item: any) => {
@@ -173,13 +173,13 @@ export const Attributes = () => {
 
           fullList.push(newItem)
 
-          termsList.push({value: item.id, label: item.label})
+          termsList.push({ value: item.id, label: item.label })
         })
-      termsList.unshift({value: '', label: 'Custom product attribute'})
+      termsList.unshift({ value: '', label: 'Custom product attribute' })
     })
-    .catch(() => {})
+    .catch(() => { })
 
-    return {termsList, fullList}
+  return { termsList, fullList }
 }
 
 export const SubAttributes = (term_slug: string) => {
@@ -187,13 +187,13 @@ export const SubAttributes = (term_slug: string) => {
   common
     .getSubAttributes(term_slug)
     .then((response) => {
-      const {data} = response.data 
+      const { data } = response.data
       data &&
         data.forEach((e: any) => {
-          termsList.push({...e})
+          termsList.push({ ...e })
         })
     })
-    .catch(() => {})
+    .catch(() => { })
 
   return termsList
 }
@@ -201,11 +201,11 @@ export const SubAttributes = (term_slug: string) => {
 export const ProductDetail = (uId: number, pId: number) => {
   common
     .getProductInfoDetail(uId, pId)
-    .then((response) => {   
-      const {data} = response.data
+    .then((response) => {
+      const { data } = response.data
       return { ...data }
     })
-    .catch(() => {})
+    .catch(() => { })
 }
 
 
@@ -215,14 +215,14 @@ export const ProductsList = (userId: number) => {
   common
     .getProductsList(userId)
     .then((response) => {
-      const {data} = response.data
+      const { data } = response.data
       data &&
         data.productsList &&
         data.productsList.forEach((e: any) => {
-          termsList.push({value: e.product_id, label: e.product_name})
+          termsList.push({ value: e.product_id, label: e.product_name })
         })
     })
-    .catch(() => {})
+    .catch(() => { })
 
   return termsList
 }
@@ -243,7 +243,7 @@ export const handleFileUpload = (files: any) => {
 }
 
 export const UploadImageField = (props: any) => {
-  const {setFileToState, setFieldValue, fileName} = props
+  const { setFileToState, setFieldValue, fileName } = props
   return (
     <>
       <div className='form-group mt-1'>
@@ -262,13 +262,13 @@ export const UploadImageField = (props: any) => {
             }
           }}
         >
-          {({getRootProps, getInputProps}) => (
+          {({ getRootProps, getInputProps }) => (
             <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
               <div {...getRootProps()}>
                 <input {...getInputProps()} name={fileName} accept='image/*' />
                 <div
                   className='dropzone-msg dz-message needsclick d-flex align-items-center'
-                  style={{cursor: 'pointer'}}
+                  style={{ cursor: 'pointer' }}
                 >
                   <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                   <div className='ms-4'>
@@ -308,7 +308,7 @@ export const fetchProfileData = (userId: number) => {
   return Promise.all([
     fetchShippingClass(),
   ]).then(([shippingClass]) => { //, categories, attributes, productsList
-    return {shippingClass}  //, categories, attributes, productsList
+    return { shippingClass }  //, categories, attributes, productsList
   })
 }
 
@@ -317,42 +317,42 @@ const fetchShippingClass = () => {
     try {
       const shippingClass = ShippingClass()
       resolve(shippingClass)
-    } catch(e) {
+    } catch (e) {
       reject({
         errorMsg: 'Error while loading data. Try again later.'
       })
-    }    
-  })    
+    }
+  })
 }
 
 const fetchCategoies = () => {
-  return new Promise((resolve, reject) => {   
+  return new Promise((resolve, reject) => {
     try {
       const categories = Categoies()
       resolve(categories)
-    } catch(e) {
+    } catch (e) {
       reject({
         errorMsg: 'Error while loading data. Try again later.'
       })
-    }  
-  })    
+    }
+  })
 }
 
 const fetchAttributes = () => {
-  return new Promise((resolve, reject) => {   
+  return new Promise((resolve, reject) => {
     try {
       const attributes = Attributes()
       resolve(attributes)
-    } catch(e) {
+    } catch (e) {
       reject({
         errorMsg: 'Error while loading data. Try again later.'
       })
-    }  
-  })    
+    }
+  })
 }
 
 export const postProduct = (params: any, token: string) => {
-  return new Promise((resolve, reject) => { 
+  return new Promise((resolve, reject) => {
     common.saveProductToDB(params, token).then((response) => {
       //console.log(response)
       const { data } = response
@@ -363,19 +363,19 @@ export const postProduct = (params: any, token: string) => {
 
 
 export const getProduct = (uid: number, pid: number) => {
-  return new Promise((resolve, reject) => { 
+  return new Promise((resolve, reject) => {
     common.getProductInfoDetail(uid, pid)
-    .then((response: any) => {
-      const {data} = response
-      resolve(data)
-    })
-    .catch(() => {})
-    .finally(() => {})
+      .then((response: any) => {
+        const { data } = response
+        resolve(data)
+      })
+      .catch(() => { })
+      .finally(() => { })
   })
 }
 
-export const loadSubAttrOptions = async (search: any) => {        
-  const response = await  common.getSubAttributes(search)
+export const loadSubAttrOptions = async (search: any) => {
+  const response = await common.getSubAttributes(search)
   const responseJSON = await response.data
   return {
     options: responseJSON.data || [],
@@ -383,8 +383,8 @@ export const loadSubAttrOptions = async (search: any) => {
   };
 }
 
-export const loadAttributeOptions = async () => {        
-  const response = await  common.getAttributesNoChild()
+export const loadAttributeOptions = async () => {
+  const response = await common.getAttributesNoChild()
   const responseJSON = await response.data
   return {
     options: responseJSON.data || [],
@@ -393,18 +393,18 @@ export const loadAttributeOptions = async () => {
 }
 
 
-export const loadCategoriesOptions = async () => {        
-  const response = await  common.getCategoires()
-  const responseJSON = await response.data 
+export const loadCategoriesOptions = async () => {
+  const response = await common.getCategoires()
+  const responseJSON = await response.data
   return {
     options: responseJSON.data || [],
     hasMore: false,
   };
 }
 
-export const loadProducts = async (userId: number) => {        
- 
-  const response = await  common.getProductsList(userId)
+export const loadProducts = async (userId: number) => {
+
+  const response = await common.getProductsList(userId)
   const responseJSON = await response.data
   const termsList = await convertToList(responseJSON.data)
   return {
@@ -416,10 +416,10 @@ export const loadProducts = async (userId: number) => {
 const convertToList = (data: any) => {
   const termsList: any = []
   data &&
-  data.productsList &&
-  data.productsList.forEach((e: any) => {
-    termsList.push({value: e.product_id, label: e.product_name.replace('&amp;', '&')})
-  })
+    data.productsList &&
+    data.productsList.forEach((e: any) => {
+      termsList.push({ value: e.product_id, label: e.product_name.replace('&amp;', '&') })
+    })
 
   return termsList
 }
