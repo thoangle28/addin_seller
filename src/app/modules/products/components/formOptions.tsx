@@ -374,12 +374,39 @@ export const getProduct = (uid: number, pid: number) => {
   })
 }
 
-export const loadSubAttrOptions = async (search: any) => {
+/* export const loadSubAttrOptions = async (search: any) => {
   const response = await common.getSubAttributes(search)
   const responseJSON = await response.data
   return {
     options: responseJSON.data || [],
     hasMore: false
+  };
+} */
+
+export const loadSubAttrOptions = async (search: any, prevOptions: any) => {
+  console.log(search)
+  const response = await common.getSubAttributes(search)
+  const responseJSON = await response.data
+
+  let options = prevOptions.length <= 0 ? (responseJSON.data  || []) : prevOptions;
+  console.log(responseJSON.data)
+  if( (prevOptions.length > 0 && (responseJSON.data && responseJSON.data.length > prevOptions.length))) {
+    let addOptions = responseJSON.data.filter((item: any) => {
+      return !prevOptions.some((item1: any) => {
+        return item1.id === item.id
+      })
+    })
+    console.log(addOptions)
+    if( addOptions ) {
+      options = addOptions;
+    }
+  } else if( prevOptions.length > 0 ) {
+    options = []
+  }
+
+  return {
+    options: options,
+    hasMore: true
   };
 }
 

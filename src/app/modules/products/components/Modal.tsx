@@ -8,14 +8,16 @@ import { useState } from 'react'
 
 const ModalAttr = (Props: any) => {
   const [formMessage, setFormMessage] = useState<string>('')
-  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy, } = Props
+  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
   const initialFormValues: any = {
-    taxonomy,
+    taxonomy: taxonomy,
     term_name: '',
   }
   const initialFormAttr: any = {
-    user_id,
-    label_name: ''
+    taxonomy: taxonomy,
+    term_name: '',
+   /*  user_id: 0,
+    label_name: '' */
   }
   const handleHideModal = () => {
     setFormMessage('')
@@ -37,7 +39,7 @@ const ModalAttr = (Props: any) => {
   const productValue = (values: any) => {
     const payload = {
       taxonomy,
-      term_name: values.name,
+      term_name: values.term_name,
     }
     createTermsProductAttribute(payload).then(res => {
       const { code, message } = res.data
@@ -58,7 +60,7 @@ const ModalAttr = (Props: any) => {
     >
       <div className='container-xxl px-10 py-10'>
         <div className='modal-header d-flex border-0 p-0'>
-          <h3>{isAddAttr ? 'Create New/Update Attribute' : 'Create New/Update Value'}</h3>
+          <h4>{isAddAttr ? 'Create New/Update Attribute' : 'Create New/Update Value'}</h4>
           <div
             className='btn btn-icon btn-sm btn-light-primary'
             onClick={handleHideModal}
@@ -110,9 +112,9 @@ const ModalAttr = (Props: any) => {
                         <input
                           type='text'
                           className='form-control fs-7'
-                          name='name'
+                          name='term_name'
                           onChange={handleChange}
-                          value={values.name}
+                          value={values.term_name}
                           placeholder=''
                           data-bs-toggle='tooltip'
                           data-bs-placement='top'
