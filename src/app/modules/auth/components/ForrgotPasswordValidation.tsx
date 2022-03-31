@@ -46,6 +46,7 @@ export function ForgotPasswordValidation() {
         onSubmit: (values, { setStatus, setSubmitting }) => {
             setLoading(true)
             setHasErrors(false)
+            setMessage('please wait for a while, your request is sending !')
             const payload = {
                 ...values
             }
