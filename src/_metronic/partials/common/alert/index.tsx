@@ -1,4 +1,4 @@
-
+import './style.scss'
 interface IAlertProps {
     alertClass: string;
     message: string;
@@ -7,7 +7,7 @@ interface IAlertProps {
 const AlertMessage = ({ alertClass, message }: IAlertProps) => {
     return <div className={alertClass}>
         <div className='alert-text font-weight-bold'>
-            <p className='text-default text-center mb-0'>{message}</p>
+            <p className='upper-st-letter text-default text-center mb-0'>{message}</p>
         </div>
     </div>
 }
