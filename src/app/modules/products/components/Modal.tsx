@@ -4,46 +4,49 @@ import { Formik } from 'formik'
 import { createProductAttributeBrand, createTermsProductAttribute } from '../redux/ProductsList'
 import { useState } from 'react'
 
-
-
 const ModalAttr = (Props: any) => {
   const [formMessage, setFormMessage] = useState<string>('')
-  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy, } = Props
+  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
+  const [newAttr, setNewAttr] = useState<any>(null)
+
   const initialFormValues: any = {
-    taxonomy,
+    taxonomy: taxonomy,
     term_name: '',
   }
   const initialFormAttr: any = {
-    user_id,
-    label_name: ''
+    taxonomy: taxonomy,
+    term_name: '',
   }
-  const handleHideModal = () => {
+  const handleHideModal = (newAttr: any) => {
     setFormMessage('')
-    onCloseModal(false)
+    onCloseModal(newAttr)
   }
   const productAttributesBrand = (values: any) => {
     const payload = {
       user_id,
-      label_name: values.name
+      label_name: values.term_name
     }
     createProductAttributeBrand(payload).then(res => {
-      const { code, message } = res.data
+      const { code, message, data } = res.data
       setFormMessage(message)
-      if (code === 200)
-        handleHideModal()
+      if (code === 200) {
+        const newAttr = {...data}      
+        handleHideModal(newAttr)
+      }
     }).catch(err => console.log(err))
   }
 
-  const productValue = (values: any) => {
+  const productAttributeValue = (values: any) => {
     const payload = {
       taxonomy,
-      term_name: values.name,
+      term_name: values.term_name,
     }
     createTermsProductAttribute(payload).then(res => {
-      const { code, message } = res.data
+      const { code, message, data } = res.data
       setFormMessage(message)
       if (code === 200) {
-        handleHideModal()
+        const newAttr = {...data}      
+        handleHideModal(newAttr)
       }
     }).catch(err => console.log(err))
   }
@@ -58,7 +61,7 @@ const ModalAttr = (Props: any) => {
     >
       <div className='container-xxl px-10 py-10'>
         <div className='modal-header d-flex border-0 p-0'>
-          <h3>{isAddAttr ? 'Create New/Update Attribute' : 'Create New/Update Value'}</h3>
+          <h4>{isAddAttr ? 'Create New/Update Attribute' : 'Create New/Update Value'}</h4>
           <div
             className='btn btn-icon btn-sm btn-light-primary'
             onClick={handleHideModal}
@@ -81,7 +84,9 @@ const ModalAttr = (Props: any) => {
                 /* validationSchema={ValidationSchema} */
                 enableReinitialize={true}
                 onSubmit={(values, { setSubmitting }) => {
-                  isAddAttr ? productAttributesBrand(values) : productValue(values);
+                  setSubmitting(true)
+                  isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);                  
+                  setSubmitting(false)
                 }}
               >
                 {({
@@ -94,7 +99,6 @@ const ModalAttr = (Props: any) => {
                   isSubmitting,
                   resetForm,
                   setFieldValue,
-                  /* and other goodies */
                 }) => (
                   <form
                     onSubmit={handleSubmit}
@@ -110,9 +114,9 @@ const ModalAttr = (Props: any) => {
                         <input
                           type='text'
                           className='form-control fs-7'
-                          name='name'
+                          name='term_name'
                           onChange={handleChange}
-                          value={values.name}
+                          value={values.term_name}
                           placeholder=''
                           data-bs-toggle='tooltip'
                           data-bs-placement='top'
