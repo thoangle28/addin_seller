@@ -31,8 +31,10 @@ export function getAttributes() {
   return axios.get<any>(API_END_POINT_URL + '/product/attribute')
 }
 
-export function getAttributesNoChild() {
-  return axios.get<any>(API_END_POINT_URL + '/product/attribute/parents')
+export function getAttributesNoChild(user_id: any) {
+  //return axios.get<any>(API_END_POINT_URL + '/product/attribute/parents')
+  //console.log(user_id)
+  return axios.post<any>(API_END_POINT_URL + '/product/get-all-attribute-product-by-brand', { 'user_id': user_id})  
 }
 
 export function getSubAttributes(slug: string) {

@@ -4,11 +4,11 @@ import { Formik } from 'formik'
 import { createProductAttributeBrand, createTermsProductAttribute } from '../redux/ProductsList'
 import { useState } from 'react'
 
-
-
 const ModalAttr = (Props: any) => {
   const [formMessage, setFormMessage] = useState<string>('')
   const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
+  const [newAttr, setNewAttr] = useState<any>(null)
+
   const initialFormValues: any = {
     taxonomy: taxonomy,
     term_name: '',
@@ -16,12 +16,10 @@ const ModalAttr = (Props: any) => {
   const initialFormAttr: any = {
     taxonomy: taxonomy,
     term_name: '',
-   /*  user_id: 0,
-    label_name: '' */
   }
-  const handleHideModal = () => {
+  const handleHideModal = (newAttr: any) => {
     setFormMessage('')
-    onCloseModal(false)
+    onCloseModal(newAttr)
   }
   const productAttributesBrand = (values: any) => {
     const payload = {
@@ -29,10 +27,12 @@ const ModalAttr = (Props: any) => {
       label_name: values.name
     }
     createProductAttributeBrand(payload).then(res => {
-      const { code, message } = res.data
+      const { code, message, data } = res.data
       setFormMessage(message)
-      if (code === 200)
-        handleHideModal()
+      if (code === 200) {
+        //setNewAttr({}) 
+        handleHideModal(1)
+      }
     }).catch(err => console.log(err))
   }
 
@@ -42,10 +42,11 @@ const ModalAttr = (Props: any) => {
       term_name: values.term_name,
     }
     createTermsProductAttribute(payload).then(res => {
-      const { code, message } = res.data
+      const { code, message, data } = res.data
       setFormMessage(message)
       if (code === 200) {
-        handleHideModal()
+        const newAttr = {...data}      
+        handleHideModal(newAttr)
       }
     }).catch(err => console.log(err))
   }
@@ -96,7 +97,6 @@ const ModalAttr = (Props: any) => {
                   isSubmitting,
                   resetForm,
                   setFieldValue,
-                  /* and other goodies */
                 }) => (
                   <form
                     onSubmit={handleSubmit}

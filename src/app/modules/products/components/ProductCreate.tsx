@@ -70,6 +70,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const [showModalAttr, setShowModalAttr] = useState(false)
   const [isAddAttr, setIsAddAttr] = useState<boolean>(true)
+  const [newAttrValues, setNewAttrValues] = useState<any>([])
 
   const tabDefault: any = useRef(null)
   //Get All Properties
@@ -97,8 +98,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setNewProduct(false)
       setLoading(false)
     } else {
-      if (typeof productId === 'undefined' || productId <= 0) {
-        //console.log(initialFormValues)
+      if (typeof productId === 'undefined' || productId <= 0) {      
         initialFormValues.user_id = currentUserId
         //mapValuesToForm(initialForm, initialFormValues)
         setNewProduct(true)
@@ -171,7 +171,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     mapValuesToForm(initialForm, formValues)
   }
 
-  const onCloseModal = () => {
+  const onCloseModal = (attr: any) => {
+    if( parseInt(attr.id)  > 0 ) {
+      const newOptItem = []
+      newOptItem.push(attr)
+      setNewAttrValues(newOptItem)
+    }
     setShowModalAttr(false)
   }
 
@@ -214,7 +219,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
     setSaveVar({loading: true, error: ''})
-    //console.log(formValues)
     saveProductProperties({
       accessToken,
       product_id: formValues.id,
@@ -224,7 +228,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       .then((response: any) => {
         const {code, message, data} = response.data
         setSaveVar({loading: false, error: message})
-        //console.log(data)
         setTimeout(() => {
           setSaveVar({loading: false, error: ''})
           setReloadPage(true)
@@ -457,6 +460,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   const handleAddNewAttributes = () => {
+    setNewAttrValues([])
     setIsAddAttr(true)
     setShowModalAttr(true)
   }
@@ -1207,7 +1211,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               styles={styles}
                                               closeMenuOnSelect={true}
                                               value={selectedAttr}
-                                              loadOptions={loadAttributeOptions}
+                                              loadOptions={() => {
+                                                return loadAttributeOptions(currentUserId)
+                                              }}
                                               onChange={onChangeAttr}
                                               name='attributes'
                                               className='w-100 fs-7'
@@ -1359,7 +1365,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           ) => {
                                                             return loadSubAttrOptions(
                                                               attr.name,
-                                                              prevOptions
+                                                              prevOptions,
+                                                              newAttrValues
                                                             )
                                                           }}
                                                           onChange={(event) => {
@@ -2011,7 +2018,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   user_id={parseInt(user.ID)}
                   isAddAttr={isAddAttr}
                   showModal={showModalAttr}
-                  onCloseModal={onCloseModal}
+                  onCloseModal={onCloseModal}                  
                 />
               </>
             )}
