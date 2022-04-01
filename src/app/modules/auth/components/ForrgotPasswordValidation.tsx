@@ -57,7 +57,7 @@ export function ForgotPasswordValidation() {
                     if (code === 200) {
                         setLoading(false)
                         setHasErrors(false)
-                        setMessage(message + " ! This page will be redirected automatically in a few seconds.")
+                        setMessage('Your password has been reset successfully! This page will be redirected automatically in a few seconds.')
                         setTimeout(() => {
                             history.push('/auth/login')
                         }, 3500);
