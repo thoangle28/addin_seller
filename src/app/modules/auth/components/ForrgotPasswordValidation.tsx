@@ -46,6 +46,7 @@ export function ForgotPasswordValidation() {
         onSubmit: (values, { setStatus, setSubmitting }) => {
             setLoading(true)
             setHasErrors(false)
+            setMessage('please wait for a while, your request is sending !')
             const payload = {
                 ...values
             }
@@ -74,7 +75,6 @@ export function ForgotPasswordValidation() {
         },
     })
 
-    const alertClass = `${hasErrors ? 'mb-lg-15 alert alert-danger' : 'mb-lg-8 p-8 alert-success'}`
 
     return (
         <>
@@ -93,7 +93,7 @@ export function ForgotPasswordValidation() {
                     <div className='text-gray-400 fs-6'>Enter your email to reset your password.</div>
                     {/* end::Link */}
                 </div>
-                {message && <AlertMessage alertClass={alertClass} message={message} />}
+                {message && <AlertMessage hasErrors={hasErrors} message={message} />}
                 {/* begin::Form group */}
                 <div className='mb-10 fv-row' data-kt-password-meter='true'>
                     <div className='mb-1'>

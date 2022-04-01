@@ -21,7 +21,7 @@ const forgotPasswordSchema = Yup.object().shape({
 
 export function ForgotPassword() {
   const [loading, setLoading] = useState(false)
-  const [hasErrors, setHasErrors] = useState<boolean | undefined>(undefined)
+  const [hasErrors, setHasErrors] = useState<boolean>(false)
   const [message, setMessage] = useState<string>()
   const history = useHistory();
 
@@ -30,7 +30,7 @@ export function ForgotPassword() {
     validationSchema: forgotPasswordSchema,
     onSubmit: (values, { setStatus, setSubmitting }) => {
       setLoading(true)
-      setHasErrors(undefined)
+      setHasErrors(false)
       setMessage('please wait for a while, your request is sending !')
       requestPassword(values.email)
         .then(res => {
@@ -56,7 +56,6 @@ export function ForgotPassword() {
         })
     },
   })
-  const alertClass = `${hasErrors ? 'mb-lg-8 alert alert-danger' : 'mb-lg-8 p-8 alert-success'}`
 
   return (
     <>
@@ -75,7 +74,7 @@ export function ForgotPassword() {
           <div className='text-gray-400 fs-6'>Enter your email to reset your password.</div>
           {/* end::Link */}
         </div>
-        {message && <AlertMessage alertClass={alertClass} message={message} />}
+        {message && <AlertMessage hasErrors={hasErrors} message={message} />}
 
         {/* begin::Form group */}
         <div className='fv-row mb-10'>
