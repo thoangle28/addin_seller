@@ -375,7 +375,7 @@ export const getProduct = (uid: number, pid: number) => {
 }
 
 export const loadSubAttrOptions = async (search: any, prevOptions: any, newAttrValues: any) => { 
-
+  
   const newOption =  newAttrValues.find((element: any) => { return element.attr === search});  
   if( prevOptions.length > 0 && newOption) {
     const newOptionAdded =  prevOptions.some((element: any) => { return element.id === newOption.id});
@@ -386,27 +386,40 @@ export const loadSubAttrOptions = async (search: any, prevOptions: any, newAttrV
   } else {
     const response = await common.getSubAttributes(search)
     const responseJSON = await response.data
-    const newOption =  responseJSON.data.filter((x: any) => {
-      return !(prevOptions.some((y:any) => { 
-        return y.id === x.id
-      }))
-    });
-    console.log(newOption)
-    const loadCondition = ( prevOptions.length > 0 &&  prevOptions.length === responseJSON.data.length )
+    
+    if(!responseJSON.data && prevOptions.length == 0 && newAttrValues) {
+      return {
+        options: newAttrValues || [],
+        hasMore: true
+      };
+    } else {
+      const loadCondition = ( prevOptions &&  prevOptions.length === responseJSON.data.length )
+      return {
+        options: !loadCondition ? responseJSON.data : [],
+        hasMore: true
+      };
+    }
+  }
+}
+
+export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newAttrValue: any) => {
+
+  const newAttr =  prevOptions.some((element: any) => { return element.id === newAttrValue[0].id});  
+  if( prevOptions.length > 0 && !newAttr && newAttrValue ) {
+    return {
+      options: newAttrValue ? newAttrValue : [],
+      hasMore: true
+    }
+  } else {
+    const response = await common.getAttributesNoChild(user_id)
+    const responseJSON = await response.data
+    
+    const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
     return {
       options: !loadCondition ? responseJSON.data : [],
       hasMore: true
     };
-  }
-}
-
-export const loadAttributeOptions = async ( user_id: any) => {
-  const response = await common.getAttributesNoChild(user_id)
-  const responseJSON = await response.data
-  return {
-    options: responseJSON.data || [],
-    hasMore: false
-  };
+  } 
 }
 
 

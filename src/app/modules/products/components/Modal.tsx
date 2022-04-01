@@ -24,19 +24,19 @@ const ModalAttr = (Props: any) => {
   const productAttributesBrand = (values: any) => {
     const payload = {
       user_id,
-      label_name: values.name
+      label_name: values.term_name
     }
     createProductAttributeBrand(payload).then(res => {
       const { code, message, data } = res.data
       setFormMessage(message)
       if (code === 200) {
-        //setNewAttr({}) 
-        handleHideModal(1)
+        const newAttr = {...data}      
+        handleHideModal(newAttr)
       }
     }).catch(err => console.log(err))
   }
 
-  const productValue = (values: any) => {
+  const productAttributeValue = (values: any) => {
     const payload = {
       taxonomy,
       term_name: values.term_name,
@@ -84,7 +84,9 @@ const ModalAttr = (Props: any) => {
                 /* validationSchema={ValidationSchema} */
                 enableReinitialize={true}
                 onSubmit={(values, { setSubmitting }) => {
-                  isAddAttr ? productAttributesBrand(values) : productValue(values);
+                  setSubmitting(true)
+                  isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);                  
+                  setSubmitting(false)
                 }}
               >
                 {({

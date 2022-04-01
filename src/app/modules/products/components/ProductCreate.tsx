@@ -165,7 +165,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       visible: true,
     }
     formValues.attributes.push(newAttr)
-
     //reset
     setSelectedAttr({value: '', label: ''})
     mapValuesToForm(initialForm, formValues)
@@ -572,8 +571,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                     if (values.usePhoto && usePhotoFromContent.length > 0) {
                       values.photo_galleries = usePhotoFromContent
                     }
-                    //console.log(values)
-                    //setSubmitting(false)
+                   
                     setSubmitting(true)
                     postProduct(values, accessToken)
                       .then((product: any) => {
@@ -581,7 +579,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         initialFormValues.attributes = [] //clear
                         initialFormValues.variations = [] //clear
                         initialFormValues.variations_attr = []
-                        //console.log(product)
+                        
                         switch (code) {
                           case 200:
                             confirmRequest(message, data)
@@ -1211,8 +1209,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               styles={styles}
                                               closeMenuOnSelect={true}
                                               value={selectedAttr}
-                                              loadOptions={() => {
-                                                return loadAttributeOptions(currentUserId)
+                                              loadOptions={( search: any, prevOptions: any) => {
+                                                return loadAttributeOptions(currentUserId, prevOptions, newAttrValues)
                                               }}
                                               onChange={onChangeAttr}
                                               name='attributes'
