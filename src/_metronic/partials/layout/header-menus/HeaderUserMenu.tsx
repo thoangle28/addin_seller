@@ -1,16 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC} from 'react'
-import {shallowEqual, useSelector} from 'react-redux'
-import {Link} from 'react-router-dom'
-import {UserModel} from '../../../../app/modules/auth/models/UserModel'
-import {RootState} from '../../../../setup'
-import {Languages} from './Languages'
+import { FC } from 'react'
+import { shallowEqual, useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
+import { UserModel } from '../../../../app/modules/auth/models/UserModel'
+import { RootState } from '../../../../setup'
+import { Languages } from './Languages'
 import * as auth from '../../../../app/modules/auth/redux/AuthRedux'
-import {useDispatch} from 'react-redux'
-import {toAbsoluteUrl} from '../../../helpers'
+import { useDispatch } from 'react-redux'
+import { toAbsoluteUrl } from '../../../helpers'
 
 const HeaderUserMenu: FC = () => {
-  const user: UserModel = useSelector<RootState>(({auth}) => auth.user, shallowEqual) as UserModel
+  const user: UserModel = useSelector<RootState>(({ auth }) => auth.user, shallowEqual) as UserModel
 
   const dispatch = useDispatch()
   const logout = () => {
@@ -33,7 +33,7 @@ const HeaderUserMenu: FC = () => {
               {user.display_name}{/*  {user.last_name} */}
               {/* <span className='badge badge-light-success fw-bolder fs-8 px-2 py-1 ms-2'>Pro</span> */}
             </div>
-           {/*  <a href='#' className='fw-bold text-muted text-hover-primary fs-7'>
+            {/*  <a href='#' className='fw-bold text-muted text-hover-primary fs-7'>
               {user.email}
             </a> */}
           </div>
@@ -142,4 +142,4 @@ const HeaderUserMenu: FC = () => {
   )
 }
 
-export {HeaderUserMenu}
+export { HeaderUserMenu }
