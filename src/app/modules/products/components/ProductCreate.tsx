@@ -1246,7 +1246,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             className='btn btn-sm btn-link ms-5'
                                             name='add-new-attr'
                                           >
-                                            Add New
+                                            Add new
                                           </button>
                                         </div>
                                       </div>
@@ -1391,7 +1391,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           className='btn btn-sm btn-link mt-2'
                                                           name='add-new-attr'
                                                         >
-                                                          Add New Value
+                                                          Add new value
                                                         </button>
                                                       </div>
                                                     </div>
