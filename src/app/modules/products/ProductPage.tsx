@@ -1,8 +1,9 @@
 import React from 'react'
-import {Route, Switch} from 'react-router-dom'
-import {PageLink, PageTitle} from '../../../_metronic/layout/core'
+import { Route, Switch } from 'react-router-dom'
+import { PageLink, PageTitle } from '../../../_metronic/layout/core'
 import ProductList from './components/ProductList'
 import ProductCreate from './components/ProductCreate'
+import Attribute from './components/Attribute'
 
 const productBreadCrumbs: Array<PageLink> = [];
 
@@ -14,14 +15,18 @@ const ProductPage: React.FC = () => {
           <PageTitle breadcrumbs={productBreadCrumbs}>Products Listing</PageTitle>
           <ProductList />
         </Route>
+        <Route path='/product/attributes'>
+          <PageTitle breadcrumbs={productBreadCrumbs}>Attributes</PageTitle>
+          <Attribute />
+        </Route>
         <Route path='/product/create'>
           <PageTitle breadcrumbs={productBreadCrumbs}>Create Product</PageTitle>
           <ProductCreate />
-        </Route>       
+        </Route>
         <Route path='/product/update'>
           <PageTitle breadcrumbs={productBreadCrumbs}>Update Product</PageTitle>
           <ProductCreate />
-        </Route> 
+        </Route>
       </Switch>
       {/* <TablesWidget14 className='mb-5 mb-xl-8' /> */}
     </>
