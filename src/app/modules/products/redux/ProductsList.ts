@@ -31,15 +31,15 @@ export function getAttributes() {
   return axios.get<any>(API_END_POINT_URL + '/product/attribute')
 }
 
-export function getAttributesNoChild(user_id: any) {
+export function getAttributesNoChild(user_id: string | number) {
   //return axios.get<any>(API_END_POINT_URL + '/product/attribute/parents')
   //console.log(user_id)
-  return axios.post<any>(API_END_POINT_URL + '/product/get-all-attribute-product-by-brand', { 'user_id': user_id})  
+  return axios.post<any>(API_END_POINT_URL + '/product/get-all-attribute-product-by-brand', { 'user_id': user_id })
 }
 
-export function getSubAttributes(slug: string) {
-  return axios.post<any>(API_END_POINT_URL + '/product/attribute-list', { 'name': slug })
-}
+export const getSubAttributes = (slug: string) => axios.post<any>(API_END_POINT_URL + '/product/attribute-list', { 'name': slug })
+
+export const updateAttr = (old_attribute_name: string, new_attribute_name: string) => axios.post(API_END_POINT_URL + '/product/update-attribute', { old_attribute_name, new_attribute_name })
 
 export function getProductsList(userId: number) {
 

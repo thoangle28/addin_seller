@@ -30,7 +30,7 @@ const ModalAttr = (Props: any) => {
       const { code, message, data } = res.data
       setFormMessage(message)
       if (code === 200) {
-        const newAttr = {...data}      
+        const newAttr = { ...data }
         handleHideModal(newAttr)
       }
     }).catch(err => console.log(err))
@@ -45,7 +45,7 @@ const ModalAttr = (Props: any) => {
       const { code, message, data } = res.data
       setFormMessage(message)
       if (code === 200) {
-        const newAttr = {...data}      
+        const newAttr = { ...data }
         handleHideModal(newAttr)
       }
     }).catch(err => console.log(err))
@@ -85,7 +85,7 @@ const ModalAttr = (Props: any) => {
                 enableReinitialize={true}
                 onSubmit={(values, { setSubmitting }) => {
                   setSubmitting(true)
-                  isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);                  
+                  isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);
                   setSubmitting(false)
                 }}
               >
