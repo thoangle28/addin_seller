@@ -26,7 +26,7 @@ const Attribute: FC = () => {
 
     const validateSchema = Yup.object().shape({
         old_attribute_name: Yup.string().required('Old Attribute is Required!'),
-        new_attribute_name: Yup.string().required('New Attribute is Required!')
+        new_attribute_name: Yup.string().required('New attribute is required!')
     })
 
     const fetchData = () => {
