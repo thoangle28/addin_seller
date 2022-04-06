@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect, useRef} from 'react'
-import ApexCharts, {ApexOptions} from 'apexcharts'
-import {KTSVG} from '../../../helpers'
-import {getCSSVariableValue} from '../../../assets/ts/_utils'
-import {Dropdown1} from '../../content/dropdown/Dropdown1'
+import React, { useEffect, useRef } from 'react'
+import ApexCharts, { ApexOptions } from 'apexcharts'
+import { KTSVG } from '../../../helpers'
+import { getCSSVariableValue } from '../../../assets/ts/_utils'
+import { Dropdown1 } from '../../content/dropdown/Dropdown1'
 
 type Props = {
   className: string
@@ -11,7 +11,7 @@ type Props = {
   chartHeight: string
 }
 
-const MixedWidget9: React.FC<Props> = ({className, chartColor, chartHeight}) => {
+const MixedWidget9: React.FC<Props> = ({ className, chartColor, chartHeight }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -38,10 +38,8 @@ const MixedWidget9: React.FC<Props> = ({className, chartColor, chartHeight}) => 
       <div className='card-header border-0 py-5'>
         <h3 className='card-title align-items-start flex-column'>
           <span className='card-label fw-bolder fs-3 mb-1'>Sales Statistics</span>
-
           <span className='text-muted fw-bold fs-7'>Recent sales statistics</span>
         </h3>
-
         <div className='card-toolbar'>
           {/* begin::Menu */}
           <button
@@ -301,4 +299,4 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
   }
 }
 
-export {MixedWidget9}
+export { MixedWidget9 }
