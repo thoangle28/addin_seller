@@ -402,9 +402,37 @@ export const loadSubAttrOptions = async (search: any, prevOptions: any, newAttrV
   }
 }
 
-export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newAttrValue: any) => {
+export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newAttrValue: any, search: any ) => {
+  const response = await common.getAttributesNoChild(user_id)
+  const responseJSON = await response.data
+  //const newAttr =  prevOptions.some((element: any) => { return element.id === newAttrValue[0].id});
+  const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
+  console.log(prevOptions.length)
+  console.log(responseJSON.data.length)
+  let options: any = []
+  if( prevOptions.length <= 0) 
+    options = responseJSON.data || []
+  else {
+    options = (loadCondition ? [] : newAttrValue) || []
+  }
 
-  const newAttr =  prevOptions.some((element: any) => { return element.id === newAttrValue[0].id});  
+  if( !search) {
+    return {
+      options: options,
+      hasMore: true
+    };
+  } else {   
+    const searchLower = search.toLowerCase();
+    const filterOption =  options.filter((item: any) => {
+      return item.label.toLocaleLowerCase().includes(searchLower)
+    })
+
+    return {
+      options: filterOption || [],
+      hasMore: false
+    };
+  }
+  /* const newAttr =  prevOptions.some((element: any) => { return element.id === newAttrValue[0].id});  
   if( prevOptions.length > 0 && !newAttr && newAttrValue ) {
     return {
       options: newAttrValue ? newAttrValue : [],
@@ -419,7 +447,7 @@ export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newA
       options: !loadCondition ? responseJSON.data : [],
       hasMore: true
     };
-  } 
+  }  */
 }
 
 

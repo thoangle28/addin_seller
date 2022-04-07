@@ -70,6 +70,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const [showModalAttr, setShowModalAttr] = useState(false)
   const [isAddAttr, setIsAddAttr] = useState<boolean>(true)
+  const [newAttrParent, setNewAttrParent] = useState<any>([])
   const [newAttrValues, setNewAttrValues] = useState<any>([])
 
   const tabDefault: any = useRef(null)
@@ -174,7 +175,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     if( parseInt(attr.id)  > 0 ) {
       const newOptItem = []
       newOptItem.push(attr)
-      setNewAttrValues(newOptItem)
+      setNewAttrParent(newOptItem)
     }
     setShowModalAttr(false)
   }
@@ -1210,7 +1211,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               closeMenuOnSelect={true}
                                               value={selectedAttr}
                                               loadOptions={( search: any, prevOptions: any) => {
-                                                return loadAttributeOptions(currentUserId, prevOptions, newAttrValues)
+                                                return loadAttributeOptions(currentUserId, prevOptions, newAttrParent, search)
                                               }}
                                               onChange={onChangeAttr}
                                               name='attributes'
@@ -1356,7 +1357,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           isMulti
                                                           styles={styles}
                                                           closeMenuOnSelect={false}
-                                                          value={attr.options.value}
+                                                          value={attr.options}
                                                           loadOptions={(
                                                             search: any,
                                                             prevOptions: any
