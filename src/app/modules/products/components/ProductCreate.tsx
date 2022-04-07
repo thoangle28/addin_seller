@@ -70,6 +70,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const [showModalAttr, setShowModalAttr] = useState(false)
   const [isAddAttr, setIsAddAttr] = useState<boolean>(true)
+  const [newAttrParent, setNewAttrParent] = useState<any>([])
   const [newAttrValues, setNewAttrValues] = useState<any>([])
 
   const tabDefault: any = useRef(null)
@@ -171,9 +172,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   const onCloseModal = (attr: any) => {
-    if( parseInt(attr.id)  > 0 ) {
-      const newOptItem = []
-      newOptItem.push(attr)
+    const newOptItem = []
+    newOptItem.push(attr)
+    if( isAddAttr ) {     
+      setNewAttrParent(newOptItem)
+    } else {
       setNewAttrValues(newOptItem)
     }
     setShowModalAttr(false)
@@ -1210,7 +1213,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               closeMenuOnSelect={true}
                                               value={selectedAttr}
                                               loadOptions={( search: any, prevOptions: any) => {
-                                                return loadAttributeOptions(currentUserId, prevOptions, newAttrValues)
+                                                return loadAttributeOptions(currentUserId, prevOptions, newAttrParent, search)
                                               }}
                                               onChange={onChangeAttr}
                                               name='attributes'
@@ -1356,7 +1359,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                           isMulti
                                                           styles={styles}
                                                           closeMenuOnSelect={false}
-                                                          value={attr.options.value}
+                                                          value={attr.options}
                                                           loadOptions={(
                                                             search: any,
                                                             prevOptions: any
@@ -1364,7 +1367,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             return loadSubAttrOptions(
                                                               attr.name,
                                                               prevOptions,
-                                                              newAttrValues
+                                                              newAttrValues,
+                                                              search
                                                             )
                                                           }}
                                                           onChange={(event) => {
