@@ -172,10 +172,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   const onCloseModal = (attr: any) => {
-    if( parseInt(attr.id)  > 0 ) {
-      const newOptItem = []
-      newOptItem.push(attr)
+    const newOptItem = []
+    newOptItem.push(attr)
+    if( isAddAttr ) {     
       setNewAttrParent(newOptItem)
+    } else {
+      setNewAttrValues(newOptItem)
     }
     setShowModalAttr(false)
   }
@@ -1365,7 +1367,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                             return loadSubAttrOptions(
                                                               attr.name,
                                                               prevOptions,
-                                                              newAttrValues
+                                                              newAttrValues,
+                                                              search
                                                             )
                                                           }}
                                                           onChange={(event) => {

@@ -374,31 +374,38 @@ export const getProduct = (uid: number, pid: number) => {
   })
 }
 
-export const loadSubAttrOptions = async (search: any, prevOptions: any, newAttrValues: any) => { 
+export const loadSubAttrOptions = async (term: any, prevOptions: any, newAttrValues: any, search: string) => { 
+
+  const newOption =  newAttrValues.find((element: any) => { return element.attr === term});
+  const newOptionAdded =  prevOptions.some((element: any) => { return element.id === newOption.id});
+
+  const response = await common.getSubAttributes(term)
+  const responseJSON = await response.data
+  const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
+  let options: any = []
+  if( prevOptions.length <= 0) 
+    options = responseJSON.data || []    
+  else {
+    options = (loadCondition ? [] : newAttrValues) || []
+  }
+  //add new
+  if( !newOptionAdded ) options.push()
   
-  const newOption =  newAttrValues.find((element: any) => { return element.attr === search});  
-  if( prevOptions.length > 0 && newOption) {
-    const newOptionAdded =  prevOptions.some((element: any) => { return element.id === newOption.id});
+  if( !search) {
     return {
-      options: newOptionAdded ? [] : [newOption],
+      options: options,
       hasMore: true
     };
-  } else {
-    const response = await common.getSubAttributes(search)
-    const responseJSON = await response.data
-    
-    if(!responseJSON.data && prevOptions.length == 0 && newAttrValues) {
-      return {
-        options: newAttrValues || [],
-        hasMore: true
-      };
-    } else {
-      const loadCondition = ( prevOptions &&  prevOptions.length === responseJSON.data.length )
-      return {
-        options: !loadCondition ? responseJSON.data : [],
-        hasMore: true
-      };
-    }
+  } else {   
+    const searchLower = search.toLowerCase();
+    const filterOption =  options.filter((item: any) => {
+      return item.label.toLocaleLowerCase().includes(searchLower)
+    })
+
+    return {
+      options: filterOption || [],
+      hasMore: false
+    };
   }
 }
 
@@ -430,22 +437,6 @@ export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newA
       hasMore: false
     };
   }
-  /* const newAttr =  prevOptions.some((element: any) => { return element.id === newAttrValue[0].id});  
-  if( prevOptions.length > 0 && !newAttr && newAttrValue ) {
-    return {
-      options: newAttrValue ? newAttrValue : [],
-      hasMore: true
-    }
-  } else {
-    const response = await common.getAttributesNoChild(user_id)
-    const responseJSON = await response.data
-    
-    const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
-    return {
-      options: !loadCondition ? responseJSON.data : [],
-      hasMore: true
-    };
-  }  */
 }
 
 
