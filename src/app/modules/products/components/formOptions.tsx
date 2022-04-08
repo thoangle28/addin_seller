@@ -375,38 +375,41 @@ export const getProduct = (uid: number, pid: number) => {
 }
 
 export const loadSubAttrOptions = async (term: any, prevOptions: any, newAttrValues: any, search: string) => { 
+  return await common.getSubAttributes(term).then((response) => {
+    const responseJSON = response.data
 
-  const newOption =  newAttrValues.find((element: any) => { return element.attr === term});
-  const newOptionAdded =  prevOptions.some((element: any) => { return element.id === newOption.id});
+    //load more
+    const loadCondition = ( prevOptions && responseJSON.data && prevOptions.length < responseJSON.data.length ) || false
 
-  const response = await common.getSubAttributes(term)
-  const responseJSON = await response.data
-  const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
-  let options: any = []
-  if( prevOptions.length <= 0) 
-    options = responseJSON.data || []    
-  else {
-    options = (loadCondition ? [] : newAttrValues) || []
-  }
-  //add new
-  if( !newOptionAdded ) options.push()
+    //add new
+    const newOption =  newAttrValues.find((element: any) => { return element.attr === term});
+    const newOptionAdded =  prevOptions.some((element: any) => { return element.id === newOption.id});
+
+    let options: any = responseJSON.data || []
   
-  if( !search) {
-    return {
-      options: options,
-      hasMore: true
-    };
-  } else {   
-    const searchLower = search.toLowerCase();
-    const filterOption =  options.filter((item: any) => {
-      return item.label.toLocaleLowerCase().includes(searchLower)
-    })
+    let addMoreOption = []
+    if( !newOptionAdded && newOption ) {
+      addMoreOption.push(newOption)
+      if( !options ) options.push(newOption)
+    }
 
-    return {
-      options: filterOption || [],
-      hasMore: false
-    };
-  }
+    if( !search) {
+      return {
+        options: prevOptions.length <= 0 ? options : addMoreOption,
+        hasMore: true
+      };
+    } else {   
+      const searchLower = search.toLowerCase();
+      const filterOption =  options.filter((item: any) => {
+        return item.label.toLocaleLowerCase().includes(searchLower)
+      })
+  
+      return {
+        options: filterOption || [],
+        hasMore: false
+      };
+    }
+  })
 }
 
 export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newAttrValue: any, search: any ) => {
