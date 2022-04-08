@@ -174,10 +174,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const onCloseModal = (attr: any) => {
     const newOptItem = []
     newOptItem.push(attr)
-    if( isAddAttr ) {     
-      setNewAttrParent(newOptItem)
+  
+    if( !attr ) {
+      setNewAttrParent([])
+      setNewAttrValues([])
     } else {
-      setNewAttrValues(newOptItem)
+      if( isAddAttr ) {     
+        setNewAttrParent(newOptItem)
+      } else {
+        setNewAttrValues(newOptItem)
+      }
     }
     setShowModalAttr(false)
   }
