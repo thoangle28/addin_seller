@@ -35,13 +35,13 @@ export function AsideMenuMain() {
             fontIcon='bi-layers'
           />
 
-          <AsideMenuItem
+         {/*  <AsideMenuItem
             to='/product/attributes'
             state='attributes'
             icon='/media/icons/duotune/general/gen055.svg'
             title='Attributes'
             fontIcon='bi-layers'
-          />
+          /> */}
           <AsideMenuItem
             to='/sale-report'
             icon='/media/icons/duotune/communication/com012.svg'
