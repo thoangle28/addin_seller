@@ -128,7 +128,6 @@ const TablesWidget14 = ({
           <div className='me-4 my-1'>
             <input
               value={searchTerms}
-              style={{ width: '200px' }}
               type='text'
               name='searchTerm'
               className='form-control px-2 py-2 me-3'
@@ -148,7 +147,6 @@ const TablesWidget14 = ({
                 setFilterOption(e.target.value)
                 searchEvent(e, searchTerms, e.target.value)
               }}
-              style={{ width: '120px' }}
             >
               <option value=''>All</option>
               <option value='draft'>Draft</option>

@@ -3,16 +3,18 @@ import { FC, useEffect, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import * as Yup from 'yup'
 import { RootState } from '../../../../setup';
+import { AddinLoading } from '../../../../_metronic/partials';
 import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
 
-
+// AddinLoading
 const Attribute: FC = () => {
     const [parentAttributeList, setParentAttributeList] = useState<any[]>([])
-    const [parentAttribute, setParentAttribute] = useState<string>('Edit childen attribute')
+    const [parentAttribute, setParentAttribute] = useState<string>('')
     const [message, setMessage] = useState<string>()
     const [childId, setChildId] = useState<string | number>()
-    const [childAttr, setChildAttr] = useState<string>('')
+    const [childAttrTaxonomy, setChildAttrTaxonomy] = useState<string>('')
+    const [childAttr, setchildAttr] = useState<string>()
     const [isActiveIndex, setActiveIndex] = useState<number>(0);
     const [hasErrors, setHasErrors] = useState<boolean>(true)
     const [isEdit, setIsEdit] = useState<boolean>(false)
@@ -26,7 +28,6 @@ const Attribute: FC = () => {
 
 
     const initialValues = {
-        old_attribute_name: '',
         new_attribute_name: ''
     }
     const createInitValue = {
@@ -39,7 +40,6 @@ const Attribute: FC = () => {
     }
 
     const validateSchema = Yup.object().shape({
-        old_attribute_name: Yup.string().required('Old Attribute is required!'),
         new_attribute_name: Yup.string().required('New attribute is required!')
     })
 
@@ -61,6 +61,12 @@ const Attribute: FC = () => {
         setIsEdit(true)
     }
 
+    const afterSubmit = (resetForm: any) => {
+        setTimeout(() => {
+            setMessage('')
+            resetForm()
+        }, 3500);
+    }
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any) => {
         updateAttr(old_attribute_name, new_attribute_name).then(res => {
             const { code, message } = res.data
@@ -80,22 +86,16 @@ const Attribute: FC = () => {
         })
     }
 
-    const afterSubmit = (resetForm: any) => {
-        setTimeout(() => {
-            setMessage('')
-            resetForm()
-        }, 3500);
-    }
-
     const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any) => {
         const payload: any = {
             ...updateChildAttrInitValue,
             id_term: childId,
-            taxonomy: childAttr,
+            taxonomy: childAttrTaxonomy,
             new_attribute_term_name,
         };
         updateAttributeTerms(payload).then(res => {
             const { code, message } = res.data
+            setHasErrors(false)
             setMessage('processing')
             if (code === 200) {
                 setHasErrors(false)
@@ -136,6 +136,7 @@ const Attribute: FC = () => {
         }
         createTermsProductAttribute(payload).then(res => {
             const { code, message } = res.data
+            setHasErrors(false)
             setMessage('processing')
             if (code === 200) {
                 setMessage(message)
@@ -159,19 +160,19 @@ const Attribute: FC = () => {
 
     const showList = () => !!parentAttributeList && newList.map((attr: any, index: number) => {
         const checkOpen = isActiveIndex === index;
-        return <li key={index} className='list-group-item border-0 mb-2'>
+        return <li key={index} className='list-group-item mt-2 shadow-sm p-4 mb-2 bg-body rounded'>
             <div className="d-flex justify-content-between align-items-center" >
                 <span>{attr.label}</span>
                 <div>
-                    <p onClick={() => { editMode(); setParentAttribute(attr.label) }} className='badge bg-warning rounded-pill mx-4 cursor-pointer'>Edit</p>
+                    <p onClick={() => { editMode(); setParentAttribute(attr.label) }} className='badge bg-warning rounded-pill my-0 mx-4 cursor-pointer'>Edit</p>
                     <p onClick={() => toggleAttr(index)} className='badge bg-success rounded-pill m-0 cursor-pointer'>{attr.options ? attr?.options.length : 0}</p>
                 </div>
             </div>
             {checkOpen && <>
                 {!!attr.options && attr?.options.map((i: any, index: number) =>
-                    <div key={index + Math.random()} className="d-flex justify-content-between">
-                        <p className='mx-4'>{i.label}</p>
-                        <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setChildAttr(i.attr) }} className='text-success cursor-pointer'>Edit</span>
+                    <div key={index + Math.random()} className="d-flex justify-content-between mt-2 border-bottom border-2">
+                        <p className='m-2'>{i.label} </p>
+                        <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label) }} className='text-success cursor-pointer'>Edit</span>
                     </div>)}
             </>
             }
@@ -220,7 +221,7 @@ const Attribute: FC = () => {
                                     <div className='text-danger mt-2'>{errors.name}</div>
                                 )}
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-12">
                                 <button className='btn btn-success my-4 ' type="submit">Submit</button>
                             </div>
                         </form>
@@ -244,18 +245,42 @@ const Attribute: FC = () => {
                     >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
                             <form onSubmit={handleSubmit}>
-                                <label htmlFor="new_attribute_term_name">New Children Attributes</label>
-                                <Field
-                                    component="input"
-                                    type='text'
-                                    id="new_attribute_term_name"
-                                    name="new_attribute_term_name"
-                                    className="form-control my-4"
-                                />
-                                {touched.new_attribute_term_name && errors.new_attribute_term_name && (
-                                    <div className='text-danger mt-2'>{errors.new_attribute_term_name}</div>
-                                )}
-                                <div className="col-md-6 ">
+                                <div className="col-xxs-12 mt-3">
+                                    <label htmlFor="parrent_attribute">Current Parent Attributes</label>
+                                    <Field
+                                        component="input"
+                                        id="parrent_attribute"
+                                        name="parrent_attribute"
+                                        className="form-control my-4"
+                                        value={parentAttribute}
+                                        disabled
+                                    />
+                                </div>
+                                <div className="col-xxs-12 mt-3">
+                                    <label htmlFor="parrent_attribute">Current Child Attributes</label>
+                                    <Field
+                                        component="input"
+                                        id="parrent_attribute"
+                                        name="parrent_attribute"
+                                        className="form-control my-4"
+                                        value={childAttr}
+                                        disabled
+                                    />
+                                </div>
+                                <div className="col-xxs-12 mt-3">
+                                    <label htmlFor="new_attribute_term_name">New Child Attributes</label>
+                                    <Field
+                                        component="input"
+                                        type='text'
+                                        id="new_attribute_term_name"
+                                        name="new_attribute_term_name"
+                                        className="form-control my-4"
+                                    />
+                                    {touched.new_attribute_term_name && errors.new_attribute_term_name && (
+                                        <div className='text-danger mt-2'>{errors.new_attribute_term_name}</div>
+                                    )}
+                                </div>
+                                <div className="col-md-12 ">
                                     <button className='btn btn-success my-4' type="submit">Submit</button>
                                     <button onClick={() => { setIsEdit(false); setIsUpdateChild(false) }} className='btn btn-danger my-4 mx-4' type="submit">cancel</button>
                                 </div>
@@ -267,22 +292,23 @@ const Attribute: FC = () => {
                             initialValues={initialValues}
                             validationSchema={validateSchema}
                             onSubmit={(values, { setSubmitting, resetForm }) => {
-                                updateDataAttr(values.old_attribute_name, values.new_attribute_name, resetForm)
+                                updateDataAttr(parentAttribute, values.new_attribute_name, resetForm)
                             }}
                         >
                             {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
                                 <form onSubmit={handleSubmit}>
-                                    <label htmlFor="old_attribute_name">Parent Attributes</label>
-                                    <Field
-                                        component="input"
-                                        type='text'
-                                        id="old_attribute_name"
-                                        name="old_attribute_name"
-                                        className="form-control"
-                                    />
-                                    {touched.new_attribute_name && errors.new_attribute_name && (
-                                        <div className='text-danger mt-2'>{errors.old_attribute_name}</div>
-                                    )}
+                                    <div className="form-group mt-4 row">
+
+                                        <label htmlFor="old_attribute_name">Current Attributes</label>
+                                        <Field
+                                            component="input"
+                                            type='text'
+                                            id="old_attribute_name"
+                                            className="form-control"
+                                            value={parentAttribute}
+                                            disabled
+                                        />
+                                    </div>
                                     <div className="form-group mt-4 row">
                                         <div className='col-md-12 mb-5'>
                                             <label htmlFor='new_attribute_name' className='d-flex align-items-center fs-7 fw-bold mb-2'>
@@ -303,7 +329,7 @@ const Attribute: FC = () => {
                                             )}
                                         </div>
                                     </div>
-                                    <div className="col-md-6">
+                                    <div className="col-md-12">
                                         <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Submit</button>
                                         <button onClick={() => { setIsEdit(false); setIsUpdateChild(false) }} className='btn btn-danger my-4 mx-4' type="submit">cancel</button>
                                     </div>
@@ -314,24 +340,31 @@ const Attribute: FC = () => {
 
             </div >)
     }
-
     return (
-        <div className='row mt-0 g-xl-8 bg-white'>
-            <div className="col-xxl-7">
-                <div className="card card-products">
-                    <div className='card-header border-0 pt-5'>
-                        <h3 className='card-title align-items-start flex-column'>
-                            <span className='card-label fw-bolder fs-3 mb-1'>{isEdit || isUpdateChild ? 'Edit Attributes : ' + parentAttribute : 'Add New Attribute'}</span>
-                        </h3>
+        <div className='row mt-0 g-xl-8 bg-white rounded'>
+            {parentAttributeList.length > 0 ? (
+                <>
+                    <div className="col-xxl-6 mt-0 ">
+                        <div className="card card-products">
+                            <div className='card-header border-0 pt-5'>
+                                <h3 className='card-title align-items-start flex-column'>
+                                    <span className='card-label fw-bolder fs-3 mb-1'>{isEdit || isUpdateChild ? 'Edit Attributes' : 'Add New Attribute'}</span>
+                                </h3>
+                            </div>
+                            {isEdit || isUpdateChild ? updateForm() : createForm()}
+                        </div>
                     </div>
-                    {isEdit || isUpdateChild ? updateForm() : createForm()}
-                </div>
-            </div>
-            <div style={{ height: 600 }} className="col-xxl-5 overflow-scroll">
-                <ul className='list-group'>
-                    {showList()}
-                </ul>
-            </div>
+                    <div style={{ height: 600 }} className="col-xxl-6 overflow-scroll">
+                        <ul className='list-group'>
+                            {showList()}
+                        </ul>
+                    </div>
+                </>) : (
+                <div className='card mb-5 mb-xl-8 loading-wrapper'>
+                    <div className='card-body py-3 loading-body'>
+                        <AddinLoading />
+                    </div>
+                </div>)}
         </div >
     )
 }
