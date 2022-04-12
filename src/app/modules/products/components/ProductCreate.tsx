@@ -659,9 +659,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               {...props}
                               style={{minHeight: '500px'}}
                             />
-                            {/*  {touched.content && errors.content ? (
-                          <div className='text-danger'>{errors.content}</div>
-                        ) : null} */}
+                            <div className="small pt-2 text-danger">Please only add a maximum of 10 images for the content</div>                          
                           </div>
                         </div>
                         <div className='w-100'>
