@@ -1,18 +1,22 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect, useRef} from 'react'
-import ApexCharts, {ApexOptions} from 'apexcharts'
-import {KTSVG} from '../../../helpers'
-import {getCSSVariableValue} from '../../../assets/ts/_utils'
-import {Dropdown1} from '../../content/dropdown/Dropdown1'
+import React, { useEffect, useRef } from 'react'
+import ApexCharts, { ApexOptions } from 'apexcharts'
+import { KTSVG } from '../../../helpers'
+import { getCSSVariableValue } from '../../../assets/ts/_utils'
+import { Dropdown1 } from '../../content/dropdown/Dropdown1'
 
 type Props = {
   className: string
   chartColor: string
   strokeColor: string
   chartHeight: string
+  weeklySales?: number,
+  newUsers?: number,
+  itemOrders?: number,
+  bugReports?: number
 }
 
-const MixedWidget2: React.FC<Props> = ({className, chartColor, chartHeight, strokeColor}) => {
+const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, strokeColor, weeklySales, newUsers, itemOrders, bugReports }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -71,10 +75,14 @@ const MixedWidget2: React.FC<Props> = ({className, chartColor, chartHeight, stro
           <div className='row g-0'>
             {/* begin::Col */}
             <div className='col bg-light-warning px-6 py-8 rounded-2 me-7 mb-7'>
-              <KTSVG
-                path='/media/icons/duotune/general/gen032.svg'
-                className='svg-icon-3x svg-icon-warning d-block my-2'
-              />
+              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
+
+                <KTSVG
+                  path='/media/icons/duotune/general/gen032.svg'
+                  className='svg-icon-3x svg-icon-warning d-block my-2'
+                />
+                <span className="px-3 text-warning">{weeklySales}</span>
+              </div>
               <a href='#' className='text-warning fw-bold fs-6'>
                 Weekly Sales
               </a>
@@ -82,10 +90,13 @@ const MixedWidget2: React.FC<Props> = ({className, chartColor, chartHeight, stro
             {/* end::Col */}
             {/* begin::Col */}
             <div className='col bg-light-primary px-6 py-8 rounded-2 mb-7'>
-              <KTSVG
-                path='/media/icons/duotune/arrows/arr075.svg'
-                className='svg-icon-3x svg-icon-primary d-block my-2'
-              />
+              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
+                <KTSVG
+                  path='/media/icons/duotune/arrows/arr075.svg'
+                  className='svg-icon-3x svg-icon-primary d-block my-2'
+                />
+                <span className="px-3 text-primary">{newUsers}</span>
+              </div>
               <a href='#' className='text-primary fw-bold fs-6'>
                 New Users
               </a>
@@ -97,10 +108,13 @@ const MixedWidget2: React.FC<Props> = ({className, chartColor, chartHeight, stro
           <div className='row g-0'>
             {/* begin::Col */}
             <div className='col bg-light-danger px-6 py-8 rounded-2 me-7'>
-              <KTSVG
-                path='/media/icons/duotune/abstract/abs027.svg'
-                className='svg-icon-3x svg-icon-danger d-block my-2'
-              />
+              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
+                <KTSVG
+                  path='/media/icons/duotune/abstract/abs027.svg'
+                  className='svg-icon-3x svg-icon-danger d-block my-2'
+                />
+                <span className="px-3 text-danger">{itemOrders}</span>
+              </div>
               <a href='#' className='text-danger fw-bold fs-6 mt-2'>
                 Item Orders
               </a>
@@ -108,10 +122,13 @@ const MixedWidget2: React.FC<Props> = ({className, chartColor, chartHeight, stro
             {/* end::Col */}
             {/* begin::Col */}
             <div className='col bg-light-success px-6 py-8 rounded-2'>
-              <KTSVG
-                path='/media/icons/duotune/communication/com010.svg'
-                className='svg-icon-3x svg-icon-success d-block my-2'
-              />
+
+              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
+                <KTSVG
+                  path='/media/icons/duotune/communication/com010.svg'
+                  className='svg-icon-3x svg-icon-success d-block my-2'
+                /> <span className='px-3 text-success'>{bugReports}</span> </div>
+
               <a href='#' className='text-success fw-bold fs-6 mt-2'>
                 Bug Reports
               </a>
@@ -139,7 +156,7 @@ const chartOptions = (
   return {
     series: [
       {
-        name: 'This feature will be ready soon.', //'Net Profit',
+        name: 'Net Profit.',
         data: [30, 45, 32, 70, 40, 40, 40],
       },
     ],
@@ -246,7 +263,7 @@ const chartOptions = (
       },
       y: {
         formatter: function (val) {
-          return ''//'$' + val + ' thousands'
+          return '$' + val + ' thousands'
         },
       },
       marker: {
@@ -262,4 +279,4 @@ const chartOptions = (
   }
 }
 
-export {MixedWidget2}
+export { MixedWidget2 }

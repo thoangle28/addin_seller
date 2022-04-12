@@ -41,6 +41,7 @@ export const getSubAttributes = (slug: string) => axios.post<any>(API_END_POINT_
 
 export const updateAttr = (old_attribute_name: string, new_attribute_name: string) => axios.post(API_END_POINT_URL + '/product/update-attribute', { old_attribute_name, new_attribute_name })
 export const getAttributesById = (user_id: string | number) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id })
+export const updateAttributeTerms = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute-term', payload)
 export function getProductsList(userId: number) {
 
   const args = {
