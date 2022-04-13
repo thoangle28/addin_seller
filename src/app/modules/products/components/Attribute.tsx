@@ -6,6 +6,7 @@ import { RootState } from '../../../../setup';
 import { AddinLoading } from '../../../../_metronic/partials';
 import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
+import { toAbsoluteUrl } from '../../../../_metronic/helpers';
 
 // AddinLoading
 const Attribute: FC = () => {
@@ -14,12 +15,12 @@ const Attribute: FC = () => {
     const [message, setMessage] = useState<string>()
     const [childId, setChildId] = useState<string | number>()
     const [childAttrTaxonomy, setChildAttrTaxonomy] = useState<string>('')
-    const [childAttr, setchildAttr] = useState<string>()
+    const [childAttr, setchildAttr] = useState<string>('')
     const [isActiveIndex, setActiveIndex] = useState<number>(0);
     const [hasErrors, setHasErrors] = useState<boolean>(true)
     const [isEdit, setIsEdit] = useState<boolean>(false)
     const [isUpdateChild, setIsUpdateChild] = useState<boolean>(false)
-
+    const [isChildOpen, setIsChildOpen] = useState(false)
 
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId = user ? user.ID : 0
@@ -27,28 +28,27 @@ const Attribute: FC = () => {
     const newList = [...parentAttributeList]
 
 
-    const initialValues = {
-        new_attribute_name: ''
-    }
     const createInitValue = {
         name: '',
         parrent_attribute: ''
     }
+    const createValidSchema = Yup.object().shape({
+        name: Yup.string().required('Name is required!')
+    })
 
-    const updateChildAttrInitValue = {
-        new_attribute_term_name: ''
+    const initialValues = {
+        new_attribute_name: parentAttribute
     }
-
     const validateSchema = Yup.object().shape({
         new_attribute_name: Yup.string().required('New attribute is required!')
     })
 
+    const updateChildAttrInitValue = {
+        new_attribute_term_name: childAttr
+    }
+
     const childUpdateValidateSchema = Yup.object().shape({
         new_attribute_term_name: Yup.string().required('New Attribute Term is required!'),
-    })
-
-    const createValidSchema = Yup.object().shape({
-        name: Yup.string().required('Name is required!')
     })
 
 
@@ -157,28 +157,39 @@ const Attribute: FC = () => {
     };
 
     const showData = () => !!parentAttributeList && parentAttributeList.map((attr: any) => <option value={attr.value} key={attr.id}>{attr.label}</option>)
-
     const showList = () => !!parentAttributeList && newList.map((attr: any, index: number) => {
         const checkOpen = isActiveIndex === index;
         return <li key={index} className='list-group-item mt-2 shadow-sm p-4 mb-2 bg-body rounded'>
-            <div className="d-flex justify-content-between align-items-center" >
-                <span>{attr.label}</span>
-                <div>
-                    <p onClick={() => { editMode(); setParentAttribute(attr.label) }} className='badge bg-warning rounded-pill my-0 mx-4 cursor-pointer'>Edit</p>
-                    <p onClick={() => toggleAttr(index)} className='badge bg-success rounded-pill m-0 cursor-pointer'>{attr.options ? attr?.options.length : 0}</p>
+            <div className="d-flex justify-content-between align-items-center my-1" >
+                <div className='cursor-pointer' onClick={() => {
+                    toggleAttr(index)
+                    isChildOpen ? setIsChildOpen(false) : setIsChildOpen(true)
+                }}>
+                    <span>{attr.label} </span>
+                    <p className='badge bg-primary rounded-pill mx-2 mb-0 '>{attr.options ? attr?.options.length : 0}</p>
                 </div>
+                <button style={isChildOpen ? { pointerEvents: 'none' } : {}} className='btn-btn-success border-0 bg-transparent' aria-disabled="true" >
+                    <p className='badge mx-4 mb-0 cursor-pointer'>
+                        <img alt={attr.label} onClick={() => { editMode(); setParentAttribute(attr.label) }} src={toAbsoluteUrl("/media/icons/duotune/art/art005.svg")} className="h-16px w-auto" />
+                    </p>
+                </button>
             </div>
-            {checkOpen && <>
-                {!!attr.options && attr?.options.map((i: any, index: number) =>
-                    <div key={index + Math.random()} className="d-flex justify-content-between mt-2 border-bottom border-2">
-                        <p className='m-2'>{i.label} </p>
-                        <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label) }} className='text-success cursor-pointer'>Edit</span>
-                    </div>)}
-            </>
+            {
+                checkOpen && <>
+                    {!!attr.options && attr?.options.map((i: any, index: number) =>
+                        <div key={index + Math.random()} className="d-flex justify-content-between mt-2 border-bottom border-1 mt-4">
+                            <p className='m-2'>{i.label} </p>
+                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); setIsChildOpen(true) }} className='text-success cursor-pointer'>Edit</span>
+                        </div>)}
+                </>
             }
         </li >
     }
     )
+
+    const cancelEvent = (resetForm: any) => {
+        setIsEdit(false); setIsUpdateChild(false); resetForm(); setIsChildOpen(false)
+    }
 
     // Create UI FORM
     const createForm = () => {
@@ -222,7 +233,7 @@ const Attribute: FC = () => {
                                 )}
                             </div>
                             <div className="col-md-12">
-                                <button className='btn btn-success my-4 ' type="submit">Submit</button>
+                                <button className='btn btn-success my-4 ' type="submit">Add New</button>
                             </div>
                         </form>
                     )}
@@ -230,25 +241,24 @@ const Attribute: FC = () => {
             </div>)
     }
 
-    // Update UI FROM
+    // Update FORM
     const updateForm = () => {
         return (
             <div className='card-body py-3'>
                 {message && <AlertMessage hasErrors={hasErrors} message={message} />}
                 {isUpdateChild ?
                     <Formik
-                        initialValues={updateChildAttrInitValue}
-                        validationSchema={childUpdateValidateSchema}
+                        initialValues={{ ...updateChildAttrInitValue }}
+                        validationSchema={childUpdateValidateSchema} enableReinitialize={true}
                         onSubmit={(values, { setSubmitting, resetForm }) => {
                             updateAttributeTerm(values.new_attribute_term_name, resetForm)
                         }}
                     >
-                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+                        {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
                             <form onSubmit={handleSubmit}>
                                 <div className="col-xxs-12 mt-3">
                                     <label htmlFor="parrent_attribute">Current Parent Attributes</label>
                                     <Field
-                                        component="input"
                                         id="parrent_attribute"
                                         name="parrent_attribute"
                                         className="form-control my-4"
@@ -256,50 +266,42 @@ const Attribute: FC = () => {
                                         disabled
                                     />
                                 </div>
+
                                 <div className="col-xxs-12 mt-3">
-                                    <label htmlFor="parrent_attribute">Current Child Attributes</label>
-                                    <Field
-                                        component="input"
-                                        id="parrent_attribute"
-                                        name="parrent_attribute"
-                                        className="form-control my-4"
-                                        value={childAttr}
-                                        disabled
-                                    />
-                                </div>
-                                <div className="col-xxs-12 mt-3">
-                                    <label htmlFor="new_attribute_term_name">New Child Attributes</label>
-                                    <Field
-                                        component="input"
+                                    <label htmlFor="new_attribute_term_name">Name</label>
+                                    <input
                                         type='text'
                                         id="new_attribute_term_name"
                                         name="new_attribute_term_name"
                                         className="form-control my-4"
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        value={values.new_attribute_term_name}
+
                                     />
                                     {touched.new_attribute_term_name && errors.new_attribute_term_name && (
                                         <div className='text-danger mt-2'>{errors.new_attribute_term_name}</div>
                                     )}
                                 </div>
                                 <div className="col-md-12 ">
-                                    <button className='btn btn-success my-4' type="submit">Submit</button>
-                                    <button onClick={() => { setIsEdit(false); setIsUpdateChild(false) }} className='btn btn-danger my-4 mx-4' type="submit">cancel</button>
+                                    <button className='btn btn-success my-4' type="submit">Update</button>
+                                    <button onClick={() => cancelEvent(resetForm)} className='btn btn-danger my-4 mx-4' type="submit">cancel</button>
                                 </div>
                             </form>
                         )}
                     </Formik>
                     : (
                         <Formik
-                            initialValues={initialValues}
-                            validationSchema={validateSchema}
+                            initialValues={{ ...initialValues }}
+                            validationSchema={validateSchema} enableReinitialize={true}
                             onSubmit={(values, { setSubmitting, resetForm }) => {
                                 updateDataAttr(parentAttribute, values.new_attribute_name, resetForm)
                             }}
                         >
-                            {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+                            {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
                                 <form onSubmit={handleSubmit}>
                                     <div className="form-group mt-4 row">
-
-                                        <label htmlFor="old_attribute_name">Current Attributes</label>
+                                        <label htmlFor="old_attribute_name">Parent Attributes</label>
                                         <Field
                                             component="input"
                                             type='text'
@@ -314,15 +316,14 @@ const Attribute: FC = () => {
                                             <label htmlFor='new_attribute_name' className='d-flex align-items-center fs-7 fw-bold mb-2'>
                                                 <span>New Attribute</span>
                                             </label>
-                                            <Field
-                                                component="input"
+                                            <input
                                                 type='text'
                                                 id="new_attribute_name"
                                                 className='form-control fs-7'
                                                 name='new_attribute_name'
-                                                placeholder=''
-                                                data-bs-toggle='tooltip'
-                                                data-bs-placement='top'
+                                                value={values.new_attribute_name}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
                                             />
                                             {touched.new_attribute_name && errors.new_attribute_name && (
                                                 <div className='text-danger mt-2'>{errors.new_attribute_name}</div>
@@ -330,13 +331,14 @@ const Attribute: FC = () => {
                                         </div>
                                     </div>
                                     <div className="col-md-12">
-                                        <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Submit</button>
-                                        <button onClick={() => { setIsEdit(false); setIsUpdateChild(false) }} className='btn btn-danger my-4 mx-4' type="submit">cancel</button>
+                                        <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Update</button>
+                                        <button onClick={() => cancelEvent(resetForm)} className='btn btn-danger my-4 mx-4' type="submit">cancel</button>
                                     </div>
                                 </form>
                             )}
                         </Formik>
-                    )}
+                    )
+                }
 
             </div >)
     }
@@ -354,7 +356,7 @@ const Attribute: FC = () => {
                             {isEdit || isUpdateChild ? updateForm() : createForm()}
                         </div>
                     </div>
-                    <div style={{ height: 600 }} className="col-xxl-6 overflow-scroll">
+                    <div style={{ height: 768 }} className="col-xxl-6 overflow-scroll">
                         <ul className='list-group'>
                             {showList()}
                         </ul>
