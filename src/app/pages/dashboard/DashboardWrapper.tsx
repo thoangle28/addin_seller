@@ -94,6 +94,8 @@ const DashboardWrapper: FC = () => {
     bugReports: 0
   }
 
+  const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
+
   useEffect(() => {
     initLoad.userId = currentUserId
     const getProductList = () => {
@@ -109,34 +111,45 @@ const DashboardWrapper: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useEffect(() => {
+  useEffect(() => {    
+    loadReport()
+  },[])
+  
+  const loadReport = () => {
+    const reportInit: iReport = {...saleReportInit}
+
     const bugReports = BugReports(currentUserId)
-    bugReports.then((result) => {
+    bugReports.then((result: any) => {
       console.log(result)
+      reportInit.bugReports = result.data ? result.data.total_tickets : 0
     })
 
     const itemOrders = ItemOrders(currentUserId)
-    itemOrders.then((result) => {
+    itemOrders.then((result: any) => {
       console.log(result)
+      reportInit.itemOrders = result.data ? result.data.total_orders : 0
     })
 
     const newUsers = NewUsers(currentUserId)
-    newUsers.then((result) => {
+    newUsers.then((result: any) => {
       console.log(result)
+      reportInit.newUsers = result.data ? result.data.total_customers : 0
     })
 
     const weeklySales = WeeklySales(currentUserId)
-    weeklySales.then((result) => {
+    weeklySales.then((result: any) => {
       console.log(result)
+      reportInit.weeklySales = result.data ? result.data.total_products : 0
     })
-  },[])
-  
+
+    //setSaleReport(reportInit)
+  }
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
 
   return (
     <>
       <PageTitle breadcrumbs={[]}>{intl.formatMessage({ id: 'MENU.DASHBOARD' })}</PageTitle>
-      <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReportInit} />
+      <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
     </>
   )
 }
