@@ -14,13 +14,23 @@ import { FallbackView } from '../../modules/products/components/formOptions'
 import * as product from '../../modules/products/redux/ProductRedux'
 import { RootState } from '../../../setup'
 
+import {BugReports, ItemOrders, NewUsers, WeeklySales} from '../../modules/sale/saleReport';
+
+interface iReport {
+  weeklySales: number | 0
+  newUsers: number | 0
+  itemOrders: number | 0
+  bugReports: number | 0
+}
 type Props = {
   dataList: any | []
   isPageLoading: boolean | true
+  saleReport: iReport
 }
 
-const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading }: Props) => (
+const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => (
   //MixedWidget2: className, chartColor, chartHeight, strokeColor, weeklySales, newUsers, itemOrders, bugReports
+
   <>
     {/* begin::Row Sale Report */}
     <div className='row gy-5 g-xl-8'>
@@ -30,10 +40,10 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading }: Props) => (
           chartColor='danger'
           chartHeight='200px'
           strokeColor='#cb1e46'
-          weeklySales={Math.round(Math.random()*100)}
-          newUsers={Math.round(Math.random()*100)}
-          itemOrders={Math.round(Math.random()*100)}
-          bugReports={Math.round(Math.random()*100)}
+          weeklySales={saleReport.weeklySales}
+          newUsers={saleReport.newUsers}
+          itemOrders={saleReport.itemOrders}
+          bugReports={saleReport.bugReports}
         />
       </div>
       <div className='col-xxl-6'>
@@ -77,6 +87,12 @@ const DashboardWrapper: FC = () => {
   const currentUserId = user ? user.ID : 0
 
   const [isPageLoading, setPageLoading] = useState(true);
+  const saleReportInit: iReport = {
+    weeklySales: 0,
+    newUsers: 0,
+    itemOrders: 0,
+    bugReports: 0
+  }
 
   useEffect(() => {
     initLoad.userId = currentUserId
@@ -89,17 +105,38 @@ const DashboardWrapper: FC = () => {
 
     getProductList().then((data: any) => {
       setPageLoading(false);
-    });
-
+    });  
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  useEffect(() => {
+    const bugReports = BugReports(currentUserId)
+    bugReports.then((result) => {
+      console.log(result)
+    })
+
+    const itemOrders = ItemOrders(currentUserId)
+    itemOrders.then((result) => {
+      console.log(result)
+    })
+
+    const newUsers = NewUsers(currentUserId)
+    newUsers.then((result) => {
+      console.log(result)
+    })
+
+    const weeklySales = WeeklySales(currentUserId)
+    weeklySales.then((result) => {
+      console.log(result)
+    })
+  },[])
+  
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
 
   return (
     <>
       <PageTitle breadcrumbs={[]}>{intl.formatMessage({ id: 'MENU.DASHBOARD' })}</PageTitle>
-      <DashboardPage dataList={data} isPageLoading={isPageLoading} />
+      <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReportInit} />
     </>
   )
 }
