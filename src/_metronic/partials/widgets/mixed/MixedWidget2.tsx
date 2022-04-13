@@ -1,22 +1,31 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useRef } from 'react'
-import ApexCharts, { ApexOptions } from 'apexcharts'
-import { KTSVG } from '../../../helpers'
-import { getCSSVariableValue } from '../../../assets/ts/_utils'
-import { Dropdown1 } from '../../content/dropdown/Dropdown1'
+import React, {useEffect, useRef} from 'react'
+import ApexCharts, {ApexOptions} from 'apexcharts'
+import {KTSVG} from '../../../helpers'
+import {getCSSVariableValue} from '../../../assets/ts/_utils'
+import {Dropdown1} from '../../content/dropdown/Dropdown1'
 
 type Props = {
   className: string
   chartColor: string
   strokeColor: string
   chartHeight: string
-  weeklySales?: number,
-  newUsers?: number,
-  itemOrders?: number,
+  weeklySales?: number
+  newUsers?: number
+  itemOrders?: number
   bugReports?: number
 }
 
-const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, strokeColor, weeklySales, newUsers, itemOrders, bugReports }) => {
+const MixedWidget2: React.FC<Props> = ({
+  className,
+  chartColor,
+  chartHeight,
+  strokeColor,
+  weeklySales,
+  newUsers,
+  itemOrders,
+  bugReports,
+}) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -45,7 +54,7 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
       {/* begin::Header */}
       <div className={`card-header border-0 py-5 bg-${chartColor}`}>
         <h3 className='card-title fw-bolder text-white'>Sales Statistics</h3>
-        <div className='card-toolbar'>
+        <div className='card-toolbar d-none'>
           {/* begin::Menu */}
           <button
             type='button'
@@ -75,31 +84,48 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
           <div className='row g-0'>
             {/* begin::Col */}
             <div className='col bg-light-warning px-6 py-8 rounded-2 me-7 mb-7'>
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-
-                <KTSVG
-                  path='/media/icons/duotune/general/gen032.svg'
-                  className='svg-icon-3x svg-icon-warning d-block my-2'
-                />
-                <span className="px-3 text-warning">{weeklySales}</span>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/general/gen032.svg'
+                    className='svg-icon-3x svg-icon-warning d-block my-2'
+                  />
+                  <a href='#' className='text-warning fw-bold fs-6'>
+                    Weekly Sales
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span
+                    className='ps-3 text-warning fs-1 fw-bolder text-800 mt-1'>
+                    {weeklySales}
+                  </span>
+                  <br />
+                  <small className='fs-8 text-warning'>products</small>
+                </div>
               </div>
-              <a href='#' className='text-warning fw-bold fs-6'>
-                Weekly Sales
-              </a>
             </div>
             {/* end::Col */}
             {/* begin::Col */}
             <div className='col bg-light-primary px-6 py-8 rounded-2 mb-7'>
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-                <KTSVG
-                  path='/media/icons/duotune/arrows/arr075.svg'
-                  className='svg-icon-3x svg-icon-primary d-block my-2'
-                />
-                <span className="px-3 text-primary">{newUsers}</span>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/arrows/arr075.svg'
+                    className='svg-icon-3x svg-icon-primary d-block my-2'
+                  />
+                  <a href='#' className='text-primary fw-bold fs-6'>
+                    New Users
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span
+                    className='ps-3 text-primary fs-1 fw-bolder text-800 mt-1'>
+                    {newUsers}
+                  </span>
+                  <br />
+                  <small className='fs-8 text-primary'>users</small>
+                </div>
               </div>
-              <a href='#' className='text-primary fw-bold fs-6'>
-                New Users
-              </a>
             </div>
             {/* end::Col */}
           </div>
@@ -108,30 +134,42 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
           <div className='row g-0'>
             {/* begin::Col */}
             <div className='col bg-light-danger px-6 py-8 rounded-2 me-7'>
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-                <KTSVG
-                  path='/media/icons/duotune/abstract/abs027.svg'
-                  className='svg-icon-3x svg-icon-danger d-block my-2'
-                />
-                <span className="px-3 text-danger">{itemOrders}</span>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/abstract/abs027.svg'
+                    className='svg-icon-3x svg-icon-danger d-block my-2'
+                  />
+                  <a href='#' className='text-danger fw-bold fs-6 mt-2'>
+                    Item Orders
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}</span>
+                  <br />
+                  <small className='fs-8 text-danger'>orders</small>
+                </div>
               </div>
-              <a href='#' className='text-danger fw-bold fs-6 mt-2'>
-                Item Orders
-              </a>
             </div>
             {/* end::Col */}
             {/* begin::Col */}
             <div className='col bg-light-success px-6 py-8 rounded-2'>
-
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-                <KTSVG
-                  path='/media/icons/duotune/communication/com010.svg'
-                  className='svg-icon-3x svg-icon-success d-block my-2'
-                /> <span className='px-3 text-success'>{bugReports}</span> </div>
-
-              <a href='#' className='text-success fw-bold fs-6 mt-2'>
-                Bug Reports
-              </a>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/communication/com010.svg'
+                    className='svg-icon-3x svg-icon-success d-block my-2'
+                  />
+                  <a href='#' className='text-success fw-bold fs-6 mt-2'>
+                    Bug Reports
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}</span>
+                     <br />
+                  <small className='fs-8 text-success'>users</small>
+                </div>
+              </div>
             </div>
             {/* end::Col */}
           </div>
@@ -279,4 +317,4 @@ const chartOptions = (
   }
 }
 
-export { MixedWidget2 }
+export {MixedWidget2}
