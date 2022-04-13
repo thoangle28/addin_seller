@@ -161,7 +161,10 @@ const Attribute: FC = () => {
         const checkOpen = isActiveIndex === index;
         return <li key={index} className='list-group-item mt-2 shadow-sm p-4 mb-2 bg-body rounded'>
             <div className="d-flex justify-content-between align-items-center my-1" >
-                <div className='cursor-pointer' onClick={() => toggleAttr(index)} >
+                <div className='cursor-pointer' onClick={() => {
+                    toggleAttr(index)
+                    isChildOpen ? setIsChildOpen(false) : setIsChildOpen(true)
+                }}>
                     <span>{attr.label} </span>
                     <p className='badge bg-primary rounded-pill mx-2 mb-0 '>{attr.options ? attr?.options.length : 0}</p>
                 </div>
