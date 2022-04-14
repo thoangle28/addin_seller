@@ -26,6 +26,7 @@ const Attribute: FC = () => {
     const createInitValue = {
         name: '',
         parrent_attribute: ''
+
     }
     const createValidSchema = Yup.object().shape({
         name: Yup.string().required('Name is required!')
