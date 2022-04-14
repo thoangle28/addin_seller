@@ -2,6 +2,20 @@ import axios from 'axios'
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT
 
+const currentDateTime = () => {
+  //{ "user_id": 5, "filter_by_year": "2022", "filter_by_month": 3 } 
+  const currentTime = new Date()
+  // returns the month (from 0 to 11)
+  const month = currentTime.getMonth() + 1
+
+  // returns the day of the month (from 1 to 31)
+  const day = currentTime.getDate()
+
+  // returns the year (four digits)
+  const year = currentTime.getFullYear()
+
+  return { year: year, month: month, day: day }
+}
 
 function getWeeklySales(params: any) {
   //{ "user_id": 6125 } 
@@ -10,7 +24,10 @@ function getWeeklySales(params: any) {
 
 function getItemOrders(params: any) {
   //{ "user_id": 6125 } 
-  return axios.post<any>(API_END_POINT_URL + '/sale-report/total-order', params)
+  const date = currentDateTime()
+  console.log(date)
+  const filter = {...params, filter_by_year: date.year, filter_by_month: date.month }
+  return axios.post<any>(API_END_POINT_URL + '/sale-report/total-order', filter)
 }
 
 function getNewUsers(params: any) {
@@ -18,11 +35,18 @@ function getNewUsers(params: any) {
   return axios.post<any>(API_END_POINT_URL + '/sale-report/new-customer-by-product', params)
 }
 
+
 function getBugReportsByMonth(userId: any) {
-  //{ "user_id": 5, "filter_by_year": "2022", "filter_by_month": 3 } 
-  const filter = {user_id: userId,  filter_by_year: 2022, filter_by_month: 3 }
+  const date = currentDateTime()
+  const filter = {user_id: userId, filter_by_year: date.year, filter_by_month: '' }
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-ticket', filter)
 }
+
+function getProductSales12Months(params: any) {
+  //{ "user_id": 6125 } 
+  return axios.post<any>(API_END_POINT_URL + '/sale-report/total-product-sales-twelve-months', params)
+}
+
 
 export const WeeklySales = (userId: any) => {
   return new Promise((resolve, reject) => {   
@@ -57,6 +81,18 @@ export const ItemOrders = (userId: any) => {
   })
 }
 
+export const ProductSales12Months = (userId: any) => {
+  return new Promise((resolve, reject) => {   
+    getProductSales12Months({ user_id: userId})
+    .then((response) => {
+      resolve(response.data)
+    }).catch((error) => {
+        reject(error.message)
+    })
+  })
+}
+
+
 export const BugReports = (userId: any) => {
   return new Promise((resolve, reject) => {   
     getBugReportsByMonth(userId)
@@ -69,10 +105,14 @@ export const BugReports = (userId: any) => {
 }
 
 export const loadAllReports = (user_id: any) => {  
-  Promise.all([
+  return Promise.all([
     WeeklySales(user_id),
     NewUsers(user_id),
     ItemOrders(user_id),
-    BugReports(user_id)
-  ])
+    BugReports(user_id),
+    ProductSales12Months(user_id)
+  ]).then(([weeklySales, newUsers, itemOrders, bugReports, productSale12M ]) => {    
+    return { weeklySales, newUsers, itemOrders, bugReports, productSale12M }
+  })
 }
+

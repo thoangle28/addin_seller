@@ -13,7 +13,8 @@ type Props = {
   weeklySales?: number
   newUsers?: number
   itemOrders?: number
-  bugReports?: number
+  bugReports?: number,
+  loading?: boolean | false
 }
 
 const MixedWidget2: React.FC<Props> = ({
@@ -145,7 +146,7 @@ const MixedWidget2: React.FC<Props> = ({
                   </a>
                 </div>
                 <div style={{textAlign: 'right'}}>
-                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}</span>
+                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}<sub><small className='fs-8'>/mt</small></sub></span>
                   <br />
                   <small className='fs-8 text-danger'>orders</small>
                 </div>
@@ -161,13 +162,13 @@ const MixedWidget2: React.FC<Props> = ({
                     className='svg-icon-3x svg-icon-success d-block my-2'
                   />
                   <a href='#' className='text-success fw-bold fs-6 mt-2'>
-                    Bug Reports
+                    Tickets Report
                   </a>
                 </div>
                 <div style={{textAlign: 'right'}}>
-                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}</span>
+                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}<sub><small className='fs-8'>/yr</small></sub></span>
                      <br />
-                  <small className='fs-8 text-success'>users</small>
+                  <small className='fs-8 text-success'>tickets</small>
                 </div>
               </div>
             </div>

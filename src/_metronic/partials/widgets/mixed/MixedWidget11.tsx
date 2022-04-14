@@ -6,10 +6,11 @@ import {getCSSVariableValue} from '../../../assets/ts/_utils'
 type Props = {
   className: string
   chartColor: string
-  chartHeight: string
+  chartHeight: string,
+  productSale12M?: any
 }
 
-const MixedWidget11: React.FC<Props> = ({className, chartColor, chartHeight}) => {
+const MixedWidget11: React.FC<Props> = ({className, chartColor, chartHeight, productSale12M}) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {

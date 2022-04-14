@@ -13,15 +13,16 @@ import {
 import { FallbackView } from '../../modules/products/components/formOptions'
 import * as product from '../../modules/products/redux/ProductRedux'
 import { RootState } from '../../../setup'
-
-import {BugReports, ItemOrders, NewUsers, WeeklySales} from '../../modules/sale/saleReport';
-
+import {loadAllReports} from '../../modules/sale/saleReport'
 interface iReport {
-  weeklySales: number | 0
-  newUsers: number | 0
-  itemOrders: number | 0
-  bugReports: number | 0
+  weeklySales: any | 0
+  newUsers: any | 0
+  itemOrders: any | 0
+  bugReports: any | 0
+  productSale12M: any | [],
+  loading: boolean | false
 }
+
 type Props = {
   dataList: any | []
   isPageLoading: boolean | true
@@ -44,6 +45,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           newUsers={saleReport.newUsers}
           itemOrders={saleReport.itemOrders}
           bugReports={saleReport.bugReports}
+          loading={saleReport.loading}
         />
       </div>
       <div className='col-xxl-6'>
@@ -56,6 +58,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           className='card-xxl-stretch-50 mb-5 mb-xl-8'
           chartColor='primary'
           chartHeight='175px'
+          productSale12M={saleReport.productSale12M}
         />
       </div>
     </div>
@@ -91,7 +94,9 @@ const DashboardWrapper: FC = () => {
     weeklySales: 0,
     newUsers: 0,
     itemOrders: 0,
-    bugReports: 0
+    bugReports: 0,
+    productSale12M: [],
+    loading: true
   }
 
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
@@ -111,39 +116,27 @@ const DashboardWrapper: FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  const allReport = loadAllReports(currentUserId)
   useEffect(() => {    
-    loadReport()
+    allReport.then((results: any) => {      
+      console.log(results)
+      const weeklySales  = results.weeklySales.data ? results.weeklySales.data.total_products : 0
+      const newUsers  = results.newUsers.data ? results.newUsers.data.total_customers : 0
+      const itemOrders  = results.itemOrders.data ? results.itemOrders.data.total_orders : 0
+      const bugReports  = results.bugReports.data ? results.bugReports.data.total_tickets : 0
+      const productSale12M  = results.productSale12M.data ? results.productSale12M.data : []
+
+      setSaleReport({
+        weeklySales: weeklySales,
+        newUsers: newUsers,
+        itemOrders: itemOrders,
+        bugReports: bugReports,
+        productSale12M: productSale12M,
+        loading: true
+      })
+    })
   },[])
   
-  const loadReport = () => {
-    const reportInit: iReport = {...saleReportInit}
-
-    const bugReports = BugReports(currentUserId)
-    bugReports.then((result: any) => {
-      console.log(result)
-      reportInit.bugReports = result.data ? result.data.total_tickets : 0
-    })
-
-    const itemOrders = ItemOrders(currentUserId)
-    itemOrders.then((result: any) => {
-      console.log(result)
-      reportInit.itemOrders = result.data ? result.data.total_orders : 0
-    })
-
-    const newUsers = NewUsers(currentUserId)
-    newUsers.then((result: any) => {
-      console.log(result)
-      reportInit.newUsers = result.data ? result.data.total_customers : 0
-    })
-
-    const weeklySales = WeeklySales(currentUserId)
-    weeklySales.then((result: any) => {
-      console.log(result)
-      reportInit.weeklySales = result.data ? result.data.total_products : 0
-    })
-
-    //setSaleReport(reportInit)
-  }
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
 
   return (
