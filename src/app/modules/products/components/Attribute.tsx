@@ -280,10 +280,10 @@ const Attribute: FC = () => {
                         parrent_attribute === '' ? createProductAttr(name, resetForm) : createProductTermAttr(name, parrent_attribute, resetForm)
                     }}
                 >
-                    {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting }) => (
+                    {({ values, errors, touched, handleSubmit, isSubmitting }) => (
                         <form onSubmit={handleSubmit}>
                             <div className="col-xxs-12">
-                                <label className="form-label mb-3" htmlFor="parrent_attribute">Attributes</label>
+                                <label className="form-label mb-2" htmlFor="parrent_attribute">Attributes</label>
                                 <Field
                                     component="select"
                                     as="select"
@@ -296,20 +296,20 @@ const Attribute: FC = () => {
                                 </Field>
                             </div>
                             <div className="col-xxs-12 mt-3">
-                                <label className="form-label mb-3" htmlFor="name">Name</label>
+                                <label className="form-label mb-2" htmlFor="name">Name</label>
                                 <Field
                                     component="input"
                                     type='text'
                                     id="name"
                                     name="name"
-                                    className="form-control"
+                                    className="form-control fs-7"
                                 />
                                 {touched.name && errors.name && (
                                     <div className='text-danger mt-2'>{errors.name}</div>
                                 )}
                             </div>
                             <div className="col-md-12">
-                                <button className='btn btn-success my-4 ' type="submit">Add New</button>
+                                <button disabled={isSubmitting} className='btn btn-success my-4 ' type="submit">Add New</button>
                             </div>
                         </form>
                     )}
@@ -332,7 +332,7 @@ const Attribute: FC = () => {
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
                             <form onSubmit={handleSubmit}>
                                 <div className="col-xxs-12">
-                                    <label className="form-label mb-3" htmlFor="parrent_attribute">Attributes</label>
+                                    <label className="form-label mb-2" htmlFor="parrent_attribute">Attributes</label>
                                     <Field
                                         component="select"
                                         as="select"
@@ -346,12 +346,12 @@ const Attribute: FC = () => {
                                     </Field>
                                 </div>
                                 <div className="col-xxs-12 mt-4">
-                                    <label className="form-label mb-3" htmlFor="new_attribute_term_name">Name</label>
+                                    <label className="form-label mb-2" htmlFor="new_attribute_term_name">Name</label>
                                     <input
                                         type='text'
                                         id="new_attribute_term_name"
                                         name="new_attribute_term_name"
-                                        className="form-control"
+                                        className="form-control fs-7"
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         value={values.new_attribute_term_name || ''}
@@ -362,7 +362,7 @@ const Attribute: FC = () => {
                                     )}
                                 </div>
                                 <div className="col-md-12 ">
-                                    <button className='btn btn-success my-4' type="submit">Update</button>
+                                    <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Update</button>
                                     <button onClick={() => cancelEvent(resetForm)} className='btn btn-danger my-4 mx-4' type="submit">Cancel</button>
                                 </div>
                             </form>
@@ -380,13 +380,13 @@ const Attribute: FC = () => {
                                 <form onSubmit={handleSubmit}>
                                     <div className="form-group row">
                                         <div className='col-md-12 mt-1'>
-                                            <label htmlFor='new_attribute_name' className=' form-label mb-3 d-flex align-items-center fs-7 fw-bold mb-2'>
+                                            <label htmlFor='new_attribute_name' className=' form-label mb-2 d-flex align-items-center fs-7 fw-bold mb-2'>
                                                 <span>Name</span>
                                             </label>
                                             <input
                                                 type='text'
                                                 id="new_attribute_name"
-                                                className='form-control fs-7'
+                                                className='form-control fs-7 fs-7'
                                                 name='new_attribute_name'
                                                 value={values.new_attribute_name || ''}
                                                 onChange={handleChange}
@@ -424,14 +424,18 @@ const Attribute: FC = () => {
                             <div className="col-xxl-6 mt-0 ">
                                 <div className="card card-products">
                                     {isEdit || isUpdateChild ? updateForm() : createForm()}
-                                    {message && <AlertMessage hasErrors={hasErrors} message={message} />}
+                                    <div className='ms-3'>
+                                        {message && <AlertMessage hasErrors={hasErrors} message={message} />}
+                                    </div>
                                 </div>
                             </div>
                             <div className="col-xxl-6 mt-0 pe-4 pb-8">
                                 <div className="border border-1 rounded p-6 "  >
-                                    <ul style={{ height: "100vh" }} className='ps-0 me-5 list-groupborder overflow-scroll'>
-                                        {showList()}
-                                    </ul>
+                                    <div style={{ height: "100vh" }} className="overflow-scroll">
+                                        <ul className='ps-0 me-5 list-groupborder'>
+                                            {showList()}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
