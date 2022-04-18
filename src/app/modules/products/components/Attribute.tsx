@@ -65,6 +65,8 @@ const Attribute: FC = () => {
     }
 
     const afterSubmit = (resetForm: any) => {
+        setIsEdit(false)
+        setIsUpdateChild(false)
         setTimeout(() => {
             setMessage('')
             resetForm()
@@ -81,11 +83,12 @@ const Attribute: FC = () => {
     }
 
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any) => {
-
         updateAttr(old_attribute_name, new_attribute_name).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
+            setMessage("Processing")
             if (code === 200) {
+                setMessage(message)
                 updateUIAttr(attrId, new_attribute_name)
                 afterSubmit(resetForm)
             }
@@ -140,11 +143,12 @@ const Attribute: FC = () => {
         updateAttributeTerms(payload).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
-            setMessage('processing')
+            setMessage('Processing')
             setIsUpdateChildWithAttr(false);
             if (code === 200) {
-                afterSubmit(resetForm)
+                setMessage(message)
                 updateUITermAttr(attrId, childId, new_attribute_term_name)
+                afterSubmit(resetForm)
             }
             else {
                 setHasErrors(true)
@@ -166,7 +170,7 @@ const Attribute: FC = () => {
         createProductAttributeBrand(payload).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
-            setMessage('processing')
+            setMessage('Processing')
             if (code === 200) {
                 createUIAttr(payload.label_name)
                 afterSubmit(resetForm)
@@ -240,7 +244,7 @@ const Attribute: FC = () => {
                 checkOpen && <>
                     {!!attr.options && attr?.options.map((i: any, index: number) =>
                         <div key={index + Math.random()} className="d-flex justify-content-between mt-4 align-items-center">
-                            <p className='my-3 ms-8'>{i.label} </p>
+                            <p className='my-2 ms-8'>{i.label} </p>
                             <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); }} className='text-success cursor-pointer fs-6 me-8'>Edit</span>
                         </div>)}
                 </>
@@ -257,7 +261,6 @@ const Attribute: FC = () => {
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
-                {message && <AlertMessage hasErrors={hasErrors} message={message} />}
                 <Formik
                     initialValues={createInitValue}
                     validationSchema={createValidSchema}
@@ -307,7 +310,6 @@ const Attribute: FC = () => {
     const updateForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
-                {message && <AlertMessage hasErrors={hasErrors} message={message} />}
                 {isUpdateChild ?
                     <Formik
                         initialValues={{ ...updateChildAttrInitValue }}
@@ -411,6 +413,7 @@ const Attribute: FC = () => {
                             <div className="col-xxl-6 mt-0 ">
                                 <div className="card card-products">
                                     {isEdit || isUpdateChild ? updateForm() : createForm()}
+                                    {message && <AlertMessage hasErrors={hasErrors} message={message} />}
                                 </div>
                             </div>
                             <div className="col-xxl-6 mt-0 pe-4 pb-8">
