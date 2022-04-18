@@ -65,8 +65,6 @@ const Attribute: FC = () => {
     }
 
     const afterSubmit = (resetForm: any) => {
-        setIsEdit(false)
-        setIsUpdateChild(false)
         setTimeout(() => {
             setMessage('')
             resetForm()
@@ -88,6 +86,9 @@ const Attribute: FC = () => {
             setHasErrors(false)
             setMessage("Processing")
             if (code === 200) {
+
+                setIsEdit(false)
+                setIsUpdateChild(false)
                 setMessage(message)
                 updateUIAttr(attrId, new_attribute_name)
                 afterSubmit(resetForm)
@@ -146,6 +147,8 @@ const Attribute: FC = () => {
             setMessage('Processing')
             setIsUpdateChildWithAttr(false);
             if (code === 200) {
+                setIsEdit(false)
+                setIsUpdateChild(false)
                 setMessage(message)
                 updateUITermAttr(attrId, childId, new_attribute_term_name)
                 afterSubmit(resetForm)
@@ -172,6 +175,8 @@ const Attribute: FC = () => {
             setHasErrors(false)
             setMessage('Processing')
             if (code === 200) {
+                setIsEdit(false)
+                setIsUpdateChild(false)
                 createUIAttr(payload.label_name)
                 afterSubmit(resetForm)
             }
@@ -208,6 +213,9 @@ const Attribute: FC = () => {
             setHasErrors(false)
             setMessage('processing')
             if (code === 200) {
+
+                setIsEdit(false)
+                setIsUpdateChild(false)
                 createUITermAttr(term_name, taxonomy)
                 afterSubmit(resetForm)
             } else {
@@ -237,7 +245,7 @@ const Attribute: FC = () => {
                     <p className='badge bg-primary rounded-pill mx-2 mb-0 '>{attr.options ? attr?.options.length : 0}</p>
                 </div>
                 <button style={isChildOpen ? { pointerEvents: 'none' } : {}} className='btn-btn-success border-0 bg-transparent' aria-disabled="true" >
-                    <p onClick={() => { editMode(); setParentAttribute(attr.label); setIsUpdateChild(false); setAttrId(attr.id) }} className='badge bg-success mx-4 mb-0 cursor-pointer'>Edit</p>
+                    <p onClick={() => { editMode(); setParentAttribute(attr.label); setIsUpdateChild(false); setAttrId(attr.id); scrollToTop() }} className='badge bg-success mx-4 mb-0 cursor-pointer'>Edit</p>
                 </button>
             </div>
             {
@@ -245,7 +253,7 @@ const Attribute: FC = () => {
                     {!!attr.options && attr?.options.map((i: any, index: number) =>
                         <div key={index + Math.random()} className="d-flex justify-content-between mt-4 align-items-center">
                             <p className='my-2 ms-8'>{i.label} </p>
-                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); }} className='text-success cursor-pointer fs-6 me-8'>Edit</span>
+                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }} className='text-success cursor-pointer fs-6 me-8'>Edit</span>
                         </div>)}
                 </>
             }
@@ -255,6 +263,10 @@ const Attribute: FC = () => {
 
     const cancelEvent = (resetForm: any) => {
         setIsEdit(false); setIsUpdateChild(false); resetForm(); setIsChildOpen(false)
+    }
+
+    const scrollToTop = () => {
+        window.scrollTo(0, 0)
     }
 
     // Create UI FORM
@@ -418,7 +430,7 @@ const Attribute: FC = () => {
                             </div>
                             <div className="col-xxl-6 mt-0 pe-4 pb-8">
                                 <div className="border border-1 rounded p-6 "  >
-                                    <ul style={{ height: "100vh" }} className='ps-0 list-groupborder overflow-scroll'>
+                                    <ul style={{ height: "100vh" }} className='ps-0 me-5 list-groupborder overflow-scroll'>
                                         {showList()}
                                     </ul>
                                 </div>
