@@ -1,23 +1,32 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect, useRef} from 'react'
-import ApexCharts, {ApexOptions} from 'apexcharts'
-import {getCSSVariableValue} from '../../../assets/ts/_utils'
+import React, { useEffect, useRef } from 'react'
+import ApexCharts, { ApexOptions } from 'apexcharts'
+import { getCSSVariableValue } from '../../../assets/ts/_utils'
 
 type Props = {
   className: string
   chartColor: string
   chartHeight: string
+  dateTime?: string
+  total?: any
+  timeline?: any
+}
+const date = new Date();
+
+const dummyData = {
+  total: [0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 3, 26],
+  data: [50, 60, 70, 80, 60, 50, 70, 60],
+  timeline: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']
 }
 
-const MixedWidget11: React.FC<Props> = ({className, chartColor, chartHeight}) => {
+const MixedWidget11: React.FC<Props> = ({ className, chartColor, chartHeight, dateTime, total, timeline }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
-
   useEffect(() => {
     if (!chartRef.current) {
       return
     }
 
-    const chart = new ApexCharts(chartRef.current, chartOptions(chartColor, chartHeight))
+    const chart = new ApexCharts(chartRef.current, chartOptions(chartColor, chartHeight, total, timeline))
     if (chart) {
       chart.render()
     }
@@ -38,7 +47,7 @@ const MixedWidget11: React.FC<Props> = ({className, chartColor, chartHeight}) =>
         <div className='d-flex flex-stack flex-wrap flex-grow-1 px-9 pt-9 pb-3'>
           <div className='me-2'>
             <span className='fw-bolder text-gray-800 d-block fs-3'>Sales</span>
-            <span className='text-gray-400 fw-bold'>Oct 8 - Feb 16 2022</span>
+            <span className='text-gray-400 fw-bold'>{dateTime || date.toISOString()}</span>
           </div>
 
           <div className={`fw-bolder fs-3 text-${chartColor}`}>{/* $15,300 */}</div>
@@ -53,7 +62,7 @@ const MixedWidget11: React.FC<Props> = ({className, chartColor, chartHeight}) =>
   )
 }
 
-const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
+const chartOptions = (chartColor: string, chartHeight: string, total: number[], timeline: string[]): ApexOptions => {
   const labelColor = getCSSVariableValue('--bs-gray-500')
   const borderColor = getCSSVariableValue('--bs-gray-200')
   const secondaryColor = getCSSVariableValue('--bs-gray-300')
@@ -62,12 +71,12 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
   return {
     series: [
       {
-        name: 'This feature will be ready soon.',//'Net Profit',
-        data: [50, 60, 70, 80, 60, 50, 70, 60],
+        name: 'Month.',
+        data: dummyData.data,
       },
       {
         name: 'Revenue',
-        data: [50, 60, 70, 80, 60, 50, 70, 60],
+        data: total ? total : dummyData.total,
       },
     ],
     chart: {
@@ -97,7 +106,7 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
       colors: ['transparent'],
     },
     xaxis: {
-      categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+      categories: timeline ? timeline : dummyData.timeline,
       axisBorder: {
         show: false,
       },
@@ -169,4 +178,4 @@ const chartOptions = (chartColor: string, chartHeight: string): ApexOptions => {
   }
 }
 
-export {MixedWidget11}
+export { MixedWidget11 }
