@@ -7,10 +7,11 @@ type Props = {
   className: string
   chartColor: string
   chartHeight: string
-  title?: string
+  title?: string,
+  reports?: any
 }
 
-const MixedWidget10: React.FC<Props> = ({ className, chartColor, chartHeight, title }) => {
+const MixedWidget10: React.FC<Props> = ({ className, chartColor, chartHeight, title, reports }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const MixedWidget10: React.FC<Props> = ({ className, chartColor, chartHeight, ti
                 {title ? title : 'Generate Reports'}
               </a>
 
-              <div className='text-muted fs-7 fw-bold'>Finance and accounting reports</div>
+              <div className='text-muted fs-7 fw-bold'>Finance and accounting reports: { reports && reports.time }</div>
             </div>
 
             <div className={`fw-bolder fs-3 text-${chartColor}`}>{/* $24,500 */}</div>

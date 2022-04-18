@@ -1,32 +1,45 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useRef } from 'react'
-import ApexCharts, { ApexOptions } from 'apexcharts'
-import { KTSVG } from '../../../helpers'
-import { getCSSVariableValue } from '../../../assets/ts/_utils'
-import { Dropdown1 } from '../../content/dropdown/Dropdown1'
+import React, {useEffect, useRef} from 'react'
+import ApexCharts, {ApexOptions} from 'apexcharts'
+import {KTSVG} from '../../../helpers'
+import {getCSSVariableValue} from '../../../assets/ts/_utils'
+import {Dropdown1} from '../../content/dropdown/Dropdown1'
 
 type Props = {
   className: string
   chartColor: string
   strokeColor: string
   chartHeight: string
-  weeklySales?: number,
-  newUsers?: number,
-  itemOrders?: number,
-  bugReports?: number
+  weeklySales?: number
+  newUsers?: number
+  itemOrders?: number
+  bugReports?: number,
+  statistics?: any,
+  loading?: boolean | false
 }
 
-const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, strokeColor, weeklySales, newUsers, itemOrders, bugReports }) => {
+const MixedWidget2: React.FC<Props> = ({
+  className,
+  chartColor,
+  chartHeight,
+  strokeColor,
+  weeklySales,
+  newUsers,
+  itemOrders,
+  bugReports,
+  statistics,
+  loading
+}) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (!chartRef.current) {
+    /* if (!chartRef.current) {
       return
     }
-
+    */
     const chart = new ApexCharts(
       chartRef.current,
-      chartOptions(chartHeight, chartColor, strokeColor)
+      chartOptions(chartHeight, chartColor, strokeColor, statistics)
     )
     if (chart) {
       chart.render()
@@ -45,7 +58,8 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
       {/* begin::Header */}
       <div className={`card-header border-0 py-5 bg-${chartColor}`}>
         <h3 className='card-title fw-bolder text-white'>Sales Statistics</h3>
-        <div className='card-toolbar'>
+        <div className='text-white fs-7 fw-bold w-100'>{statistics && statistics.time}</div>
+        <div className='card-toolbar d-none'>
           {/* begin::Menu */}
           <button
             type='button'
@@ -56,18 +70,18 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
           >
             <KTSVG path='/media/icons/duotune/general/gen024.svg' className='svg-icon-2' />
           </button>
-          <Dropdown1 />
+          {/* <Dropdown1 /> */}
           {/* end::Menu */}
         </div>
       </div>
       {/* end::Header */}
       {/* begin::Body */}
       <div className='card-body p-0'>
-        {/* begin::Chart */}
+        {/* begin::Chart */}       
         <div
           ref={chartRef}
-          className={`mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
-        ></div>
+          className={`pb-20 mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
+        ></div>       
         {/* end::Chart */}
         {/* begin::Stats */}
         <div className='card-p mt-n20 position-relative'>
@@ -75,31 +89,48 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
           <div className='row g-0'>
             {/* begin::Col */}
             <div className='col bg-light-warning px-6 py-8 rounded-2 me-7 mb-7'>
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-
-                <KTSVG
-                  path='/media/icons/duotune/general/gen032.svg'
-                  className='svg-icon-3x svg-icon-warning d-block my-2'
-                />
-                <span className="px-3 text-warning">{weeklySales}</span>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/general/gen032.svg'
+                    className='svg-icon-3x svg-icon-warning d-block my-2'
+                  />
+                  <a href='#' className='text-warning fw-bold fs-6'>
+                    Weekly Sales
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span
+                    className='ps-3 text-warning fs-1 fw-bolder text-800 mt-1'>
+                    {weeklySales}
+                  </span>
+                  <br />
+                  <small className='fs-8 text-warning'>products</small>
+                </div>
               </div>
-              <a href='#' className='text-warning fw-bold fs-6'>
-                Weekly Sales
-              </a>
             </div>
             {/* end::Col */}
             {/* begin::Col */}
             <div className='col bg-light-primary px-6 py-8 rounded-2 mb-7'>
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-                <KTSVG
-                  path='/media/icons/duotune/arrows/arr075.svg'
-                  className='svg-icon-3x svg-icon-primary d-block my-2'
-                />
-                <span className="px-3 text-primary">{newUsers}</span>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/arrows/arr075.svg'
+                    className='svg-icon-3x svg-icon-primary d-block my-2'
+                  />
+                  <a href='#' className='text-primary fw-bold fs-6'>
+                    New Users
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span
+                    className='ps-3 text-primary fs-1 fw-bolder text-800 mt-1'>
+                    {newUsers}
+                  </span>
+                  <br />
+                  <small className='fs-8 text-primary'>in month</small>
+                </div>
               </div>
-              <a href='#' className='text-primary fw-bold fs-6'>
-                New Users
-              </a>
             </div>
             {/* end::Col */}
           </div>
@@ -108,30 +139,42 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
           <div className='row g-0'>
             {/* begin::Col */}
             <div className='col bg-light-danger px-6 py-8 rounded-2 me-7'>
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-                <KTSVG
-                  path='/media/icons/duotune/abstract/abs027.svg'
-                  className='svg-icon-3x svg-icon-danger d-block my-2'
-                />
-                <span className="px-3 text-danger">{itemOrders}</span>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/abstract/abs027.svg'
+                    className='svg-icon-3x svg-icon-danger d-block my-2'
+                  />
+                  <a href='#' className='text-danger fw-bold fs-6 mt-2'>
+                    Item Orders
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
+                  <br />
+                  <small className='fs-8 text-danger'>in month</small>
+                </div>
               </div>
-              <a href='#' className='text-danger fw-bold fs-6 mt-2'>
-                Item Orders
-              </a>
             </div>
             {/* end::Col */}
             {/* begin::Col */}
             <div className='col bg-light-success px-6 py-8 rounded-2'>
-
-              <div className="d-flex align-items-center fs-2 fw-bolder text-800">
-                <KTSVG
-                  path='/media/icons/duotune/communication/com010.svg'
-                  className='svg-icon-3x svg-icon-success d-block my-2'
-                /> <span className='px-3 text-success'>{bugReports}</span> </div>
-
-              <a href='#' className='text-success fw-bold fs-6 mt-2'>
-                Bug Reports
-              </a>
+              <div className='d-flex align-items-end'>
+                <div style={{flex: '1 0'}}>
+                  <KTSVG
+                    path='/media/icons/duotune/communication/com010.svg'
+                    className='svg-icon-3x svg-icon-success d-block my-2'
+                  />
+                  <a href='#' className='text-success fw-bold fs-6 mt-2'>
+                    Tickets Report
+                  </a>
+                </div>
+                <div style={{textAlign: 'right'}}>
+                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
+                     <br />
+                  <small className='fs-8 text-success'>in month</small>
+                </div>
+              </div>
             </div>
             {/* end::Col */}
           </div>
@@ -147,17 +190,33 @@ const MixedWidget2: React.FC<Props> = ({ className, chartColor, chartHeight, str
 const chartOptions = (
   chartHeight: string,
   chartColor: string,
-  strokeColor: string
+  strokeColor: string,
+  statistics: any
 ): ApexOptions => {
   const labelColor = getCSSVariableValue('--bs-gray-500')
   const borderColor = getCSSVariableValue('--bs-gray-200')
   const color = getCSSVariableValue('--bs-' + chartColor)
 
+  const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May',  'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const dataList: Array<number> = []
+  const dataListM: Array<string> = []
+
+  const chartData = statistics.list ? statistics.list : []
+
+  !!chartData && chartData.map((item: any) => {   
+    dataList.push( item.total ? parseFloat(item.total) : 0 )
+    dataListM.push( monthName[item.month -1] + ' ' + item.year )
+  })
+  console.log(dataList)
+  console.log(dataListM)
+
+  const maxValue = Math.max(...dataList) > 0 ? Math.max(...dataList) +  200 : 0;
+
   return {
     series: [
       {
-        name: 'Net Profit.',
-        data: [30, 45, 32, 70, 40, 40, 40],
+        name: 'Net Profit',
+        data: dataList,//[30, 45, 32, 70, 40, 40, 40],
       },
     ],
     chart: {
@@ -201,7 +260,7 @@ const chartOptions = (
       colors: [strokeColor],
     },
     xaxis: {
-      categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+      categories: dataListM,//['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
       axisBorder: {
         show: false,
       },
@@ -227,7 +286,7 @@ const chartOptions = (
     },
     yaxis: {
       min: 0,
-      max: 80,
+      max: maxValue,
       labels: {
         show: false,
         style: {
@@ -235,6 +294,7 @@ const chartOptions = (
           fontSize: '12px',
         },
       },
+      opposite: true
     },
     states: {
       normal: {
@@ -263,7 +323,12 @@ const chartOptions = (
       },
       y: {
         formatter: function (val) {
-          return '$' + val + ' thousands'
+          const currenyFormat = (val).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          })
+
+          return currenyFormat
         },
       },
       marker: {
@@ -279,4 +344,4 @@ const chartOptions = (
   }
 }
 
-export { MixedWidget2 }
+export {MixedWidget2}
