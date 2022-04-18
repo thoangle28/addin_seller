@@ -86,7 +86,6 @@ const Attribute: FC = () => {
             setHasErrors(false)
             setMessage("Processing")
             if (code === 200) {
-
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
