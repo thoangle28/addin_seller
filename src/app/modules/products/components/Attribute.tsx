@@ -149,7 +149,7 @@ const Attribute: FC = () => {
 
     const showList = () => !!parentAttributeList && parentAttributeList.map((attr: any, index: number) => {
         const checkOpen = isActiveIndex === index;
-        return <li key={index} className='list-group-item border-0 shadow-sm p-2 mb-2 bg-body rounded'>
+        return <li key={index} className='list-group-item border border-bottom-1 p-2 mb-2 bg-body rounded'>
             <div className="d-flex justify-content-between align-items-center ms-4" >
                 <div className='cursor-pointer' onClick={() => { toggleAttr(index) }}>
                     <span>{attr.label} </span>
@@ -356,4 +356,4 @@ const Attribute: FC = () => {
     )
 }
 
-export default Attribute
+export default Attribute 
