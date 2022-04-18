@@ -25,7 +25,6 @@ function getWeeklySales(params: any) {
 function getItemOrders(params: any) {
   //{ "user_id": 6125 } 
   const date = currentDateTime()
-  console.log(date)
   const filter = {...params, filter_by_year: date.year, filter_by_month: date.month }
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-order', filter)
 }
@@ -38,13 +37,18 @@ function getNewUsers(params: any) {
 
 function getBugReportsByMonth(userId: any) {
   const date = currentDateTime()
-  const filter = {user_id: userId, filter_by_year: date.year, filter_by_month: '' }
+  const filter = {user_id: userId, filter_by_year: date.year, filter_by_month: date.month }
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-ticket', filter)
 }
 
 function getProductSales12Months(params: any) {
   //{ "user_id": 6125 } 
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-product-sales-twelve-months', params)
+}
+
+ //{ "user_id": 6125 } 
+function getStatisticsSales12Months(params: any) {
+ return axios.post<any>(API_END_POINT_URL + '/sale-report/total-sales-twelve-months', params)
 }
 
 
@@ -104,15 +108,28 @@ export const BugReports = (userId: any) => {
   })
 }
 
+
+export const StatisticsSales12Months = (userId: any) => {
+  return new Promise((resolve, reject) => {   
+    getStatisticsSales12Months({ user_id: userId})
+    .then((response) => {
+      resolve(response.data)
+    }).catch((error) => {
+        reject(error.message)
+    })
+  })
+}
+
 export const loadAllReports = (user_id: any) => {  
   return Promise.all([
     WeeklySales(user_id),
     NewUsers(user_id),
     ItemOrders(user_id),
     BugReports(user_id),
-    ProductSales12Months(user_id)
-  ]).then(([weeklySales, newUsers, itemOrders, bugReports, productSale12M ]) => {    
-    return { weeklySales, newUsers, itemOrders, bugReports, productSale12M }
+    ProductSales12Months(user_id),
+    StatisticsSales12Months(user_id)
+  ]).then(([weeklySales, newUsers, itemOrders, bugReports, productSale12M,statistics ]) => {    
+    return { weeklySales, newUsers, itemOrders, bugReports, productSale12M, statistics }
   })
 }
 

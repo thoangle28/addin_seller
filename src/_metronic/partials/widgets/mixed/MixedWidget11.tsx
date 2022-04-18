@@ -69,8 +69,6 @@ const chartOptions = (chartColor: string, chartHeight: string, chartData: any): 
     dataListM.push( monthName[item.month -1] )
   })
   
-  console.log(dataListM)
-
   return {
     series: [
       {
@@ -161,7 +159,7 @@ const chartOptions = (chartColor: string, chartHeight: string, chartData: any): 
       },
       y: {
         formatter: function (val) {
-          return ''//'$' + val + ' revenue'
+          return val + ' product(s)'
         },
       },
     },

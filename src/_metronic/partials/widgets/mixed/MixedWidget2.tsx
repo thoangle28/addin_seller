@@ -14,6 +14,7 @@ type Props = {
   newUsers?: number
   itemOrders?: number
   bugReports?: number,
+  statistics?: any,
   loading?: boolean | false
 }
 
@@ -26,17 +27,19 @@ const MixedWidget2: React.FC<Props> = ({
   newUsers,
   itemOrders,
   bugReports,
+  statistics,
+  loading
 }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    if (!chartRef.current) {
+    /* if (!chartRef.current) {
       return
     }
-
+    */
     const chart = new ApexCharts(
       chartRef.current,
-      chartOptions(chartHeight, chartColor, strokeColor)
+      chartOptions(chartHeight, chartColor, strokeColor, statistics)
     )
     if (chart) {
       chart.render()
@@ -55,6 +58,7 @@ const MixedWidget2: React.FC<Props> = ({
       {/* begin::Header */}
       <div className={`card-header border-0 py-5 bg-${chartColor}`}>
         <h3 className='card-title fw-bolder text-white'>Sales Statistics</h3>
+        <div className='text-white fs-7 fw-bold w-100'>{statistics && statistics.time}</div>
         <div className='card-toolbar d-none'>
           {/* begin::Menu */}
           <button
@@ -66,18 +70,18 @@ const MixedWidget2: React.FC<Props> = ({
           >
             <KTSVG path='/media/icons/duotune/general/gen024.svg' className='svg-icon-2' />
           </button>
-          <Dropdown1 />
+          {/* <Dropdown1 /> */}
           {/* end::Menu */}
         </div>
       </div>
       {/* end::Header */}
       {/* begin::Body */}
       <div className='card-body p-0'>
-        {/* begin::Chart */}
+        {/* begin::Chart */}       
         <div
           ref={chartRef}
-          className={`mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
-        ></div>
+          className={`pb-20 mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
+        ></div>       
         {/* end::Chart */}
         {/* begin::Stats */}
         <div className='card-p mt-n20 position-relative'>
@@ -124,7 +128,7 @@ const MixedWidget2: React.FC<Props> = ({
                     {newUsers}
                   </span>
                   <br />
-                  <small className='fs-8 text-primary'>users</small>
+                  <small className='fs-8 text-primary'>in month</small>
                 </div>
               </div>
             </div>
@@ -146,9 +150,9 @@ const MixedWidget2: React.FC<Props> = ({
                   </a>
                 </div>
                 <div style={{textAlign: 'right'}}>
-                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}<sub><small className='fs-8'>/mt</small></sub></span>
+                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
                   <br />
-                  <small className='fs-8 text-danger'>orders</small>
+                  <small className='fs-8 text-danger'>in month</small>
                 </div>
               </div>
             </div>
@@ -166,9 +170,9 @@ const MixedWidget2: React.FC<Props> = ({
                   </a>
                 </div>
                 <div style={{textAlign: 'right'}}>
-                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}<sub><small className='fs-8'>/yr</small></sub></span>
+                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
                      <br />
-                  <small className='fs-8 text-success'>tickets</small>
+                  <small className='fs-8 text-success'>in month</small>
                 </div>
               </div>
             </div>
@@ -186,17 +190,33 @@ const MixedWidget2: React.FC<Props> = ({
 const chartOptions = (
   chartHeight: string,
   chartColor: string,
-  strokeColor: string
+  strokeColor: string,
+  statistics: any
 ): ApexOptions => {
   const labelColor = getCSSVariableValue('--bs-gray-500')
   const borderColor = getCSSVariableValue('--bs-gray-200')
   const color = getCSSVariableValue('--bs-' + chartColor)
 
+  const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May',  'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const dataList: Array<number> = []
+  const dataListM: Array<string> = []
+
+  const chartData = statistics.list ? statistics.list : []
+
+  !!chartData && chartData.map((item: any) => {   
+    dataList.push( item.total ? parseFloat(item.total) : 0 )
+    dataListM.push( monthName[item.month -1] + ' ' + item.year )
+  })
+  console.log(dataList)
+  console.log(dataListM)
+
+  const maxValue = Math.max(...dataList) > 0 ? Math.max(...dataList) +  200 : 0;
+
   return {
     series: [
       {
-        name: 'Net Profit.',
-        data: [30, 45, 32, 70, 40, 40, 40],
+        name: 'Net Profit',
+        data: dataList,//[30, 45, 32, 70, 40, 40, 40],
       },
     ],
     chart: {
@@ -240,7 +260,7 @@ const chartOptions = (
       colors: [strokeColor],
     },
     xaxis: {
-      categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
+      categories: dataListM,//['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
       axisBorder: {
         show: false,
       },
@@ -266,7 +286,7 @@ const chartOptions = (
     },
     yaxis: {
       min: 0,
-      max: 80,
+      max: maxValue,
       labels: {
         show: false,
         style: {
@@ -274,6 +294,7 @@ const chartOptions = (
           fontSize: '12px',
         },
       },
+      opposite: true
     },
     states: {
       normal: {
@@ -302,7 +323,12 @@ const chartOptions = (
       },
       y: {
         formatter: function (val) {
-          return '$' + val + ' thousands'
+          const currenyFormat = (val).toLocaleString('en-US', {
+            style: 'currency',
+            currency: 'USD',
+          })
+
+          return currenyFormat
         },
       },
       marker: {

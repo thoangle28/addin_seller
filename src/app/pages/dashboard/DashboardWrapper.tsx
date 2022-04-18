@@ -20,6 +20,7 @@ interface iReport {
   itemOrders: any | 0
   bugReports: any | 0
   productSale12M: any | [],
+  statistics: any | [],
   loading: boolean | false
 }
 
@@ -35,8 +36,9 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
   <>
     {/* begin::Row Sale Report */}
     <div className='row gy-5 g-xl-8'>
-      <div className='col-xxl-6'>
-        <MixedWidget2
+      <div className='col-xxl-6'>       
+        {!saleReport.loading && (
+          <MixedWidget2
           className='card-xl-stretch mb-xl-8'
           chartColor='danger'
           chartHeight='200px'
@@ -46,20 +48,43 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           itemOrders={saleReport.itemOrders}
           bugReports={saleReport.bugReports}
           loading={saleReport.loading}
-        />
+          statistics={saleReport.statistics}
+        />  
+        ) || (
+          <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
+            <div className="card-body d-flex justify-content-center align-items-center">
+              <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
+                Loading...
+                <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+              </span>
+            </div>
+          </div>
+        )}             
       </div>
       <div className='col-xxl-6'>
         <MixedWidget10
           className='card-xxl-stretch-50 mb-5 mb-xl-8'
           chartColor='primary'
           chartHeight='150px'
+          reports={saleReport.statistics}
         />
-        <MixedWidget11
+        {!saleReport.loading && (
+          <MixedWidget11
           className='card-xxl-stretch-50 mb-5 mb-xl-8'
           chartColor='primary'
           chartHeight='175px'
           productSale12M={saleReport.productSale12M}
-        />
+          />
+        ) || (
+          <div className="card card-xxl-stretch-50 mb-5 mb-xl-8" style={{minHeight: '520px'}}>
+            <div className="card-body d-flex justify-content-center align-items-center">
+              <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
+                Loading...
+                <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+              </span>
+            </div>
+          </div>
+        )}       
       </div>
     </div>
     {/* end::Row */}
@@ -96,6 +121,7 @@ const DashboardWrapper: FC = () => {
     itemOrders: 0,
     bugReports: 0,
     productSale12M: [],
+    statistics: [],
     loading: true
   }
 
@@ -125,6 +151,7 @@ const DashboardWrapper: FC = () => {
       const itemOrders  = results.itemOrders.data ? results.itemOrders.data.total_orders : 0
       const bugReports  = results.bugReports.data ? results.bugReports.data.total_tickets : 0
       const productSale12M  = results.productSale12M.data ? results.productSale12M.data : []
+      const statistics  = results.statistics.data ? results.statistics.data : []
 
       setSaleReport({
         weeklySales: weeklySales,
@@ -132,7 +159,8 @@ const DashboardWrapper: FC = () => {
         itemOrders: itemOrders,
         bugReports: bugReports,
         productSale12M: productSale12M,
-        loading: true
+        statistics: statistics,
+        loading: false
       })
     })
   },[])
