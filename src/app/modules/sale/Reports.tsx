@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 const Reports = () => {
   return (
-    <div className={`card card-reports`}>
+    <div className="card card-reports pb-5">
       {/* begin::Header */}
       <div className='card-header border-0 pt-5'>
         <h3 className='card-title align-items-start flex-column'>
@@ -12,12 +12,20 @@ const Reports = () => {
       {/* end::Header */}
       {/* begin::Body */}
       <div className='card-body py-3'>
-        <div>
+        <div className='header'>
           <h5>Generate Reports</h5>
         </div>
+        <div className='card-wrapper'>
+          sdfsf - 3 cols
+        </div>
         <hr />
-        <div>
-          <h5>Detail Reports</h5>
+        <div className='tabs'>          
+          <div className='header'>
+            <h5>Detail Reports</h5>
+          </div>
+          <div className='card-wrapper'>
+            tabs - 5tabs
+          </div>
         </div>
       </div>
     </div>
