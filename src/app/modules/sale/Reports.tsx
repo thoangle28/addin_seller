@@ -16,7 +16,11 @@ const Reports = () => {
           <h5>Generate Reports</h5>
         </div>
         <div className='card-wrapper'>
-          sdfsf - 3 cols
+          <div className="row">
+            <div className='col-xs-12 col-md-4'>1</div>
+            <div className='col-xs-12 col-md-4'>2</div>
+            <div className='col-xs-12 col-md-4'>3</div>
+          </div>
         </div>
         <hr />
         <div className='tabs'>          

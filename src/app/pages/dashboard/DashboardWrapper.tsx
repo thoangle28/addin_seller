@@ -31,8 +31,6 @@ type Props = {
 }
 
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => (
-  //MixedWidget2: className, chartColor, chartHeight, strokeColor, weeklySales, newUsers, itemOrders, bugReports
-
   <>
     {/* begin::Row Sale Report */}
     <div className='row gy-5 g-xl-8'>
