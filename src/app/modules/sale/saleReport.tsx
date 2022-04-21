@@ -25,7 +25,7 @@ function getWeeklySales(params: any) {
 function getItemOrders(params: any) {
   //{ "user_id": 6125 } 
   const date = currentDateTime()
-  const filter = {...params, filter_by_year: date.year, filter_by_month: date.month }
+  const filter = { ...params, filter_by_year: date.year, filter_by_month: date.month }
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-order', filter)
 }
 
@@ -37,7 +37,7 @@ function getNewUsers(params: any) {
 
 function getBugReportsByMonth(userId: any) {
   const date = currentDateTime()
-  const filter = {user_id: userId, filter_by_year: date.year, filter_by_month: date.month }
+  const filter = { user_id: userId, filter_by_year: date.year, filter_by_month: date.month }
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-ticket', filter)
 }
 
@@ -46,81 +46,83 @@ function getProductSales12Months(params: any) {
   return axios.post<any>(API_END_POINT_URL + '/sale-report/total-product-sales-twelve-months', params)
 }
 
- //{ "user_id": 6125 } 
+//{ "user_id": 6125 } 
 function getStatisticsSales12Months(params: any) {
- return axios.post<any>(API_END_POINT_URL + '/sale-report/total-sales-twelve-months', params)
+  return axios.post<any>(API_END_POINT_URL + '/sale-report/total-sales-twelve-months', params)
 }
 
 
+export const getCustomerList = (user_id: number, page_size: number = 10, current_page: number = 1) => axios.post(API_END_POINT_URL + '/sale-report/customer-list', { user_id, page_size, current_page })
+export const getProductSaleList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/product-sale-list', params)
+export const getProductOrderList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/order-list', params)
+
 export const WeeklySales = (userId: any) => {
-  return new Promise((resolve, reject) => {   
+  return new Promise((resolve, reject) => {
     getWeeklySales({ user_id: userId })
-    .then((response) => {
-      resolve(response.data)
-    }).catch((error) => {
+      .then((response) => {
+        resolve(response.data)
+      }).catch((error) => {
         reject(error.message)
-    })
+      })
   })
 }
 
 export const NewUsers = (userId: any) => {
-  return new Promise((resolve, reject) => {   
-    getNewUsers({ user_id: userId})
-    .then((response) => {
-      resolve(response.data)
-    }).catch((error) => {
+  return new Promise((resolve, reject) => {
+    getNewUsers({ user_id: userId })
+      .then((response) => {
+        resolve(response.data)
+      }).catch((error) => {
         reject(error.message)
-    })
+      })
   })
 }
 
 export const ItemOrders = (userId: any) => {
-  return new Promise((resolve, reject) => {   
-    getItemOrders({ user_id: userId})
-    .then((response) => {
-      resolve(response.data)
-    }).catch((error) => {
+  return new Promise((resolve, reject) => {
+    getItemOrders({ user_id: userId })
+      .then((response) => {
+        resolve(response.data)
+      }).catch((error) => {
         reject(error.message)
-    })
+      })
   })
 }
 
 export const ProductSales12Months = (userId: any) => {
-  return new Promise((resolve, reject) => {   
-    getProductSales12Months({ user_id: userId})
-    .then((response) => {
-      resolve(response.data)
-    }).catch((error) => {
+  return new Promise((resolve, reject) => {
+    getProductSales12Months({ user_id: userId })
+      .then((response) => {
+        resolve(response.data)
+      }).catch((error) => {
         reject(error.message)
-    })
+      })
   })
 }
-
 
 export const BugReports = (userId: any) => {
-  return new Promise((resolve, reject) => {   
+  return new Promise((resolve, reject) => {
     getBugReportsByMonth(userId)
-    .then((response) => {
-      resolve(response.data)
-    }).catch((error) => {
+      .then((response) => {
+        resolve(response.data)
+      }).catch((error) => {
         reject(error.message)
-    })
+      })
   })
 }
-
 
 export const StatisticsSales12Months = (userId: any) => {
-  return new Promise((resolve, reject) => {   
-    getStatisticsSales12Months({ user_id: userId})
-    .then((response) => {
-      resolve(response.data)
-    }).catch((error) => {
+  return new Promise((resolve, reject) => {
+    getStatisticsSales12Months({ user_id: userId })
+      .then((response) => {
+        resolve(response.data)
+      }).catch((error) => {
         reject(error.message)
-    })
+      })
   })
 }
 
-export const loadAllReports = (user_id: any) => {  
+export const loadAllReports = (user_id: any) => {
   return Promise.all([
     WeeklySales(user_id),
     NewUsers(user_id),
@@ -128,7 +130,7 @@ export const loadAllReports = (user_id: any) => {
     BugReports(user_id),
     ProductSales12Months(user_id),
     StatisticsSales12Months(user_id)
-  ]).then(([weeklySales, newUsers, itemOrders, bugReports, productSale12M,statistics ]) => {    
+  ]).then(([weeklySales, newUsers, itemOrders, bugReports, productSale12M, statistics]) => {
     return { weeklySales, newUsers, itemOrders, bugReports, productSale12M, statistics }
   })
 }
