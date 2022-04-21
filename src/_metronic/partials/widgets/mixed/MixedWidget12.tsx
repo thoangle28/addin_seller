@@ -1,8 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useRef } from 'react'
-import ApexCharts, { ApexOptions } from 'apexcharts'
+import React from 'react'
+import { Link, useHistory } from 'react-router-dom'
 import { KTSVG } from '../../../helpers'
-import { getCSSVariableValue } from '../../../assets/ts/_utils'
 
 type Props = {
   className: string
@@ -16,41 +15,13 @@ type Props = {
   statistics?: any,
   loading?: boolean | false
 }
-
 const MixedWidget12: React.FC<Props> = ({
   className,
-  chartColor,
-  chartHeight,
-  strokeColor,
   weeklySales,
   newUsers,
   itemOrders,
   bugReports,
-  statistics,
-  loading
 }) => {
-  const chartRef = useRef<HTMLDivElement | null>(null)
-
-  useEffect(() => {
-    /* if (!chartRef.current) {
-      return
-    }
-    */
-    const chart = new ApexCharts(
-      chartRef.current,
-      chartOptions(chartHeight, chartColor, strokeColor, statistics)
-    )
-    if (chart) {
-      chart.render()
-    }
-
-    return () => {
-      if (chart) {
-        chart.destroy()
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chartRef])
 
   return (
     <div className={`card ${className}`}>
@@ -139,9 +110,9 @@ const MixedWidget12: React.FC<Props> = ({
                       path='/media/icons/duotune/communication/com010.svg'
                       className='svg-icon-3x svg-icon-success d-block my-2'
                     />
-                    <a href='#' className='text-success fw-bold fs-4 mt-2'>
+                    <Link to="/support/ticket/listing" className='text-success fw-bold fs-4 mt-2'>
                       Tickets Report
-                    </a>
+                    </Link>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
@@ -162,158 +133,5 @@ const MixedWidget12: React.FC<Props> = ({
   )
 }
 
-const chartOptions = (
-  chartHeight: string,
-  chartColor: string,
-  strokeColor: string,
-  statistics: any
-): ApexOptions => {
-  const labelColor = getCSSVariableValue('--bs-gray-500')
-  const borderColor = getCSSVariableValue('--bs-gray-200')
-  const color = getCSSVariableValue('--bs-' + chartColor)
-
-  const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const dataList: Array<number> = []
-  const dataListM: Array<string> = []
-
-  const chartData = statistics.list ? statistics.list : []
-
-  !!chartData && chartData.map((item: any) => {
-    dataList.push(item.total ? parseFloat(item.total) : 0)
-    dataListM.push(monthName[item.month - 1] + ' ' + item.year)
-  })
-  const maxValue = Math.max(...dataList) > 0 ? Math.max(...dataList) + 200 : 0;
-
-  return {
-    series: [
-      {
-        name: 'Net Profit',
-        data: dataList,//[30, 45, 32, 70, 40, 40, 40],
-      },
-    ],
-    chart: {
-      fontFamily: 'inherit',
-      type: 'area',
-      height: chartHeight,
-      toolbar: {
-        show: false,
-      },
-      zoom: {
-        enabled: false,
-      },
-      sparkline: {
-        enabled: true,
-      },
-      dropShadow: {
-        enabled: true,
-        enabledOnSeries: undefined,
-        top: 5,
-        left: 0,
-        blur: 3,
-        color: strokeColor,
-        opacity: 0.5,
-      },
-    },
-    plotOptions: {},
-    legend: {
-      show: false,
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    fill: {
-      type: 'solid',
-      opacity: 0,
-    },
-    stroke: {
-      curve: 'smooth',
-      show: true,
-      width: 3,
-      colors: [strokeColor],
-    },
-    xaxis: {
-      categories: dataListM,//['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
-      labels: {
-        show: false,
-        style: {
-          colors: labelColor,
-          fontSize: '12px',
-        },
-      },
-      crosshairs: {
-        show: false,
-        position: 'front',
-        stroke: {
-          color: borderColor,
-          width: 1,
-          dashArray: 3,
-        },
-      },
-    },
-    yaxis: {
-      min: 0,
-      max: maxValue,
-      labels: {
-        show: false,
-        style: {
-          colors: labelColor,
-          fontSize: '12px',
-        },
-      },
-      opposite: true
-    },
-    states: {
-      normal: {
-        filter: {
-          type: 'none',
-          value: 0,
-        },
-      },
-      hover: {
-        filter: {
-          type: 'none',
-          value: 0,
-        },
-      },
-      active: {
-        allowMultipleDataPointsSelection: false,
-        filter: {
-          type: 'none',
-          value: 0,
-        },
-      },
-    },
-    tooltip: {
-      style: {
-        fontSize: '12px',
-      },
-      y: {
-        formatter: function (val) {
-          const currenyFormat = (val).toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
-          })
-
-          return currenyFormat
-        },
-      },
-      marker: {
-        show: false,
-      },
-    },
-    colors: ['transparent'],
-    markers: {
-      colors: [color],
-      strokeColors: [strokeColor],
-      strokeWidth: 3,
-    },
-  }
-}
 
 export { MixedWidget12 }

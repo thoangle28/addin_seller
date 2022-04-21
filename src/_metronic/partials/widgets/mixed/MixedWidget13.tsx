@@ -3,7 +3,6 @@ import React, { useEffect, useRef } from 'react'
 import ApexCharts, { ApexOptions } from 'apexcharts'
 import { KTSVG } from '../../../helpers'
 import { getCSSVariableValue } from '../../../assets/ts/_utils'
-import { Dropdown1 } from '../../content/dropdown/Dropdown1'
 
 type Props = {
   className: string
@@ -23,12 +22,7 @@ const MixedWidget13: React.FC<Props> = ({
   chartColor,
   chartHeight,
   strokeColor,
-  weeklySales,
-  newUsers,
-  itemOrders,
-  bugReports,
   statistics,
-  loading
 }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
