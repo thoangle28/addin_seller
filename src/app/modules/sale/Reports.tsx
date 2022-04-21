@@ -223,6 +223,7 @@ const Reports: FC = () => {
 
   // UI components
   const displayProductSaleList = () => {
+    console.log('response')
     return list ? (<div className='col-xs-12'>
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
@@ -395,7 +396,7 @@ const Reports: FC = () => {
                     <option value="1">1</option>
                     <option value="2">3</option>
                     <option value="5">5</option>
-                    <option value="10">10</option>
+                    <option selected value="10">10</option>
                   </select>
                 </div>
               </div>
