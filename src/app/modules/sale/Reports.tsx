@@ -265,16 +265,30 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-20 text-left">Product ID</th>
-            <th className="w-20 text-left ">Product Sale</th>
+            <th className="w-15 text-left">#ID</th>
+            <th className="w-30 text-left ">Product Name</th>
             <th className="w-30 text-center"> Price</th>
             <th className="w-25 text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
           {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-20 text-left">{item.product_id}</td>
-            <td className="w-20 text-left text-dark fw-bolder text-hover-primary fs-6">{item.product_sale}</td>
+            <td className="w-5 text-left">{item.product_id}</td>
+            <td>
+              <div className='d-flex align-items-center'>
+                <div className='symbol symbol-45px me-5'>
+                  <img
+                    src={item.product_image ? item.product_image : 'https://via.placeholder.com/75x75/f0f0f0'}
+                    alt=''
+                  />
+                </div>
+                <div className='d-flex justify-content-start flex-column'>
+                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
+                    {item.product_sale}
+                  </span>
+                </div>
+              </div>
+            </td>
             <td className="w-30 text-center"><span>$ {item.regular_price}</span> <br /><span className='m-0'> <s>${item.sale_price}</s></span></td>
             <td className="w-25 text-end">{item.date}</td>
           </tr>
@@ -323,8 +337,8 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-20 text-center">Order ID</th>
-            <th className="w-30 text-center">Product Title</th>
+            <th className=" text-center">#ID</th>
+            <th className="w-30 text-center">Product Name</th>
             <th className="w-25 text-center">Date Created</th>
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
@@ -332,7 +346,7 @@ const Reports: FC = () => {
         </thead>
         <tbody>
           {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-20 text-center">{item.order_id}</td>
+            <td className=" text-center">{item.order_id}</td>
             <td className="w-30 text-center text-dark fw-bolder text-hover-primary fs-6">{item.title_product}</td>
             <td className="w-25 text-center">{item.date}</td>
             <td className="w-25 text-center">$ {item.price}</td>
@@ -384,7 +398,7 @@ const Reports: FC = () => {
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
           <thead>
             <tr className="fw-bolder text-muted">
-              <th className="w-25 text-start">User ID</th>
+              <th className="w-5 text-start">#ID</th>
               <th className="w-30 text-start">Full Name</th>
               <th className="w-25 text-center">City</th>
               <th className="w-25 text-center">Country</th>
@@ -394,7 +408,7 @@ const Reports: FC = () => {
           </thead>
           <tbody>
             {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
-              <td className="w-25 text-start">{item.user_id}</td>
+              <td className="w-5 text-start">{item.user_id}</td>
               <td className="w-30 text-start">{item.full_name}</td>
               <td className="w-25 text-center">{item.city ? item.city : '-'}</td>
               <td className="w-25 text-center">{item.country ? item.country : '-'}</td>
