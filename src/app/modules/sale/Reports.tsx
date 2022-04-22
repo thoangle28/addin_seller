@@ -58,7 +58,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           <MixedWidget11
             className='card-xxl-stretch-50 mb-5 mb-xl-8'
             chartColor='primary'
-            chartHeight='250px'
+            chartHeight='220px'
             productSale12M={saleReport.productSale12M}
           />
         ) || (<Loading />)}
@@ -265,12 +265,14 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
+            <th className="w-20 text-center">Product ID</th>
             <th className="w-20 text-center">Product Sale</th>
             <th className="w-30 text-center">Regular Price</th>
             <th className="w-25 text-center">Sale Price</th>
-            <th className="w-25 text-center">Date</th>
+            <th className="w-25 text-center">Date Created</th>
           </tr>
-          {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+          {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
+            <td className="w-20 text-center">{item.product_id}</td>
             <td className="w-20 text-center">{item.product_sale}</td>
             <td className="w-30 text-center">$ {item.regular_price}</td>
             <td className="w-25 text-center">$ {item.sale_price}</td>
@@ -290,10 +292,10 @@ const Reports: FC = () => {
               className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
             >
               <option value='10'>10</option>
-              <option value='5'>5</option>
-              <option value='2'>2</option>
-              <option value='3'>3</option>
-              <option value='1'>1</option>
+              <option value='20'>20</option>
+              <option value='50'>50</option>
+              <option value='30'>30</option>
+              <option value='100'>100</option>
             </select>
             <span className='text-muted ms-3'>item(s)/page</span>
             <span className='text-muted ms-5'>
@@ -323,11 +325,11 @@ const Reports: FC = () => {
           <tr className="fw-bolder text-muted">
             <th className="w-20 text-center">Order ID</th>
             <th className="w-30 text-center">Product Title</th>
-            <th className="w-25 text-center">Date</th>
+            <th className="w-25 text-center">Date Created</th>
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
           </tr>
-          {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+          {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-20 text-center">{item.order_id}</td>
             <td className="w-30 text-center">{item.title_product}</td>
             <td className="w-25 text-center">{item.date}</td>
@@ -348,10 +350,10 @@ const Reports: FC = () => {
               className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
             >
               <option value='10'>10</option>
-              <option value='5'>5</option>
-              <option value='2'>2</option>
-              <option value='3'>3</option>
-              <option value='1'>1</option>
+              <option value='20'>20</option>
+              <option value='50'>50</option>
+              <option value='30'>30</option>
+              <option value='100'>100</option>
             </select>
             <span className='text-muted ms-3'>item(s)/page</span>
             <span className='text-muted ms-5'>
@@ -387,7 +389,7 @@ const Reports: FC = () => {
               <th className="w-25 text-center">Email</th>
               <th className="w-25 text-center">Phone</th>
             </tr>
-            {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+            {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
               <td className="w-20 text-center">{item.user_id}</td>
               <td className="w-30 text-center">{item.full_name}</td>
               <td className="w-25 text-center">{item.city}</td>
@@ -409,10 +411,10 @@ const Reports: FC = () => {
                 onChange={(e) => { onChangeHandler(e) }}
               >
                 <option value='10'>10</option>
-                <option value='5'>5</option>
-                <option value='2'>2</option>
-                <option value='3'>3</option>
-                <option value='1'>1</option>
+                <option value='20'>20</option>
+                <option value='50'>50</option>
+                <option value='30'>30</option>
+                <option value='100'>100</option>
               </select>
               <span className='text-muted ms-3'>item(s)/page</span>
               <span className='text-muted ms-5'>
@@ -466,7 +468,7 @@ const Reports: FC = () => {
                 <div className='col-md-3 me-4 my-1'>
                   <label className="form-label">Month</label>
                   <select
-                    className='form-select form-select-solid form-select-sm me-3'
+                    className='form-select text-primary form-select-solid bg-light-primary form-select-sm me-3'
                     name="filter_by_month"
                     onChange={(e) => { onChangeHandler(e); }}
                   >
@@ -477,7 +479,7 @@ const Reports: FC = () => {
                 <div className='col-md-3 me-4 my-1'>
                   <label className="form-label">Year</label>
                   <select
-                    className='form-select form-select-solid form-select-sm me-3'
+                    className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
                     name="filter_by_year"
                     onChange={(e) => { onChangeHandler(e); }}
                   >

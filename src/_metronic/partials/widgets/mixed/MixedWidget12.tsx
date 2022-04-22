@@ -25,7 +25,7 @@ const MixedWidget12: React.FC<Props> = ({
 
   return (
     <div className={`card ${className}`}>
-      <div className="row mb-4">
+      <div className="row">
         <div className='col-md-3'>
           <div className='d-flex align-items-end justify-content-between bg-light-warning px-4 py-8 rounded-2'>
             <div >
