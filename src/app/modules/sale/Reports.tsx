@@ -266,21 +266,21 @@ const Reports: FC = () => {
         <thead>
           <tr className="fw-bolder text-muted">
             <th className="w-20 text-left">Product ID</th>
-            <th className="w-20 text-left">Product Sale</th>
-            <th className="w-30 text-left">Regular Price</th>
-            <th className="w-25 text-left">Sale Price</th>
+            <th className="w-20 text-left ">Product Sale</th>
+            <th className="w-30 text-center"> Price</th>
             <th className="w-25 text-end">Date Created</th>
           </tr>
+        </thead>
+        <tbody>
           {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-20 text-left">{item.product_id}</td>
-            <td className="w-20 text-left">{item.product_sale}</td>
-            <td className="w-30 text-left">$ {item.regular_price}</td>
-            <td className="w-25 text-left">$ {item.sale_price}</td>
+            <td className="w-20 text-left text-dark fw-bolder text-hover-primary fs-6">{item.product_sale}</td>
+            <td className="w-30 text-center"><span>$ {item.regular_price}</span> <br /><span className='m-0'> <s>${item.sale_price}</s></span></td>
             <td className="w-25 text-end">{item.date}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
           {/* Pagination */}
-        </thead>
+        </tbody>
       </table>
       <div className="row justify-content-between align-items-center">
         <div className="col-md-6">
@@ -329,16 +329,18 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
           </tr>
+        </thead>
+        <tbody>
           {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-20 text-center">{item.order_id}</td>
-            <td className="w-30 text-center">{item.title_product}</td>
+            <td className="w-30 text-center text-dark fw-bolder text-hover-primary fs-6">{item.title_product}</td>
             <td className="w-25 text-center">{item.date}</td>
             <td className="w-25 text-center">$ {item.price}</td>
             <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
-          {/* Pagination */}
-        </thead>
+        </tbody>
+        {/* Pagination */}
       </table>
       <div className="row justify-content-between align-items-center">
         <div className="col-md-6">
@@ -389,6 +391,8 @@ const Reports: FC = () => {
               <th className="w-25 text-center">Email</th>
               <th className="w-25 text-end">Phone</th>
             </tr>
+          </thead>
+          <tbody>
             {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
               <td className="w-25 text-start">{item.user_id}</td>
               <td className="w-30 text-start">{item.full_name}</td>
@@ -398,8 +402,8 @@ const Reports: FC = () => {
               <td className="w-25 text-end">{item.phone}</td>
             </tr>
             ) : <AlertMessage hasErrors={true} message={message} />}
-            {/* Pagination */}
-          </thead>
+          </tbody>
+          {/* Pagination */}
         </table>
         <div className="row justify-content-between align-items-center">
           <div className="col-md-5">
