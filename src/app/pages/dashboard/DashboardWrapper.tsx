@@ -33,8 +33,7 @@ type Props = {
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => (
   <>
     {/* begin::Row Sale Report */}
-    <div className='row gy-5 g-xl-8'>
-      {console.log(saleReport)}
+    <div className='row gy-5 g-xl-8'>      
       <div className='col-xxl-6'>
         {!saleReport.loading && (
           <MixedWidget2
@@ -144,8 +143,7 @@ const DashboardWrapper: FC = () => {
   const allReport = loadAllReports(currentUserId)
 
   useEffect(() => {
-    allReport.then((results: any) => {
-      console.log(results)
+    allReport.then((results: any) => { 
       const weeklySales = results.weeklySales.data ? results.weeklySales.data.total_products : 0
       const newUsers = results.newUsers.data ? results.newUsers.data.total_customers : 0
       const itemOrders = results.itemOrders.data ? results.itemOrders.data.total_orders : 0

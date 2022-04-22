@@ -207,9 +207,7 @@ const chartOptions = (
     dataList.push( item.total ? parseFloat(item.total) : 0 )
     dataListM.push( monthName[item.month -1] + ' ' + item.year )
   })
-  console.log(dataList)
-  console.log(dataListM)
-
+  
   const maxValue = Math.max(...dataList) > 0 ? Math.max(...dataList) +  200 : 0;
 
   return {
