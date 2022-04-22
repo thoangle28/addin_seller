@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect, useRef} from 'react'
-import ApexCharts, {ApexOptions} from 'apexcharts'
-import {KTSVG} from '../../../helpers'
-import {getCSSVariableValue} from '../../../assets/ts/_utils'
-import {Dropdown1} from '../../content/dropdown/Dropdown1'
+import React, { useEffect, useRef } from 'react'
+import ApexCharts, { ApexOptions } from 'apexcharts'
+import { KTSVG } from '../../../helpers'
+import { getCSSVariableValue } from '../../../assets/ts/_utils'
+import { Dropdown1 } from '../../content/dropdown/Dropdown1'
+import { Link } from 'react-router-dom'
 
 type Props = {
   className: string
@@ -77,11 +78,11 @@ const MixedWidget2: React.FC<Props> = ({
       {/* end::Header */}
       {/* begin::Body */}
       <div className='card-body p-0'>
-        {/* begin::Chart */}       
+        {/* begin::Chart */}
         <div
           ref={chartRef}
           className={`pb-20 mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
-        ></div>       
+        ></div>
         {/* end::Chart */}
         {/* begin::Stats */}
         <div className='card-p mt-n20 position-relative'>
@@ -90,16 +91,16 @@ const MixedWidget2: React.FC<Props> = ({
             {/* begin::Col */}
             <div className='col bg-light-warning px-6 py-8 rounded-2 me-7 mb-7'>
               <div className='d-flex align-items-end'>
-                <div style={{flex: '1 0'}}>
+                <div style={{ flex: '1 0' }}>
                   <KTSVG
                     path='/media/icons/duotune/general/gen032.svg'
                     className='svg-icon-3x svg-icon-warning d-block my-2'
                   />
-                  <a href='#' className='text-warning fw-bold fs-6'>
+                  <span className='text-warning fw-bold fs-6'>
                     Weekly Sales
-                  </a>
+                  </span>
                 </div>
-                <div style={{textAlign: 'right'}}>
+                <div style={{ textAlign: 'right' }}>
                   <span
                     className='ps-3 text-warning fs-1 fw-bolder text-800 mt-1'>
                     {weeklySales}
@@ -113,16 +114,16 @@ const MixedWidget2: React.FC<Props> = ({
             {/* begin::Col */}
             <div className='col bg-light-primary px-6 py-8 rounded-2 mb-7'>
               <div className='d-flex align-items-end'>
-                <div style={{flex: '1 0'}}>
+                <div style={{ flex: '1 0' }}>
                   <KTSVG
                     path='/media/icons/duotune/arrows/arr075.svg'
                     className='svg-icon-3x svg-icon-primary d-block my-2'
                   />
-                  <a href='#' className='text-primary fw-bold fs-6'>
+                  <span className='text-primary fw-bold fs-6'>
                     New Users
-                  </a>
+                  </span>
                 </div>
-                <div style={{textAlign: 'right'}}>
+                <div style={{ textAlign: 'right' }}>
                   <span
                     className='ps-3 text-primary fs-1 fw-bolder text-800 mt-1'>
                     {newUsers}
@@ -140,16 +141,16 @@ const MixedWidget2: React.FC<Props> = ({
             {/* begin::Col */}
             <div className='col bg-light-danger px-6 py-8 rounded-2 me-7'>
               <div className='d-flex align-items-end'>
-                <div style={{flex: '1 0'}}>
+                <div style={{ flex: '1 0' }}>
                   <KTSVG
                     path='/media/icons/duotune/abstract/abs027.svg'
                     className='svg-icon-3x svg-icon-danger d-block my-2'
                   />
-                  <a href='#' className='text-danger fw-bold fs-6 mt-2'>
+                  <span className='text-danger fw-bold fs-6 mt-2'>
                     Item Orders
-                  </a>
+                  </span>
                 </div>
-                <div style={{textAlign: 'right'}}>
+                <div style={{ textAlign: 'right' }}>
                   <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
                   <br />
                   <small className='fs-8 text-danger'>in month</small>
@@ -160,18 +161,18 @@ const MixedWidget2: React.FC<Props> = ({
             {/* begin::Col */}
             <div className='col bg-light-success px-6 py-8 rounded-2'>
               <div className='d-flex align-items-end'>
-                <div style={{flex: '1 0'}}>
+                <div style={{ flex: '1 0' }}>
                   <KTSVG
                     path='/media/icons/duotune/communication/com010.svg'
                     className='svg-icon-3x svg-icon-success d-block my-2'
                   />
-                  <a href='#' className='text-success fw-bold fs-6 mt-2'>
+                  <Link to='/support/ticket/listing' className='text-success fw-bold fs-6 mt-2'>
                     Tickets Report
-                  </a>
+                  </Link>
                 </div>
-                <div style={{textAlign: 'right'}}>
+                <div style={{ textAlign: 'right' }}>
                   <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
-                     <br />
+                  <br />
                   <small className='fs-8 text-success'>in month</small>
                 </div>
               </div>
@@ -197,18 +198,18 @@ const chartOptions = (
   const borderColor = getCSSVariableValue('--bs-gray-200')
   const color = getCSSVariableValue('--bs-' + chartColor)
 
-  const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May',  'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const monthName = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const dataList: Array<number> = []
   const dataListM: Array<string> = []
 
   const chartData = statistics.list ? statistics.list : []
 
-  !!chartData && chartData.map((item: any) => {   
-    dataList.push( item.total ? parseFloat(item.total) : 0 )
-    dataListM.push( monthName[item.month -1] + ' ' + item.year )
+  !!chartData && chartData.map((item: any) => {
+    dataList.push(item.total ? parseFloat(item.total) : 0)
+    dataListM.push(monthName[item.month - 1] + ' ' + item.year)
   })
-  
-  const maxValue = Math.max(...dataList) > 0 ? Math.max(...dataList) +  200 : 0;
+
+  const maxValue = Math.max(...dataList) > 0 ? Math.max(...dataList) + 200 : 0;
 
   return {
     series: [
@@ -342,4 +343,4 @@ const chartOptions = (
   }
 }
 
-export {MixedWidget2}
+export { MixedWidget2 }

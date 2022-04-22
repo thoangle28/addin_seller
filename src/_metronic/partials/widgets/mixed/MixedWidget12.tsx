@@ -33,9 +33,9 @@ const MixedWidget12: React.FC<Props> = ({
                 path='/media/icons/duotune/general/gen032.svg'
                 className='svg-icon-3x svg-icon-warning d-block my-2'
               />
-              <a href='#' className='text-warning fw-bold fs-4'>
+              <span className='text-warning fw-bold fs-4'>
                 Weekly Sales
-              </a>
+              </span>
             </div>
             <div style={{ textAlign: 'right' }}>
               <span
@@ -54,9 +54,9 @@ const MixedWidget12: React.FC<Props> = ({
                 path='/media/icons/duotune/arrows/arr075.svg'
                 className='svg-icon-3x svg-icon-primary d-block my-2'
               />
-              <a href='#' className='text-primary fw-bold fs-4'>
+              <span className='text-primary fw-bold fs-4'>
                 New Users
-              </a>
+              </span>
             </div>
             <div style={{ textAlign: 'right' }}>
               <span
@@ -75,9 +75,9 @@ const MixedWidget12: React.FC<Props> = ({
                 path='/media/icons/duotune/abstract/abs027.svg'
                 className='svg-icon-3x svg-icon-danger d-block my-2'
               />
-              <a href='#' className='text-danger fw-bold fs-4 mt-2'>
+              <span className='text-danger fw-bold fs-4 mt-2'>
                 Item Orders
-              </a>
+              </span>
             </div>
             <div style={{ textAlign: 'right' }}>
               <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
