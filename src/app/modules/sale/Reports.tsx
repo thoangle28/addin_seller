@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
-import { AddinLoading } from '../../../_metronic/partials'
 import AlertMessage from '../../../_metronic/partials/common/alert'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList } from './saleReport'
@@ -48,14 +47,12 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           <MixedWidget12
             className='card-xl-stretch mb-xl-8'
             chartColor='danger'
-            chartHeight='200px'
+            chartHeight='150px'
             strokeColor='#cb1e46'
             weeklySales={saleReport.weeklySales}
             newUsers={saleReport.newUsers}
             itemOrders={saleReport.itemOrders}
             bugReports={saleReport.bugReports}
-            loading={saleReport.loading}
-            statistics={saleReport.statistics}
           />
         ) || (<Loading />)}
       </div>
@@ -65,7 +62,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           <MixedWidget13
             className='card-xl-stretch mb-xl-8'
             chartColor='danger'
-            chartHeight='200px'
+            chartHeight='170px'
             strokeColor='#cb1e46'
             loading={saleReport.loading}
             statistics={saleReport.statistics}
@@ -77,7 +74,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           <MixedWidget11
             className='card-xxl-stretch-50 mb-5 mb-xl-8'
             chartColor='primary'
-            chartHeight='175px'
+            chartHeight='250px'
             productSale12M={saleReport.productSale12M}
           />
         ) || (<Loading />)}
@@ -85,6 +82,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
     </>
   )
 }
+
 const Reports: FC = () => {
 
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
@@ -117,13 +115,25 @@ const Reports: FC = () => {
   const [customerList, setCustomerList] = useState<any>()
   const [productOrderList, setProductOrderList] = useState<any>()
   const [formValue, setFormValue] = useState<formValue>(initFormValue)
+  const [formProductOrderValue, setFormProductOrderValue] = useState<formValue>(initFormValue)
+  const [formCustomerValue, setFormCustomerValue] = useState<formValue>(initFormValue)
   const [message, setMessage] = useState<string>('')
   const allReport = loadAllReports(currentUserId)
-  const onChangeHandler = (e: any) => {
+
+  const onChangeHandler = (e: any, current_page: number = 1) => {
     e.preventDefault()
     const { name, value } = e.target
-    setFormValue({ ...formValue, user_id: currentUserId, [name]: parseInt(value) })
+    if (tab === 'Weekly Sales' || tab === 'Product Sold') {
+      setFormValue({ ...formValue, [name]: parseInt(value), current_page })
+    }
+    if (tab === 'New Users') {
+      setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
+    }
+    if (tab === 'Item Orders' || tab === "Item Orders") {
+      setFormProductOrderValue({ ...formProductOrderValue, [name]: parseInt(value), current_page })
+    }
   }
+  // API Calling
   const showProductSaleList = (formValue: any) => {
     getProductSaleList(formValue).then(res => {
       const { code, data } = res.data
@@ -147,8 +157,8 @@ const Reports: FC = () => {
       setMessage('Processing')
       setIsLoading(true)
       if (code === 200) {
-        setCustomerList(data)
         setIsLoading(false)
+        setCustomerList(data)
         setMessage(message)
         setTimeout(() => {
           setMessage('')
@@ -163,8 +173,8 @@ const Reports: FC = () => {
       setMessage('Processing')
       setIsLoading(true)
       if (code === 200) {
-        setProductOrderList(data)
         setIsLoading(false)
+        setProductOrderList(data)
         setMessage(message)
         setTimeout(() => {
           setMessage('')
@@ -194,26 +204,26 @@ const Reports: FC = () => {
     })
   }, [])
 
-  // Load data each tab when user has clicked
+  // Load data each tab when user has clicked 
   useEffect(() => {
-    showProductSaleList(formValue)
-    showProductOrderList(formValue)
-    showCustomerList(formValue)
-  }, [formValue])
+    if (tab === 'Weekly Sales' || tab === 'Product Sold')
+      showProductSaleList(formValue)
+  }, [formValue, tab])
 
-  const addinLoading = () => {
-    return <div className='card mb-5 mb-xl-8 loading-wrapper'>
-      <div className='card-body py-3 loading-body'>
-        <AddinLoading />
-      </div>
-    </div>
-  }
+  useEffect(() => {
+    if (tab === 'New Users')
+      showCustomerList(formCustomerValue)
+  }, [formCustomerValue, tab])
 
-  const onChangePageHandler = (e: any, current_page: string | number) => {
-    e.preventDefault()
-    setFormValue({ ...formValue, current_page })
-  }
+  useEffect(() => {
+    if (tab === 'Item Orders' || tab === "Item Orders")
+      showProductOrderList(formProductOrderValue)
+  }, [formProductOrderValue, tab])
+
+
+  // UI components
   const displayProductSaleList = () => {
+    console.log('response')
     return list ? (<div className='col-xs-12'>
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
@@ -223,24 +233,24 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Sale Price</th>
             <th className="w-25 text-center">Date</th>
           </tr>
-          {list.product_sale_list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+          {list.product_sale_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
             <th className="w-20 text-center">{item.product_sale}</th>
             <th className="w-30 text-center">{item.regular_price}</th>
             <th className="w-25 text-center">{item.sale_price}</th>
             <th className="w-25 text-center">{item.date}</th>
           </tr>
-          ) : <AlertMessage hasErrors={true} message={message} />}
+          )}
           {/* Pagination */}
         </thead>
       </table>
       <nav aria-label="Page navigation example" className='my-5'>
         <ul className="pagination justify-content-center">
           <li className="page-item disabled"><span className={`page-link cursor-pointer ${list.current_page === 1 ? 'disabled' : ''}`} aria-disabled="true">Previous</span></li>
-          {getPageNumber(list)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangePageHandler(e, item)} className={`page-item cursor-pointer ${list.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
+          {getPageNumber(list)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${list.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
           <li className="page-item"> <span className={`page-link cursor-pointer ${list.current_page === list.total_pages ? 'disabled' : ''}`}>Next</span></li>
         </ul>
       </nav>
-    </div >) : addinLoading();
+    </div >) : <Loading />;
   }
 
   const displayProductOrderList = () => {
@@ -254,28 +264,29 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
           </tr>
-          {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+          {productOrderList.order_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
             <th className="w-20 text-center">{item.order_id}</th>
             <th className="w-30 text-center">{item.title_product}</th>
             <th className="w-25 text-center">{item.date}</th>
             <th className="w-25 text-center">{item.price}</th>
             <th className="w-25 text-center">{item.status}</th>
           </tr>
-          ) : <AlertMessage hasErrors={true} message={message} />}
+          )}
           {/* Pagination */}
         </thead>
       </table>
       <nav aria-label="Page navigation example" className='my-5'>
         <ul className="pagination justify-content-center">
           <li className="page-item disabled"><span className={`page-link cursor-pointer ${productOrderList.current_page === 1 ? 'disabled' : ''}`} aria-disabled="true">Previous</span></li>
-          {getPageNumber(productOrderList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangePageHandler(e, item)} className={`page-item cursor-pointer ${productOrderList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
+          {getPageNumber(productOrderList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${productOrderList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
           <li className="page-item"> <span className={`page-link cursor-pointer ${productOrderList.current_page === productOrderList.total_pages ? 'disabled' : ''}`}>Next</span></li>
         </ul>
       </nav>
-    </div>) : addinLoading()
+    </div>) : <Loading />
   }
 
   const displayCustomerSaleList = () => {
+    console.log(customerList)
     return customerList ? (
       <div className='col-xs-12'>
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
@@ -303,11 +314,11 @@ const Reports: FC = () => {
         <nav aria-label="Page navigation example" className='my-5'>
           <ul className="pagination justify-content-center">
             <li className="page-item disabled"><span className={`page-link cursor-pointer ${customerList.current_page === 1 ? 'disabled' : ''}`} aria-disabled="true">Previous</span></li>
-            {getPageNumber(customerList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangePageHandler(e, item)} className={`page-item cursor-pointer ${customerList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
+            {getPageNumber(customerList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${customerList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
             <li className="page-item"> <span className={`page-link cursor-pointer ${customerList.current_page === customerList.total_pages ? 'disabled' : ''}`}>Next</span></li>
           </ul>
         </nav>
-      </div>) : addinLoading()
+      </div>) : <Loading />
   }
 
   const getPageNumber = (data: any) => {
@@ -320,27 +331,28 @@ const Reports: FC = () => {
     }
     return pageNumbers
   }
-  return (
-    <div className="card card-reports pb-5">
-      <div className='card-header border-0 pt-5'>
-        <h3 className='card-title align-items-start flex-column'>
-          <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
-        </h3>
+
+  return (<div className="card card-reports pb-5">
+    <div className='card-header border-0 pt-5'>
+      <h3 className='card-title align-items-start flex-column'>
+        <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
+      </h3>
+    </div>
+    <div className='card-body py-0'>
+      <div className='card-title align-items-start flex-column  mb-4'>
+        <span className='card-label fw-bolder fs-4'>Generate Reports</span>
       </div>
-      <div className='card-body py-3'>
+      <div className='card-wrapper'>
+        <div className="row">
+          <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
+        </div>
+      </div>
+      <hr />
+      <div>
         <div className='header'>
-          <h5>Generate Reports</h5>
+          <h5>Detail Reports</h5>
         </div>
-        <div className='card-wrapper'>
-          <div className="row">
-            <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
-          </div>
-        </div>
-        <hr />
-        <div>
-          <div className='header'>
-            <h5>Detail Reports</h5>
-          </div>
+        {isLoading ? (<Loading />) : (
           <div className='card-wrapper'>
             <div className='row'>
               {/* Tabs */}
@@ -384,24 +396,23 @@ const Reports: FC = () => {
                     <option value="1">1</option>
                     <option value="2">3</option>
                     <option value="5">5</option>
-                    <option value="10">10</option>
+                    <option selected value="10">10</option>
                   </select>
                 </div>
               </div>
-              {isLoading ? (
-                <div>
-                  {tab === 'Weekly Sales' && displayProductSaleList()}
-                  {tab === 'Product Sold' && displayProductSaleList()}
-                  {tab === 'New Users' && displayCustomerSaleList()}
-                  {tab === 'Item Orders' && displayProductOrderList()}
-                  {tab === 'Ticket Reports' && displayProductOrderList()}
-                </div>
-              ) : addinLoading()}
+              <div>
+                {tab === 'Weekly Sales' && displayProductSaleList()}
+                {tab === 'Product Sold' && displayProductSaleList()}
+                {tab === 'New Users' && displayCustomerSaleList()}
+                {tab === 'Item Orders' && displayProductOrderList()}
+                {tab === 'Ticket Reports' && displayProductOrderList()}
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
-    </div >
+    </div>
+  </div >
   )
 }
 
