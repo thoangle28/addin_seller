@@ -271,20 +271,21 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Date</th>
           </tr>
           {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
-            <th className="w-20 text-center">{item.product_sale}</th>
-            <th className="w-30 text-center">{item.regular_price}</th>
-            <th className="w-25 text-center">{item.sale_price}</th>
-            <th className="w-25 text-center">{item.date}</th>
+            <td className="w-20 text-center">{item.product_sale}</td>
+            <td className="w-30 text-center">$ {item.regular_price}</td>
+            <td className="w-25 text-center">$ {item.sale_price}</td>
+            <td className="w-25 text-center">{item.date}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
           {/* Pagination */}
         </thead>
       </table>
       <div className="row justify-content-between align-items-center">
-        <div className="col-md-5">
+        <div className="col-md-6">
           <div className='d-flex align-items-center py-3'>
             <span className='text-muted me-3'>Showing</span>
             <select
+              name="page_size"
               onChange={(e) => { onChangeHandler(e) }}
               className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
             >
@@ -301,12 +302,14 @@ const Reports: FC = () => {
             {isPaginate && (<Loading />)}
           </div>
         </div>
-        <div className="col-md-7">
-          {listPages &&
-            listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
-              {item.label}
-            </span>
-            )}
+        <div className="col-md-6 d-flex justify-content-end">
+          <div>
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
         </div>
       </div>
     </div >) : <Loading />;
@@ -325,21 +328,22 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Status</th>
           </tr>
           {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
-            <th className="w-20 text-center">{item.order_id}</th>
-            <th className="w-30 text-center">{item.title_product}</th>
-            <th className="w-25 text-center">{item.date}</th>
-            <th className="w-25 text-center">{item.price}</th>
-            <th className="w-25 text-center">{item.status}</th>
+            <td className="w-20 text-center">{item.order_id}</td>
+            <td className="w-30 text-center">{item.title_product}</td>
+            <td className="w-25 text-center">{item.date}</td>
+            <td className="w-25 text-center">$ {item.price}</td>
+            <td className="w-25 text-center">{item.status}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
           {/* Pagination */}
         </thead>
       </table>
       <div className="row justify-content-between align-items-center">
-        <div className="col-md-5">
+        <div className="col-md-6">
           <div className='d-flex align-items-center py-3'>
             <span className='text-muted me-3'>Showing</span>
             <select
+              name="page_size"
               onChange={(e) => { onChangeHandler(e) }}
               className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
             >
@@ -356,8 +360,8 @@ const Reports: FC = () => {
             {isPaginate && (<Loading />)}
           </div>
         </div>
-        <div className="col-md-7">
-          <div className="col-md-7">
+        <div className="col-md-6 d-flex justify-content-end">
+          <div className="col-md-6 d-flex justify-content-end">
             {listPages &&
               listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
                 {item.label}
@@ -384,12 +388,12 @@ const Reports: FC = () => {
               <th className="w-25 text-center">Phone</th>
             </tr>
             {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
-              <th className="w-20 text-center">{item.user_id}</th>
-              <th className="w-30 text-center">{item.full_name}</th>
-              <th className="w-25 text-center">{item.city}</th>
-              <th className="w-25 text-center">{item.country}</th>
-              <th className="w-25 text-center">{item.email}</th>
-              <th className="w-25 text-center">{item.phone}</th>
+              <td className="w-20 text-center">{item.user_id}</td>
+              <td className="w-30 text-center">{item.full_name}</td>
+              <td className="w-25 text-center">{item.city}</td>
+              <td className="w-25 text-center">{item.country}</td>
+              <td className="w-25 text-center">{item.email}</td>
+              <td className="w-25 text-center">{item.phone}</td>
             </tr>
             ) : <AlertMessage hasErrors={true} message={message} />}
             {/* Pagination */}
@@ -400,8 +404,9 @@ const Reports: FC = () => {
             <div className='d-flex align-items-center py-3'>
               <span className='text-muted me-3'>Showing</span>
               <select
-                onChange={(e) => { onChangeHandler(e) }}
+                name="page_size"
                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+                onChange={(e) => { onChangeHandler(e) }}
               >
                 <option value='10'>10</option>
                 <option value='5'>5</option>
@@ -416,7 +421,7 @@ const Reports: FC = () => {
               {isPaginate && (<Loading />)}
             </div>
           </div>
-          <div className="col-md-7">
+          <div className="col-md-6 d-flex justify-content-end">
             {listPages &&
               listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
                 {item.label}
@@ -425,17 +430,6 @@ const Reports: FC = () => {
           </div>
         </div>
       </div>) : <Loading />
-  }
-
-  const getPageNumber = (data: any) => {
-    if (!data) {
-      return;
-    }
-    const pageNumbers = [];
-    for (let i = 1; i <= data?.total_pages; i++) {
-      pageNumbers.push(i);
-    }
-    return pageNumbers
   }
 
   return (<div className="card card-reports pb-5">
@@ -470,7 +464,7 @@ const Reports: FC = () => {
               {/* Filter */}
               <div className="row my-2">
                 <div className='col-md-3 me-4 my-1'>
-                  <label>Month</label>
+                  <label className="form-label">Month</label>
                   <select
                     className='form-select form-select-solid form-select-sm me-3'
                     name="filter_by_month"
@@ -481,7 +475,7 @@ const Reports: FC = () => {
                   </select>
                 </div>
                 <div className='col-md-3 me-4 my-1'>
-                  <label>Year</label>
+                  <label className="form-label">Year</label>
                   <select
                     className='form-select form-select-solid form-select-sm me-3'
                     name="filter_by_year"
