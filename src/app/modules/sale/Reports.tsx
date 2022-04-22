@@ -41,8 +41,31 @@ const Loading: FC = () => {
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
+      {/* red chart */}
+      <div className='col-xs-12 col-md-6'>
+        {!saleReport.loading && (
+          <MixedWidget13
+            className='card-xl-stretch mb-xl-8'
+            chartColor='danger'
+            chartHeight='170px'
+            strokeColor='#cb1e46'
+            loading={saleReport.loading}
+            statistics={saleReport.statistics}
+          />
+        ) || (<Loading />)}
+      </div>
+      <div className='col-xs-12 col-md-6'>
+        {!saleReport.loading && (
+          <MixedWidget11
+            className='card-xxl-stretch-50 mb-5 mb-xl-8'
+            chartColor='primary'
+            chartHeight='250px'
+            productSale12M={saleReport.productSale12M}
+          />
+        ) || (<Loading />)}
+      </div>
       {/* infor card */}
-      <div className='col-xs-12 col-md-4'>
+      <div className='col-xs-12 col-md-12'>
         {!saleReport.loading && (
           <MixedWidget12
             className='card-xl-stretch mb-xl-8'
@@ -56,35 +79,11 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
           />
         ) || (<Loading />)}
       </div>
-      {/* red chart */}
-      <div className='col-xs-12 col-md-4'>
-        {!saleReport.loading && (
-          <MixedWidget13
-            className='card-xl-stretch mb-xl-8'
-            chartColor='danger'
-            chartHeight='170px'
-            strokeColor='#cb1e46'
-            loading={saleReport.loading}
-            statistics={saleReport.statistics}
-          />
-        ) || (<Loading />)}
-      </div>
-      <div className='col-xs-12 col-md-4'>
-        {!saleReport.loading && (
-          <MixedWidget11
-            className='card-xxl-stretch-50 mb-5 mb-xl-8'
-            chartColor='primary'
-            chartHeight='250px'
-            productSale12M={saleReport.productSale12M}
-          />
-        ) || (<Loading />)}
-      </div>
     </>
   )
 }
 
 const Reports: FC = () => {
-
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
@@ -123,15 +122,15 @@ const Reports: FC = () => {
   const onChangeHandler = (e: any, current_page: number = 1) => {
     e.preventDefault()
     const { name, value } = e.target
-    if (tab === 'Weekly Sales' || tab === 'Product Sold') {
+
+    if (tab === 'Weekly Sales' || tab === 'Product Sold')
       setFormValue({ ...formValue, [name]: parseInt(value), current_page })
-    }
-    if (tab === 'New Users') {
+
+    if (tab === 'New Users')
       setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
-    }
-    if (tab === 'Item Orders' || tab === "Item Orders") {
+
+    if (tab === 'Item Orders' || tab === "Item Orders")
       setFormProductOrderValue({ ...formProductOrderValue, [name]: parseInt(value), current_page })
-    }
   }
   // API Calling
   const showProductSaleList = (formValue: any) => {
@@ -223,7 +222,7 @@ const Reports: FC = () => {
 
   // UI components
   const displayProductSaleList = () => {
-    console.log('response')
+    console.log(list)
     return list ? (<div className='col-xs-12'>
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
@@ -245,9 +244,9 @@ const Reports: FC = () => {
       </table>
       <nav aria-label="Page navigation example" className='my-5'>
         <ul className="pagination justify-content-center">
-          <li className="page-item disabled"><span className={`page-link cursor-pointer ${list.current_page === 1 ? 'disabled' : ''}`} aria-disabled="true">Previous</span></li>
+          <li className={`page-item  ${list.current_page === 1 ? 'disabled' : ''}`}><span className={`page-link cursor-pointer`} aria-disabled="true">Previous</span></li>
           {getPageNumber(list)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${list.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
-          <li className="page-item"> <span className={`page-link cursor-pointer ${list.current_page === list.total_pages ? 'disabled' : ''}`}>Next</span></li>
+          <li className={`page-item  ${list.current_page === list.total_pages ? 'disabled' : ''}`}> <span className={`page-link cursor-pointer `}>Next</span></li>
         </ul>
       </nav>
     </div >) : <Loading />;
@@ -277,16 +276,15 @@ const Reports: FC = () => {
       </table>
       <nav aria-label="Page navigation example" className='my-5'>
         <ul className="pagination justify-content-center">
-          <li className="page-item disabled"><span className={`page-link cursor-pointer ${productOrderList.current_page === 1 ? 'disabled' : ''}`} aria-disabled="true">Previous</span></li>
+          <li className={`page-item  ${productOrderList.current_page === 1 ? 'disabled' : ''}`}><span className={`page-link cursor-pointer`} aria-disabled="true">Previous</span></li>
           {getPageNumber(productOrderList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${productOrderList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
-          <li className="page-item"> <span className={`page-link cursor-pointer ${productOrderList.current_page === productOrderList.total_pages ? 'disabled' : ''}`}>Next</span></li>
+          <li className={`page-item  ${productOrderList.current_page === productOrderList.total_pages ? 'disabled' : ''}`} > <span className={`page-link cursor-pointer`}>Next</span></li>
         </ul>
       </nav>
-    </div>) : <Loading />
+    </div >) : <Loading />
   }
 
   const displayCustomerSaleList = () => {
-    console.log(customerList)
     return customerList ? (
       <div className='col-xs-12'>
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
@@ -313,9 +311,9 @@ const Reports: FC = () => {
         </table>
         <nav aria-label="Page navigation example" className='my-5'>
           <ul className="pagination justify-content-center">
-            <li className="page-item disabled"><span className={`page-link cursor-pointer ${customerList.current_page === 1 ? 'disabled' : ''}`} aria-disabled="true">Previous</span></li>
+            <li className={`page-item  ${customerList.current_page === 1 ? 'disabled' : ''}`}><span className={`page-link cursor-pointer`} aria-disabled="true">Previous</span></li>
             {getPageNumber(customerList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${customerList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
-            <li className="page-item"> <span className={`page-link cursor-pointer ${customerList.current_page === customerList.total_pages ? 'disabled' : ''}`}>Next</span></li>
+            <li className={`page-item  ${customerList.current_page === customerList.total_pages ? 'disabled' : ''}`} > <span className={`page-link cursor-pointer`}>Next</span></li>
           </ul>
         </nav>
       </div>) : <Loading />
@@ -339,9 +337,6 @@ const Reports: FC = () => {
       </h3>
     </div>
     <div className='card-body py-0'>
-      <div className='card-title align-items-start flex-column  mb-4'>
-        <span className='card-label fw-bolder fs-4'>Generate Reports</span>
-      </div>
       <div className='card-wrapper'>
         <div className="row">
           <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
@@ -349,8 +344,10 @@ const Reports: FC = () => {
       </div>
       <hr />
       <div>
-        <div className='header'>
-          <h5>Detail Reports</h5>
+        <div className='card-header border-0 ps-0'>
+          <h3 className='card-title align-items-start flex-column'>
+            <span className='card-label fw-bolder fs-3 mb-1'>Reports Detail</span>
+          </h3>
         </div>
         {isLoading ? (<Loading />) : (
           <div className='card-wrapper'>
@@ -392,11 +389,12 @@ const Reports: FC = () => {
                     className='form-select form-select-solid form-select-sm me-3'
                     name="page_size"
                     onChange={(e) => { onChangeHandler(e); }}
+                    value={10}
                   >
                     <option value="1">1</option>
                     <option value="2">3</option>
                     <option value="5">5</option>
-                    <option selected value="10">10</option>
+                    <option value="10">10</option>
                   </select>
                 </div>
               </div>
