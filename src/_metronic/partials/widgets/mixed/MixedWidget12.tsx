@@ -43,7 +43,7 @@ const MixedWidget12: React.FC<Props> = ({
                 {weeklySales}
               </span>
               <br />
-              <small className='fs-7 text-warning'>products</small>
+              <small className='fs-8 text-warning'>products</small>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@ const MixedWidget12: React.FC<Props> = ({
                 {newUsers}
               </span>
               <br />
-              <small className='fs-7 text-primary'>in month</small>
+              <small className='fs-8 text-primary'>in month</small>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ const MixedWidget12: React.FC<Props> = ({
             <div style={{ textAlign: 'right' }}>
               <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
               <br />
-              <small className='fs-7 text-danger'>in month</small>
+              <small className='fs-8 text-danger'>in month</small>
             </div>
           </div>
         </div>
@@ -100,7 +100,7 @@ const MixedWidget12: React.FC<Props> = ({
             <div style={{ textAlign: 'right' }}>
               <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
               <br />
-              <small className='fs-7 text-success'>in month</small>
+              <small className='fs-8 text-success'>in month</small>
             </div>
           </div>
         </div>

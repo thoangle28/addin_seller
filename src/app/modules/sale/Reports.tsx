@@ -37,7 +37,6 @@ const Loading: FC = () => {
     </div>
   </div>
 }
-
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
@@ -89,7 +88,7 @@ const Reports: FC = () => {
   const currentUserId: number = user ? parseInt(user.ID) : 0
   const tabs = ['Weekly Sales', 'New Users', 'Item Orders', 'Ticket Reports', 'Product Sold']
   const now = new Date().getUTCFullYear();
-  const years = Array(now - (now - 50)).fill('').map((v, idx) => now - idx);
+  const years = Array(now - (now - 2)).fill('').map((v, idx) => now - idx);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const saleReportInit: iReport = {
     weeklySales: 0,
@@ -109,6 +108,7 @@ const Reports: FC = () => {
   const [isActiveIndex, setActiveIndex] = useState<number>(0);
   const [isPageLoading, setPageLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isPaginate, setIsPaginate] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
   const [list, setList] = useState<any>()
   const [customerList, setCustomerList] = useState<any>()
@@ -219,10 +219,48 @@ const Reports: FC = () => {
       showProductOrderList(formProductOrderValue)
   }, [formProductOrderValue, tab])
 
+  const find_page_begin_end = (currentPage: number, maxPage: number) => {
+    const step = 5
+    let beginBlock = 1
+    let begin: number = 1
+    let next_end = step * beginBlock
 
+    while (currentPage > next_end) {
+      beginBlock++ //next with 5 items
+      next_end = step * beginBlock
+    }
+
+    begin = next_end - step + 1
+    let end: number = next_end
+    end = end > maxPage ? maxPage : end
+
+    const listPages = []
+    //fist
+    listPages.push({ label: '«', page: 1, class: 'btn-light-primary' })
+    //previous
+    listPages.push({
+      label: '‹',
+      page: currentPage - 1 <= 0 ? 1 : currentPage - 1,
+      class: 'btn-light-primary',
+    })
+    //list page with 5 items
+    for (let index = begin; index <= end; index++) {
+      listPages.push({ label: index, page: index, class: currentPage === index ? 'active' : '' })
+    }
+    //next
+    listPages.push({
+      label: '›',
+      page: currentPage + 1 > maxPage ? maxPage : currentPage + 1,
+      class: 'btn-light-primary',
+    })
+    //last
+    listPages.push({ label: '»', page: maxPage, class: 'btn-light-primary' })
+
+    return listPages
+  }
   // UI components
   const displayProductSaleList = () => {
-    console.log(list)
+    const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
     return list ? (<div className='col-xs-12'>
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
@@ -232,27 +270,50 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Sale Price</th>
             <th className="w-25 text-center">Date</th>
           </tr>
-          {list.product_sale_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+          {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
             <th className="w-20 text-center">{item.product_sale}</th>
             <th className="w-30 text-center">{item.regular_price}</th>
             <th className="w-25 text-center">{item.sale_price}</th>
             <th className="w-25 text-center">{item.date}</th>
           </tr>
-          )}
+          ) : <AlertMessage hasErrors={true} message={message} />}
           {/* Pagination */}
         </thead>
       </table>
-      <nav aria-label="Page navigation example" className='my-5'>
-        <ul className="pagination justify-content-center">
-          <li className={`page-item  ${list.current_page === 1 ? 'disabled' : ''}`}><span className={`page-link cursor-pointer`} aria-disabled="true">Previous</span></li>
-          {getPageNumber(list)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${list.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
-          <li className={`page-item  ${list.current_page === list.total_pages ? 'disabled' : ''}`}> <span className={`page-link cursor-pointer `}>Next</span></li>
-        </ul>
-      </nav>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-5">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+            >
+              <option value='10'>10</option>
+              <option value='5'>5</option>
+              <option value='2'>2</option>
+              <option value='3'>3</option>
+              <option value='1'>1</option>
+            </select>
+            <span className='text-muted ms-3'>item(s)/page</span>
+            <span className='text-muted ms-5'>
+              Displaying {list.current_page} of {list.total_pages} pages
+            </span>
+            {isPaginate && (<Loading />)}
+          </div>
+        </div>
+        <div className="col-md-7">
+          {listPages &&
+            listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+              {item.label}
+            </span>
+            )}
+        </div>
+      </div>
     </div >) : <Loading />;
   }
 
   const displayProductOrderList = () => {
+    const listPages = find_page_begin_end(productOrderList?.current_page, productOrderList?.total_pages)
     return productOrderList ? (<div className='col-xs-12'>
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
@@ -263,28 +324,53 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
           </tr>
-          {productOrderList.order_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
+          {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} className="fw-bolder text-muted">
             <th className="w-20 text-center">{item.order_id}</th>
             <th className="w-30 text-center">{item.title_product}</th>
             <th className="w-25 text-center">{item.date}</th>
             <th className="w-25 text-center">{item.price}</th>
             <th className="w-25 text-center">{item.status}</th>
           </tr>
-          )}
+          ) : <AlertMessage hasErrors={true} message={message} />}
           {/* Pagination */}
         </thead>
       </table>
-      <nav aria-label="Page navigation example" className='my-5'>
-        <ul className="pagination justify-content-center">
-          <li className={`page-item  ${productOrderList.current_page === 1 ? 'disabled' : ''}`}><span className={`page-link cursor-pointer`} aria-disabled="true">Previous</span></li>
-          {getPageNumber(productOrderList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${productOrderList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
-          <li className={`page-item  ${productOrderList.current_page === productOrderList.total_pages ? 'disabled' : ''}`} > <span className={`page-link cursor-pointer`}>Next</span></li>
-        </ul>
-      </nav>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-5">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+            >
+              <option value='10'>10</option>
+              <option value='5'>5</option>
+              <option value='2'>2</option>
+              <option value='3'>3</option>
+              <option value='1'>1</option>
+            </select>
+            <span className='text-muted ms-3'>item(s)/page</span>
+            <span className='text-muted ms-5'>
+              Displaying {productOrderList.current_page} of {productOrderList.total_pages} pages
+            </span>
+            {isPaginate && (<Loading />)}
+          </div>
+        </div>
+        <div className="col-md-7">
+          <div className="col-md-7">
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
+        </div>
+      </div>
     </div >) : <Loading />
   }
 
   const displayCustomerSaleList = () => {
+    const listPages = find_page_begin_end(customerList?.current_page, customerList?.total_pages)
     return customerList ? (
       <div className='col-xs-12'>
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
@@ -309,13 +395,35 @@ const Reports: FC = () => {
             {/* Pagination */}
           </thead>
         </table>
-        <nav aria-label="Page navigation example" className='my-5'>
-          <ul className="pagination justify-content-center">
-            <li className={`page-item  ${customerList.current_page === 1 ? 'disabled' : ''}`}><span className={`page-link cursor-pointer`} aria-disabled="true">Previous</span></li>
-            {getPageNumber(customerList)?.map((item: number, index: number) => <li key={index} onClick={(e: any) => onChangeHandler(e, item)} className={`page-item cursor-pointer ${customerList.current_page === item ? 'active' : ''}`}><span className="page-link" aria-disabled="true">{item}</span></li>)}
-            <li className={`page-item  ${customerList.current_page === customerList.total_pages ? 'disabled' : ''}`} > <span className={`page-link cursor-pointer`}>Next</span></li>
-          </ul>
-        </nav>
+        <div className="row justify-content-between align-items-center">
+          <div className="col-md-5">
+            <div className='d-flex align-items-center py-3'>
+              <span className='text-muted me-3'>Showing</span>
+              <select
+                onChange={(e) => { onChangeHandler(e) }}
+                className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              >
+                <option value='10'>10</option>
+                <option value='5'>5</option>
+                <option value='2'>2</option>
+                <option value='3'>3</option>
+                <option value='1'>1</option>
+              </select>
+              <span className='text-muted ms-3'>item(s)/page</span>
+              <span className='text-muted ms-5'>
+                Displaying {customerList.current_page} of {customerList.total_pages} pages
+              </span>
+              {isPaginate && (<Loading />)}
+            </div>
+          </div>
+          <div className="col-md-7">
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
+        </div>
       </div>) : <Loading />
   }
 
@@ -381,20 +489,6 @@ const Reports: FC = () => {
                   >
                     <option value="">None</option>
                     {years.map(item => <option key={item} value={item}>{item}</option>)}
-                  </select>
-                </div>
-                <div className="col-md-3 me-4 my-1">
-                  <label>Items Per Page</label>
-                  <select
-                    className='form-select form-select-solid form-select-sm me-3'
-                    name="page_size"
-                    onChange={(e) => { onChangeHandler(e); }}
-                    value={10}
-                  >
-                    <option value="1">1</option>
-                    <option value="2">3</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
                   </select>
                 </div>
               </div>
