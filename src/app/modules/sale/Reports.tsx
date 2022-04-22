@@ -86,7 +86,7 @@ const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
-  const tabs = ['Weekly Sales', 'New Users', 'Item Orders', 'Ticket Reports', 'Product Sold']
+  const tabs = ['Weekly Sales', 'New Users', 'Item Orders', 'Product Sold']
   const now = new Date().getUTCFullYear();
   const years = Array(now - (now - 2)).fill('').map((v, idx) => now - idx);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -129,7 +129,7 @@ const Reports: FC = () => {
     if (tab === 'New Users')
       setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
 
-    if (tab === 'Item Orders' || tab === "Item Orders")
+    if (tab === 'Item Orders')
       setFormProductOrderValue({ ...formProductOrderValue, [name]: parseInt(value), current_page })
   }
   // API Calling
@@ -265,22 +265,22 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-20 text-center">Product ID</th>
-            <th className="w-20 text-center">Product Sale</th>
-            <th className="w-30 text-center">Regular Price</th>
-            <th className="w-25 text-center">Sale Price</th>
-            <th className="w-25 text-center">Date Created</th>
+            <th className="w-20 text-left">Product ID</th>
+            <th className="w-20 text-left ">Product Sale</th>
+            <th className="w-30 text-center"> Price</th>
+            <th className="w-25 text-end">Date Created</th>
           </tr>
+        </thead>
+        <tbody>
           {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-20 text-center">{item.product_id}</td>
-            <td className="w-20 text-center">{item.product_sale}</td>
-            <td className="w-30 text-center">$ {item.regular_price}</td>
-            <td className="w-25 text-center">$ {item.sale_price}</td>
-            <td className="w-25 text-center">{item.date}</td>
+            <td className="w-20 text-left">{item.product_id}</td>
+            <td className="w-20 text-left text-dark fw-bolder text-hover-primary fs-6">{item.product_sale}</td>
+            <td className="w-30 text-center"><span>$ {item.regular_price}</span> <br /><span className='m-0'> <s>${item.sale_price}</s></span></td>
+            <td className="w-25 text-end">{item.date}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
           {/* Pagination */}
-        </thead>
+        </tbody>
       </table>
       <div className="row justify-content-between align-items-center">
         <div className="col-md-6">
@@ -329,16 +329,18 @@ const Reports: FC = () => {
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
           </tr>
+        </thead>
+        <tbody>
           {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-20 text-center">{item.order_id}</td>
-            <td className="w-30 text-center">{item.title_product}</td>
+            <td className="w-30 text-center text-dark fw-bolder text-hover-primary fs-6">{item.title_product}</td>
             <td className="w-25 text-center">{item.date}</td>
             <td className="w-25 text-center">$ {item.price}</td>
-            <td className="w-25 text-center">{item.status}</td>
+            <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
-          {/* Pagination */}
-        </thead>
+        </tbody>
+        {/* Pagination */}
       </table>
       <div className="row justify-content-between align-items-center">
         <div className="col-md-6">
@@ -382,24 +384,26 @@ const Reports: FC = () => {
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
           <thead>
             <tr className="fw-bolder text-muted">
-              <th className="w-20 text-center">User ID</th>
-              <th className="w-30 text-center">Full Name</th>
+              <th className="w-25 text-start">User ID</th>
+              <th className="w-30 text-start">Full Name</th>
               <th className="w-25 text-center">City</th>
               <th className="w-25 text-center">Country</th>
               <th className="w-25 text-center">Email</th>
-              <th className="w-25 text-center">Phone</th>
+              <th className="w-25 text-end">Phone</th>
             </tr>
+          </thead>
+          <tbody>
             {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
-              <td className="w-20 text-center">{item.user_id}</td>
-              <td className="w-30 text-center">{item.full_name}</td>
-              <td className="w-25 text-center">{item.city}</td>
-              <td className="w-25 text-center">{item.country}</td>
-              <td className="w-25 text-center">{item.email}</td>
-              <td className="w-25 text-center">{item.phone}</td>
+              <td className="w-25 text-start">{item.user_id}</td>
+              <td className="w-30 text-start">{item.full_name}</td>
+              <td className="w-25 text-center">{item.city ? item.city : '-'}</td>
+              <td className="w-25 text-center">{item.country ? item.country : '-'}</td>
+              <td className="w-25 text-center">{item.email ? item.email : '-'}</td>
+              <td className="w-25 text-end">{item.phone}</td>
             </tr>
             ) : <AlertMessage hasErrors={true} message={message} />}
-            {/* Pagination */}
-          </thead>
+          </tbody>
+          {/* Pagination */}
         </table>
         <div className="row justify-content-between align-items-center">
           <div className="col-md-5">
