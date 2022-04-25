@@ -435,35 +435,23 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className=" text-center">#ID</th>
-            <th className="w-30 text-center">Product Name</th>
+            <th className="w-30 text-center">Order ID</th>
+            <th className="w-30 text-center">Customer's Name</th>
             <th className="w-25 text-center">Date Created</th>
-            <th className="w-25 text-center">SKU</th>
-            <th className="w-25 text-center">Price</th>
-            <th className="w-25 text-center">Status</th>
+            <th className="w-25 text-center">Total</th>
+            <th className="w-25 text-center">Order Status</th>
           </tr>
         </thead>
         <tbody>
           {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
-            <td className=" text-center">{item.order_id}</td>
-            <td className="w-35 text-left">
-              <div className='d-flex align-items-center'>
-                <div className='symbol symbol-45px me-5'>
-                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
-                </div>
-                <div className='d-flex justify-content-start flex-column'>
-                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
-                    {item.product_sale}
-                  </span>
-                </div>
-              </div>
+            <td className="w-30 text-center">{item.order_id}</td>
+            <td className="w-35 text-left">{item.product_sale}
             </td>
             <td className="w-25 text-center">{item.date}</td>
-            <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
             <td className="w-25 text-center">{formatMoney(item.price)}</td>
-            <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
+            <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Processing</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
-          ) : <th colSpan={6} className="text-center">No Item Found</th>
+          ) : <th colSpan={5} className="text-center">No Item Found</th>
           }
         </tbody>
         {/* Pagination */}
