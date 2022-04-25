@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
-import AlertMessage from '../../../_metronic/partials/common/alert'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList } from './saleReport'
 interface iReport {
@@ -21,7 +20,7 @@ type Props = {
 }
 interface formValue {
   user_id: number,
-  filter_by_month?: number | string,
+  filter_by_month?: number,
   filter_by_year?: number | string,
   page_size?: number | string
   current_page?: number | string
@@ -87,11 +86,12 @@ const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
-  const tabs = ['Weekly Sales', 'New Users', 'Item Orders', 'Product Sold']
+  const tabs = ['Product Sales', 'New Users', 'Item Orders', 'Product Sold']
   const now = new Date().getUTCFullYear();
+  const currentMonth: number = new Date().getMonth() + 1
+  const currentYear: number = new Date().getFullYear()
   const years = Array(now - (now - 5)).fill('').map((v, idx) => now - idx);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
   const saleReportInit: iReport = {
     weeklySales: 0,
     newUsers: 0,
@@ -102,18 +102,17 @@ const Reports: FC = () => {
     loading: true
   }
 
-  const last_seven_date = true;
-
   const initFormValue: formValue = {
     user_id: currentUserId,
-    page_size: 20
+    page_size: 20,
+    filter_by_month: currentMonth,
+    filter_by_year: currentYear
   }
 
-  const [tab, setTab] = useState('Weekly Sales')
+  const [tab, setTab] = useState('Product Sales')
   const [isActiveIndex, setActiveIndex] = useState<number>(0);
   const [isPageLoading, setPageLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isPaginate, setIsPaginate] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
   const [list, setList] = useState<any>()
   const [customerList, setCustomerList] = useState<any>()
@@ -131,7 +130,7 @@ const Reports: FC = () => {
     if (tab === 'Product Sold') {
       setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
     }
-    if (tab === 'Weekly Sales')
+    if (tab === 'Product Sales')
       setFormValue({ ...formValue, [name]: parseInt(value), current_page })
 
     if (tab === 'New Users')
@@ -154,14 +153,7 @@ const Reports: FC = () => {
           setMessage('')
         }, 3500);
       }
-      if (code === 200 && tab === 'Product Sold') {
-        setIsLoading(false)
-        setProductSoldList(data)
-        setMessage(message)
-        setTimeout(() => {
-          setMessage('')
-        }, 3500);
-      }
+
     }).catch(err => console.log(err))
   }
 
@@ -184,11 +176,20 @@ const Reports: FC = () => {
   const showProductOrderList = (formProductOrderValue: any) => {
     getProductOrderList(formProductOrderValue).then(res => {
       const { code, data } = res.data
+      console.log(data)
       setMessage('Processing')
       setIsLoading(true)
       if (code === 200) {
         setIsLoading(false)
         setProductOrderList(data)
+        setMessage(message)
+        setTimeout(() => {
+          setMessage('')
+        }, 3500);
+      }
+      if (code === 200 && tab === 'Product Sold') {
+        setIsLoading(false)
+        setProductSoldList(data)
         setMessage(message)
         setTimeout(() => {
           setMessage('')
@@ -224,24 +225,24 @@ const Reports: FC = () => {
   // Load data each tab when user has clicked 
 
   useEffect(() => {
-    if (tab === 'Product Sold')
-      showProductSaleList({ ...formProductSold, last_seven_date })
-  }, [formProductSold, tab])
-
-  useEffect(() => {
-    if (tab === 'Weekly Sales')
-      showProductSaleList(formValue)
+    if (tab === 'Product Sales')
+      showProductSaleList({ ...formValue })
   }, [formValue, tab])
 
   useEffect(() => {
     if (tab === 'New Users')
-      showCustomerList(formCustomerValue)
+      showCustomerList({ ...formCustomerValue })
   }, [formCustomerValue, tab])
 
   useEffect(() => {
     if (tab === 'Item Orders')
-      showProductOrderList(formProductOrderValue)
+      showProductOrderList({ ...formProductOrderValue })
   }, [formProductOrderValue, tab])
+
+  useEffect(() => {
+    if (tab === 'Product Sold')
+      showProductOrderList({ ...formProductSold })
+  }, [formProductSold, tab])
 
   const find_page_begin_end = (currentPage: number, maxPage: number) => {
     const step = 5
@@ -290,16 +291,16 @@ const Reports: FC = () => {
         <thead>
           <tr className="fw-bolder text-muted">
             <th className="w-15 text-left">#ID</th>
-            <th className="w-35 text-left ">Product Name</th>
-            <th className="w-25 text-center"> Price</th>
+            <th className="w-15 text-left ">Product Name</th>
             <th className="w-15 text-center"> SKU</th>
             <th className="w-15 text-center"> Status</th>
-            <th className="w-25 text-end">Date Created</th>
+            <th className="w-15 text-center"> Quantity</th>
+            <th className="w-15 text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
-          {productSoldList.product_sale_list.length > 0 ? productSoldList.product_sale_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-5 text-left">{item.product_id}</td>
+          {productSoldList.order_list.length > 0 ? productSoldList.order_list?.map((item: any, index: number) => <tr key={index} >
+            <td className="w-5 text-left">{item.order_id}</td>
             <td className="w-35 text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
@@ -307,15 +308,15 @@ const Reports: FC = () => {
                 </div>
                 <div className='d-flex justify-content-start flex-column'>
                   <span className='text-dark fw-bolder text-hover-primary fs-6' >
-                    {item.product_sale}
+                    {item.title_product}
                   </span>
                 </div>
               </div>
             </td>
-            <td className="w-15 fs-4 text-center"><span>{formatMoney(item.regular_price)}</span><span className='fs-8 m-0 text-muted'> <s>{formatMoney(item.sale_price)}</s></span></td>
             <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
             <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
-            <td className="w-25 text-end">{item.date}</td>
+            <th className="w-15 text-center"> {item.quantity}</th>
+            <td className="w-15 text-end">{item.date}</td>
           </tr>
           ) : <th colSpan={6} className="text-center">No Item Found</th>
           }
@@ -338,11 +339,10 @@ const Reports: FC = () => {
               <option value='30'>30</option>
               <option value='100'>100</option>
             </select>
-            <span className='text-muted ms-3'>item(s)/page</span>
-            <span className='text-muted ms-5'>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
               Displaying {list.current_page} of {list.total_pages} pages
             </span>
-            {isPaginate && (<Loading />)}
           </div>
         </div>
         <div className="col-md-6 d-flex justify-content-end">
@@ -411,11 +411,10 @@ const Reports: FC = () => {
               <option value='30'>30</option>
               <option value='100'>100</option>
             </select>
-            <span className='text-muted ms-3'>item(s)/page</span>
-            <span className='text-muted ms-5'>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
               Displaying {list.current_page} of {list.total_pages} pages
             </span>
-            {isPaginate && (<Loading />)}
           </div>
         </div>
         <div className="col-md-6 d-flex justify-content-end">
@@ -486,11 +485,10 @@ const Reports: FC = () => {
               <option value='30'>30</option>
               <option value='100'>100</option>
             </select>
-            <span className='text-muted ms-3'>item(s)/page</span>
-            <span className='text-muted ms-5'>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
               Displaying {productOrderList.current_page} of {productOrderList.total_pages} pages
             </span>
-            {isPaginate && (<Loading />)}
           </div>
         </div>
         <div className="col-md-6 d-flex justify-content-end">
@@ -550,11 +548,10 @@ const Reports: FC = () => {
                 <option value='30'>30</option>
                 <option value='100'>100</option>
               </select>
-              <span className='text-muted ms-3'>item(s)/page</span>
-              <span className='text-muted ms-5'>
+              <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+              <span className='text-muted fs-8 ms-2'>
                 Displaying {customerList.current_page} of {customerList.total_pages} pages
               </span>
-              {isPaginate && (<Loading />)}
             </div>
           </div>
           <div className="col-md-6 d-flex justify-content-end">
@@ -566,6 +563,116 @@ const Reports: FC = () => {
           </div>
         </div>
       </div>) : <Loading />
+  }
+
+  const filterSection = (tab: string) => {
+    if (tab === "Product Sales") return <div className="row my-2">
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Month</label>
+        <select
+          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+          name="filter_by_month"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formValue.filter_by_month}
+        >
+          <option value="">None</option>
+          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
+        </select>
+      </div>
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Year</label>
+        <select
+          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+          name="filter_by_year"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formValue.filter_by_year}
+        >
+          <option value="">None</option>
+          {years.map(item => <option key={item} value={item}>{item}</option>)}
+        </select>
+      </div>
+    </div>
+
+    if (tab === "New Users") return <div className="row my-2">
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Month</label>
+        <select
+          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+          name="filter_by_month"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formCustomerValue.filter_by_month}
+        >
+          <option value="">None</option>
+          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
+        </select>
+      </div>
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Year</label>
+        <select
+          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+          name="filter_by_year"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formCustomerValue.filter_by_year}
+        >
+          <option value="">None</option>
+          {years.map(item => <option key={item} value={item}>{item}</option>)}
+        </select>
+      </div>
+    </div>
+
+    if (tab === "Item Orders") return <div className="row my-2">
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Month</label>
+        <select
+          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+          name="filter_by_month"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formProductOrderValue.filter_by_month}
+        >
+          <option value="">None</option>
+          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
+        </select>
+      </div>
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Year</label>
+        <select
+          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+          name="filter_by_year"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formProductOrderValue.filter_by_year}
+        >
+          <option value="">None</option>
+          {years.map(item => <option key={item} value={item}>{item}</option>)}
+        </select>
+      </div>
+    </div>
+
+    if (tab === "Product Sold") return <div className="row my-2">
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Month</label>
+        <select
+          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+          name="filter_by_month"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formProductSold.filter_by_month}
+        >
+          <option value="">None</option>
+          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
+        </select>
+      </div>
+      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+        <label className="form-label me-3 mb-0">Year</label>
+        <select
+          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+          name="filter_by_year"
+          onChange={(e) => { onChangeHandler(e); }}
+          value={formProductSold.filter_by_year}
+        >
+          <option value="">None</option>
+          {years.map(item => <option key={item} value={item}>{item}</option>)}
+        </select>
+      </div>
+    </div>
   }
 
   return (<div className="card card-reports pb-5">
@@ -580,14 +687,13 @@ const Reports: FC = () => {
           <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
         </div>
       </div>
-      <hr />
       <div>
         <div className='card-header border-0 ps-0'>
           <h3 className='card-title align-items-start flex-column'>
             <span className='card-label fw-bolder fs-3 mb-1'>Reports Detail</span>
           </h3>
         </div>
-        {isLoading ? (<Loading />) : (
+        {isLoading ? <Loading /> : (
           <div className='card-wrapper'>
             <div className='row'>
               {/* Tabs */}
@@ -597,33 +703,9 @@ const Reports: FC = () => {
                   return <li key={index} onClick={() => { setTab(tab); setActiveIndex(index) }} className="nav-item cursor-pointer"><p className={`dropdown-item ${checkOpen ? 'active' : ''}`}  >{tab}</p></li>
                 })}
               </ul>
-              {/* Filter */}
-              <div className="row my-2">
-                <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-                  <label className="form-label me-3 mb-0">Month</label>
-                  <select
-                    className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
-                    name="filter_by_month"
-                    onChange={(e) => { onChangeHandler(e); }}
-                  >
-                    <option value="">None</option>
-                    {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
-                  </select>
-                </div>
-                <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-                  <label className="form-label me-3 mb-0">Year</label>
-                  <select
-                    className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
-                    name="filter_by_year"
-                    onChange={(e) => { onChangeHandler(e); }}
-                  >
-                    <option value="">None</option>
-                    {years.map(item => <option key={item} value={item}>{item}</option>)}
-                  </select>
-                </div>
-              </div>
+              {filterSection(tab)}
               <div>
-                {tab === 'Weekly Sales' && displayProductSaleList()}
+                {tab === 'Product Sales' && displayProductSaleList()}
                 {tab === 'Product Sold' && displayProductSoldList()}
                 {tab === 'New Users' && displayCustomerSaleList()}
                 {tab === 'Item Orders' && displayProductOrderList()}
