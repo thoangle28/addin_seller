@@ -298,7 +298,7 @@ const Reports: FC = () => {
           </tr>
         </thead>
         <tbody>
-          {productSoldList ? productSoldList.product_sale_list?.map((item: any, index: number) => <tr key={index} >
+          {productSoldList.product_sale_list.length > 0 ? productSoldList.product_sale_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-5 text-left">{item.product_id}</td>
             <td className="w-35 text-left">
               <div className='d-flex align-items-center'>
@@ -317,7 +317,8 @@ const Reports: FC = () => {
             <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
             <td className="w-25 text-end">{item.date}</td>
           </tr>
-          ) : <AlertMessage hasErrors={true} message={message} />}
+          ) : <th colSpan={6} className="text-center">No Item Found</th>
+          }
           {/* Pagination */}
         </tbody>
       </table>
@@ -371,7 +372,7 @@ const Reports: FC = () => {
           </tr>
         </thead>
         <tbody>
-          {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
+          {list.product_sale_list.length ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-5 text-left">{item.product_id}</td>
             <td className="w-35 text-left">
               <div className='d-flex align-items-center'>
@@ -390,7 +391,7 @@ const Reports: FC = () => {
             <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
             <td className="w-25 text-end">{item.date}</td>
           </tr>
-          ) : <AlertMessage hasErrors={true} message={message} />}
+          ) : <th colSpan={6} className="text-center">No Item Found</th>}
           {/* Pagination */}
         </tbody>
       </table>
@@ -444,7 +445,7 @@ const Reports: FC = () => {
           </tr>
         </thead>
         <tbody>
-          {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
+          {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
             <td className=" text-center">{item.order_id}</td>
             <td className="w-35 text-left">
               <div className='d-flex align-items-center'>
@@ -463,7 +464,8 @@ const Reports: FC = () => {
             <td className="w-25 text-center">{formatMoney(item.price)}</td>
             <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
-          ) : <AlertMessage hasErrors={true} message={message} />}
+          ) : <th colSpan={6} className="text-center">No Item Found</th>
+          }
         </tbody>
         {/* Pagination */}
       </table>
@@ -519,7 +521,7 @@ const Reports: FC = () => {
             </tr>
           </thead>
           <tbody>
-            {customerList.customer_list ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
+            {customerList.customer_list.length > 0 ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
               <td className="w-5 text-start">{item.user_id}</td>
               <td className="w-30 text-start">{item.full_name}</td>
               <td className="w-25 text-center">{item.city ? item.city : '-'}</td>
@@ -527,7 +529,8 @@ const Reports: FC = () => {
               <td className="w-25 text-center">{item.email ? item.email : '-'}</td>
               <td className="w-25 text-end">{item.phone}</td>
             </tr>
-            ) : <AlertMessage hasErrors={true} message={message} />}
+            ) : <th colSpan={6} className="text-Center">No Item Found</th>
+            }
           </tbody>
           {/* Pagination */}
         </table>
