@@ -266,21 +266,20 @@ const Reports: FC = () => {
         <thead>
           <tr className="fw-bolder text-muted">
             <th className="w-15 text-left">#ID</th>
-            <th className="w-30 text-left ">Product Name</th>
-            <th className="w-30 text-center"> Price</th>
+            <th className="w-35 text-left ">Product Name</th>
+            <th className="w-25 text-center"> Price</th>
+            <th className="w-15 text-center"> SKU</th>
+            <th className="w-15 text-center"> Status</th>
             <th className="w-25 text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
           {list ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-5 text-left">{item.product_id}</td>
-            <td>
+            <td className="w-35 text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
-                  <img
-                    src={item.product_image ? item.product_image : 'https://via.placeholder.com/75x75/f0f0f0'}
-                    alt=''
-                  />
+                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
                 </div>
                 <div className='d-flex justify-content-start flex-column'>
                   <span className='text-dark fw-bolder text-hover-primary fs-6' >
@@ -289,7 +288,9 @@ const Reports: FC = () => {
                 </div>
               </div>
             </td>
-            <td className="w-30 text-center"><span>$ {item.regular_price}</span> <br /><span className='m-0'> <s>${item.sale_price}</s></span></td>
+            <td className="w-15 fs-4 text-center"><span>$ {item.regular_price}</span><span className='fs-8 m-0 text-muted'> <s>$ {item.sale_price}</s></span></td>
+            <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
+            <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
             <td className="w-25 text-end">{item.date}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
