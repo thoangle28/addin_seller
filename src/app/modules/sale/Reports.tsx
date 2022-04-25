@@ -25,6 +25,7 @@ interface formValue {
   filter_by_year?: number | string,
   page_size?: number | string
   current_page?: number | string
+  last_seven_date?: boolean
 }
 
 const Loading: FC = () => {
@@ -82,8 +83,6 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
   )
 }
 
-
-
 const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
@@ -92,6 +91,7 @@ const Reports: FC = () => {
   const now = new Date().getUTCFullYear();
   const years = Array(now - (now - 5)).fill('').map((v, idx) => now - idx);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
   const saleReportInit: iReport = {
     weeklySales: 0,
     newUsers: 0,
@@ -101,6 +101,8 @@ const Reports: FC = () => {
     statistics: [],
     loading: true
   }
+
+  const last_seven_date = true;
 
   const initFormValue: formValue = {
     user_id: currentUserId,
@@ -115,18 +117,21 @@ const Reports: FC = () => {
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
   const [list, setList] = useState<any>()
   const [customerList, setCustomerList] = useState<any>()
+  const [productSoldList, setProductSoldList] = useState<any>()
   const [productOrderList, setProductOrderList] = useState<any>()
   const [formValue, setFormValue] = useState<formValue>(initFormValue)
   const [formProductOrderValue, setFormProductOrderValue] = useState<formValue>(initFormValue)
   const [formCustomerValue, setFormCustomerValue] = useState<formValue>(initFormValue)
+  const [formProductSold, setFormProductSold] = useState<formValue>(initFormValue)
   const [message, setMessage] = useState<string>('')
-  const allReport = loadAllReports(currentUserId)
 
   const onChangeHandler = (e: any, current_page: number = 1) => {
     e.preventDefault()
     const { name, value } = e.target
-
-    if (tab === 'Weekly Sales' || tab === 'Product Sold')
+    if (tab === 'Product Sold') {
+      setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
+    }
+    if (tab === 'Weekly Sales')
       setFormValue({ ...formValue, [name]: parseInt(value), current_page })
 
     if (tab === 'New Users')
@@ -149,12 +154,19 @@ const Reports: FC = () => {
           setMessage('')
         }, 3500);
       }
+      if (code === 200 && tab === 'Product Sold') {
+        setIsLoading(false)
+        setProductSoldList(data)
+        setMessage(message)
+        setTimeout(() => {
+          setMessage('')
+        }, 3500);
+      }
     }).catch(err => console.log(err))
   }
 
   const showCustomerList = (formCustomerValue: any) => {
-    const { user_id, page_size, current_page } = formCustomerValue
-    getCustomerList(user_id, page_size, current_page).then(res => {
+    getCustomerList(formCustomerValue).then(res => {
       const { code, data, message } = res.data
       setMessage('Processing')
       setIsLoading(true)
@@ -185,9 +197,10 @@ const Reports: FC = () => {
     }).catch(err => console.log(err))
   }
 
-  const formatMoney = (money: string | number) => "$" + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
+  const formatMoney = (money: string | number, currentcy: string = "$") => currentcy + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
   useEffect(() => {
+    const allReport = loadAllReports(currentUserId)
     allReport.then((results: any) => {
       const weeklySales = results.weeklySales.data ? results.weeklySales.data.total_products : 0
       const newUsers = results.newUsers.data ? results.newUsers.data.total_customers : 0
@@ -209,8 +222,14 @@ const Reports: FC = () => {
   }, [])
 
   // Load data each tab when user has clicked 
+
   useEffect(() => {
-    if (tab === 'Weekly Sales' || tab === 'Product Sold')
+    if (tab === 'Product Sold')
+      showProductSaleList({ ...formProductSold, last_seven_date })
+  }, [formProductSold, tab])
+
+  useEffect(() => {
+    if (tab === 'Weekly Sales')
       showProductSaleList(formValue)
   }, [formValue, tab])
 
@@ -264,6 +283,79 @@ const Reports: FC = () => {
     return listPages
   }
   // UI components
+  const displayProductSoldList = () => {
+    const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
+    return productSoldList ? (<div className='col-xs-12'>
+      <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+        <thead>
+          <tr className="fw-bolder text-muted">
+            <th className="w-15 text-left">#ID</th>
+            <th className="w-35 text-left ">Product Name</th>
+            <th className="w-25 text-center"> Price</th>
+            <th className="w-15 text-center"> SKU</th>
+            <th className="w-15 text-center"> Status</th>
+            <th className="w-25 text-end">Date Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productSoldList ? productSoldList.product_sale_list?.map((item: any, index: number) => <tr key={index} >
+            <td className="w-5 text-left">{item.product_id}</td>
+            <td className="w-35 text-left">
+              <div className='d-flex align-items-center'>
+                <div className='symbol symbol-45px me-5'>
+                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
+                </div>
+                <div className='d-flex justify-content-start flex-column'>
+                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
+                    {item.product_sale}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td className="w-15 fs-4 text-center"><span>{formatMoney(item.regular_price)}</span><span className='fs-8 m-0 text-muted'> <s>{formatMoney(item.sale_price)}</s></span></td>
+            <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
+            <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
+            <td className="w-25 text-end">{item.date}</td>
+          </tr>
+          ) : <AlertMessage hasErrors={true} message={message} />}
+          {/* Pagination */}
+        </tbody>
+      </table>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-6">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              name="page_size"
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formProductSold.page_size ? formProductSold.page_size : initFormValue.page_size}
+            >
+              <option value='10'>10</option>
+              <option value='20'>20</option>
+              <option value='50'>50</option>
+              <option value='30'>30</option>
+              <option value='100'>100</option>
+            </select>
+            <span className='text-muted ms-3'>item(s)/page</span>
+            <span className='text-muted ms-5'>
+              Displaying {list.current_page} of {list.total_pages} pages
+            </span>
+            {isPaginate && (<Loading />)}
+          </div>
+        </div>
+        <div className="col-md-6 d-flex justify-content-end">
+          <div>
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
+        </div>
+      </div>
+    </div >) : <Loading />;
+  }
   const displayProductSaleList = () => {
     const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
     return list ? (<div className='col-xs-12'>
@@ -337,7 +429,6 @@ const Reports: FC = () => {
       </div>
     </div >) : <Loading />;
   }
-
   const displayProductOrderList = () => {
     const listPages = find_page_begin_end(productOrderList?.current_page, productOrderList?.total_pages)
     return productOrderList ? (<div className='col-xs-12'>
@@ -412,7 +503,6 @@ const Reports: FC = () => {
       </div>
     </div >) : <Loading />
   }
-
   const displayCustomerSaleList = () => {
     const listPages = find_page_begin_end(customerList?.current_page, customerList?.total_pages)
     return customerList ? (
@@ -531,7 +621,7 @@ const Reports: FC = () => {
               </div>
               <div>
                 {tab === 'Weekly Sales' && displayProductSaleList()}
-                {tab === 'Product Sold' && displayProductSaleList()}
+                {tab === 'Product Sold' && displayProductSoldList()}
                 {tab === 'New Users' && displayCustomerSaleList()}
                 {tab === 'Item Orders' && displayProductOrderList()}
               </div>
