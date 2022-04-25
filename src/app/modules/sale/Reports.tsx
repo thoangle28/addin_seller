@@ -82,13 +82,15 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
   )
 }
 
+
+
 const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
   const tabs = ['Weekly Sales', 'New Users', 'Item Orders', 'Product Sold']
   const now = new Date().getUTCFullYear();
-  const years = Array(now - (now - 2)).fill('').map((v, idx) => now - idx);
+  const years = Array(now - (now - 5)).fill('').map((v, idx) => now - idx);
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const saleReportInit: iReport = {
     weeklySales: 0,
@@ -102,6 +104,7 @@ const Reports: FC = () => {
 
   const initFormValue: formValue = {
     user_id: currentUserId,
+    page_size: 20
   }
 
   const [tab, setTab] = useState('Weekly Sales')
@@ -149,8 +152,8 @@ const Reports: FC = () => {
     }).catch(err => console.log(err))
   }
 
-  const showCustomerList = (formValue: any) => {
-    const { user_id, page_size, current_page } = formValue
+  const showCustomerList = (formCustomerValue: any) => {
+    const { user_id, page_size, current_page } = formCustomerValue
     getCustomerList(user_id, page_size, current_page).then(res => {
       const { code, data, message } = res.data
       setMessage('Processing')
@@ -166,8 +169,8 @@ const Reports: FC = () => {
     }).catch(err => console.log(err))
   }
 
-  const showProductOrderList = (formValue: any) => {
-    getProductOrderList(formValue).then(res => {
+  const showProductOrderList = (formProductOrderValue: any) => {
+    getProductOrderList(formProductOrderValue).then(res => {
       const { code, data } = res.data
       setMessage('Processing')
       setIsLoading(true)
@@ -181,6 +184,8 @@ const Reports: FC = () => {
       }
     }).catch(err => console.log(err))
   }
+
+  const formatMoney = (money: string | number) => "$" + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')
 
   useEffect(() => {
     allReport.then((results: any) => {
@@ -215,7 +220,7 @@ const Reports: FC = () => {
   }, [formCustomerValue, tab])
 
   useEffect(() => {
-    if (tab === 'Item Orders' || tab === "Item Orders")
+    if (tab === 'Item Orders')
       showProductOrderList(formProductOrderValue)
   }, [formProductOrderValue, tab])
 
@@ -288,7 +293,7 @@ const Reports: FC = () => {
                 </div>
               </div>
             </td>
-            <td className="w-15 fs-4 text-center"><span>$ {item.regular_price}</span><span className='fs-8 m-0 text-muted'> <s>$ {item.sale_price}</s></span></td>
+            <td className="w-15 fs-4 text-center"><span>{formatMoney(item.regular_price)}</span><span className='fs-8 m-0 text-muted'> <s>{formatMoney(item.sale_price)}</s></span></td>
             <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
             <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
             <td className="w-25 text-end">{item.date}</td>
@@ -305,6 +310,7 @@ const Reports: FC = () => {
               name="page_size"
               onChange={(e) => { onChangeHandler(e) }}
               className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formValue.page_size ? formValue.page_size : initFormValue.page_size}
             >
               <option value='10'>10</option>
               <option value='20'>20</option>
@@ -341,6 +347,7 @@ const Reports: FC = () => {
             <th className=" text-center">#ID</th>
             <th className="w-30 text-center">Product Name</th>
             <th className="w-25 text-center">Date Created</th>
+            <th className="w-25 text-center">SKU</th>
             <th className="w-25 text-center">Price</th>
             <th className="w-25 text-center">Status</th>
           </tr>
@@ -348,9 +355,21 @@ const Reports: FC = () => {
         <tbody>
           {productOrderList.order_list ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
             <td className=" text-center">{item.order_id}</td>
-            <td className="w-30 text-center text-dark fw-bolder text-hover-primary fs-6">{item.title_product}</td>
+            <td className="w-35 text-left">
+              <div className='d-flex align-items-center'>
+                <div className='symbol symbol-45px me-5'>
+                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
+                </div>
+                <div className='d-flex justify-content-start flex-column'>
+                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
+                    {item.product_sale}
+                  </span>
+                </div>
+              </div>
+            </td>
             <td className="w-25 text-center">{item.date}</td>
-            <td className="w-25 text-center">$ {item.price}</td>
+            <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
+            <td className="w-25 text-center">{formatMoney(item.price)}</td>
             <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
           ) : <AlertMessage hasErrors={true} message={message} />}
@@ -365,6 +384,8 @@ const Reports: FC = () => {
               name="page_size"
               onChange={(e) => { onChangeHandler(e) }}
               className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formProductOrderValue.page_size ? formProductOrderValue.page_size : initFormValue.page_size}
+
             >
               <option value='10'>10</option>
               <option value='20'>20</option>
@@ -428,6 +449,7 @@ const Reports: FC = () => {
                 name="page_size"
                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
                 onChange={(e) => { onChangeHandler(e) }}
+                value={formCustomerValue.page_size ? formCustomerValue.page_size : initFormValue.page_size}
               >
                 <option value='10'>10</option>
                 <option value='20'>20</option>
@@ -484,10 +506,10 @@ const Reports: FC = () => {
               </ul>
               {/* Filter */}
               <div className="row my-2">
-                <div className='col-md-3 me-4 my-1'>
-                  <label className="form-label">Month</label>
+                <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+                  <label className="form-label me-3 mb-0">Month</label>
                   <select
-                    className='form-select text-primary form-select-solid bg-light-primary form-select-sm me-3'
+                    className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
                     name="filter_by_month"
                     onChange={(e) => { onChangeHandler(e); }}
                   >
@@ -495,8 +517,8 @@ const Reports: FC = () => {
                     {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
                   </select>
                 </div>
-                <div className='col-md-3 me-4 my-1'>
-                  <label className="form-label">Year</label>
+                <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+                  <label className="form-label me-3 mb-0">Year</label>
                   <select
                     className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
                     name="filter_by_year"
@@ -512,7 +534,6 @@ const Reports: FC = () => {
                 {tab === 'Product Sold' && displayProductSaleList()}
                 {tab === 'New Users' && displayCustomerSaleList()}
                 {tab === 'Item Orders' && displayProductOrderList()}
-                {tab === 'Ticket Reports' && displayProductOrderList()}
               </div>
             </div>
           </div>
