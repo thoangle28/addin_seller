@@ -52,7 +52,7 @@ function getStatisticsSales12Months(params: any) {
 }
 
 
-export const getCustomerList = (user_id: number, page_size: number = 10, current_page: number = 1) => axios.post(API_END_POINT_URL + '/sale-report/customer-list', { user_id, page_size, current_page })
+export const getCustomerList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/customer-list', params)
 export const getProductSaleList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/product-sale-list', params)
 export const getProductOrderList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/order-list', params)
 
