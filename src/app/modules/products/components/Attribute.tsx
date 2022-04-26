@@ -283,7 +283,7 @@ const Attribute: FC = () => {
                     {({ values, errors, touched, handleSubmit, isSubmitting }) => (
                         <form onSubmit={handleSubmit}>
                             <div className="col-xxs-12">
-                                <label className="form-label mb-2" htmlFor="parrent_attribute">Attributes</label>
+                                <label className="form-label mb-2" htmlFor="parrent_attribute">Parent</label>
                                 <Field
                                     component="select"
                                     as="select"
