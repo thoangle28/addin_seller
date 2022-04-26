@@ -21,7 +21,7 @@ type Props = {
 interface formValue {
   user_id: number,
   filter_by_month?: number,
-  filter_by_year?: number | string,
+  filter_by_year?: number,
   page_size?: number | string
   current_page?: number | string
   last_seven_date?: boolean
@@ -176,7 +176,6 @@ const Reports: FC = () => {
   const showProductOrderList = (formProductOrderValue: any) => {
     getProductOrderList(formProductOrderValue).then(res => {
       const { code, data } = res.data
-      console.log(data)
       setMessage('Processing')
       setIsLoading(true)
       if (code === 200) {
@@ -223,26 +222,17 @@ const Reports: FC = () => {
   }, [])
 
   // Load data each tab when user has clicked 
-
   useEffect(() => {
     if (tab === 'Product Sales')
       showProductSaleList({ ...formValue })
-  }, [formValue, tab])
-
-  useEffect(() => {
     if (tab === 'New Users')
       showCustomerList({ ...formCustomerValue })
-  }, [formCustomerValue, tab])
-
-  useEffect(() => {
     if (tab === 'Item Orders')
       showProductOrderList({ ...formProductOrderValue })
-  }, [formProductOrderValue, tab])
-
-  useEffect(() => {
     if (tab === 'Product Sold')
       showProductOrderList({ ...formProductSold })
-  }, [formProductSold, tab])
+  }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, tab])
+
 
   const find_page_begin_end = (currentPage: number, maxPage: number) => {
     const step = 5
@@ -435,21 +425,21 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-30 text-center">Order ID</th>
-            <th className="w-30 text-center">Customer's Name</th>
+            <th className="w-15 text-center">Order ID</th>
+            <th className="w-65 text-center">Customer's Name</th>
             <th className="w-25 text-center">Date Created</th>
-            <th className="w-25 text-center">Total</th>
-            <th className="w-25 text-center">Order Status</th>
+            <th className="w-5 text-center">Total</th>
+            <th className="w-5 text-end">Order Status</th>
           </tr>
         </thead>
         <tbody>
           {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-30 text-center">{item.order_id}</td>
-            <td className="w-35 text-left">{item.product_sale}
+            <td className="w-15 text-center">{item.order_id}</td>
+            <td className="w-65 text-left">{item.customer_name ? item.customer_name : ''}
             </td>
             <td className="w-25 text-center">{item.date}</td>
-            <td className="w-25 text-center">{formatMoney(item.price)}</td>
-            <td className="w-25 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Processing</span> : <span className='badge badge-light-success'>Approved</span>}</td>
+            <td className="w-5 text-center">{formatMoney(item.price)}</td>
+            <td className="w-5 text-end">{item.status === 'processing' ? <span className='badge badge-light-warning'>Processing</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
           ) : <th colSpan={5} className="text-center">No Item Found</th>
           }
@@ -663,7 +653,7 @@ const Reports: FC = () => {
     </div>
   }
 
-  return (<div className="card card-reports pb-5">
+  return <div className="card card-reports pb-5">
     <div className='card-header border-0 pt-5'>
       <h3 className='card-title align-items-start flex-column'>
         <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
@@ -704,7 +694,6 @@ const Reports: FC = () => {
       </div>
     </div>
   </div >
-  )
 }
 
 export default Reports
