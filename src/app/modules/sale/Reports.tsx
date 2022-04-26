@@ -484,7 +484,7 @@ const Reports: FC = () => {
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
           <thead>
             <tr className="fw-bolder text-muted">
-              <th className="w-5 text-start">#ID</th>
+              <th className="w-5 text-end">#ID</th>
               <th className="w-30 text-start">Full Name</th>
               <th className="w-25 text-center">City</th>
               <th className="w-25 text-center">Country</th>
@@ -494,7 +494,7 @@ const Reports: FC = () => {
           </thead>
           <tbody>
             {customerList.customer_list.length > 0 ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
-              <td className="w-5 text-start">{item.user_id}</td>
+              <td className="w-5 text-end">{item.user_id}</td>
               <td className="w-30 text-start">{item.full_name}</td>
               <td className="w-25 text-center">{item.city ? item.city : '-'}</td>
               <td className="w-25 text-center">{item.country ? item.country : '-'}</td>
