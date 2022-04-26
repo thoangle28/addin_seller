@@ -223,16 +223,11 @@ const Reports: FC = () => {
 
   // Load data each tab when user has clicked 
   useEffect(() => {
-    if (tab === 'Product Sales')
-      showProductSaleList({ ...formValue })
-    if (tab === 'New Users')
-      showCustomerList({ ...formCustomerValue })
-    if (tab === 'Item Orders')
-      showProductOrderList({ ...formProductOrderValue })
-    if (tab === 'Product Sold')
-      showProductOrderList({ ...formProductSold })
+    if (tab === 'Product Sales') showProductSaleList({ ...formValue })
+    if (tab === 'New Users') showCustomerList({ ...formCustomerValue })
+    if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
+    if (tab === 'Product Sold') showProductOrderList({ ...formProductSold })
   }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, tab])
-
 
   const find_page_begin_end = (currentPage: number, maxPage: number) => {
     const step = 5
@@ -274,6 +269,7 @@ const Reports: FC = () => {
     return listPages
   }
   // UI components
+
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
     return productSoldList ? (<div className='col-xs-12'>
@@ -426,19 +422,19 @@ const Reports: FC = () => {
         <thead>
           <tr className="fw-bolder text-muted">
             <th className="w-15 text-center">Order ID</th>
-            <th className="w-65 text-center">Customer's Name</th>
+            <th className="w-35 text-left">Customer's Name</th>
             <th className="w-25 text-center">Date Created</th>
-            <th className="w-5 text-center">Total</th>
+            <th className="w-30 text-center">Total</th>
             <th className="w-5 text-end">Order Status</th>
           </tr>
         </thead>
         <tbody>
           {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
             <td className="w-15 text-center">{item.order_id}</td>
-            <td className="w-65 text-left">{item.customer_name ? item.customer_name : ''}
+            <td className="w-35 text-left text-dark fw-bolder fs-6">{item.customer_name ? item.customer_name : ''}
             </td>
             <td className="w-25 text-center">{item.date}</td>
-            <td className="w-5 text-center">{formatMoney(item.price)}</td>
+            <td className="w-30 text-center">{formatMoney(item.price)}</td>
             <td className="w-5 text-end">{item.status === 'processing' ? <span className='badge badge-light-warning'>Processing</span> : <span className='badge badge-light-success'>Approved</span>}</td>
           </tr>
           ) : <th colSpan={5} className="text-center">No Item Found</th>
