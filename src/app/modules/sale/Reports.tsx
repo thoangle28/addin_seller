@@ -8,8 +8,8 @@ interface iReport {
   newUsers: any | 0
   itemOrders: any | 0
   bugReports: any | 0
-  productSale12M: any | [],
-  statistics: any | [],
+  productSale12M: any | []
+  statistics: any | []
   loading: boolean | false
 }
 
@@ -19,30 +19,32 @@ type Props = {
   saleReport: iReport
 }
 interface formValue {
-  user_id: number,
-  filter_by_month?: number,
-  filter_by_year?: number,
+  user_id: number
+  filter_by_month?: number
+  filter_by_year?: number
   page_size?: number | string
   current_page?: number | string
   last_seven_date?: boolean
 }
 
 const Loading: FC = () => {
-  return <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
-    <div className="card-body d-flex justify-content-center align-items-center">
-      <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
-        Loading...
-        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-      </span>
+  return (
+    <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
+      <div className='card-body d-flex justify-content-center align-items-center'>
+        <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
+          Loading...
+          <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+        </span>
+      </div>
     </div>
-  </div>
+  )
 }
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
       {/* red chart */}
       <div className='col-xs-12 col-md-6'>
-        {!saleReport.loading && (
+        {(!saleReport.loading && (
           <MixedWidget13
             className='card-xl-stretch mb-xl-8'
             chartColor='danger'
@@ -51,21 +53,21 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
             loading={saleReport.loading}
             statistics={saleReport.statistics}
           />
-        ) || (<Loading />)}
+        )) || <Loading />}
       </div>
       <div className='col-xs-12 col-md-6'>
-        {!saleReport.loading && (
+        {(!saleReport.loading && (
           <MixedWidget11
             className='card-xxl-stretch-50 mb-5 mb-xl-8'
             chartColor='primary'
             chartHeight='220px'
             productSale12M={saleReport.productSale12M}
           />
-        ) || (<Loading />)}
+        )) || <Loading />}
       </div>
       {/* infor card */}
       <div className='col-xs-12 col-md-12'>
-        {!saleReport.loading && (
+        {(!saleReport.loading && (
           <MixedWidget12
             className='card-xl-stretch mb-xl-8'
             chartColor='danger'
@@ -76,7 +78,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
             itemOrders={saleReport.itemOrders}
             bugReports={saleReport.bugReports}
           />
-        ) || (<Loading />)}
+        )) || <Loading />}
       </div>
     </>
   )
@@ -90,8 +92,23 @@ const Reports: FC = () => {
   const now = new Date().getUTCFullYear();
   const currentMonth: number = new Date().getMonth() + 1
   const currentYear: number = new Date().getFullYear()
-  const years = Array(now - (now - 5)).fill('').map((v, idx) => now - idx);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'June', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  const years = Array(now - (now - 5))
+    .fill('')
+    .map((v, idx) => now - idx)
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'June',
+    'July',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ]
   const saleReportInit: iReport = {
     weeklySales: 0,
     newUsers: 0,
@@ -99,20 +116,20 @@ const Reports: FC = () => {
     bugReports: 0,
     productSale12M: [],
     statistics: [],
-    loading: true
+    loading: true,
   }
 
   const initFormValue: formValue = {
     user_id: currentUserId,
     page_size: 20,
     filter_by_month: currentMonth,
-    filter_by_year: currentYear
+    filter_by_year: currentYear,
   }
 
   const [tab, setTab] = useState('Product Sales')
-  const [isActiveIndex, setActiveIndex] = useState<number>(0);
-  const [isPageLoading, setPageLoading] = useState<boolean>(true);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isActiveIndex, setActiveIndex] = useState<number>(0)
+  const [isPageLoading, setPageLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
   const [list, setList] = useState<any>()
   const [customerList, setCustomerList] = useState<any>()
@@ -136,60 +153,65 @@ const Reports: FC = () => {
   }
   // API Calling
   const showProductSaleList = (formValue: any) => {
-    getProductSaleList(formValue).then(res => {
-      const { code, data } = res.data
-      setMessage('Processing')
-      setIsLoading(true)
-      if (code === 200) {
-        setIsLoading(false)
-        setList(data)
-        setMessage(message)
-        setTimeout(() => {
-          setMessage('')
-        }, 3500);
-      }
-
-    }).catch(err => console.log(err))
+    getProductSaleList(formValue)
+      .then((res) => {
+        const { code, data } = res.data
+        setMessage('Processing')
+        setIsLoading(true)
+        if (code === 200) {
+          setIsLoading(false)
+          setList(data)
+          setMessage(message)
+          setTimeout(() => {
+            setMessage('')
+          }, 3500)
+        }
+      })
+      .catch((err) => console.log(err))
   }
 
   const showCustomerList = (formCustomerValue: any) => {
-    getCustomerList(formCustomerValue).then(res => {
-      const { code, data, message } = res.data
-      setMessage('Processing')
-      setIsLoading(true)
-      if (code === 200) {
-        setIsLoading(false)
-        setCustomerList(data)
-        setMessage(message)
-        setTimeout(() => {
-          setMessage('')
-        }, 3500);
-      }
-    }).catch(err => console.log(err))
+    getCustomerList(formCustomerValue)
+      .then((res) => {
+        const { code, data, message } = res.data
+        setMessage('Processing')
+        setIsLoading(true)
+        if (code === 200) {
+          setIsLoading(false)
+          setCustomerList(data)
+          setMessage(message)
+          setTimeout(() => {
+            setMessage('')
+          }, 3500)
+        }
+      })
+      .catch((err) => console.log(err))
   }
 
   const showProductOrderList = (formProductOrderValue: any) => {
-    getProductOrderList(formProductOrderValue).then(res => {
-      const { code, data } = res.data
-      setMessage('Processing')
-      setIsLoading(true)
-      if (code === 200) {
-        setIsLoading(false)
-        setProductOrderList(data)
-        setMessage(message)
-        setTimeout(() => {
-          setMessage('')
-        }, 3500);
-      }
-      if (code === 200 && tab === 'Product Sold') {
-        setIsLoading(false)
-        setProductSoldList(data)
-        setMessage(message)
-        setTimeout(() => {
-          setMessage('')
-        }, 3500);
-      }
-    }).catch(err => console.log(err))
+    getProductOrderList(formProductOrderValue)
+      .then((res) => {
+        const { code, data } = res.data
+        setMessage('Processing')
+        setIsLoading(true)
+        if (code === 200) {
+          setIsLoading(false)
+          setProductOrderList(data)
+          setMessage(message)
+          setTimeout(() => {
+            setMessage('')
+          }, 3500)
+        }
+        if (code === 200 && tab === 'Product Sold') {
+          setIsLoading(false)
+          setProductSoldList(data)
+          setMessage(message)
+          setTimeout(() => {
+            setMessage('')
+          }, 3500)
+        }
+      })
+      .catch((err) => console.log(err))
   }
 
   const showRefundList = (formRefund: any) => {
@@ -227,12 +249,12 @@ const Reports: FC = () => {
         bugReports: bugReports,
         productSale12M: productSale12M,
         statistics: statistics,
-        loading: false
+        loading: false,
       })
     })
   }, [])
 
-  // Load data each tab when user has clicked 
+  // Load data each tab when user has clicked
   useEffect(() => {
     if (tab === 'Product Sales') showProductSaleList({ ...formValue })
     if (tab === 'New Users') showCustomerList({ ...formCustomerValue })
@@ -305,148 +327,225 @@ const Reports: FC = () => {
   }
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
-    return productSoldList ? (<div className='col-xs-12'>
-      <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
-        <thead>
-          <tr className="fw-bolder text-muted">
-            <th className="w-15 text-left">#ID</th>
-            <th className="w-15 text-left ">Product Name</th>
-            <th className="w-15 text-center"> SKU</th>
-            <th className="w-15 text-center"> Status</th>
-            <th className="w-15 text-center"> Quantity</th>
-            <th className="w-15 text-end">Date Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productSoldList.order_list.length > 0 ? productSoldList.order_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-5 text-left">{item.order_id}</td>
-            <td className="w-35 text-left">
-              <div className='d-flex align-items-center'>
-                <div className='symbol symbol-45px me-5'>
-                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
-                </div>
-                <div className='d-flex justify-content-start flex-column'>
-                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
-                    {item.title_product}
-                  </span>
-                </div>
-              </div>
-            </td>
-            <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
-            <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
-            <th className="w-15 text-center"> {item.quantity}</th>
-            <td className="w-15 text-end">{item.date}</td>
-          </tr>
-          ) : <th colSpan={6} className="text-center">No Item Found</th>
-          }
-          {/* Pagination */}
-        </tbody>
-      </table>
-      <div className="row justify-content-between align-items-center">
-        <div className="col-md-6">
-          <div className='d-flex align-items-center py-3'>
-            <span className='text-muted me-3'>Showing</span>
-            <select
-              name="page_size"
-              onChange={(e) => { onChangeHandler(e) }}
-              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
-              value={formProductSold.page_size ? formProductSold.page_size : initFormValue.page_size}
-            >
-              <option value='10'>10</option>
-              <option value='20'>20</option>
-              <option value='50'>50</option>
-              <option value='30'>30</option>
-              <option value='100'>100</option>
-            </select>
-            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
-            <span className='text-muted fs-8 ms-3'>
-              Displaying {list.current_page} of {list.total_pages} pages
-            </span>
-          </div>
-        </div>
-        <div className="col-md-6 d-flex justify-content-end">
-          <div>
-            {listPages &&
-              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
-                {item.label}
+    return productSoldList ? (
+      <div className='col-xs-12'>
+        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+          <thead>
+            <tr className='fw-bolder text-muted'>
+              <th className='w-15 text-left'>#ID</th>
+              <th className='w-15 text-left '>Product Name</th>
+              <th className='w-15 text-center'> SKU</th>
+              <th className='w-15 text-center'> Status</th>
+              <th className='w-15 text-center'> Quantity</th>
+              <th className='w-15 text-end'>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {productSoldList.order_list.length > 0 ? (
+              productSoldList.order_list?.map((item: any, index: number) => (
+                <tr key={index}>
+                  <td className='w-5 text-left'>{item.order_id}</td>
+                  <td className='w-35 text-left'>
+                    <div className='d-flex align-items-center'>
+                      <div className='symbol symbol-45px me-5'>
+                        <img
+                          src={
+                            item.product_img
+                              ? item.product_img
+                              : 'https://via.placeholder.com/75x75/f0f0f0'
+                          }
+                          alt={item.product_sale}
+                        />
+                      </div>
+                      <div className='d-flex justify-content-start flex-column'>
+                        <span className='text-dark fw-bolder text-hover-primary fs-6'>
+                          {item.title_product}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className='w-25 text-center'>{item.sku ? item.sku : '-'}</td>
+                  <td className='w-15 text-center'>
+                    {item.status === 'processing' ? (
+                      <span className='badge badge-light-warning'>Pending</span>
+                    ) : (
+                      <span className='badge badge-light-success'>Approved</span>
+                    )}
+                  </td>
+                  <th className='w-15 text-center'> {item.quantity}</th>
+                  <td className='w-15 text-end'>{item.date}</td>
+                </tr>
+              ))
+            ) : (
+              <th colSpan={6} className='text-center'>
+                No Item Found
+              </th>
+            )}
+            {/* Pagination */}
+          </tbody>
+        </table>
+        <div className='row justify-content-between align-items-center'>
+          <div className='col-md-6'>
+            <div className='d-flex align-items-center py-3'>
+              <span className='text-muted me-3'>Showing</span>
+              <select
+                name='page_size'
+                onChange={(e) => {
+                  onChangeHandler(e)
+                }}
+                className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+                value={
+                  formProductSold.page_size ? formProductSold.page_size : initFormValue.page_size
+                }
+              >
+                <option value='10'>10</option>
+                <option value='20'>20</option>
+                <option value='50'>50</option>
+                <option value='30'>30</option>
+                <option value='100'>100</option>
+              </select>
+              <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+              <span className='text-muted fs-8 ms-3'>
+                Displaying {list.current_page} of {list.total_pages} pages
               </span>
-              )}
+            </div>
+          </div>
+          <div className='col-md-6 d-flex justify-content-end'>
+            <div>
+              {listPages &&
+                listPages.map((item, index) => (
+                  <span
+                    key={index}
+                    onClick={(e: any) => {
+                      onChangeHandler(e, item.page)
+                    }}
+                    className={
+                      'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                    }
+                  >
+                    {item.label}
+                  </span>
+                ))}
+            </div>
           </div>
         </div>
       </div>
-    </div >) : <Loading />;
+    ) : (
+      <Loading />
+    )
   }
   const displayProductSaleList = () => {
     const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
-    return list ? (<div className='col-xs-12'>
-      <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
-        <thead>
-          <tr className="fw-bolder text-muted">
-            <th className="w-15 text-left">#ID</th>
-            <th className="w-35 text-left ">Product Name</th>
-            <th className="w-25 text-center"> Price</th>
-            <th className="w-15 text-center"> SKU</th>
-            <th className="w-15 text-center"> Status</th>
-            <th className="w-25 text-end">Date Created</th>
-          </tr>
-        </thead>
-        <tbody>
-          {list.product_sale_list.length ? list.product_sale_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-5 text-left">{item.product_id}</td>
-            <td className="w-35 text-left">
-              <div className='d-flex align-items-center'>
-                <div className='symbol symbol-45px me-5'>
-                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
-                </div>
-                <div className='d-flex justify-content-start flex-column'>
-                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
-                    {item.product_sale}
-                  </span>
-                </div>
-              </div>
-            </td>
-            <td className="w-15 fs-4 text-center"><span>{formatMoney(item.regular_price)}</span><span className='fs-8 m-0 text-muted'> <s>{formatMoney(item.sale_price)}</s></span></td>
-            <td className="w-25 text-center">{item.sku ? item.sku : '-'}</td>
-            <td className="w-15 text-center">{item.status === 'processing' ? <span className='badge badge-light-warning'>Pending</span> : <span className='badge badge-light-success'>Approved</span>}</td>
-            <td className="w-25 text-end">{item.date}</td>
-          </tr>
-          ) : <th colSpan={6} className="text-center">No Item Found</th>}
-          {/* Pagination */}
-        </tbody>
-      </table>
-      <div className="row justify-content-between align-items-center">
-        <div className="col-md-6">
-          <div className='d-flex align-items-center py-3'>
-            <span className='text-muted me-3'>Showing</span>
-            <select
-              name="page_size"
-              onChange={(e) => { onChangeHandler(e) }}
-              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
-              value={formValue.page_size ? formValue.page_size : initFormValue.page_size}
-            >
-              <option value='10'>10</option>
-              <option value='20'>20</option>
-              <option value='50'>50</option>
-              <option value='30'>30</option>
-              <option value='100'>100</option>
-            </select>
-            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
-            <span className='text-muted fs-8 ms-3'>
-              Displaying {list.current_page} of {list.total_pages} pages
-            </span>
-          </div>
-        </div>
-        <div className="col-md-6 d-flex justify-content-end">
-          <div>
-            {listPages &&
-              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
-                {item.label}
+    return list ? (
+      <div className='col-xs-12'>
+        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+          <thead>
+            <tr className='fw-bolder text-muted'>
+              <th className='w-15 text-left'>#ID</th>
+              <th className='w-35 text-left '>Product Name</th>
+              <th className='w-15 text-center'>SKU</th>
+              <th className='w-25 text-center'>Price</th>
+              <th className='w-15 text-center'>Status</th>
+              <th className='w-25 text-end'>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {list.product_sale_list.length ? (
+              list.product_sale_list?.map((item: any, index: number) => (
+                <tr key={index}>
+                  <td className='w-5 text-left'>{item.product_id}</td>
+                  <td className='w-35 text-left'>
+                    <div className='d-flex align-items-center'>
+                      <div className='symbol symbol-45px me-5'>
+                        <img
+                          src={
+                            item.product_img
+                              ? item.product_img
+                              : 'https://via.placeholder.com/75x75/f0f0f0'
+                          }
+                          alt={item.product_sale}
+                        />
+                      </div>
+                      <div className='d-flex justify-content-start flex-column'>
+                        <span className='text-dark fw-bolder text-hover-primary fs-6'>
+                          {item.product_sale}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className='w-25 text-center'>{item.sku ? item.sku : '-'}</td>
+                  <td className='w-15 fs-4 text-center'>
+                    <span>{formatMoney(item.regular_price)}</span>
+                    <span className='fs-8 m-0 text-muted'>
+                      {' '}
+                      <s>{formatMoney(item.sale_price)}</s>
+                    </span>
+                  </td>
+                  <td className='w-15 text-center'>
+                    {item.status === 'processing' ? (
+                      <span className='badge badge-light-warning'>Pending</span>
+                    ) : (
+                      <span className='badge badge-light-success'>Approved</span>
+                    )}
+                  </td>
+                  <td className='w-25 text-end'>{item.date}</td>
+                </tr>
+              ))
+            ) : (
+              <th colSpan={6} className='text-center'>
+                No Item Found
+              </th>
+            )}
+            {/* Pagination */}
+          </tbody>
+        </table>
+        <div className='row justify-content-between align-items-center'>
+          <div className='col-md-6'>
+            <div className='d-flex align-items-center py-3'>
+              <span className='text-muted me-3'>Showing</span>
+              <select
+                name='page_size'
+                onChange={(e) => {
+                  onChangeHandler(e)
+                }}
+                className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+                value={formValue.page_size ? formValue.page_size : initFormValue.page_size}
+              >
+                <option value='10'>10</option>
+                <option value='20'>20</option>
+                <option value='50'>50</option>
+                <option value='30'>30</option>
+                <option value='100'>100</option>
+              </select>
+              <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+              <span className='text-muted fs-8 ms-3'>
+                Displaying {list.current_page} of {list.total_pages} pages
               </span>
-              )}
+            </div>
+          </div>
+          <div className='col-md-6 d-flex justify-content-end'>
+            <div>
+              {listPages &&
+                listPages.map((item, index) => (
+                  <span
+                    key={index}
+                    onClick={(e: any) => {
+                      onChangeHandler(e, item.page)
+                    }}
+                    className={
+                      'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                    }
+                  >
+                    {item.label}
+                  </span>
+                ))}
+            </div>
           </div>
         </div>
       </div>
-    </div >) : <Loading />;
+    ) : (
+      <Loading />
+    )
   }
   const displayProductOrderList = () => {
     const listPages = find_page_begin_end(productOrderList?.current_page, productOrderList?.total_pages)
@@ -507,47 +606,80 @@ const Reports: FC = () => {
               )}
           </div>
         </div>
+        <div className='col-md-6 d-flex justify-content-end'>
+          <div className='col-md-6 d-flex justify-content-end'>
+            {listPages &&
+              listPages.map((item, index) => (
+                <span
+                  key={index}
+                  onClick={(e: any) => {
+                    onChangeHandler(e, item.page)
+                  }}
+                  className={
+                    'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                  }
+                >
+                  {item.label}
+                </span>
+              ))}
+          </div>
+        </div>
       </div>
-    </div >) : <Loading />
+    </div>
+    ) : (
+      <Loading />
+    )
   }
   const displayCustomerSaleList = () => {
     const listPages = find_page_begin_end(customerList?.current_page, customerList?.total_pages)
     return customerList ? (
       <div className='col-xs-12'>
-        <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
-            <tr className="fw-bolder text-muted">
-              <th className="w-5 text-end">#ID</th>
-              <th className="w-30 text-start">Full Name</th>
-              <th className="w-25 text-center">City</th>
-              <th className="w-25 text-center">Country</th>
-              <th className="w-25 text-center">Email</th>
-              <th className="w-25 text-end">Phone</th>
+            <tr className='fw-bolder text-muted'>
+              <th className='w-5 text-end'>#ID</th>
+              <th className='w-30 text-start'>Full Name</th>
+              <th className='w-25 text-center'>Email</th>
+              <th className='w-25 text-end'>Phone</th>
+              <th className='w-25 text-center'>City</th>
+              <th className='w-25 text-center'>Country</th>
             </tr>
           </thead>
           <tbody>
-            {customerList.customer_list.length > 0 ? customerList.customer_list?.map((item: any, index: number) => <tr key={index}>
-              <td className="w-5 text-end">{item.user_id}</td>
-              <td className="w-30 text-start">{item.full_name}</td>
-              <td className="w-25 text-center">{item.city ? item.city : '-'}</td>
-              <td className="w-25 text-center">{item.country ? item.country : '-'}</td>
-              <td className="w-25 text-center">{item.email ? item.email : '-'}</td>
-              <td className="w-25 text-end">{item.phone}</td>
-            </tr>
-            ) : <th colSpan={6} className="text-Center">No Item Found</th>
-            }
+            {customerList.customer_list.length > 0 ? (
+              customerList.customer_list?.map((item: any, index: number) => (
+                <tr key={index}>
+                  <td className='w-5 text-end'>{item.user_id}</td>
+                  <td className='w-30 text-start'>{item.full_name}</td>
+                  <td className='w-25 text-center'>{item.email ? item.email : '-'}</td>
+                  <td className='w-25 text-end'>{item.phone}</td>
+                  <td className='w-25 text-center'>{item.city ? item.city : '-'}</td>
+                  <td className='w-25 text-center'>{item.country ? item.country : '-'}</td>
+                </tr>
+              ))
+            ) : (
+              <th colSpan={6} className='text-Center'>
+                No Item Found
+              </th>
+            )}
           </tbody>
           {/* Pagination */}
         </table>
-        <div className="row justify-content-between align-items-center">
-          <div className="col-md-5">
+        <div className='row justify-content-between align-items-center'>
+          <div className='col-md-5'>
             <div className='d-flex align-items-center py-3'>
               <span className='text-muted me-3'>Showing</span>
               <select
-                name="page_size"
+                name='page_size'
                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
-                onChange={(e) => { onChangeHandler(e) }}
-                value={formCustomerValue.page_size ? formCustomerValue.page_size : initFormValue.page_size}
+                onChange={(e) => {
+                  onChangeHandler(e)
+                }}
+                value={
+                  formCustomerValue.page_size
+                    ? formCustomerValue.page_size
+                    : initFormValue.page_size
+                }
               >
                 <option value='10'>10</option>
                 <option value='20'>20</option>
@@ -561,15 +693,27 @@ const Reports: FC = () => {
               </span>
             </div>
           </div>
-          <div className="col-md-6 d-flex justify-content-end">
+          <div className='col-md-6 d-flex justify-content-end'>
             {listPages &&
-              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
-                {item.label}
-              </span>
-              )}
+              listPages.map((item, index) => (
+                <span
+                  key={index}
+                  onClick={(e: any) => {
+                    onChangeHandler(e, item.page)
+                  }}
+                  className={
+                    'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                  }
+                >
+                  {item.label}
+                </span>
+              ))}
           </div>
         </div>
-      </div>) : <Loading />
+      </div>
+    ) : (
+      <Loading />
+    )
   }
 
   const displayProductOrderRefundList = () => {
@@ -646,132 +790,187 @@ const Reports: FC = () => {
     </div >) : <Loading />
   }
   const filterSection = (tab: string) => {
-    if (tab === "Product Sales") return <div className="row my-2">
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Month</label>
-        <select
-          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
-          name="filter_by_month"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formValue.filter_by_month}
-        >
-          <option value="">None</option>
-          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
-        </select>
-      </div>
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Year</label>
-        <select
-          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
-          name="filter_by_year"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formValue.filter_by_year}
-        >
-          <option value="">None</option>
-          {years.map(item => <option key={item} value={item}>{item}</option>)}
-        </select>
-      </div>
-    </div>
+    if (tab === 'Product Sales')
+      return (
+        <div className='row my-2'>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Month</label>
+            <select
+              className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+              name='filter_by_month'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formValue.filter_by_month}
+            >
+              <option value=''>None</option>
+              {months.map((item, index) => (
+                <option key={index} value={index + 1}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Year</label>
+            <select
+              className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+              name='filter_by_year'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formValue.filter_by_year}
+            >
+              <option value=''>None</option>
+              {years.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )
 
-    if (tab === "New Users") return <div className="row my-2">
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Month</label>
-        <select
-          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
-          name="filter_by_month"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formCustomerValue.filter_by_month}
-        >
-          <option value="">None</option>
-          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
-        </select>
-      </div>
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Year</label>
-        <select
-          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
-          name="filter_by_year"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formCustomerValue.filter_by_year}
-        >
-          <option value="">None</option>
-          {years.map(item => <option key={item} value={item}>{item}</option>)}
-        </select>
-      </div>
-    </div>
+    if (tab === 'New Users')
+      return (
+        <div className='row my-2'>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Month</label>
+            <select
+              className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+              name='filter_by_month'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formCustomerValue.filter_by_month}
+            >
+              <option value=''>None</option>
+              {months.map((item, index) => (
+                <option key={index} value={index + 1}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Year</label>
+            <select
+              className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+              name='filter_by_year'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formCustomerValue.filter_by_year}
+            >
+              <option value=''>None</option>
+              {years.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )
 
-    if (tab === "Item Orders") return <div className="row my-2">
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Month</label>
-        <select
-          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
-          name="filter_by_month"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formProductOrderValue.filter_by_month}
-        >
-          <option value="">None</option>
-          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
-        </select>
-      </div>
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Year</label>
-        <select
-          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
-          name="filter_by_year"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formProductOrderValue.filter_by_year}
-        >
-          <option value="">None</option>
-          {years.map(item => <option key={item} value={item}>{item}</option>)}
-        </select>
-      </div>
-    </div>
+    if (tab === 'Item Orders')
+      return (
+        <div className='row my-2'>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Month</label>
+            <select
+              className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+              name='filter_by_month'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formProductOrderValue.filter_by_month}
+            >
+              <option value=''>None</option>
+              {months.map((item, index) => (
+                <option key={index} value={index + 1}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Year</label>
+            <select
+              className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+              name='filter_by_year'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formProductOrderValue.filter_by_year}
+            >
+              <option value=''>None</option>
+              {years.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )
 
-    if (tab === "Product Sold") return <div className="row my-2">
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Month</label>
-        <select
-          className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
-          name="filter_by_month"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formProductSold.filter_by_month}
-        >
-          <option value="">None</option>
-          {months.map((item, index) => <option key={index} value={index + 1}>{item}</option>)}
-        </select>
-      </div>
-      <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
-        <label className="form-label me-3 mb-0">Year</label>
-        <select
-          className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
-          name="filter_by_year"
-          onChange={(e) => { onChangeHandler(e); }}
-          value={formProductSold.filter_by_year}
-        >
-          <option value="">None</option>
-          {years.map(item => <option key={item} value={item}>{item}</option>)}
-        </select>
-      </div>
-    </div>
+    if (tab === 'Product Sold')
+      return (
+        <div className='row my-2'>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Month</label>
+            <select
+              className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+              name='filter_by_month'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formProductSold.filter_by_month}
+            >
+              <option value=''>None</option>
+              {months.map((item, index) => (
+                <option key={index} value={index + 1}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Year</label>
+            <select
+              className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+              name='filter_by_year'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formProductSold.filter_by_year}
+            >
+              <option value=''>None</option>
+              {years.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )
   }
 
-  return <div className="card card-reports pb-5">
-    <div className='card-header border-0 pt-5'>
-      <h3 className='card-title align-items-start flex-column'>
-        <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
-      </h3>
-    </div>
-    <div className='card-body py-0'>
-      <div className='card-wrapper'>
-        <div className="row">
-          <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
-        </div>
+  return (
+    <div className='card card-reports pb-5'>
+      <div className='card-header border-0 pt-5'>
+        <h3 className='card-title align-items-start flex-column'>
+          <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
+        </h3>
       </div>
-      <div>
-        <div className='card-header border-0 ps-0'>
-          <h3 className='card-title align-items-start flex-column'>
-            <span className='card-label fw-bolder fs-3 mb-1'>Reports Detail</span>
-          </h3>
+      <div className='card-body py-0'>
+        <div className='card-wrapper'>
+          <div className='row'>
+            <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
+          </div>
         </div>
         {isLoading ? <Loading /> : (
           <div className='card-wrapper'>
@@ -796,7 +995,7 @@ const Reports: FC = () => {
         )}
       </div>
     </div>
-  </div >
+  )
 }
 
 export default Reports

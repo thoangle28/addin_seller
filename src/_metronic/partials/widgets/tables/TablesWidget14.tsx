@@ -125,35 +125,39 @@ const TablesWidget14 = ({
               <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
             </span>
           )}
-          <div className='me-4 my-1'>
-            <input
-              value={searchTerms}
-              type='text'
-              name='searchTerm'
-              className='form-control px-2 py-2 me-3'
-              id='searchTerm'
-              placeholder='Search'
-              onChange={(e) => {
-                setSearchTerms(e.target.value)
-              }}
-              onKeyDown={(e) => { onEnterKeyDown(e) }}
-            />
-          </div>
-          <div className='me-4 my-1'>
-            <select
-              className='form-select form-select-solid form-select-sm me-3'
-              value={filterOption}
-              onChange={(e) => {
-                setFilterOption(e.target.value)
-                searchEvent(e, searchTerms, e.target.value)
-              }}
-            >
-              <option value=''>All</option>
-              <option value='draft'>Draft</option>
-              <option value='pending'>Pending</option>
-              <option value='publish'>Publish</option>
-            </select>
-          </div>
+          {!isHome && (
+          <>
+            <div className='me-4 my-1'>
+              <input
+                value={searchTerms}
+                type='text'
+                name='searchTerm'
+                className='form-control px-2 py-2 me-3'
+                id='searchTerm'
+                placeholder='Search'
+                onChange={(e) => {
+                  setSearchTerms(e.target.value)
+                }}
+                onKeyDown={(e) => { onEnterKeyDown(e) }}
+              />
+            </div>
+            <div className='me-4 my-1'>
+              <select
+                className='form-select form-select-solid form-select-sm me-3'
+                value={filterOption}
+                onChange={(e) => {
+                  setFilterOption(e.target.value)
+                  searchEvent(e, searchTerms, e.target.value)
+                }}
+              >
+                <option value=''>All</option>
+                <option value='draft'>Draft</option>
+                <option value='pending'>Pending</option>
+                <option value='publish'>Publish</option>
+              </select>
+            </div>
+          </>
+          )}
           {/* <div className='my-1'>
             <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>
               Apply
