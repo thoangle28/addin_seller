@@ -435,7 +435,7 @@ const Reports: FC = () => {
             </td>
             <td className="w-25 text-center">{item.date}</td>
             <td className="w-30 text-center">{formatMoney(item.price)}</td>
-            <td className="w-5 text-end">{item.status === 'processing' ? <span className='badge badge-light-warning'>Processing</span> : <span className='badge badge-light-success'>Approved</span>}</td>
+            <td className="w-5 text-end">{item.status === 'processing' ? <span className='badge badge-light-warning'>Processing</span> : <span className='badge badge-light-success'>Refunded</span>}</td>
           </tr>
           ) : <th colSpan={5} className="text-center">No Item Found</th>
           }
