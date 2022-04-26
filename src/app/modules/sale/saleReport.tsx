@@ -54,7 +54,7 @@ function getStatisticsSales12Months(params: any) {
 
 export const getCustomerList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/customer-list', params)
 export const getProductSaleList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/product-sale-list', params)
-export const getProductOrderList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/order-list', params)
+export const getProductOrderList = (params: any) => axios.post(API_END_POINT_URL + '/sale-report/info-product-sale', params)
 
 export const WeeklySales = (userId: any) => {
   return new Promise((resolve, reject) => {
