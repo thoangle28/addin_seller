@@ -1,13 +1,8 @@
-import React, {FC, useEffect, useState} from 'react'
-import {shallowEqual, useSelector} from 'react-redux'
-import {RootState} from '../../../setup'
-import {MixedWidget11, MixedWidget12, MixedWidget13} from '../../../_metronic/partials/widgets'
-import {
-  loadAllReports,
-  getProductSaleList,
-  getCustomerList,
-  getProductOrderList,
-} from './saleReport'
+import React, { FC, useEffect, useState } from 'react'
+import { shallowEqual, useSelector } from 'react-redux'
+import { RootState } from '../../../setup'
+import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
+import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList } from './saleReport'
 interface iReport {
   weeklySales: any | 0
   newUsers: any | 0
@@ -36,7 +31,7 @@ const Loading: FC = () => {
   return (
     <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
       <div className='card-body d-flex justify-content-center align-items-center'>
-        <span className='indicator-progress text-center' style={{display: 'block', width: '100px'}}>
+        <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
           Loading...
           <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
         </span>
@@ -44,7 +39,7 @@ const Loading: FC = () => {
     </div>
   )
 }
-const DashboardPage: FC<Props> = ({dataList = [], isPageLoading, saleReport}: Props) => {
+const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
       {/* red chart */}
@@ -90,11 +85,11 @@ const DashboardPage: FC<Props> = ({dataList = [], isPageLoading, saleReport}: Pr
 }
 
 const Reports: FC = () => {
-  const data = useSelector<RootState>(({product}) => product, shallowEqual)
-  const user: any = useSelector<RootState>(({auth}) => auth.user, shallowEqual)
+  const data = useSelector<RootState>(({ product }) => product, shallowEqual)
+  const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
-  const tabs = ['Product Sales', 'New Users', 'Item Orders', 'Product Sold']
-  const now = new Date().getUTCFullYear()
+  const tabs = ['Product Sales', 'New Users', 'Item Orders', 'Product Sold', 'Refunded']
+  const now = new Date().getUTCFullYear();
   const currentMonth: number = new Date().getMonth() + 1
   const currentYear: number = new Date().getFullYear()
   const years = Array(now - (now - 5))
@@ -140,31 +135,27 @@ const Reports: FC = () => {
   const [customerList, setCustomerList] = useState<any>()
   const [productSoldList, setProductSoldList] = useState<any>()
   const [productOrderList, setProductOrderList] = useState<any>()
+  const [refundList, setRefundList] = useState<any>()
   const [formValue, setFormValue] = useState<formValue>(initFormValue)
   const [formProductOrderValue, setFormProductOrderValue] = useState<formValue>(initFormValue)
   const [formCustomerValue, setFormCustomerValue] = useState<formValue>(initFormValue)
   const [formProductSold, setFormProductSold] = useState<formValue>(initFormValue)
+  const [formRefund, setFormRefund] = useState<formValue>(initFormValue)
   const [message, setMessage] = useState<string>('')
-
   const onChangeHandler = (e: any, current_page: number = 1) => {
     e.preventDefault()
-    const {name, value} = e.target
-    if (tab === 'Product Sold') {
-      setFormProductSold({...formProductSold, [name]: parseInt(value), current_page})
-    }
-    if (tab === 'Product Sales') setFormValue({...formValue, [name]: parseInt(value), current_page})
-
-    if (tab === 'New Users')
-      setFormCustomerValue({...formCustomerValue, [name]: parseInt(value), current_page})
-
-    if (tab === 'Item Orders')
-      setFormProductOrderValue({...formProductOrderValue, [name]: parseInt(value), current_page})
+    const { name, value } = e.target
+    if (tab === 'Product Sold') setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
+    if (tab === 'Product Sales') setFormValue({ ...formValue, [name]: parseInt(value), current_page })
+    if (tab === 'New Users') setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
+    if (tab === 'Item Orders') setFormProductOrderValue({ ...formProductOrderValue, [name]: parseInt(value), current_page })
+    if (tab === 'Refunded') setFormRefund({ ...formRefund, [name]: parseInt(value), current_page })
   }
   // API Calling
   const showProductSaleList = (formValue: any) => {
     getProductSaleList(formValue)
       .then((res) => {
-        const {code, data} = res.data
+        const { code, data } = res.data
         setMessage('Processing')
         setIsLoading(true)
         if (code === 200) {
@@ -182,7 +173,7 @@ const Reports: FC = () => {
   const showCustomerList = (formCustomerValue: any) => {
     getCustomerList(formCustomerValue)
       .then((res) => {
-        const {code, data, message} = res.data
+        const { code, data, message } = res.data
         setMessage('Processing')
         setIsLoading(true)
         if (code === 200) {
@@ -200,7 +191,7 @@ const Reports: FC = () => {
   const showProductOrderList = (formProductOrderValue: any) => {
     getProductOrderList(formProductOrderValue)
       .then((res) => {
-        const {code, data} = res.data
+        const { code, data } = res.data
         setMessage('Processing')
         setIsLoading(true)
         if (code === 200) {
@@ -223,8 +214,23 @@ const Reports: FC = () => {
       .catch((err) => console.log(err))
   }
 
-  const formatMoney = (money: string | number, currentcy: string = '$') =>
-    currentcy + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  const showRefundList = (formRefund: any) => {
+    getRefundedList(formRefund).then(res => {
+      const { code, data, message } = res.data
+      setMessage('Processing')
+      setIsLoading(true)
+      if (code === 200) {
+        setIsLoading(false)
+        setRefundList(data)
+        setMessage(message)
+        setTimeout(() => {
+          setMessage('')
+        }, 3500);
+      }
+    }).catch(err => console.log(err))
+  }
+
+  const formatMoney = (money: string | number, currentcy: string = "$") => currentcy + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
   useEffect(() => {
     const allReport = loadAllReports(currentUserId)
@@ -250,10 +256,11 @@ const Reports: FC = () => {
 
   // Load data each tab when user has clicked
   useEffect(() => {
-    if (tab === 'Product Sales') showProductSaleList({...formValue})
-    if (tab === 'New Users') showCustomerList({...formCustomerValue})
-    if (tab === 'Item Orders') showProductOrderList({...formProductOrderValue})
-    if (tab === 'Product Sold') showProductOrderList({...formProductSold})
+    if (tab === 'Product Sales') showProductSaleList({ ...formValue })
+    if (tab === 'New Users') showCustomerList({ ...formCustomerValue })
+    if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
+    if (tab === 'Product Sold') showProductOrderList({ ...formProductSold })
+    if (tab === 'Refunded') showRefundList({ ...formRefund })
   }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, tab])
 
   const find_page_begin_end = (currentPage: number, maxPage: number) => {
@@ -273,7 +280,7 @@ const Reports: FC = () => {
 
     const listPages = []
     //fist
-    listPages.push({label: '«', page: 1, class: 'btn-light-primary'})
+    listPages.push({ label: '«', page: 1, class: 'btn-light-primary' })
     //previous
     listPages.push({
       label: '‹',
@@ -282,7 +289,7 @@ const Reports: FC = () => {
     })
     //list page with 5 items
     for (let index = begin; index <= end; index++) {
-      listPages.push({label: index, page: index, class: currentPage === index ? 'active' : ''})
+      listPages.push({ label: index, page: index, class: currentPage === index ? 'active' : '' })
     }
     //next
     listPages.push({
@@ -291,12 +298,33 @@ const Reports: FC = () => {
       class: 'btn-light-primary',
     })
     //last
-    listPages.push({label: '»', page: maxPage, class: 'btn-light-primary'})
+    listPages.push({ label: '»', page: maxPage, class: 'btn-light-primary' })
 
     return listPages
   }
   // UI components
-
+  const productSoldStatus = (status: string) => {
+    if (status === 'processing')
+      return <td className="w-5 text-end "><span className='badge badge-light-primary'>Processing</span></td>
+    if (status === 'refunded')
+      return <td className="w-5 text-end "><span className='badge badge-light-warning'>Refunded</span></td>
+    if (status === 'in-china-warehous')
+      return <td className="w-5 text-end "><span className='badge badge-light-info'>In China Warehous</span></td>
+    if (status === 'leave-china-port')
+      return <td className="w-5 text-end "><span className='badge badge-light-success'>Leave China Port</span></td>
+    if (status === 'reach-singapre-p')
+      return <td className="w-5 text-end "><span className='badge badge-light-success'>Reach Singapore Port</span></td>
+    if (status === 'reach-tuas-wareho')
+      return <td className="w-5 text-end "><span className='badge badge-light-success'>Reach Tuas Wareho</span></td>
+    if (status === 'failed')
+      return <td className="w-5 text-end "><span className='badge badge-light-danger'>Failed</span></td>
+    if (status === 'cancelled')
+      return <td className="w-5 text-end "><span className='badge badge-light-danger'>Cancelled</span></td>
+    if (status === 'completed')
+      return <td className="w-5 text-end "><span className='badge badge-light-success'>Completed</span></td>
+    if (status === 'on-hold')
+      return <td className="w-5 text-end "><span className='badge badge-light-primary'>On Hold</span></td>
+  }
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
     return productSoldList ? (
@@ -452,7 +480,7 @@ const Reports: FC = () => {
                       {' '}
                       <s>{formatMoney(item.sale_price)}</s>
                     </span>
-                  </td>                  
+                  </td>
                   <td className='w-15 text-center'>
                     {item.status === 'processing' ? (
                       <span className='badge badge-light-warning'>Pending</span>
@@ -520,97 +548,84 @@ const Reports: FC = () => {
     )
   }
   const displayProductOrderList = () => {
-    const listPages = find_page_begin_end(
-      productOrderList?.current_page,
-      productOrderList?.total_pages
-    )
-    return productOrderList ? (
-      <div className='col-xs-12'>
-        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
-          <thead>
-            <tr className='fw-bolder text-muted'>
-              <th className='w-15 text-center'>Order ID</th>
-              <th className='w-35 text-left'>Customer's Name</th>              
-              <th className='w-30 text-center'>Total</th>
-              <th className='w-5 text-end'>Order Status</th>
-              <th className='w-25 text-center'>Date Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productOrderList.order_list.length > 0 ? (
-              productOrderList.order_list?.map((item: any, index: number) => (
-                <tr key={index}>
-                  <td className='w-15 text-center'>{item.order_id}</td>
-                  <td className='w-35 text-left text-dark fw-bolder fs-6'>
-                    {item.customer_name ? item.customer_name : ''}
-                  </td>                  
-                  <td className='w-30 text-center'>{formatMoney(item.price)}</td>
-                  <td className='w-5 text-end'>
-                    {item.status === 'processing' ? (
-                      <span className='badge badge-light-warning'>Processing</span>
-                    ) : (
-                      <span className='badge badge-light-success'>Refunded</span>
-                    )}
-                  </td>
-                  <td className='w-25 text-center'>{item.date}</td>
-                </tr>
-              ))
-            ) : (
-              <th colSpan={5} className='text-center'>
-                No Item Found
-              </th>
-            )}
-          </tbody>
-          {/* Pagination */}
-        </table>
-        <div className='row justify-content-between align-items-center'>
-          <div className='col-md-6'>
-            <div className='d-flex align-items-center py-3'>
-              <span className='text-muted me-3'>Showing</span>
-              <select
-                name='page_size'
-                onChange={(e) => {
-                  onChangeHandler(e)
-                }}
-                className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
-                value={
-                  formProductOrderValue.page_size
-                    ? formProductOrderValue.page_size
-                    : initFormValue.page_size
-                }
-              >
-                <option value='10'>10</option>
-                <option value='20'>20</option>
-                <option value='50'>50</option>
-                <option value='30'>30</option>
-                <option value='100'>100</option>
-              </select>
-              <span className='text-muted fs-8 ms-3'>item(s)/page</span>
-              <span className='text-muted fs-8 ms-3'>
-                Displaying {productOrderList.current_page} of {productOrderList.total_pages} pages
-              </span>
-            </div>
+    const listPages = find_page_begin_end(productOrderList?.current_page, productOrderList?.total_pages)
+    return productOrderList ? (<div className='col-xs-12'>
+      <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+        <thead>
+          <tr className="fw-bolder text-muted">
+            <th className="w-15 text-center">Order ID</th>
+            <th className="w-35 text-left">Customer's Name</th>
+            <th className="w-25 text-center">Date Created</th>
+            <th className="w-30 text-center">Total</th>
+            <th className="w-5 text-end">Order Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
+            <td className="w-15 text-center">{item.order_id}</td>
+            <td className="w-35 text-left text-dark fw-bolder fs-6">{item.customer_name ? item.customer_name : ''}
+            </td>
+            <td className="w-25 text-center">{item.date}</td>
+            <td className="w-30 text-center">{formatMoney(item.price)}</td>
+            {productSoldStatus(item.status)}
+          </tr>
+          ) : <th colSpan={5} className="text-center">No Item Found</th>
+          }
+        </tbody>
+        {/* Pagination */}
+      </table>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-6">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              name="page_size"
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formProductOrderValue.page_size ? formProductOrderValue.page_size : initFormValue.page_size}
+
+            >
+              <option value='10'>10</option>
+              <option value='20'>20</option>
+              <option value='50'>50</option>
+              <option value='30'>30</option>
+              <option value='100'>100</option>
+            </select>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
+              Displaying {productOrderList.current_page} of {productOrderList.total_pages} pages
+            </span>
           </div>
+        </div>
+        <div className="col-md-6 d-flex justify-content-end">
+          <div className="col-md-6 d-flex justify-content-end">
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
+        </div>
+        <div className='col-md-6 d-flex justify-content-end'>
           <div className='col-md-6 d-flex justify-content-end'>
-            <div className='col-md-6 d-flex justify-content-end'>
-              {listPages &&
-                listPages.map((item, index) => (
-                  <span
-                    key={index}
-                    onClick={(e: any) => {
-                      onChangeHandler(e, item.page)
-                    }}
-                    className={
-                      'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
-                    }
-                  >
-                    {item.label}
-                  </span>
-                ))}
-            </div>
+            {listPages &&
+              listPages.map((item, index) => (
+                <span
+                  key={index}
+                  onClick={(e: any) => {
+                    onChangeHandler(e, item.page)
+                  }}
+                  className={
+                    'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                  }
+                >
+                  {item.label}
+                </span>
+              ))}
           </div>
         </div>
       </div>
+    </div>
     ) : (
       <Loading />
     )
@@ -627,7 +642,7 @@ const Reports: FC = () => {
               <th className='w-25 text-center'>Email</th>
               <th className='w-25 text-end'>Phone</th>
               <th className='w-25 text-center'>City</th>
-              <th className='w-25 text-center'>Country</th>             
+              <th className='w-25 text-center'>Country</th>
             </tr>
           </thead>
           <tbody>
@@ -639,7 +654,7 @@ const Reports: FC = () => {
                   <td className='w-25 text-center'>{item.email ? item.email : '-'}</td>
                   <td className='w-25 text-end'>{item.phone}</td>
                   <td className='w-25 text-center'>{item.city ? item.city : '-'}</td>
-                  <td className='w-25 text-center'>{item.country ? item.country : '-'}</td>                  
+                  <td className='w-25 text-center'>{item.country ? item.country : '-'}</td>
                 </tr>
               ))
             ) : (
@@ -701,6 +716,79 @@ const Reports: FC = () => {
     )
   }
 
+  const displayProductOrderRefundList = () => {
+    const listPages = find_page_begin_end(refundList?.current_page, refundList?.total_pages)
+    return refundList ? (<div className='col-xs-12'>
+      <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+        <thead>
+          <tr className="fw-bolder text-muted">
+            <th className="w-10 text-center">Order ID</th>
+            <th className="w-40 text-left">Customer's Name</th>
+            <th className="w-15 text-center">SKU</th>
+            <th className="w-20 text-center">Total</th>
+            <th className="w-15 text-end">Date Created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {refundList.order_refund_list.length > 0 ? refundList.order_refund_list?.map((item: any, index: number) => <tr key={index} >
+            <td className="w-10 text-center">{item.order_id}</td>
+            <td className="w-40 text-left">
+              <div className='d-flex align-items-center'>
+                <div className='symbol symbol-45px me-5'>
+                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
+                </div>
+                <div className='d-flex justify-content-start flex-column'>
+                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
+                    {item.title_product}
+                  </span>
+                </div>
+              </div>
+            </td>
+            <td className="w-15 text-center">{item.sku}</td>
+            <td className="w-20 text-center">{formatMoney(item.price_refund)}</td>
+            <td className="w-15 text-end">{item.date}</td>
+
+          </tr>
+          ) : <th colSpan={5} className="text-center">No Item Found</th>
+          }
+        </tbody>
+        {/* Pagination */}
+      </table>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-6">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              name="page_size"
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formRefund.page_size ? formRefund.page_size : initFormValue.page_size}
+
+            >
+              <option value='10'>10</option>
+              <option value='20'>20</option>
+              <option value='50'>50</option>
+              <option value='30'>30</option>
+              <option value='100'>100</option>
+            </select>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
+              Displaying {refundList.current_page} of {refundList.total_pages} pages
+            </span>
+          </div>
+        </div>
+        <div className="col-md-6 d-flex justify-content-end">
+          <div className="col-md-6 d-flex justify-content-end">
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
+        </div>
+      </div>
+    </div >) : <Loading />
+  }
   const filterSection = (tab: string) => {
     if (tab === 'Product Sales')
       return (
@@ -884,46 +972,27 @@ const Reports: FC = () => {
             <DashboardPage dataList={data} isPageLoading={isPageLoading} saleReport={saleReport} />
           </div>
         </div>
-        <div>
-          <div className='card-header border-0 ps-0'>
-            <h3 className='card-title align-items-start flex-column'>
-              <span className='card-label fw-bolder fs-3 mb-1'>Reports Detail</span>
-            </h3>
-          </div>
-          {isLoading ? (
-            <Loading />
-          ) : (
-            <div className='card-wrapper'>
-              <div className='row'>
-                {/* Tabs */}
-                <ul className='nav nav-tabs'>
-                  {tabs.map((tab: string, index: number) => {
-                    const checkOpen = isActiveIndex === index
-                    return (
-                      <li
-                        key={index}
-                        onClick={() => {
-                          setTab(tab)
-                          setActiveIndex(index)
-                        }}
-                        className='nav-item cursor-pointer'
-                      >
-                        <p className={`dropdown-item ${checkOpen ? 'active' : ''}`}>{tab}</p>
-                      </li>
-                    )
-                  })}
-                </ul>
-                {filterSection(tab)}
-                <div>
-                  {tab === 'Product Sales' && displayProductSaleList()}
-                  {tab === 'Product Sold' && displayProductSoldList()}
-                  {tab === 'New Users' && displayCustomerSaleList()}
-                  {tab === 'Item Orders' && displayProductOrderList()}
-                </div>
+        {isLoading ? <Loading /> : (
+          <div className='card-wrapper'>
+            <div className='row'>
+              {/* Tabs */}
+              <ul className="nav nav-tabs">
+                {tabs.map((tab: string, index: number) => {
+                  const checkOpen = isActiveIndex === index;
+                  return <li key={index} onClick={() => { setTab(tab); setActiveIndex(index) }} className="nav-item cursor-pointer"><p className={`dropdown-item ${checkOpen ? 'active' : ''}`}  >{tab}</p></li>
+                })}
+              </ul>
+              {filterSection(tab)}
+              <div>
+                {tab === 'Product Sales' && displayProductSaleList()}
+                {tab === 'Product Sold' && displayProductSoldList()}
+                {tab === 'New Users' && displayCustomerSaleList()}
+                {tab === 'Item Orders' && displayProductOrderList()}
+                {tab === 'Refunded' && displayProductOrderRefundList()}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
