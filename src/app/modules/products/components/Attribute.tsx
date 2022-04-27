@@ -41,7 +41,7 @@ const Attribute: FC = () => {
         new_attribute_name: parentAttribute
     }
     const validateSchema = Yup.object().shape({
-        new_attribute_name: Yup.string().required('New attribute is required!')
+        new_attribute_name: Yup.string().required('Name is required!')
     })
 
     const updateChildAttrInitValue = {
@@ -50,7 +50,7 @@ const Attribute: FC = () => {
     }
 
     const childUpdateValidateSchema = Yup.object().shape({
-        new_attribute_term_name: Yup.string().required('New Attribute Term is required!'),
+        new_attribute_term_name: Yup.string().required('Name is required!'),
     })
 
 
@@ -64,10 +64,11 @@ const Attribute: FC = () => {
         setIsEdit(true)
     }
 
-    const afterSubmit = (resetForm: any) => {
+    const afterSubmit = (isReset: boolean = true, resetForm: any) => {
         setTimeout(() => {
             setMessage('')
-            resetForm()
+            if (isReset)
+                resetForm()
         }, 3500);
     }
 
@@ -80,7 +81,7 @@ const Attribute: FC = () => {
         setParentAttributeList(updatedList)
     }
 
-    const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any) => {
+    const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any, setSubmitting: any) => {
         updateAttr(old_attribute_name, new_attribute_name).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
@@ -90,12 +91,13 @@ const Attribute: FC = () => {
                 setIsUpdateChild(false)
                 setMessage(message)
                 updateUIAttr(attrId, new_attribute_name)
-                afterSubmit(resetForm)
+                afterSubmit(true, resetForm)
             }
             else {
                 setHasErrors(true)
+                setSubmitting(false)
                 setMessage(message)
-                afterSubmit(resetForm)
+                afterSubmit(true, resetForm)
             }
         })
     }
@@ -127,11 +129,11 @@ const Attribute: FC = () => {
             }
             // filter current list 
             const filteredData = parentAttributeList.filter((item: any) => item.id !== attrId).filter((item: any) => item.name !== childAttrTaxonomy)
-            setParentAttributeList([result, oldParentResult, ...filteredData,])
+            setParentAttributeList([result, oldParentResult, ...filteredData])
         }
     }
 
-    const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any) => {
+    const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any) => {
         const payload: any = {
             ...updateChildAttrInitValue,
             id_term: childId,
@@ -139,88 +141,85 @@ const Attribute: FC = () => {
             new_attribute_term_name,
             label_term: childAttr
         };
-
         updateAttributeTerms(payload).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
             setMessage('Processing')
             setIsUpdateChildWithAttr(false);
+            updateUITermAttr(attrId, childId, new_attribute_term_name)
             if (code === 200) {
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
-                updateUITermAttr(attrId, childId, new_attribute_term_name)
-                afterSubmit(resetForm)
+                afterSubmit(true, resetForm)
             }
             else {
                 setHasErrors(true)
+                setSubmitting(false)
                 setMessage(message)
-                afterSubmit(resetForm)
+                afterSubmit(true, resetForm)
             }
         })
     }
 
-    const createUIAttr = (label: string) => {
-        setParentAttributeList(prevData => [...prevData, { label }])
+    const createUIAttr = (label: string, id: number, value: string, name: string) => {
+        setParentAttributeList(prevData => [{ id, value, label, name, options: [] }, ...prevData])
     }
 
-    const createProductAttr = (label_name: string, resetForm: any) => {
+    const createProductAttr = (label_name: string, resetForm: any, setSubmitting: any) => {
         const payload = {
             user_id: currentUserId,
             label_name
         }
         createProductAttributeBrand(payload).then(res => {
-            const { code, message } = res.data
+            const { code, message, data } = res.data
             setHasErrors(false)
             setMessage('Processing')
             if (code === 200) {
                 setIsEdit(false)
+                setMessage(message)
+                createUIAttr(data.label, data.id, data.value, data.name)
                 setIsUpdateChild(false)
-                createUIAttr(payload.label_name)
-                afterSubmit(resetForm)
+                afterSubmit(true, resetForm)
             }
             else {
                 setHasErrors(true)
                 setMessage(message)
-                afterSubmit(resetForm)
+                setSubmitting(false);
+                afterSubmit(false, resetForm)
             }
         }).catch(err => console.log(err))
     }
 
-    const createUITermAttr = (term_name: string, taxonomy: string) => {
-        const parentItem = parentAttributeList.find((item: any) => item.name === taxonomy)
-        const options = parentItem.options && parentItem.options.map((item: any) => item)
+    const createUITermAttr = (id: number, label: string, value: string, attr: string) => {
+        const parentItem = parentAttributeList.find((item: any) => item.name === attr)
+        const options = parentItem.options && parentItem.options?.map((item: any) => item);
         const result = {
-            ...parentItem, options: [
-                ...options,
-                {
-                    id: childId,
-                    label: term_name
-                }
-            ]
+            ...parentItem, options: [...options, { id, label, value, attr }]
         }
-        const filteredData = parentAttributeList.filter((item: any) => item.name !== taxonomy)
+        const filteredData = parentAttributeList.filter((item: any) => item.name !== attr)
         setParentAttributeList([result, ...filteredData])
     }
 
-    const createProductTermAttr = (term_name: string, taxonomy: string, resetForm: any) => {
+    const createProductTermAttr = (term_name: string, resetForm: any, setSubmitting: any) => {
         const payload = {
-            term_name, taxonomy
+            term_name, taxonomy: childAttrTaxonomy
         }
         createTermsProductAttribute(payload).then(res => {
-            const { code, message } = res.data
+            const { code, message, data } = res.data
             setHasErrors(false)
             setMessage('processing')
             if (code === 200) {
-
+                setMessage(message)
                 setIsEdit(false)
                 setIsUpdateChild(false)
-                createUITermAttr(term_name, taxonomy)
-                afterSubmit(resetForm)
+                createUITermAttr(data.id, data.label, data.value, data.attr)
+                afterSubmit(true, resetForm)
             } else {
                 setHasErrors(true)
                 setMessage(message)
-                afterSubmit(resetForm)
+                setSubmitting(false)
+                afterSubmit(false, resetForm)
             }
         }).catch(err => console.log(err))
     }
@@ -233,7 +232,7 @@ const Attribute: FC = () => {
         setActiveIndex(isActiveIndex === index ? undefined : index);
     };
 
-    const showData = () => !!parentAttributeList && parentAttributeList.map((attr: any, index: number) => <option value={attr.value} key={index}>{attr.label}</option>)
+    const showData = () => !!parentAttributeList && parentAttributeList.map((attr: any, index: number) => <option value={attr.name} key={index}>{attr.label}</option>)
 
     const showList = () => !!parentAttributeList && parentAttributeList.map((attr: any, index: number) => {
         const checkOpen = isActiveIndex === index;
@@ -249,11 +248,13 @@ const Attribute: FC = () => {
             </div>
             {
                 checkOpen && <>
-                    {!!attr.options && attr?.options.map((i: any, index: number) =>
+                    {!!attr.options && attr.options.map((i: any, index: number) =>
                         <div key={index + Math.random()} className="d-flex justify-content-between mt-4 align-items-center">
                             <p className='my-2 ms-8'>{i.label} </p>
-                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }} className='text-success cursor-pointer fs-6 me-8'>Edit</span>
-                        </div>)}
+                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.name); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }
+                            } className='text-success cursor-pointer fs-6 me-8'>Edit</span>
+                        </div>
+                    )}
                 </>
             }
         </li >
@@ -267,41 +268,43 @@ const Attribute: FC = () => {
     const scrollToTop = () => {
         window.scrollTo(0, 0)
     }
-
     // Create UI FORM
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
                 <Formik
-                    initialValues={createInitValue}
+                    initialValues={{ ...createInitValue }}
                     validationSchema={createValidSchema}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
                         const { name, parrent_attribute } = values
-                        parrent_attribute === '' ? createProductAttr(name, resetForm) : createProductTermAttr(name, parrent_attribute, resetForm)
+                        parrent_attribute === '' ? createProductAttr(name, resetForm, setSubmitting) : createProductTermAttr(name, resetForm, setSubmitting)
                     }}
                 >
                     {({ values, errors, touched, handleSubmit, isSubmitting }) => (
                         <form onSubmit={handleSubmit}>
                             <div className="col-xxs-12">
-                                <label className="form-label mb-2" htmlFor="parrent_attribute">Parent</label>
+                                <label className="form-label mb-2" htmlFor="parrent_attribute">Parent Attribute</label>
                                 <Field
                                     component="select"
                                     as="select"
                                     id="parrent_attribute"
                                     name="parrent_attribute"
                                     className="form-select"
+                                    value={values.parrent_attribute || ''}
+                                    onClick={(e: any) => setChildAttrTaxonomy(e.target.value)}
                                 >
                                     <option value="">None</option>
                                     {showData()}
                                 </Field>
                             </div>
                             <div className="col-xxs-12 mt-3">
-                                <label className="form-label mb-2" htmlFor="name">Name</label>
+                                <label className="form-label mb-2" htmlFor="name">{values.parrent_attribute === '' ? 'Parent Attribute' : 'Child Attribute'} Name</label>
                                 <Field
                                     component="input"
                                     type='text'
                                     id="name"
                                     name="name"
+                                    value={values.name || ''}
                                     className="form-control fs-7"
                                 />
                                 {touched.name && errors.name && (
@@ -326,7 +329,7 @@ const Attribute: FC = () => {
                         initialValues={{ ...updateChildAttrInitValue }}
                         validationSchema={childUpdateValidateSchema} enableReinitialize={true}
                         onSubmit={(values, { setSubmitting, resetForm }) => {
-                            updateAttributeTerm(values.new_attribute_term_name, resetForm)
+                            updateAttributeTerm(values.new_attribute_term_name, resetForm, setSubmitting)
                         }}
                     >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
@@ -373,7 +376,7 @@ const Attribute: FC = () => {
                             initialValues={{ ...initialValues }}
                             validationSchema={validateSchema} enableReinitialize={true}
                             onSubmit={(values, { setSubmitting, resetForm }) => {
-                                updateDataAttr(parentAttribute, values.new_attribute_name, resetForm)
+                                updateDataAttr(parentAttribute, values.new_attribute_name, resetForm, setSubmitting)
                             }}
                         >
                             {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
