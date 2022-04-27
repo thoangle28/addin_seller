@@ -132,7 +132,6 @@ const Attribute: FC = () => {
             setParentAttributeList([result, oldParentResult, ...filteredData])
         }
     }
-
     const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any) => {
         const payload: any = {
             ...updateChildAttrInitValue,
@@ -146,11 +145,11 @@ const Attribute: FC = () => {
             setHasErrors(false)
             setMessage('Processing')
             setIsUpdateChildWithAttr(false);
-            updateUITermAttr(attrId, childId, new_attribute_term_name)
             if (code === 200) {
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
+                updateUITermAttr(attrId, childId, new_attribute_term_name)
                 afterSubmit(true, resetForm)
             }
             else {
@@ -251,7 +250,7 @@ const Attribute: FC = () => {
                     {!!attr.options && attr.options.map((i: any, index: number) =>
                         <div key={index + Math.random()} className="d-flex justify-content-between mt-4 align-items-center">
                             <p className='my-2 ms-8'>{i.label} </p>
-                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.name); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }
+                            <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }
                             } className='text-success cursor-pointer fs-6 me-8'>Edit</span>
                         </div>
                     )}
@@ -277,13 +276,13 @@ const Attribute: FC = () => {
                     validationSchema={createValidSchema}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
                         const { name, parrent_attribute } = values
-                        parrent_attribute === '' ? createProductAttr(name, resetForm, setSubmitting) : createProductTermAttr(name, resetForm, setSubmitting)
+                        !parrent_attribute ? createProductAttr(name, resetForm, setSubmitting) : createProductTermAttr(name, resetForm, setSubmitting)
                     }}
                 >
                     {({ values, errors, touched, handleSubmit, isSubmitting }) => (
                         <form onSubmit={handleSubmit}>
                             <div className="col-xxs-12">
-                                <label className="form-label mb-2" htmlFor="parrent_attribute">Parent Attribute</label>
+                                <label className="form-label mb-2" htmlFor="parrent_attribute">{!values.parrent_attribute ? 'Attribute' : 'Parent Attribute'}</label>
                                 <Field
                                     component="select"
                                     as="select"
@@ -298,7 +297,7 @@ const Attribute: FC = () => {
                                 </Field>
                             </div>
                             <div className="col-xxs-12 mt-3">
-                                <label className="form-label mb-2" htmlFor="name">{values.parrent_attribute === '' ? 'Parent Attribute' : 'Child Attribute'} Name</label>
+                                <label className="form-label mb-2" htmlFor="name">{!values.parrent_attribute ? 'Parent Attribute' : 'Child Attribute'} Name</label>
                                 <Field
                                     component="input"
                                     type='text'
@@ -312,14 +311,13 @@ const Attribute: FC = () => {
                                 )}
                             </div>
                             <div className="col-md-12">
-                                <button disabled={isSubmitting} className='btn btn-success my-4 ' type="submit">Add New</button>
+                                <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Add New</button>
                             </div>
                         </form>
                     )}
                 </Formik>
-            </div>)
+            </div >)
     }
-
     // Update FORM
     const updateForm = () => {
         return (
@@ -335,7 +333,7 @@ const Attribute: FC = () => {
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
                             <form onSubmit={handleSubmit}>
                                 <div className="col-xxs-12">
-                                    <label className="form-label mb-2" htmlFor="parrent_attribute">Attributes</label>
+                                    <label className="form-label mb-2" htmlFor="parrent_attribute">Parent Attribute</label>
                                     <Field
                                         component="select"
                                         as="select"
@@ -349,7 +347,7 @@ const Attribute: FC = () => {
                                     </Field>
                                 </div>
                                 <div className="col-xxs-12 mt-4">
-                                    <label className="form-label mb-2" htmlFor="new_attribute_term_name">Name</label>
+                                    <label className="form-label mb-2" htmlFor="new_attribute_term_name">Child Attribute Name</label>
                                     <input
                                         type='text'
                                         id="new_attribute_term_name"
@@ -366,7 +364,7 @@ const Attribute: FC = () => {
                                 </div>
                                 <div className="col-md-12 ">
                                     <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Update</button>
-                                    <button onClick={() => cancelEvent(resetForm)} className='btn btn-danger my-4 mx-4' type="submit">Cancel</button>
+                                    <button onClick={() => { cancelEvent(resetForm); }} className='btn btn-danger my-4 mx-4' type="submit">Cancel</button>
                                 </div>
                             </form>
                         )}
@@ -402,7 +400,7 @@ const Attribute: FC = () => {
                                     </div>
                                     <div className="col-md-12">
                                         <button disabled={isSubmitting} className='btn btn-success my-4' type="submit">Update</button>
-                                        <button onClick={() => cancelEvent(resetForm)} className='btn btn-danger my-4 mx-4' type="submit">Cancel</button>
+                                        <button onClick={() => { cancelEvent(resetForm); }} className='btn btn-danger my-4 mx-4' type="submit">Cancel</button>
                                     </div>
                                 </form>
                             )}
