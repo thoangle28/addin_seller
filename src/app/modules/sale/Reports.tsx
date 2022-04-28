@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
-import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList } from './saleReport'
+import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
 interface iReport {
   weeklySales: any | 0
   newUsers: any | 0
@@ -202,16 +202,26 @@ const Reports: FC = () => {
             setMessage('')
           }, 3500)
         }
-        if (code === 200 && tab === 'Product Sold') {
-          setIsLoading(false)
-          setProductSoldList(data)
-          setMessage(message)
-          setTimeout(() => {
-            setMessage('')
-          }, 3500)
-        }
+
       })
       .catch((err) => console.log(err))
+  }
+
+  const showProductSoldList = (formProductSold: any) => {
+    getProductSoldList(formProductSold).then(res => {
+      const { code, data } = res.data
+      setMessage('Processing')
+      setIsLoading(true)
+      if (code === 200) {
+        console.log(res)
+        setIsLoading(false)
+        setProductSoldList(data)
+        setMessage(message)
+        setTimeout(() => {
+          setMessage('')
+        }, 3500)
+      }
+    }).catch((err) => console.log(err))
   }
 
   const showRefundList = (formRefund: any) => {
@@ -253,13 +263,13 @@ const Reports: FC = () => {
       })
     })
   }, [])
-
+  console.log(formProductSold)
   // Load data each tab when user has clicked
   useEffect(() => {
     if (tab === 'Product Sales') showProductSaleList({ ...formValue })
     if (tab === 'Customers') showCustomerList({ ...formCustomerValue })
     if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
-    if (tab === 'Product Sold') showProductOrderList({ ...formProductSold })
+    if (tab === 'Product Sold') showProductSoldList({ ...formProductSold })
     if (tab === 'Refunded') showRefundList({ ...formRefund })
   }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, tab])
 
@@ -326,20 +336,23 @@ const Reports: FC = () => {
       return <td className="w-5 text-end "><span className='badge badge-light-primary'>On Hold</span></td>
   }
   const displayProductSoldList = () => {
-    const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
+    const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
     return productSoldList ? (
       <div className='col-xs-12'>
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-15 text-start'>Order ID</th>
-              <th className='w-15 text-left '>Product Name</th>
-              <th className='w-15 text-end'>Date Created</th>
+              <th className='fs-7 w-15 text-start'>Order ID</th>
+              <th className='fs-7 w-35 text-left '>Product Name</th>
+              <th className='fs-7 w-10 text-left '>SKU</th>
+              <th className='fs-7 w-10 text-center '>Quantity</th>
+              <th className='fs-7 w-10 text-left '>Total</th>
+              <th className='fs-7 w-20 text-end'>Date Created</th>
             </tr>
           </thead>
           <tbody>
-            {productSoldList.order_list.length > 0 ? (
-              productSoldList.order_list?.map((item: any, index: number) => (
+            {productSoldList.product_list.length > 0 ? (
+              productSoldList.product_list?.map((item: any, index: number) => (
                 <tr key={index}>
                   <td className='w-15 text-start'>{item.order_id}</td>
                   <td className='w-35 text-left'>
@@ -351,7 +364,7 @@ const Reports: FC = () => {
                               ? item.product_img
                               : 'https://via.placeholder.com/75x75/f0f0f0'
                           }
-                          alt={item.product_sale}
+                          alt={item.title_product}
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
@@ -361,6 +374,9 @@ const Reports: FC = () => {
                       </div>
                     </div>
                   </td>
+                  <td className='fs-7 w-10 text-left '>{item.sku}</td>
+                  <td className='fs-7 w-10 text-center '>{item.quantity}</td>
+                  <td className='fs-7 w-10 text-left '>{item.price}</td>
                   <td className='w-15 text-end'>{item.date}</td>
                 </tr>
               ))
@@ -383,7 +399,7 @@ const Reports: FC = () => {
                 }}
                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
                 value={
-                  formProductSold.page_size ? formProductSold.page_size : initFormValue.page_size
+                  productSoldList.page_size ? productSoldList.page_size : initFormValue.page_size
                 }
               >
                 <option value='10'>10</option>
@@ -394,7 +410,7 @@ const Reports: FC = () => {
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-3'>
-                Displaying {list.current_page} of {list.total_pages} pages
+                Displaying {productSoldList.current_page} of {productSoldList.total_pages} pages
               </span>
             </div>
           </div>
@@ -429,7 +445,7 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-5 text-left'>Product ID</th>
+              <th className='w-5 text-left'>#ID</th>
               <th className='w-35 text-left '>Product Name</th>
               <th className='w-10 text-center'>SKU</th>
               <th className='w-15 text-center'>Price</th>
@@ -540,11 +556,11 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-15 text-start">Order ID</th>
-            <th className="w-35 text-left">Customer's Name</th>
-            <th className="w-25 text-center">Date Created</th>
-            <th className="w-30 text-center">Total</th>
-            <th className="w-5 text-end">Order Status</th>
+            <th className="fs-7 w-15 text-start">Order ID</th>
+            <th className="fs-7 w-35 text-left">Customer's Name</th>
+            <th className="fs-7 w-25 text-center">Date Created</th>
+            <th className="fs-7 w-30 text-center">Total</th>
+            <th className="fs-7 w-5 text-end">Order Status</th>
           </tr>
         </thead>
         <tbody>
@@ -604,19 +620,19 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-10 text-start'>Customer ID</th>
-              <th className='w-30 text-start'>Full Name</th>
-              <th className='w-15 text-start'>Email</th>
-              <th className='w-15 text-center'>Phone</th>
-              <th className='w-15 text-center'>City</th>
-              <th className='w-15 text-center'>Country</th>
+              <th className='w-10 fs-7 text-start'>#ID</th>
+              <th className='w-30 fs-7 text-start'>Full Name</th>
+              <th className='w-15 fs-7 text-start'>Email</th>
+              <th className='w-15 fs-7 text-center'>Phone</th>
+              <th className='w-15 fs-7 text-center'>City</th>
+              <th className='w-15 fs-7 text-center'>Country</th>
             </tr>
           </thead>
           <tbody>
             {customerList.customer_list.length > 0 ? (
               customerList.customer_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-10 text-start'>{item.user_id}</td>
+                  <td className='w-10 text-start'>{index + 1}</td>
                   <td className='w-30 text-start'>{item.full_name}</td>
                   <td className='w-15 text-start'>{item.email ? item.email : '-'}</td>
                   <td className='w-15 text-center'>{item.phone}</td>
@@ -689,15 +705,15 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-10 text-start">Order ID</th>
-            <th className="w-40 text-left">Product Name</th>
-            <th className="w-15 text-center">SKU</th>
-            <th className="w-20 text-center">Total</th>
-            <th className="w-15 text-end">Date Created</th>
+            <th className=" fs-7 w-10 text-start">Order ID</th>
+            <th className=" fs-7 w-40 text-left">Product Name</th>
+            <th className=" fs-7 w-15 text-center">SKU</th>
+            <th className=" fs-7 w-20 text-center">Total</th>
+            <th className=" fs-7 w-15 text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
-          {refundList.order_list.length > 0 ? refundList?.order_list.map((item: any, index: number) => <tr key={index} >
+          {refundList.order_refund_list.length > 0 ? refundList?.order_refund_list.map((item: any, index: number) => <tr key={index} >
             <td className="w-10 text-start">{item.order_id}</td>
             <td className="w-40 text-left">
               <div className='d-flex align-items-center'>
