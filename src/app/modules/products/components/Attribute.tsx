@@ -64,13 +64,13 @@ const Attribute: FC = () => {
     }
 
     const afterSubmit = (isReset: boolean = true, resetForm: any) => {
+        setActiveIndex(undefined)
         if (isReset)
             resetForm()
         setTimeout(() => {
             setMessage('')
         }, 3500);
     }
-    console.log(parentAttributeList)
     const updateUIAttr = (attrId: number = 0, label: any, taxonomy: string) => {
         const updatedList = parentAttributeList.map((item: any) => {
             if (attrId === item.id)
@@ -145,7 +145,7 @@ const Attribute: FC = () => {
             new_attribute_term_name,
             label_term: childAttr
         };
-        console.log(payload)
+
         updateAttributeTerms(payload).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
