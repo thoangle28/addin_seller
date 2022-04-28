@@ -88,7 +88,7 @@ const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
-  const tabs = ['Product Sales', 'New Users', 'Item Orders', 'Product Sold', 'Refunded']
+  const tabs = ['Product Sales', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
   const now = new Date().getUTCFullYear();
   const currentMonth: number = new Date().getMonth() + 1
   const currentYear: number = new Date().getFullYear()
@@ -147,7 +147,7 @@ const Reports: FC = () => {
     const { name, value } = e.target
     if (tab === 'Product Sold') setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
     if (tab === 'Product Sales') setFormValue({ ...formValue, [name]: parseInt(value), current_page })
-    if (tab === 'New Users') setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
+    if (tab === 'Customers') setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
     if (tab === 'Item Orders') setFormProductOrderValue({ ...formProductOrderValue, [name]: parseInt(value), current_page })
     if (tab === 'Refunded') setFormRefund({ ...formRefund, [name]: parseInt(value), current_page })
   }
@@ -257,7 +257,7 @@ const Reports: FC = () => {
   // Load data each tab when user has clicked
   useEffect(() => {
     if (tab === 'Product Sales') showProductSaleList({ ...formValue })
-    if (tab === 'New Users') showCustomerList({ ...formCustomerValue })
+    if (tab === 'Customers') showCustomerList({ ...formCustomerValue })
     if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
     if (tab === 'Product Sold') showProductOrderList({ ...formProductSold })
     if (tab === 'Refunded') showRefundList({ ...formRefund })
@@ -332,7 +332,7 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-15 text-left'>Order ID</th>
+              <th className='w-15 text-start'>Order ID</th>
               <th className='w-15 text-left '>Product Name</th>
               <th className='w-15 text-end'>Date Created</th>
             </tr>
@@ -341,7 +341,7 @@ const Reports: FC = () => {
             {productSoldList.order_list.length > 0 ? (
               productSoldList.order_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-15 text-left'>{item.order_id}</td>
+                  <td className='w-15 text-start'>{item.order_id}</td>
                   <td className='w-35 text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
@@ -429,7 +429,7 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-5 text-left'>#ID</th>
+              <th className='w-5 text-left'>Product ID</th>
               <th className='w-35 text-left '>Product Name</th>
               <th className='w-10 text-center'>SKU</th>
               <th className='w-15 text-center'>Price</th>
@@ -540,7 +540,7 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-15 text-center">Order ID</th>
+            <th className="w-15 text-start">Order ID</th>
             <th className="w-35 text-left">Customer's Name</th>
             <th className="w-25 text-center">Date Created</th>
             <th className="w-30 text-center">Total</th>
@@ -549,7 +549,7 @@ const Reports: FC = () => {
         </thead>
         <tbody>
           {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-15 text-center">{item.order_id}</td>
+            <td className="w-15 text-start">{item.order_id}</td>
             <td className="w-35 text-left text-dark fw-bolder fs-6">{item.customer_name ? item.customer_name : ''}
             </td>
             <td className="w-25 text-center">{item.date}</td>
@@ -604,7 +604,7 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-10 text-end'>#ID</th>
+              <th className='w-10 text-start'>Customer ID</th>
               <th className='w-30 text-start'>Full Name</th>
               <th className='w-15 text-start'>Email</th>
               <th className='w-15 text-center'>Phone</th>
@@ -616,7 +616,7 @@ const Reports: FC = () => {
             {customerList.customer_list.length > 0 ? (
               customerList.customer_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-10 text-end'>{item.user_id}</td>
+                  <td className='w-10 text-start'>{item.user_id}</td>
                   <td className='w-30 text-start'>{item.full_name}</td>
                   <td className='w-15 text-start'>{item.email ? item.email : '-'}</td>
                   <td className='w-15 text-center'>{item.phone}</td>
@@ -689,7 +689,7 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="w-10 text-center">Order ID</th>
+            <th className="w-10 text-start">Order ID</th>
             <th className="w-40 text-left">Product Name</th>
             <th className="w-15 text-center">SKU</th>
             <th className="w-20 text-center">Total</th>
@@ -698,7 +698,7 @@ const Reports: FC = () => {
         </thead>
         <tbody>
           {refundList.order_list.length > 0 ? refundList?.order_list.map((item: any, index: number) => <tr key={index} >
-            <td className="w-10 text-center">{item.order_id}</td>
+            <td className="w-10 text-start">{item.order_id}</td>
             <td className="w-40 text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
@@ -798,7 +798,7 @@ const Reports: FC = () => {
         </div>
       )
 
-    if (tab === 'New Users')
+    if (tab === 'Customers')
       return (
         <div className='row my-2'>
           <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
@@ -952,7 +952,7 @@ const Reports: FC = () => {
               <div>
                 {tab === 'Product Sales' && displayProductSaleList()}
                 {tab === 'Product Sold' && displayProductSoldList()}
-                {tab === 'New Users' && displayCustomerSaleList()}
+                {tab === 'Customers' && displayCustomerSaleList()}
                 {tab === 'Item Orders' && displayProductOrderList()}
                 {tab === 'Refunded' && displayProductOrderRefundList()}
               </div>

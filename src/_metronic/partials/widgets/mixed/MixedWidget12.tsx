@@ -55,7 +55,7 @@ const MixedWidget12: React.FC<Props> = ({
                 className='svg-icon-3x svg-icon-primary d-block my-2'
               />
               <span className='text-primary fw-bold fs-4'>
-                New Users
+                Customers
               </span>
             </div>
             <div style={{ textAlign: 'right' }}>
