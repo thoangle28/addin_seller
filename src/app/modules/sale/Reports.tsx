@@ -332,11 +332,8 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-15 text-left'>#ID</th>
+              <th className='w-15 text-left'>Order ID</th>
               <th className='w-15 text-left '>Product Name</th>
-              <th className='w-15 text-center'> SKU</th>
-              <th className='w-15 text-center'> Status</th>
-              <th className='w-15 text-center'> Quantity</th>
               <th className='w-15 text-end'>Date Created</th>
             </tr>
           </thead>
@@ -344,7 +341,7 @@ const Reports: FC = () => {
             {productSoldList.order_list.length > 0 ? (
               productSoldList.order_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-5 text-left'>{item.order_id}</td>
+                  <td className='w-15 text-left'>{item.order_id}</td>
                   <td className='w-35 text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
@@ -364,15 +361,6 @@ const Reports: FC = () => {
                       </div>
                     </div>
                   </td>
-                  <td className='w-25 text-center'>{item.sku ? item.sku : '-'}</td>
-                  <td className='w-15 text-center'>
-                    {item.status === 'processing' ? (
-                      <span className='badge badge-light-warning'>Pending</span>
-                    ) : (
-                      <span className='badge badge-light-success'>Approved</span>
-                    )}
-                  </td>
-                  <th className='w-15 text-center'> {item.quantity}</th>
                   <td className='w-15 text-end'>{item.date}</td>
                 </tr>
               ))
@@ -441,12 +429,12 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-15 text-left'>#ID</th>
+              <th className='w-5 text-left'>#ID</th>
               <th className='w-35 text-left '>Product Name</th>
-              <th className='w-15 text-center'>SKU</th>
-              <th className='w-25 text-center'>Price</th>
-              <th className='w-15 text-center'>Status</th>
-              <th className='w-25 text-end'>Date Created</th>
+              <th className='w-10 text-center'>SKU</th>
+              <th className='w-15 text-center'>Price</th>
+              <th className='w-20 text-center'>Status</th>
+              <th className='w-15 text-end'>Date Created</th>
             </tr>
           </thead>
           <tbody>
@@ -454,7 +442,7 @@ const Reports: FC = () => {
               list.product_sale_list?.map((item: any, index: number) => (
                 <tr key={index}>
                   <td className='w-5 text-left'>{item.product_id}</td>
-                  <td className='w-35 text-left'>
+                  <td className='w-40 text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -473,22 +461,21 @@ const Reports: FC = () => {
                       </div>
                     </div>
                   </td>
-                  <td className='w-25 text-center'>{item.sku ? item.sku : '-'}</td>
+                  <td className='w-10 text-center'>{item.sku ? item.sku : '-'}</td>
                   <td className='w-15 fs-4 text-center'>
-                    <span>{formatMoney(item.regular_price)}</span>
-                    <span className='fs-8 m-0 text-muted'>
-                      {' '}
-                      <s>{formatMoney(item.sale_price)}</s>
-                    </span>
+                    <p>{formatMoney(item.sale_price)}</p>
+                    <p className='fs-8 m-0 text-muted'>
+                      <s>{formatMoney(item.regular_price)}</s>
+                    </p>
                   </td>
-                  <td className='w-15 text-center'>
+                  <td className='w-20 text-center'>
                     {item.status === 'processing' ? (
                       <span className='badge badge-light-warning'>Pending</span>
                     ) : (
                       <span className='badge badge-light-success'>Approved</span>
                     )}
                   </td>
-                  <td className='w-25 text-end'>{item.date}</td>
+                  <td className='w-15 text-end'>{item.date}</td>
                 </tr>
               ))
             ) : (
@@ -598,31 +585,11 @@ const Reports: FC = () => {
           </div>
         </div>
         <div className="col-md-6 d-flex justify-content-end">
-          <div className="col-md-6 d-flex justify-content-end">
-            {listPages &&
-              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
-                {item.label}
-              </span>
-              )}
-          </div>
-        </div>
-        <div className='col-md-6 d-flex justify-content-end'>
-          <div className='col-md-6 d-flex justify-content-end'>
-            {listPages &&
-              listPages.map((item, index) => (
-                <span
-                  key={index}
-                  onClick={(e: any) => {
-                    onChangeHandler(e, item.page)
-                  }}
-                  className={
-                    'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
-                  }
-                >
-                  {item.label}
-                </span>
-              ))}
-          </div>
+          {listPages &&
+            listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+              {item.label}
+            </span>
+            )}
         </div>
       </div>
     </div>
@@ -637,28 +604,28 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-5 text-end'>#ID</th>
+              <th className='w-10 text-end'>#ID</th>
               <th className='w-30 text-start'>Full Name</th>
-              <th className='w-25 text-center'>Email</th>
-              <th className='w-25 text-end'>Phone</th>
-              <th className='w-25 text-center'>City</th>
-              <th className='w-25 text-center'>Country</th>
+              <th className='w-15 text-start'>Email</th>
+              <th className='w-15 text-center'>Phone</th>
+              <th className='w-15 text-center'>City</th>
+              <th className='w-15 text-center'>Country</th>
             </tr>
           </thead>
           <tbody>
             {customerList.customer_list.length > 0 ? (
               customerList.customer_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-5 text-end'>{item.user_id}</td>
+                  <td className='w-10 text-end'>{item.user_id}</td>
                   <td className='w-30 text-start'>{item.full_name}</td>
-                  <td className='w-25 text-center'>{item.email ? item.email : '-'}</td>
-                  <td className='w-25 text-end'>{item.phone}</td>
-                  <td className='w-25 text-center'>{item.city ? item.city : '-'}</td>
-                  <td className='w-25 text-center'>{item.country ? item.country : '-'}</td>
+                  <td className='w-15 text-start'>{item.email ? item.email : '-'}</td>
+                  <td className='w-15 text-center'>{item.phone}</td>
+                  <td className='w-15 text-center'>{item.city ? item.city : '-'}</td>
+                  <td className='w-15 text-center'>{item.country ? item.country : '-'}</td>
                 </tr>
               ))
             ) : (
-              <th colSpan={6} className='text-Center'>
+              <th colSpan={6} className='text-center'>
                 No Item Found
               </th>
             )}
@@ -723,14 +690,14 @@ const Reports: FC = () => {
         <thead>
           <tr className="fw-bolder text-muted">
             <th className="w-10 text-center">Order ID</th>
-            <th className="w-40 text-left">Customer's Name</th>
+            <th className="w-40 text-left">Product Name</th>
             <th className="w-15 text-center">SKU</th>
             <th className="w-20 text-center">Total</th>
             <th className="w-15 text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
-          {refundList.order_refund_list.length > 0 ? refundList.order_refund_list?.map((item: any, index: number) => <tr key={index} >
+          {refundList.order_list.length > 0 ? refundList?.order_list.map((item: any, index: number) => <tr key={index} >
             <td className="w-10 text-center">{item.order_id}</td>
             <td className="w-40 text-left">
               <div className='d-flex align-items-center'>
@@ -747,9 +714,8 @@ const Reports: FC = () => {
             <td className="w-15 text-center">{item.sku}</td>
             <td className="w-20 text-center">{formatMoney(item.price_refund)}</td>
             <td className="w-15 text-end">{item.date}</td>
-
           </tr>
-          ) : <th colSpan={5} className="text-center">No Item Found</th>
+          ) : <td colSpan={5} className="text-center">No Item Found</td>
           }
         </tbody>
         {/* Pagination */}

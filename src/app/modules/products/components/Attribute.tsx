@@ -30,7 +30,6 @@ const Attribute: FC = () => {
     const createInitValue = {
         name: '',
         parrent_attribute: ''
-
     }
 
     const createValidSchema = Yup.object().shape({
@@ -65,17 +64,17 @@ const Attribute: FC = () => {
     }
 
     const afterSubmit = (isReset: boolean = true, resetForm: any) => {
+        if (isReset)
+            resetForm()
         setTimeout(() => {
             setMessage('')
-            if (isReset)
-                resetForm()
         }, 3500);
     }
-
-    const updateUIAttr = (attrId: number = 0, label: any) => {
+    console.log(parentAttributeList)
+    const updateUIAttr = (attrId: number = 0, label: any, taxonomy: string) => {
         const updatedList = parentAttributeList.map((item: any) => {
             if (attrId === item.id)
-                return { ...item, id: attrId, label }
+                return { ...item, id: attrId, label, value: taxonomy, name: taxonomy }
             return item
         })
         setParentAttributeList(updatedList)
@@ -90,7 +89,7 @@ const Attribute: FC = () => {
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
-                updateUIAttr(attrId, new_attribute_name)
+                updateUIAttr(attrId, new_attribute_name, old_attribute_name)
                 afterSubmit(true, resetForm)
             }
             else {
@@ -102,12 +101,16 @@ const Attribute: FC = () => {
         })
     }
 
-    const updateUITermAttr = (attrID: number, childID: number, label: string) => {
+    const updateUITermAttr = (attrID: number, childID: number, label: string, taxonomy: string) => {
         if (!isUpdateChildWithAttr) {
             const parentItem = parentAttributeList.find((item: any) => item.id === attrID)
             const options = parentItem.options.map((item: any) => {
                 if (childID === item.id)
-                    return { id: childID, label }
+                    return {
+                        id: childID, label,
+                        value: label.replace(' ', '-'),
+                        attr: taxonomy
+                    }
                 return item
             })
             const result = { ...parentItem, options }
@@ -119,7 +122,9 @@ const Attribute: FC = () => {
             const result = {
                 ...newParentItem, options: [{
                     id: childID,
-                    label
+                    label,
+                    value: label.replace(' ', '-'),
+                    attr: taxonomy
                 }]
             }
             const parentItem = parentAttributeList.find((item: any) => item.id === attrID)
@@ -132,7 +137,7 @@ const Attribute: FC = () => {
             setParentAttributeList([result, oldParentResult, ...filteredData])
         }
     }
-    const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any) => {
+    const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any, taxonomy: string) => {
         const payload: any = {
             ...updateChildAttrInitValue,
             id_term: childId,
@@ -140,6 +145,7 @@ const Attribute: FC = () => {
             new_attribute_term_name,
             label_term: childAttr
         };
+        console.log(payload)
         updateAttributeTerms(payload).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
@@ -149,14 +155,14 @@ const Attribute: FC = () => {
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
-                updateUITermAttr(attrId, childId, new_attribute_term_name)
+                updateUITermAttr(attrId, childId, new_attribute_term_name, taxonomy)
                 afterSubmit(true, resetForm)
             }
             else {
                 setHasErrors(true)
                 setSubmitting(false)
                 setMessage(message)
-                afterSubmit(true, resetForm)
+                afterSubmit(false, resetForm)
             }
         })
     }
@@ -327,7 +333,7 @@ const Attribute: FC = () => {
                         initialValues={{ ...updateChildAttrInitValue }}
                         validationSchema={childUpdateValidateSchema} enableReinitialize={true}
                         onSubmit={(values, { setSubmitting, resetForm }) => {
-                            updateAttributeTerm(values.new_attribute_term_name, resetForm, setSubmitting)
+                            updateAttributeTerm(values.new_attribute_term_name, resetForm, setSubmitting, childAttrTaxonomy)
                         }}
                     >
                         {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
