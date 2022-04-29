@@ -22,6 +22,7 @@ const Attribute: FC = () => {
     const [isUpdateChild, setIsUpdateChild] = useState<boolean>(false)
     const [isUpdateChildWithAttr, setIsUpdateChildWithAttr] = useState<boolean>(false)
     const [isChildOpen, setIsChildOpen] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     // Declare Variables
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
@@ -55,7 +56,11 @@ const Attribute: FC = () => {
 
     const fetchData = () => {
         getAttributesById(currentUserId).then((res: any) => {
-            setParentAttributeList(res.data.data)
+            const { code, data } = res.data
+            if (code === 200) {
+                setIsLoading(true)
+                setParentAttributeList(res.data.data)
+            }
         }).catch(err => console.log(err));
     }
 
@@ -232,7 +237,7 @@ const Attribute: FC = () => {
     useEffect(() => {
         fetchData();
     }, [])
-
+    console.log(isLoading)
     const toggleAttr = (index: number) => {
         setActiveIndex(isActiveIndex === index ? undefined : index);
     };
@@ -274,6 +279,17 @@ const Attribute: FC = () => {
         window.scrollTo(0, 0)
     }
     // Create UI FORM
+    const Loading: FC = () => {
+        return (
+            <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
+                <div className='card-body d-flex justify-content-center align-items-center'>
+                    <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
+                        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
+                    </span>
+                </div>
+            </div>
+        )
+    }
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
@@ -417,10 +433,20 @@ const Attribute: FC = () => {
             </div >)
     }
 
+    const noItemFound = () => {
+        return <div className="col-xxl-6 mt-0 pe-4 pb-8">
+            <div className="border border-1 rounded p-6 "  >
+                <div style={{ height: "100vh" }} className="overflow-scroll">
+                    <p className='text-center fs-2'>No Item Founds , Please Add New Item</p>
+                </div>
+            </div>
+        </div>
+    }
+
     return (
-        <div className='row mt-0 g-xl-8 bg-white rounded'>
-            {parentAttributeList.length > 0 ? (
-                <>
+        <>
+            {isLoading ? (
+                <div className='row mt-0 g-xl-8 bg-white rounded'>
                     <div className='card-header border-0'>
                         <h3 className='card-title align-items-start flex-column'>
                             <p className='card-label fw-bolder fs-6 mb-1 mx-4'>{isEdit || isUpdateChild ? 'Edit Attributes' : 'Add New Attribute'}</p>
@@ -439,22 +465,25 @@ const Attribute: FC = () => {
                             <div className="col-xxl-6 mt-0 pe-4 pb-8">
                                 <div className="border border-1 rounded p-6 "  >
                                     <div style={{ height: "100vh" }} className="overflow-scroll">
-                                        <ul className='ps-0 me-5 list-groupborder'>
-                                            {showList()}
-                                        </ul>
+                                        {parentAttributeList.length > 0 ? (
+                                            <ul className='ps-0 me-5 list-groupborder'>
+                                                {showList()}
+                                            </ul>
+                                        ) : <Loading />
+                                        }
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </>) : (
-                <div className='card mb-5 mb-xl-8 loading-wrapper'>
-                    <div className='card-body py-3 loading-body'>
-                        <AddinLoading />
-                    </div>
-                </div>)
+                </div >
+            ) : <div className='card mb-5 mb-xl-8 loading-wrapper'>
+                <div className='card-body py-3 loading-body'>
+                    <AddinLoading />
+                </div>
+            </div>
             }
-        </div >
+        </>
     )
 }
 
