@@ -26,7 +26,7 @@ const MixedWidget12: React.FC<Props> = ({
   return (
     <div className={`card ${className}`}>
       <div className="row">
-        <div className='col-md-3'>
+        <div className='col-md-3 col-lg-6'>
           <div className='d-flex align-items-end justify-content-between bg-light-warning px-4 py-8 rounded-2'>
             <div >
               <KTSVG
@@ -47,7 +47,7 @@ const MixedWidget12: React.FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className='col-md-3'>
+        <div className='col-md-3 col-lg-6'>
           <div className='d-flex align-items-end justify-content-between  bg-light-primary px-4 py-8 rounded-2'>
             <div >
               <KTSVG
@@ -68,7 +68,7 @@ const MixedWidget12: React.FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className='col-md-3'>
+        <div className='col-md-3 col-lg-6'>
           <div className='d-flex align-items-end justify-content-between  bg-light-danger px-4 py-8 rounded-2'>
             <div >
               <KTSVG
@@ -86,7 +86,7 @@ const MixedWidget12: React.FC<Props> = ({
             </div>
           </div>
         </div>
-        <div className='col-md-3'>
+        <div className='col-md-3 col-lg-6'>
           <div className='d-flex align-items-end justify-content-between  bg-light-success px-4 py-8  rounded-2'>
             <div >
               <KTSVG

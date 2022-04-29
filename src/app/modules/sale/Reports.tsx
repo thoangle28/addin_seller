@@ -263,7 +263,6 @@ const Reports: FC = () => {
       })
     })
   }, [])
-  console.log(formProductSold)
   // Load data each tab when user has clicked
   useEffect(() => {
     if (tab === 'Product Sales') showProductSaleList({ ...formValue })
@@ -334,6 +333,12 @@ const Reports: FC = () => {
       return <td className="w-5 text-end "><span className='badge badge-light-success'>Completed</span></td>
     if (status === 'on-hold')
       return <td className="w-5 text-end "><span className='badge badge-light-primary'>On Hold</span></td>
+    if (status === 'pending')
+      return <td className="w-5 text-end "><span className='badge badge-light-warning'>Pending</span></td>
+    if (status === 'approved')
+      return <td className="w-5 text-end "><span className='badge badge-light-success'>Approved</span></td>
+    if (status === 'publish')
+      return <td className="w-5 text-end "><span className='badge badge-light-success'>Publish</span></td>
   }
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
@@ -342,9 +347,9 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='fs-7 w-15 text-start'>Order ID</th>
-              <th className='fs-7 w-35 text-left '>Product Name</th>
-              <th className='fs-7 w-10 text-left '>SKU</th>
+              <th className='fs-7 w-20 text-start'>Order ID</th>
+              <th className='fs-7 w-30 text-left '>Product Name</th>
+              <th className='fs-7 w-10 text-center '>SKU</th>
               <th className='fs-7 w-10 text-center '>Quantity</th>
               <th className='fs-7 w-10 text-left '>Total</th>
               <th className='fs-7 w-20 text-end'>Date Created</th>
@@ -354,8 +359,8 @@ const Reports: FC = () => {
             {productSoldList.product_list.length > 0 ? (
               productSoldList.product_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-15 text-start'>{item.order_id}</td>
-                  <td className='w-35 text-left'>
+                  <td className='fs-7 w-20 text-start'>{item.order_id}</td>
+                  <td className='fs-7 w-30 text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -368,16 +373,16 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <span className='text-dark fw-bolder text-hover-primary fs-6'>
+                        <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6'>
                           {item.title_product}
-                        </span>
+                        </a>
                       </div>
                     </div>
                   </td>
-                  <td className='fs-7 w-10 text-left '>{item.sku}</td>
+                  <td className='fs-7 w-10 text-center '>{item.sku ? item.sku : '-'}</td>
                   <td className='fs-7 w-10 text-center '>{item.quantity}</td>
-                  <td className='fs-7 w-10 text-left '>{item.price}</td>
-                  <td className='w-15 text-end'>{item.date}</td>
+                  <td className='fs-7 w-10 text-left '>{formatMoney(item.price)}</td>
+                  <td className='fs-7 w-15 text-end'>{item.date}</td>
                 </tr>
               ))
             ) : (
@@ -457,8 +462,8 @@ const Reports: FC = () => {
             {list.product_sale_list.length ? (
               list.product_sale_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-5 text-left'>{item.product_id}</td>
-                  <td className='w-40 text-left'>
+                  <td className='fs-7 w-5 text-left'>{item.product_id}</td>
+                  <td className='fs-7 w-35 text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -477,21 +482,17 @@ const Reports: FC = () => {
                       </div>
                     </div>
                   </td>
-                  <td className='w-10 text-center'>{item.sku ? item.sku : '-'}</td>
-                  <td className='w-15 fs-4 text-center'>
+                  <td className='fs-7 w-10 text-center'>{item.sku ? item.sku : '-'}</td>
+                  <td className='fs-7 w-15 text-center'>
                     <p>{formatMoney(item.sale_price)}</p>
-                    <p className='fs-8 m-0 text-muted'>
+                    <p className='m-0 text-muted'>
                       <s>{formatMoney(item.regular_price)}</s>
                     </p>
                   </td>
-                  <td className='w-20 text-center'>
-                    {item.status === 'processing' ? (
-                      <span className='badge badge-light-warning'>Pending</span>
-                    ) : (
-                      <span className='badge badge-light-success'>Approved</span>
-                    )}
+                  <td className='fs-7 w-20 text-center'>
+                    {productSoldStatus(item.status)}
                   </td>
-                  <td className='w-15 text-end'>{item.date}</td>
+                  <td className='fs-7 w-15 text-end'>{item.date}</td>
                 </tr>
               ))
             ) : (
@@ -620,24 +621,24 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-10 fs-7 text-start'>#ID</th>
-              <th className='w-30 fs-7 text-start'>Full Name</th>
-              <th className='w-15 fs-7 text-start'>Email</th>
-              <th className='w-15 fs-7 text-center'>Phone</th>
-              <th className='w-15 fs-7 text-center'>City</th>
-              <th className='w-15 fs-7 text-center'>Country</th>
+              <th className='w-10 text-start'>No.</th>
+              <th className='w-30 text-start'>Full Name</th>
+              <th className='w-15 text-start'>Email</th>
+              <th className='w-15 text-center'>Phone</th>
+              <th className='w-15 text-center'>City</th>
+              <th className='w-15 text-center'>Country</th>
             </tr>
           </thead>
           <tbody>
             {customerList.customer_list.length > 0 ? (
               customerList.customer_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='w-10 text-start'>{index + 1}</td>
-                  <td className='w-30 text-start'>{item.full_name}</td>
-                  <td className='w-15 text-start'>{item.email ? item.email : '-'}</td>
-                  <td className='w-15 text-center'>{item.phone}</td>
-                  <td className='w-15 text-center'>{item.city ? item.city : '-'}</td>
-                  <td className='w-15 text-center'>{item.country ? item.country : '-'}</td>
+                  <td className='fs-7 w-10 text-start'>{index + 1}</td>
+                  <td className='fs-7 w-30 text-start'>{item.full_name}</td>
+                  <td className='fs-7 w-15 text-start'>{item.email ? item.email : '-'}</td>
+                  <td className='fs-7 w-15 text-center'>{item.phone}</td>
+                  <td className='fs-7 w-15 text-center'>{item.city ? item.city : '-'}</td>
+                  <td className='fs-7 w-15 text-center'>{item.country ? item.country : '-'}</td>
                 </tr>
               ))
             ) : (
@@ -705,31 +706,31 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className=" fs-7 w-10 text-start">Order ID</th>
-            <th className=" fs-7 w-40 text-left">Product Name</th>
-            <th className=" fs-7 w-15 text-center">SKU</th>
-            <th className=" fs-7 w-20 text-center">Total</th>
-            <th className=" fs-7 w-15 text-end">Date Created</th>
+            <th className=" text-start">Order ID</th>
+            <th className=" text-left">Product Name</th>
+            <th className=" text-center">SKU</th>
+            <th className=" text-center">Total</th>
+            <th className=" text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
           {refundList.order_refund_list.length > 0 ? refundList?.order_refund_list.map((item: any, index: number) => <tr key={index} >
-            <td className="w-10 text-start">{item.order_id}</td>
-            <td className="w-40 text-left">
+            <td className="text-start">{item.order_id}</td>
+            <td className="text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
                   <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
                 </div>
                 <div className='d-flex justify-content-start flex-column'>
-                  <span className='text-dark fw-bolder text-hover-primary fs-6' >
+                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6' >
                     {item.title_product}
-                  </span>
+                  </a>
                 </div>
               </div>
             </td>
-            <td className="w-15 text-center">{item.sku}</td>
-            <td className="w-20 text-center">{formatMoney(item.price_refund)}</td>
-            <td className="w-15 text-end">{item.date}</td>
+            <td className="text-center">{item.sku ? item.sku : '-'}</td>
+            <td className="text-center">{formatMoney(item.price_refund)}</td>
+            <td className="text-end">{item.date}</td>
           </tr>
           ) : <td colSpan={5} className="text-center">No Item Found</td>
           }
@@ -928,6 +929,47 @@ const Reports: FC = () => {
                 onChangeHandler(e)
               }}
               value={formProductSold.filter_by_year}
+            >
+              <option value=''>None</option>
+              {years.map((item) => (
+                <option key={item} value={item}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      )
+    if (tab === 'Refunded')
+      return (
+        <div className='row my-2'>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Month</label>
+            <select
+              className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
+              name='filter_by_month'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formRefund.filter_by_month}
+            >
+              <option value=''>None</option>
+              {months.map((item, index) => (
+                <option key={index} value={index + 1}>
+                  {item}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
+            <label className='form-label me-3 mb-0'>Year</label>
+            <select
+              className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
+              name='filter_by_year'
+              onChange={(e) => {
+                onChangeHandler(e)
+              }}
+              value={formRefund.filter_by_year}
             >
               <option value=''>None</option>
               {years.map((item) => (
