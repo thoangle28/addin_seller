@@ -425,7 +425,7 @@ const Attribute: FC = () => {
         return <div className="col-xxl-12 mt-0 pe-4 pb-8">
             <div className="border border-1 rounded p-6 "  >
                 <div style={{ height: "100vh" }} className="overflow-scroll">
-                    <p className='text-center fs-2'>No Item Founds , Please Add New Item</p>
+                    <p className='text-center fs-6'>No Item Found</p>
                 </div>
             </div>
         </div>
