@@ -3,8 +3,6 @@ import React, { useEffect, useRef } from 'react'
 import ApexCharts, { ApexOptions } from 'apexcharts'
 import { KTSVG } from '../../../helpers'
 import { getCSSVariableValue } from '../../../assets/ts/_utils'
-import { Dropdown1 } from '../../content/dropdown/Dropdown1'
-import { Link } from 'react-router-dom'
 
 type Props = {
   className: string
@@ -19,17 +17,12 @@ type Props = {
   loading?: boolean | false
 }
 
-const MixedWidget2: React.FC<Props> = ({
+const MixedWidget13: React.FC<Props> = ({
   className,
   chartColor,
   chartHeight,
   strokeColor,
-  weeklySales,
-  newUsers,
-  itemOrders,
-  bugReports,
   statistics,
-  loading
 }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
@@ -81,107 +74,9 @@ const MixedWidget2: React.FC<Props> = ({
         {/* begin::Chart */}
         <div
           ref={chartRef}
-          className={`pb-20 mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
+          className={`pb-10 mixed-widget-2-chart card-rounded-bottom bg-${chartColor}`}
         ></div>
         {/* end::Chart */}
-        {/* begin::Stats */}
-        <div className='card-p mt-n20 position-relative'>
-          {/* begin::Row */}
-          <div className='row g-0'>
-            {/* begin::Col */}
-            <div className='col bg-light-warning px-6 py-8 rounded-2 me-7 mb-7'>
-              <div className='d-flex align-items-end'>
-                <div style={{ flex: '1 0' }}>
-                  <KTSVG
-                    path='/media/icons/duotune/general/gen032.svg'
-                    className='svg-icon-3x svg-icon-warning d-block my-2'
-                  />
-                  <span className='text-warning fw-bold fs-6'>
-                    Product Sales
-                  </span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span
-                    className='ps-3 text-warning fs-1 fw-bolder text-800 mt-1'>
-                    {weeklySales}
-                  </span>
-                  <br />
-                  <small className='fs-8 text-warning'>products</small>
-                </div>
-              </div>
-            </div>
-            {/* end::Col */}
-            {/* begin::Col */}
-            <div className='col bg-light-primary px-6 py-8 rounded-2 mb-7'>
-              <div className='d-flex align-items-end'>
-                <div style={{ flex: '1 0' }}>
-                  <KTSVG
-                    path='/media/icons/duotune/arrows/arr075.svg'
-                    className='svg-icon-3x svg-icon-primary d-block my-2'
-                  />
-                  <span className='text-primary fw-bold fs-6'>
-                    New Users
-                  </span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span
-                    className='ps-3 text-primary fs-1 fw-bolder text-800 mt-1'>
-                    {newUsers}
-                  </span>
-                  <br />
-                  <small className='fs-8 text-primary'>in month</small>
-                </div>
-              </div>
-            </div>
-            {/* end::Col */}
-          </div>
-          {/* end::Row */}
-          {/* begin::Row */}
-          <div className='row g-0'>
-            {/* begin::Col */}
-            <div className='col bg-light-danger px-6 py-8 rounded-2 me-7'>
-              <div className='d-flex align-items-end'>
-                <div style={{ flex: '1 0' }}>
-                  <KTSVG
-                    path='/media/icons/duotune/abstract/abs027.svg'
-                    className='svg-icon-3x svg-icon-danger d-block my-2'
-                  />
-                  <span className='text-danger fw-bold fs-6 mt-2'>
-                    Item Orders
-                  </span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
-                  <br />
-                  <small className='fs-8 text-danger'>in month</small>
-                </div>
-              </div>
-            </div>
-            {/* end::Col */}
-            {/* begin::Col */}
-            <div className='col bg-light-success px-6 py-8 rounded-2'>
-              <div className='d-flex align-items-end'>
-                <div style={{ flex: '1 0' }}>
-                  <KTSVG
-                    path='/media/icons/duotune/communication/com010.svg'
-                    className='svg-icon-3x svg-icon-success d-block my-2'
-                  />
-                  <Link to='/support/ticket/listing' className='text-success fw-bold fs-6 mt-2'>
-                    Tickets Report
-                  </Link>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
-                  <br />
-                  <small className='fs-8 text-success'>in month</small>
-                </div>
-              </div>
-            </div>
-            {/* end::Col */}
-          </div>
-          {/* end::Row */}
-        </div>
-        {/* end::Stats */}
       </div>
       {/* end::Body */}
     </div>
@@ -343,4 +238,4 @@ const chartOptions = (
   }
 }
 
-export { MixedWidget2 }
+export { MixedWidget13 }

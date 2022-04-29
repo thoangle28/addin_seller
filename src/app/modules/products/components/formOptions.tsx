@@ -374,52 +374,72 @@ export const getProduct = (uid: number, pid: number) => {
   })
 }
 
-export const loadSubAttrOptions = async (search: any, prevOptions: any, newAttrValues: any) => { 
-  
-  const newOption =  newAttrValues.find((element: any) => { return element.attr === search});  
-  if( prevOptions.length > 0 && newOption) {
+export const loadSubAttrOptions = async (term: any, prevOptions: any, newAttrValues: any, search: string) => { 
+  return await common.getSubAttributes(term).then((response) => {
+    const responseJSON = response.data
+
+    //load more
+    const loadCondition = ( prevOptions && responseJSON.data && prevOptions.length < responseJSON.data.length ) || false
+
+    //add new
+    const newOption =  newAttrValues.find((element: any) => { return element.attr === term});
     const newOptionAdded =  prevOptions.some((element: any) => { return element.id === newOption.id});
-    return {
-      options: newOptionAdded ? [] : [newOption],
-      hasMore: true
-    };
-  } else {
-    const response = await common.getSubAttributes(search)
-    const responseJSON = await response.data
-    
-    if(!responseJSON.data && prevOptions.length == 0 && newAttrValues) {
+
+    let options: any = responseJSON.data || []
+  
+    let addMoreOption = []
+    if( !newOptionAdded && newOption ) {
+      addMoreOption.push(newOption)
+      if( !options ) options.push(newOption)
+    }
+
+    if( !search) {
       return {
-        options: newAttrValues || [],
+        options: prevOptions.length <= 0 ? options : addMoreOption,
         hasMore: true
       };
-    } else {
-      const loadCondition = ( prevOptions &&  prevOptions.length === responseJSON.data.length )
+    } else {   
+      const searchLower = search.toLowerCase();
+      const filterOption =  options.filter((item: any) => {
+        return item.label.toLocaleLowerCase().includes(searchLower)
+      })
+  
       return {
-        options: !loadCondition ? responseJSON.data : [],
-        hasMore: true
+        options: filterOption || [],
+        hasMore: false
       };
     }
-  }
+  })
 }
 
-export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newAttrValue: any) => {
+export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newAttrValue: any, search: any ) => {
+  const response = await common.getAttributesNoChild(user_id)
+  const responseJSON = await response.data
+  const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
 
-  const newAttr =  prevOptions.some((element: any) => { return element.id === newAttrValue[0].id});  
-  if( prevOptions.length > 0 && !newAttr && newAttrValue ) {
+  let options: any = []
+  if( prevOptions.length <= 0) 
+    options = responseJSON.data || []
+  else {
+    options = (loadCondition ? [] : newAttrValue) || []
+  }
+
+  if( !search) {
     return {
-      options: newAttrValue ? newAttrValue : [],
-      hasMore: true
-    }
-  } else {
-    const response = await common.getAttributesNoChild(user_id)
-    const responseJSON = await response.data
-    
-    const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
-    return {
-      options: !loadCondition ? responseJSON.data : [],
+      options: options,
       hasMore: true
     };
-  } 
+  } else {   
+    const searchLower = search.toLowerCase();
+    const filterOption =  options.filter((item: any) => {
+      return item.label.toLocaleLowerCase().includes(searchLower)
+    })
+
+    return {
+      options: filterOption || [],
+      hasMore: false
+    };
+  }
 }
 
 

@@ -1,9 +1,9 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect, useRef} from 'react'
-import ApexCharts, {ApexOptions} from 'apexcharts'
-import {KTSVG} from '../../../helpers'
-import {getCSSVariableValue} from '../../../assets/ts/_utils'
-import {Dropdown1} from '../../content/dropdown/Dropdown1'
+import React, { useEffect, useRef } from 'react'
+import ApexCharts, { ApexOptions } from 'apexcharts'
+import { KTSVG } from '../../../helpers'
+import { getCSSVariableValue } from '../../../assets/ts/_utils'
+import { Dropdown1 } from '../../content/dropdown/Dropdown1'
 import clsx from 'clsx'
 
 type Props = {
@@ -12,7 +12,7 @@ type Props = {
   chartHeight: string
 }
 
-const MixedWidget3: React.FC<Props> = ({className, chartColor, chartHeight}) => {
+const MixedWidget3: React.FC<Props> = ({ className, chartColor, chartHeight }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -159,7 +159,7 @@ const chartOptions = (chartHeight: string): ApexOptions => {
       colors: ['transparent'],
     },
     xaxis: {
-      categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+      categories: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Agus', 'Sep', 'Oct'],
       axisBorder: {
         show: false,
       },
@@ -238,4 +238,4 @@ const chartOptions = (chartHeight: string): ApexOptions => {
   }
 }
 
-export {MixedWidget3}
+export { MixedWidget3 }

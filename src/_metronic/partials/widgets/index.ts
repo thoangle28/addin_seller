@@ -17,6 +17,8 @@ export * from './mixed/MixedWidget8'
 export * from './mixed/MixedWidget9'
 export * from './mixed/MixedWidget10'
 export * from './mixed/MixedWidget11'
+export * from './mixed/MixedWidget12'
+export * from './mixed/MixedWidget13'
 
 // lists
 export * from './lists/ListsWidget1'
