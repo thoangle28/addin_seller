@@ -123,7 +123,6 @@ const Attribute: FC = () => {
             setParentAttributeList([result, ...currentList])
         } else {
             const newParentItem = parentAttributeList.find((item: any) => item.name === childAttrTaxonomy)
-            console.log(newParentItem)
             const result = {
                 ...newParentItem, options: [...newParentItem.options, {
                     id: childID,
@@ -139,6 +138,7 @@ const Attribute: FC = () => {
             }
             // filter current list 
             const filteredData = parentAttributeList.filter((item: any) => item.id !== attrId).filter((item: any) => item.name !== childAttrTaxonomy)
+            console.log(filteredData)
             setParentAttributeList([result, oldParentResult, ...filteredData])
         }
     }
