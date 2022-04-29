@@ -270,7 +270,7 @@ const Reports: FC = () => {
     if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
     if (tab === 'Product Sold') showProductSoldList({ ...formProductSold })
     if (tab === 'Refunded') showRefundList({ ...formRefund })
-  }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, tab])
+  }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, formRefund, tab])
 
   const find_page_begin_end = (currentPage: number, maxPage: number) => {
     const step = 5
@@ -314,31 +314,31 @@ const Reports: FC = () => {
   // UI components
   const productSoldStatus = (status: string) => {
     if (status === 'processing')
-      return <td className="w-5 text-end "><span className='badge badge-light-primary'>Processing</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-primary'>Processing</span></td>
     if (status === 'refunded')
-      return <td className="w-5 text-end "><span className='badge badge-light-warning'>Refunded</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-warning'>Refunded</span></td>
     if (status === 'in-china-warehous')
-      return <td className="w-5 text-end "><span className='badge badge-light-info'>In China Warehous</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-info'>In China Warehous</span></td>
     if (status === 'leave-china-port')
-      return <td className="w-5 text-end "><span className='badge badge-light-success'>Leave China Port</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-success'>Leave China Port</span></td>
     if (status === 'reach-singapre-p')
-      return <td className="w-5 text-end "><span className='badge badge-light-success'>Reach Singapore Port</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-success'>Reach Singapore Port</span></td>
     if (status === 'reach-tuas-wareho')
-      return <td className="w-5 text-end "><span className='badge badge-light-success'>Reach Tuas Wareho</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-success'>Reach Tuas Wareho</span></td>
     if (status === 'failed')
-      return <td className="w-5 text-end "><span className='badge badge-light-danger'>Failed</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-danger'>Failed</span></td>
     if (status === 'cancelled')
-      return <td className="w-5 text-end "><span className='badge badge-light-danger'>Cancelled</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-danger'>Cancelled</span></td>
     if (status === 'completed')
-      return <td className="w-5 text-end "><span className='badge badge-light-success'>Completed</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-success'>Completed</span></td>
     if (status === 'on-hold')
-      return <td className="w-5 text-end "><span className='badge badge-light-primary'>On Hold</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-primary'>On Hold</span></td>
     if (status === 'pending')
-      return <td className="w-5 text-end "><span className='badge badge-light-warning'>Pending</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-warning'>Pending</span></td>
     if (status === 'approved')
-      return <td className="w-5 text-end "><span className='badge badge-light-success'>Approved</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-success'>Approved</span></td>
     if (status === 'publish')
-      return <td className="w-5 text-end "><span className='badge badge-light-success'>Publish</span></td>
+      return <td className="w-15 text-center "><span className='badge badge-light-success'>Approved</span></td>
   }
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
@@ -347,20 +347,20 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='fs-7 w-20 text-start'>Order ID</th>
-              <th className='fs-7 w-30 text-left '>Product Name</th>
-              <th className='fs-7 w-10 text-center '>SKU</th>
-              <th className='fs-7 w-10 text-center '>Quantity</th>
-              <th className='fs-7 w-10 text-left '>Total</th>
-              <th className='fs-7 w-20 text-end'>Date Created</th>
+              <th className='w-20 text-start'>Order ID</th>
+              <th style={{ width: '30%' }} className='w-30 text-left '>Product Name</th>
+              <th className='w-10 text-center '>SKU</th>
+              <th className='w-10 text-center '>Quantity</th>
+              <th className='w-10 text-left '>Total</th>
+              <th className='w-20 text-end'>Date Created</th>
             </tr>
           </thead>
           <tbody>
             {productSoldList.product_list.length > 0 ? (
               productSoldList.product_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='fs-7 w-20 text-start'>{item.order_id}</td>
-                  <td className='fs-7 w-30 text-left'>
+                  <td className='w-20 text-start'>{item.order_id}</td>
+                  <td style={{ width: '30%' }} className='w-30 text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -373,16 +373,16 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6'>
+                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary'>
                           {item.title_product}
                         </a>
                       </div>
                     </div>
                   </td>
-                  <td className='fs-7 w-10 text-center '>{item.sku ? item.sku : '-'}</td>
-                  <td className='fs-7 w-10 text-center '>{item.quantity}</td>
-                  <td className='fs-7 w-10 text-left '>{formatMoney(item.price)}</td>
-                  <td className='fs-7 w-15 text-end'>{item.date}</td>
+                  <td className='w-10 text-center '>{item.sku ? item.sku : '-'}</td>
+                  <td className='w-10 text-center '>{item.quantity}</td>
+                  <td className='w-10 text-left '>{formatMoney(item.price)}</td>
+                  <td className='w-15 text-end'>{item.date}</td>
                 </tr>
               ))
             ) : (
@@ -450,11 +450,11 @@ const Reports: FC = () => {
         <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
           <thead>
             <tr className='fw-bolder text-muted'>
-              <th className='w-5 text-left'>#ID</th>
-              <th className='w-35 text-left '>Product Name</th>
+              <th className='w-15 text-left'>#ID</th>
+              <th style={{ width: '30%' }} className='text-left '>Product Name</th>
               <th className='w-10 text-center'>SKU</th>
               <th className='w-15 text-center'>Price</th>
-              <th className='w-20 text-center'>Status</th>
+              <th className='w-15 text-center'>Status</th>
               <th className='w-15 text-end'>Date Created</th>
             </tr>
           </thead>
@@ -462,8 +462,8 @@ const Reports: FC = () => {
             {list.product_sale_list.length ? (
               list.product_sale_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='fs-7 w-5 text-left'>{item.product_id}</td>
-                  <td className='fs-7 w-35 text-left'>
+                  <td className='fs-7 w-15 text-left'>{item.product_id}</td>
+                  <td style={{ width: '30%' }} className='fs-7 text-left '>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -476,9 +476,9 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <span className='text-dark fw-bolder text-hover-primary fs-6'>
+                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary' >
                           {item.product_sale}
-                        </span>
+                        </a>
                       </div>
                     </div>
                   </td>
@@ -489,9 +489,7 @@ const Reports: FC = () => {
                       <s>{formatMoney(item.regular_price)}</s>
                     </p>
                   </td>
-                  <td className='fs-7 w-20 text-center'>
-                    {productSoldStatus(item.status)}
-                  </td>
+                  {productSoldStatus(item.status)}
                   <td className='fs-7 w-15 text-end'>{item.date}</td>
                 </tr>
               ))
@@ -699,7 +697,7 @@ const Reports: FC = () => {
       <Loading />
     )
   }
-
+  console.log(formRefund)
   const displayProductOrderRefundList = () => {
     const listPages = find_page_begin_end(refundList?.current_page, refundList?.total_pages)
     return refundList ? (<div className='col-xs-12'>
@@ -707,7 +705,7 @@ const Reports: FC = () => {
         <thead>
           <tr className="fw-bolder text-muted">
             <th className=" text-start">Order ID</th>
-            <th className=" text-left">Product Name</th>
+            <th style={{ width: '30%' }} className=" text-left">Product Name</th>
             <th className=" text-center">SKU</th>
             <th className=" text-center">Total</th>
             <th className=" text-end">Date Created</th>
@@ -716,13 +714,13 @@ const Reports: FC = () => {
         <tbody>
           {refundList.order_refund_list.length > 0 ? refundList?.order_refund_list.map((item: any, index: number) => <tr key={index} >
             <td className="text-start">{item.order_id}</td>
-            <td className="text-left">
+            <td style={{ width: '30%' }} className="text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
                   <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
                 </div>
                 <div className='d-flex justify-content-start flex-column'>
-                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6' >
+                  <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary' >
                     {item.title_product}
                   </a>
                 </div>
