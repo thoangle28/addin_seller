@@ -348,7 +348,7 @@ const Reports: FC = () => {
           <thead>
             <tr className='fw-bolder text-muted'>
               <th className='w-20 text-start'>Order ID</th>
-              <th style={{ width: '30%' }} className='w-30 text-left '>Product Name</th>
+              <th style={{ width: '30%' }} className='text-left '>Product Name</th>
               <th className='w-10 text-center '>SKU</th>
               <th className='w-10 text-center '>Quantity</th>
               <th className='w-10 text-left '>Total</th>
@@ -360,7 +360,7 @@ const Reports: FC = () => {
               productSoldList.product_list?.map((item: any, index: number) => (
                 <tr key={index}>
                   <td className='w-20 text-start'>{item.order_id}</td>
-                  <td style={{ width: '30%' }} className='w-30 text-left'>
+                  <td style={{ width: '30%' }} className='text-left'>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -373,7 +373,7 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary'>
+                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-7'>
                           {item.title_product}
                         </a>
                       </div>
@@ -476,7 +476,7 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary' >
+                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary fs-7' >
                           {item.product_sale}
                         </a>
                       </div>
@@ -697,7 +697,6 @@ const Reports: FC = () => {
       <Loading />
     )
   }
-  console.log(formRefund)
   const displayProductOrderRefundList = () => {
     const listPages = find_page_begin_end(refundList?.current_page, refundList?.total_pages)
     return refundList ? (<div className='col-xs-12'>
@@ -719,8 +718,8 @@ const Reports: FC = () => {
                 <div className='symbol symbol-45px me-5'>
                   <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
                 </div>
-                <div className='d-flex justify-content-start flex-column'>
-                  <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary' >
+                <div style={{ fontSize: "13px !important" }} className='d-flex justify-content-start flex-column'>
+                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-7' >
                     {item.title_product}
                   </a>
                 </div>
