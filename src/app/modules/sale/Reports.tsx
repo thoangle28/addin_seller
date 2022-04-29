@@ -373,7 +373,7 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-7'>
+                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary '>
                           {item.title_product}
                         </a>
                       </div>
@@ -462,8 +462,8 @@ const Reports: FC = () => {
             {list.product_sale_list.length ? (
               list.product_sale_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='fs-7 w-15 text-left'>{item.product_id}</td>
-                  <td style={{ width: '30%' }} className='fs-7 text-left '>
+                  <td className=' w-15 text-left'>{item.product_id}</td>
+                  <td style={{ width: '30%' }} className=' text-left '>
                     <div className='d-flex align-items-center'>
                       <div className='symbol symbol-45px me-5'>
                         <img
@@ -476,21 +476,21 @@ const Reports: FC = () => {
                         />
                       </div>
                       <div className='d-flex justify-content-start flex-column'>
-                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary fs-7' >
+                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary ' >
                           {item.product_sale}
                         </a>
                       </div>
                     </div>
                   </td>
-                  <td className='fs-7 w-10 text-center'>{item.sku ? item.sku : '-'}</td>
-                  <td className='fs-7 w-15 text-center'>
+                  <td className=' w-10 text-center'>{item.sku ? item.sku : '-'}</td>
+                  <td className=' w-15 text-center'>
                     <p>{formatMoney(item.sale_price)}</p>
                     <p className='m-0 text-muted'>
                       <s>{formatMoney(item.regular_price)}</s>
                     </p>
                   </td>
                   {productSoldStatus(item.status)}
-                  <td className='fs-7 w-15 text-end'>{item.date}</td>
+                  <td className=' w-15 text-end'>{item.date}</td>
                 </tr>
               ))
             ) : (
@@ -555,11 +555,11 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="fs-7 w-15 text-start">Order ID</th>
-            <th className="fs-7 w-35 text-left">Customer's Name</th>
-            <th className="fs-7 w-25 text-center">Date Created</th>
-            <th className="fs-7 w-30 text-center">Total</th>
-            <th className="fs-7 w-5 text-end">Order Status</th>
+            <th className=" w-15 text-start">Order ID</th>
+            <th className=" w-35 text-left">Customer's Name</th>
+            <th className=" w-25 text-center">Date Created</th>
+            <th className=" w-30 text-center">Total</th>
+            <th className=" w-5 text-end">Order Status</th>
           </tr>
         </thead>
         <tbody>
@@ -631,12 +631,12 @@ const Reports: FC = () => {
             {customerList.customer_list.length > 0 ? (
               customerList.customer_list?.map((item: any, index: number) => (
                 <tr key={index}>
-                  <td className='fs-7 w-10 text-start'>{index + 1}</td>
-                  <td className='fs-7 w-30 text-start'>{item.full_name}</td>
-                  <td className='fs-7 w-15 text-start'>{item.email ? item.email : '-'}</td>
-                  <td className='fs-7 w-15 text-center'>{item.phone}</td>
-                  <td className='fs-7 w-15 text-center'>{item.city ? item.city : '-'}</td>
-                  <td className='fs-7 w-15 text-center'>{item.country ? item.country : '-'}</td>
+                  <td className=' w-10 text-start'>{index + 1}</td>
+                  <td className=' w-30 text-start'>{item.full_name}</td>
+                  <td className=' w-15 text-start'>{item.email ? item.email : '-'}</td>
+                  <td className=' w-15 text-center'>{item.phone}</td>
+                  <td className=' w-15 text-center'>{item.city ? item.city : '-'}</td>
+                  <td className=' w-15 text-center'>{item.country ? item.country : '-'}</td>
                 </tr>
               ))
             ) : (
@@ -719,7 +719,7 @@ const Reports: FC = () => {
                   <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
                 </div>
                 <div style={{ fontSize: "13px !important" }} className='d-flex justify-content-start flex-column'>
-                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-7' >
+                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary ' >
                     {item.title_product}
                   </a>
                 </div>
