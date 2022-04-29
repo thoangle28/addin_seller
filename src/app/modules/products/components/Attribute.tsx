@@ -69,7 +69,6 @@ const Attribute: FC = () => {
     }
 
     const afterSubmit = (isReset: boolean = true, resetForm: any) => {
-        setActiveIndex(undefined)
         if (isReset)
             resetForm()
         setTimeout(() => {
@@ -124,8 +123,9 @@ const Attribute: FC = () => {
             setParentAttributeList([result, ...currentList])
         } else {
             const newParentItem = parentAttributeList.find((item: any) => item.name === childAttrTaxonomy)
+            console.log(newParentItem)
             const result = {
-                ...newParentItem, options: [{
+                ...newParentItem, options: [...newParentItem.options, {
                     id: childID,
                     label,
                     value: label.replace(' ', '-'),
@@ -162,6 +162,7 @@ const Attribute: FC = () => {
                 setMessage(message)
                 updateUITermAttr(attrId, childId, new_attribute_term_name, taxonomy)
                 afterSubmit(true, resetForm)
+                setActiveIndex(undefined)
             }
             else {
                 setHasErrors(true)
@@ -191,6 +192,7 @@ const Attribute: FC = () => {
                 createUIAttr(data.label, data.id, data.value, data.name)
                 setIsUpdateChild(false)
                 afterSubmit(true, resetForm)
+                setActiveIndex(undefined)
             }
             else {
                 setHasErrors(true)
@@ -237,14 +239,13 @@ const Attribute: FC = () => {
     useEffect(() => {
         fetchData();
     }, [])
-    console.log(isLoading)
     const toggleAttr = (index: number) => {
         setActiveIndex(isActiveIndex === index ? undefined : index);
     };
 
-    const showData = () => !!parentAttributeList && parentAttributeList.map((attr: any, index: number) => <option value={attr.name} key={index}>{attr.label}</option>)
+    const showData = () => parentAttributeList && parentAttributeList.map((attr: any, index: number) => <option value={attr.name} key={index}>{attr.label}</option>)
 
-    const showList = () => !!parentAttributeList && parentAttributeList.map((attr: any, index: number) => {
+    const showList = () => parentAttributeList ? parentAttributeList.map((attr: any, index: number) => {
         const checkOpen = isActiveIndex === index;
         return <li key={index} className='list-group-item border border-bottom-1 p-2 mb-2 bg-body rounded'>
             <div className="d-flex justify-content-between align-items-center ms-4" >
@@ -268,8 +269,7 @@ const Attribute: FC = () => {
                 </>
             }
         </li >
-    }
-    )
+    }) : noItemFound()
 
     const cancelEvent = (resetForm: any) => {
         setIsEdit(false); setIsUpdateChild(false); resetForm(); setIsChildOpen(false)
