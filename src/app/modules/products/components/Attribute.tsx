@@ -138,7 +138,6 @@ const Attribute: FC = () => {
             }
             // filter current list 
             const filteredData = parentAttributeList.filter((item: any) => item.id !== attrId).filter((item: any) => item.name !== childAttrTaxonomy)
-            console.log(filteredData)
             setParentAttributeList([result, oldParentResult, ...filteredData])
         }
     }
@@ -278,18 +277,7 @@ const Attribute: FC = () => {
     const scrollToTop = () => {
         window.scrollTo(0, 0)
     }
-    // Create UI FORM
-    const Loading: FC = () => {
-        return (
-            <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
-                <div className='card-body d-flex justify-content-center align-items-center'>
-                    <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
-                        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                    </span>
-                </div>
-            </div>
-        )
-    }
+    // Create UI FORM 
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
@@ -434,7 +422,7 @@ const Attribute: FC = () => {
     }
 
     const noItemFound = () => {
-        return <div className="col-xxl-6 mt-0 pe-4 pb-8">
+        return <div className="col-xxl-12 mt-0 pe-4 pb-8">
             <div className="border border-1 rounded p-6 "  >
                 <div style={{ height: "100vh" }} className="overflow-scroll">
                     <p className='text-center fs-2'>No Item Founds , Please Add New Item</p>
@@ -469,7 +457,7 @@ const Attribute: FC = () => {
                                             <ul className='ps-0 me-5 list-groupborder'>
                                                 {showList()}
                                             </ul>
-                                        ) : <Loading />
+                                        ) : noItemFound()
                                         }
                                     </div>
                                 </div>
