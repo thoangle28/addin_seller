@@ -213,7 +213,6 @@ const Reports: FC = () => {
       setMessage('Processing')
       setIsLoading(true)
       if (code === 200) {
-        console.log(res)
         setIsLoading(false)
         setProductSoldList(data)
         setMessage(message)
