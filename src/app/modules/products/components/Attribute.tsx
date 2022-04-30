@@ -76,11 +76,13 @@ const Attribute: FC = () => {
         }, 3500);
     }
     const updateUIAttr = (attrId: number = 0, label: any, taxonomy: string) => {
+        console.log(taxonomy)
         const updatedList = parentAttributeList.map((item: any) => {
             if (attrId === item.id)
                 return { ...item, id: attrId, label, value: taxonomy, name: taxonomy }
             return item
         })
+        console.log(updatedList)
         setParentAttributeList(updatedList)
     }
 
@@ -93,7 +95,7 @@ const Attribute: FC = () => {
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
-                updateUIAttr(attrId, new_attribute_name, old_attribute_name)
+                updateUIAttr(attrId, new_attribute_name, childAttrTaxonomy)
                 afterSubmit(true, resetForm)
             }
             else {
@@ -140,11 +142,11 @@ const Attribute: FC = () => {
                     attr: taxonomy
                 }]
             }
-            // filter current list 
-            const filteredData = list.filter((item: any) => item.id !== attrId)
-                .filter((item: any) => item.name !== childAttrTaxonomy)
+            const newItems = [oldParentResult, result]
+            // filter current list  
+            const newList = list.map(obj => newItems.find(o => o.id === obj.id) || obj);
 
-            setParentAttributeList([oldParentResult, result, ...filteredData])
+            setParentAttributeList(newList)
         }
     }
     const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any, taxonomy: string) => {

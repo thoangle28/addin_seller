@@ -213,7 +213,6 @@ const Reports: FC = () => {
       setMessage('Processing')
       setIsLoading(true)
       if (code === 200) {
-        console.log(res)
         setIsLoading(false)
         setProductSoldList(data)
         setMessage(message)
@@ -573,7 +572,7 @@ const Reports: FC = () => {
           <tbody>
             {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
               <td className="w-15 text-start">{item.order_id}</td>
-              <td className="w-35 text-left text-dark fw-bolder fs-6">{item.customer_name ? item.customer_name : ''}
+              <td className="w-35 text-left text-dark fs-6">{item.customer_name ? item.customer_name : ''}
               </td>
               <td className="w-25 text-center">{item.date}</td>
               <td className="w-30 text-center">{formatMoney(item.price)}</td>
