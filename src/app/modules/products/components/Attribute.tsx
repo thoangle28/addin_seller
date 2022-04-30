@@ -122,7 +122,16 @@ const Attribute: FC = () => {
             const currentList = parentAttributeList.filter(item => item.id !== attrID)
             setParentAttributeList([result, ...currentList])
         } else {
-            const newParentItem = parentAttributeList.find((item: any) => item.name === childAttrTaxonomy)
+            // Get Parent Item where u wanna update
+            const list = [...parentAttributeList]
+            const parentItem = list.find((item: any) => item.id === attrID)
+            // Select the child Option you wanna update
+            const options = parentItem.options.filter((item: any) => item.id !== childID)
+            // Return new Object With the option without you changed
+            const oldParentResult = {
+                ...parentItem, options
+            }
+            const newParentItem = list.find((item: any) => item.name === childAttrTaxonomy)
             const result = {
                 ...newParentItem, options: [...newParentItem.options, {
                     id: childID,
@@ -131,14 +140,11 @@ const Attribute: FC = () => {
                     attr: taxonomy
                 }]
             }
-            const parentItem = parentAttributeList.find((item: any) => item.id === attrID)
-            const options = parentItem.options.filter((item: any) => item.id !== childID)
-            const oldParentResult = {
-                ...parentItem, options
-            }
             // filter current list 
-            const filteredData = parentAttributeList.filter((item: any) => item.id !== attrId).filter((item: any) => item.name !== childAttrTaxonomy)
-            setParentAttributeList([result, oldParentResult, ...filteredData])
+            const filteredData = list.filter((item: any) => item.id !== attrId)
+                .filter((item: any) => item.name !== childAttrTaxonomy)
+
+            setParentAttributeList([oldParentResult, result, ...filteredData])
         }
     }
     const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any, taxonomy: string) => {

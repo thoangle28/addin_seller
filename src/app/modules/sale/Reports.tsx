@@ -344,55 +344,59 @@ const Reports: FC = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
     return productSoldList ? (
       <div className='col-xs-12'>
-        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
-          <thead>
-            <tr className='fw-bolder text-muted'>
-              <th className='w-20 text-start'>Order ID</th>
-              <th style={{ width: '30%' }} className='text-left '>Product Name</th>
-              <th className='w-10 text-center '>SKU</th>
-              <th className='w-10 text-center '>Quantity</th>
-              <th className='w-10 text-left '>Total</th>
-              <th className='w-20 text-end'>Date Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {productSoldList.product_list.length > 0 ? (
-              productSoldList.product_list?.map((item: any, index: number) => (
-                <tr key={index}>
-                  <td className='w-20 text-start'>{item.order_id}</td>
-                  <td style={{ width: '30%' }} className='text-left'>
-                    <div className='d-flex align-items-center'>
-                      <div className='symbol symbol-45px me-5'>
-                        <img
-                          src={
-                            item.product_img
-                              ? item.product_img
-                              : 'https://via.placeholder.com/75x75/f0f0f0'
-                          }
-                          alt={item.title_product}
-                        />
+        <div className="table-responsive">
+          <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+            <thead>
+              <tr className='fw-bolder text-muted'>
+                <th className='w-20 text-start'>Order ID</th>
+                <th style={{ width: '250px' }} className='text-left '>Product Name</th>
+                <th className='w-10 text-center '>SKU</th>
+                <th className='w-10 text-center '>Quantity</th>
+                <th className='w-10 text-left '>Total</th>
+                <th className='w-20 text-end'>Date Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {productSoldList.product_list.length > 0 ? (
+                productSoldList.product_list?.map((item: any, index: number) => (
+                  <tr key={index}>
+                    <td className='w-20 text-start'>{item.order_id}</td>
+                    <td style={{ width: '250px' }} className='text-left'>
+                      <div className='d-flex align-items-center'>
+                        <div className='symbol symbol-45px me-5'>
+                          <img
+                            src={
+                              item.product_img
+                                ? item.product_img
+                                : 'https://via.placeholder.com/75x75/f0f0f0'
+                            }
+                            alt={item.title_product}
+                          />
+                        </div>
+                        <div className='d-flex justify-content-start flex-column'>
+                          <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6 '>
+                            {item.title_product}
+                          </a>
+                        </div>
                       </div>
-                      <div className='d-flex justify-content-start flex-column'>
-                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary '>
-                          {item.title_product}
-                        </a>
-                      </div>
-                    </div>
+                    </td>
+                    <td className='w-10 text-center '>{item.sku ? item.sku : '-'}</td>
+                    <td className='w-10 text-center '>{item.quantity}</td>
+                    <td className='w-10 text-left '>{formatMoney(item.price)}</td>
+                    <td className='w-15 text-end'>{item.date}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className='text-center'>
+                    No Item Found
                   </td>
-                  <td className='w-10 text-center '>{item.sku ? item.sku : '-'}</td>
-                  <td className='w-10 text-center '>{item.quantity}</td>
-                  <td className='w-10 text-left '>{formatMoney(item.price)}</td>
-                  <td className='w-15 text-end'>{item.date}</td>
                 </tr>
-              ))
-            ) : (
-              <th colSpan={6} className='text-center'>
-                No Item Found
-              </th>
-            )}
-            {/* Pagination */}
-          </tbody>
-        </table>
+              )}
+              {/* Pagination */}
+            </tbody>
+          </table>
+        </div>
         <div className='row justify-content-between align-items-center'>
           <div className='col-md-6'>
             <div className='d-flex align-items-center py-3'>
@@ -447,60 +451,63 @@ const Reports: FC = () => {
     const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
     return list ? (
       <div className='col-xs-12'>
-        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
-          <thead>
-            <tr className='fw-bolder text-muted'>
-              <th className='w-15 text-left'>#ID</th>
-              <th style={{ width: '30%' }} className='text-left '>Product Name</th>
-              <th className='w-10 text-center'>SKU</th>
-              <th className='w-15 text-center'>Price</th>
-              <th className='w-15 text-center'>Status</th>
-              <th className='w-15 text-end'>Date Created</th>
-            </tr>
-          </thead>
-          <tbody>
-            {list.product_sale_list.length ? (
-              list.product_sale_list?.map((item: any, index: number) => (
-                <tr key={index}>
-                  <td className=' w-15 text-left'>{item.product_id}</td>
-                  <td style={{ width: '30%' }} className=' text-left '>
-                    <div className='d-flex align-items-center'>
-                      <div className='symbol symbol-45px me-5'>
-                        <img
-                          src={
-                            item.product_img
-                              ? item.product_img
-                              : 'https://via.placeholder.com/75x75/f0f0f0'
-                          }
-                          alt={item.product_sale}
-                        />
+        <div className="table-responsive">
+          <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+            <thead>
+              <tr className='fw-bolder text-muted'>
+                <th className='w-15 text-left'>#ID</th>
+                <th style={{ width: '250px' }} className='text-left '>Product Name</th>
+                <th className='w-10 text-center'>SKU</th>
+                <th className='w-15 text-center'>Price</th>
+                <th className='w-15 text-center'>Status</th>
+                <th className='w-15 text-end'>Date Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.product_sale_list.length ? (
+                list.product_sale_list?.map((item: any, index: number) => (
+                  <tr key={index}>
+                    <td className=' w-15 text-left'>{item.product_id}</td>
+                    <td style={{ width: '250px' }} className=' text-left '>
+                      <div className='d-flex align-items-center'>
+                        <div className='symbol symbol-45px me-5'>
+                          <img
+                            src={
+                              item.product_img
+                                ? item.product_img
+                                : 'https://via.placeholder.com/75x75/f0f0f0'
+                            }
+                            alt={item.product_sale}
+                          />
+                        </div>
+                        <div className='d-flex justify-content-start flex-column'>
+                          <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary fs-6 ' >
+                            {item.product_sale}
+                          </a>
+                        </div>
                       </div>
-                      <div className='d-flex justify-content-start flex-column'>
-                        <a style={{ fontSize: "13px !important" }} target="blank" href={item.preview ? item.preview : '#'} className='text-dark fw-bolder text-hover-primary ' >
-                          {item.product_sale}
-                        </a>
-                      </div>
-                    </div>
-                  </td>
-                  <td className=' w-10 text-center'>{item.sku ? item.sku : '-'}</td>
-                  <td className=' w-15 text-center'>
-                    <p>{formatMoney(item.sale_price)}</p>
-                    <p className='m-0 text-muted'>
-                      <s>{formatMoney(item.regular_price)}</s>
-                    </p>
-                  </td>
-                  {productSoldStatus(item.status)}
-                  <td className=' w-15 text-end'>{item.date}</td>
-                </tr>
-              ))
-            ) : (
-              <th colSpan={6} className='text-center'>
-                No Item Found
-              </th>
-            )}
-            {/* Pagination */}
-          </tbody>
-        </table>
+                    </td>
+                    <td className=' w-10 text-center'>{item.sku ? item.sku : '-'}</td>
+                    <td className=' w-15 text-center'>
+                      <p>{formatMoney(item.sale_price)}</p>
+                      <p className='m-0 text-muted'>
+                        <s>{formatMoney(item.regular_price)}</s>
+                      </p>
+                    </td>
+                    {productSoldStatus(item.status)}
+                    <td className=' w-15 text-end'>{item.date}</td>
+                  </tr>
+                ))
+              ) : <tr>
+                <td colSpan={6} className='text-center'>
+                  No Item Found
+                </td>
+              </tr>
+              }
+              {/* Pagination */}
+            </tbody>
+          </table>
+        </div>
         <div className='row justify-content-between align-items-center'>
           <div className='col-md-6'>
             <div className='d-flex align-items-center py-3'>
@@ -552,30 +559,34 @@ const Reports: FC = () => {
   const displayProductOrderList = () => {
     const listPages = find_page_begin_end(productOrderList?.current_page, productOrderList?.total_pages)
     return productOrderList ? (<div className='col-xs-12'>
-      <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
-        <thead>
-          <tr className="fw-bolder text-muted">
-            <th className=" w-15 text-start">Order ID</th>
-            <th className=" w-35 text-left">Customer's Name</th>
-            <th className=" w-25 text-center">Date Created</th>
-            <th className=" w-30 text-center">Total</th>
-            <th className=" w-5 text-end">Order Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
-            <td className="w-15 text-start">{item.order_id}</td>
-            <td className="w-35 text-left text-dark fw-bolder fs-6">{item.customer_name ? item.customer_name : ''}
-            </td>
-            <td className="w-25 text-center">{item.date}</td>
-            <td className="w-30 text-center">{formatMoney(item.price)}</td>
-            {productSoldStatus(item.status)}
-          </tr>
-          ) : <th colSpan={5} className="text-center">No Item Found</th>
-          }
-        </tbody>
-        {/* Pagination */}
-      </table>
+      <div className="table-responsive">
+        <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
+          <thead>
+            <tr className="fw-bolder text-muted">
+              <th className=" w-15 text-start">Order ID</th>
+              <th className=" w-35 text-left">Customer's Name</th>
+              <th className=" w-25 text-center">Date Created</th>
+              <th className=" w-30 text-center">Total</th>
+              <th className=" w-5 text-end">Order Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
+              <td className="w-15 text-start">{item.order_id}</td>
+              <td className="w-35 text-left text-dark fw-bolder fs-6">{item.customer_name ? item.customer_name : ''}
+              </td>
+              <td className="w-25 text-center">{item.date}</td>
+              <td className="w-30 text-center">{formatMoney(item.price)}</td>
+              {productSoldStatus(item.status)}
+            </tr>
+            ) : <tr>
+              <td colSpan={5} className="text-center">No Item Found</td>
+            </tr>
+            }
+          </tbody>
+          {/* Pagination */}
+        </table>
+      </div>
       <div className="row justify-content-between align-items-center">
         <div className="col-md-6">
           <div className='d-flex align-items-center py-3'>
@@ -616,37 +627,40 @@ const Reports: FC = () => {
     const listPages = find_page_begin_end(customerList?.current_page, customerList?.total_pages)
     return customerList ? (
       <div className='col-xs-12'>
-        <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
-          <thead>
-            <tr className='fw-bolder text-muted'>
-              <th className='w-10 text-start'>No.</th>
-              <th className='w-30 text-start'>Full Name</th>
-              <th className='w-15 text-start'>Email</th>
-              <th className='w-15 text-center'>Phone</th>
-              <th className='w-15 text-center'>City</th>
-              <th className='w-15 text-center'>Country</th>
-            </tr>
-          </thead>
-          <tbody>
-            {customerList.customer_list.length > 0 ? (
-              customerList.customer_list?.map((item: any, index: number) => (
-                <tr key={index}>
-                  <td className=' w-10 text-start'>{index + 1}</td>
-                  <td className=' w-30 text-start'>{item.full_name}</td>
-                  <td className=' w-15 text-start'>{item.email ? item.email : '-'}</td>
-                  <td className=' w-15 text-center'>{item.phone}</td>
-                  <td className=' w-15 text-center'>{item.city ? item.city : '-'}</td>
-                  <td className=' w-15 text-center'>{item.country ? item.country : '-'}</td>
-                </tr>
-              ))
-            ) : (
-              <th colSpan={6} className='text-center'>
-                No Item Found
-              </th>
-            )}
-          </tbody>
-          {/* Pagination */}
-        </table>
+        <div className="table-responsive">
+          <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+            <thead>
+              <tr className='fw-bolder text-muted'>
+                <th className='w-10 text-start'>No.</th>
+                <th className='w-30 text-start'>Full Name</th>
+                <th className='w-15 text-start'>Email</th>
+                <th className='w-15 text-center'>Phone</th>
+                <th className='w-15 text-center'>City</th>
+                <th className='w-15 text-center'>Country</th>
+              </tr>
+            </thead>
+            <tbody>
+              {customerList.customer_list.length > 0 ? (
+                customerList.customer_list?.map((item: any, index: number) => (
+                  <tr key={index}>
+                    <td className=' w-10 text-start'>{index + 1}</td>
+                    <td className=' w-30 text-start'>{item.full_name}</td>
+                    <td className=' w-15 text-start'>{item.email ? item.email : '-'}</td>
+                    <td className=' w-15 text-center'>{item.phone}</td>
+                    <td className=' w-15 text-center'>{item.city ? item.city : '-'}</td>
+                    <td className=' w-15 text-center'>{item.country ? item.country : '-'}</td>
+                  </tr>
+                ))
+              ) : <tr>
+                <td colSpan={6} className='text-center'>
+                  No Item Found
+                </td>
+              </tr>
+              }
+            </tbody>
+            {/* Pagination */}
+          </table>
+        </div>
         <div className='row justify-content-between align-items-center'>
           <div className='col-md-5'>
             <div className='d-flex align-items-center py-3'>
@@ -699,12 +713,12 @@ const Reports: FC = () => {
   }
   const displayProductOrderRefundList = () => {
     const listPages = find_page_begin_end(refundList?.current_page, refundList?.total_pages)
-    return refundList ? (<div className='col-xs-12'>
+    return refundList ? (<div className='table-responsive'>
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
             <th className=" text-start">Order ID</th>
-            <th style={{ width: '30%' }} className=" text-left">Product Name</th>
+            <th style={{ width: '250px' }} className=" text-left">Product Name</th>
             <th className=" text-center">SKU</th>
             <th className=" text-center">Total</th>
             <th className=" text-end">Date Created</th>
@@ -713,13 +727,13 @@ const Reports: FC = () => {
         <tbody>
           {refundList.order_refund_list.length > 0 ? refundList?.order_refund_list.map((item: any, index: number) => <tr key={index} >
             <td className="text-start">{item.order_id}</td>
-            <td style={{ width: '30%' }} className="text-left">
+            <td style={{ width: '250px' }} className="text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
                   <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
                 </div>
                 <div style={{ fontSize: "13px !important" }} className='d-flex justify-content-start flex-column'>
-                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary ' >
+                  <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6 ' >
                     {item.title_product}
                   </a>
                 </div>
@@ -729,7 +743,9 @@ const Reports: FC = () => {
             <td className="text-center">{formatMoney(item.price_refund)}</td>
             <td className="text-end">{item.date}</td>
           </tr>
-          ) : <td colSpan={5} className="text-center">No Item Found</td>
+          ) : <tr>
+            <td colSpan={5} className="text-center">No Item Found</td>
+          </tr>
           }
         </tbody>
         {/* Pagination */}
