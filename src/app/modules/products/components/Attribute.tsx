@@ -76,16 +76,15 @@ const Attribute: FC = () => {
         }, 3500);
     }
     const updateUIAttr = (attrId: number = 0, label: any, taxonomy: string) => {
-        console.log(taxonomy)
         const updatedList = parentAttributeList.map((item: any) => {
             if (attrId === item.id)
                 return { ...item, id: attrId, label, value: taxonomy, name: taxonomy }
             return item
         })
-        console.log(updatedList)
         setParentAttributeList(updatedList)
     }
 
+    console.log(parentAttribute)
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any, setSubmitting: any) => {
         updateAttr(old_attribute_name, new_attribute_name).then(res => {
             const { code, message } = res.data
@@ -96,7 +95,7 @@ const Attribute: FC = () => {
                 setIsUpdateChild(false)
                 setMessage(message)
                 updateUIAttr(attrId, new_attribute_name, childAttrTaxonomy)
-                afterSubmit(true, resetForm)
+                afterSubmit(false, resetForm)
             }
             else {
                 setHasErrors(true)
@@ -153,7 +152,7 @@ const Attribute: FC = () => {
         const payload: any = {
             ...updateChildAttrInitValue,
             id_term: childId,
-            taxonomy: childAttrTaxonomy,
+            taxonomy: `pa_${parentAttribute.replaceAll(' ', '-')}_${currentUserId}`,
             new_attribute_term_name,
             label_term: childAttr
         };
