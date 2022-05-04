@@ -1,4 +1,4 @@
-import { Field, Formik } from 'formik'
+import { Field, Formik, validateYupSchema } from 'formik'
 import { FC, useEffect, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import * as Yup from 'yup'
@@ -27,7 +27,6 @@ const Attribute: FC = () => {
     const [childAttr, setchildAttr] = useState<string>('')
     const [childId, setChildId] = useState<number>(0)
     const [attrId, setAttrId] = useState<number>(0)
-    const [newAttrId, setNewAttrId] = useState<number>(0)
     const [isActiveIndex, setActiveIndex] = useState<number>();
     const [hasErrors, setHasErrors] = useState<boolean>(true)
     const [isEdit, setIsEdit] = useState<boolean>(false)
@@ -208,14 +207,14 @@ const Attribute: FC = () => {
                 setMessage(message)
                 createUIAttr(data.label, data.id, data.value, data.name)
                 setIsUpdateChild(false)
-                afterSubmit(true, resetForm)
+                afterSubmit(true, resetForm, setSubmitting)
                 setActiveIndex(undefined)
             }
             else {
                 setHasErrors(true)
                 setMessage(message)
                 setSubmitting(false);
-                afterSubmit(false, resetForm)
+                afterSubmit(false, resetForm, setSubmitting)
             }
         }).catch(err => console.log(err))
     }
@@ -243,12 +242,12 @@ const Attribute: FC = () => {
                 createUITermAttr(data.id, data.label, data.value, data.attr)
                 setIsEdit(false)
                 setIsUpdateChild(false)
-                afterSubmit(true, resetForm)
+                afterSubmit(true, resetForm, setSubmitting)
             } else {
                 setHasErrors(true)
                 setMessage(message)
                 setSubmitting(false)
-                afterSubmit(false, resetForm)
+                afterSubmit(false, resetForm, setSubmitting)
             }
         }).catch(err => console.log(err))
     }
@@ -260,7 +259,6 @@ const Attribute: FC = () => {
     };
 
     const showData = () => parentAttributeList && parentAttributeList.map((attr: any, index: number) => <option value={attr.id} key={index}>{attr.label}</option>)
-
     const showList = () => parentAttributeList ? parentAttributeList.map((attr: any, index: number) => {
         const checkOpen = isActiveIndex === index;
         return <li key={index} className='list-group-item border border-bottom-1 p-2 mb-2 bg-body rounded'>
@@ -295,7 +293,7 @@ const Attribute: FC = () => {
         window.scrollTo(0, 0)
     }
     // Create UI FORM  
-
+    console.log(attrId)
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
@@ -304,13 +302,13 @@ const Attribute: FC = () => {
                     validationSchema={createValidSchema}
                     onSubmit={(values, { setSubmitting, resetForm }) => {
                         const { name } = values
-                        attrId !== 0 ? createProductTermAttr(attrId, name, resetForm, setSubmitting) : createProductAttr(name, resetForm, setSubmitting)
+                        attrId === 0 ? createProductAttr(name, resetForm, setSubmitting) : createProductTermAttr(attrId, name, resetForm, setSubmitting)
                     }}
                 >
                     {({ values, errors, touched, handleSubmit, isSubmitting }) => (
                         <form onSubmit={handleSubmit}>
                             <div className="col-xxs-12">
-                                <label className="form-label mb-2" htmlFor="parrent_attribute">{!attrId.toString() ? 'Parent' : ''} Attribute</label>
+                                <label className="form-label mb-2" htmlFor="parrent_attribute">{attrId === 0 ? 'Parent' : ''} Attribute</label>
                                 <Field
                                     component="select"
                                     as="select"
@@ -318,14 +316,14 @@ const Attribute: FC = () => {
                                     name="parrent_attribute"
                                     className="form-select"
                                     value={attrId}
-                                    onChange={(e: any) => { setAttrId(e.target.value) }}
+                                    onChange={(e: any) => { setAttrId(parseInt(e.target.value)) }}
                                 >
-                                    <option value="">None</option>
+                                    <option value="0">None</option>
                                     {showData()}
                                 </Field>
                             </div>
                             <div className="col-xxs-12 mt-3">
-                                <label className="form-label mb-2" htmlFor="name">{!attrId.toString() ? 'Child' : 'Parent'} Attribute Name</label>
+                                <label className="form-label mb-2" htmlFor="name">{attrId === 0 ? 'Child' : 'Parent'} Attribute Name</label>
                                 <Field
                                     component="input"
                                     type='text'
@@ -370,7 +368,7 @@ const Attribute: FC = () => {
                                         name="parrent_attribute"
                                         className="form-select"
                                         value={values.parent_id || 0}
-                                        onChange={(e: any) => { setAttrId(e.target.value); setIsUpdateChildWithAttr(true) }}
+                                        onChange={(e: any) => { setAttrId(parseInt(e.target.value)); setIsUpdateChildWithAttr(true) }}
                                     >
                                         {showData()}
                                     </Field>
