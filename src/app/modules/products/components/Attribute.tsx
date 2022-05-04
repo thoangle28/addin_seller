@@ -84,6 +84,7 @@ const Attribute: FC = () => {
         setParentAttributeList(updatedList)
     }
 
+    console.log(parentAttribute)
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any, setSubmitting: any) => {
         updateAttr(old_attribute_name, new_attribute_name).then(res => {
             const { code, message } = res.data
@@ -93,8 +94,8 @@ const Attribute: FC = () => {
                 setIsEdit(false)
                 setIsUpdateChild(false)
                 setMessage(message)
-                updateUIAttr(attrId, new_attribute_name, old_attribute_name)
-                afterSubmit(true, resetForm)
+                updateUIAttr(attrId, new_attribute_name, childAttrTaxonomy)
+                afterSubmit(false, resetForm)
             }
             else {
                 setHasErrors(true)
@@ -122,7 +123,16 @@ const Attribute: FC = () => {
             const currentList = parentAttributeList.filter(item => item.id !== attrID)
             setParentAttributeList([result, ...currentList])
         } else {
-            const newParentItem = parentAttributeList.find((item: any) => item.name === childAttrTaxonomy)
+            // Get Parent Item where u wanna update
+            const list = [...parentAttributeList]
+            const parentItem = list.find((item: any) => item.id === attrID)
+            // Select the child Option you wanna update
+            const options = parentItem.options.filter((item: any) => item.id !== childID)
+            // Return new Object With the option without you changed
+            const oldParentResult = {
+                ...parentItem, options
+            }
+            const newParentItem = list.find((item: any) => item.name === childAttrTaxonomy)
             const result = {
                 ...newParentItem, options: [...newParentItem.options, {
                     id: childID,
@@ -131,22 +141,18 @@ const Attribute: FC = () => {
                     attr: taxonomy
                 }]
             }
-            const parentItem = parentAttributeList.find((item: any) => item.id === attrID)
-            const options = parentItem.options.filter((item: any) => item.id !== childID)
-            const oldParentResult = {
-                ...parentItem, options
-            }
-            // filter current list 
-            const filteredData = parentAttributeList.filter((item: any) => item.id !== attrId).filter((item: any) => item.name !== childAttrTaxonomy)
-            console.log(filteredData)
-            setParentAttributeList([result, oldParentResult, ...filteredData])
+            const newItems = [oldParentResult, result]
+            // filter current list  
+            const newList = list.map(obj => newItems.find(o => o.id === obj.id) || obj);
+
+            setParentAttributeList(newList)
         }
     }
     const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any, taxonomy: string) => {
         const payload: any = {
             ...updateChildAttrInitValue,
             id_term: childId,
-            taxonomy: childAttrTaxonomy,
+            taxonomy: `pa_${parentAttribute.replaceAll(' ', '-')}_${currentUserId}`,
             new_attribute_term_name,
             label_term: childAttr
         };
@@ -278,18 +284,7 @@ const Attribute: FC = () => {
     const scrollToTop = () => {
         window.scrollTo(0, 0)
     }
-    // Create UI FORM
-    const Loading: FC = () => {
-        return (
-            <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
-                <div className='card-body d-flex justify-content-center align-items-center'>
-                    <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
-                        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                    </span>
-                </div>
-            </div>
-        )
-    }
+    // Create UI FORM 
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
@@ -434,10 +429,10 @@ const Attribute: FC = () => {
     }
 
     const noItemFound = () => {
-        return <div className="col-xxl-6 mt-0 pe-4 pb-8">
+        return <div className="col-xxl-12 mt-0 pe-4 pb-8">
             <div className="border border-1 rounded p-6 "  >
                 <div style={{ height: "100vh" }} className="overflow-scroll">
-                    <p className='text-center fs-2'>No Item Founds , Please Add New Item</p>
+                    <p className='text-center fs-6'>No Item Found</p>
                 </div>
             </div>
         </div>
@@ -469,7 +464,7 @@ const Attribute: FC = () => {
                                             <ul className='ps-0 me-5 list-groupborder'>
                                                 {showList()}
                                             </ul>
-                                        ) : <Loading />
+                                        ) : noItemFound()
                                         }
                                     </div>
                                 </div>
