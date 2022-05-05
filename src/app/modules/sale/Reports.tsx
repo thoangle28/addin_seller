@@ -239,7 +239,7 @@ const Reports: FC = () => {
     }).catch(err => console.log(err))
   }
 
-  const formatMoney = (money: string | number, currentcy: string = "$") => currentcy + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  const formatMoney = (money: string | number, currency: string = "$") => currency + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
   useEffect(() => {
     const allReport = loadAllReports(currentUserId)
@@ -338,6 +338,8 @@ const Reports: FC = () => {
       return <td className="w-15 text-center "><span className='badge badge-light-success'>Approved</span></td>
     if (status === 'publish')
       return <td className="w-15 text-center "><span className='badge badge-light-success'>Approved</span></td>
+    if (status === 'draft')
+      return <td className="w-15 text-center "><span className='badge badge-light-info'>Draft</span></td>
   }
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
@@ -562,11 +564,11 @@ const Reports: FC = () => {
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
           <thead>
             <tr className="fw-bolder text-muted">
-              <th className=" w-15 text-start">Order ID</th>
-              <th className=" w-35 text-left">Customer's Name</th>
-              <th className=" w-25 text-center">Date Created</th>
-              <th className=" w-30 text-center">Total</th>
-              <th className=" w-5 text-end">Order Status</th>
+              <th className="w-15 text-start">Order ID</th>
+              <th className="w-35 text-left">Customer's Name</th>
+              <th className="w-5 text-center">Order Status</th>
+              <th className="w-30 text-center">Total</th>
+              <th className="w-25 text-end">Date Created</th>
             </tr>
           </thead>
           <tbody>
@@ -574,9 +576,9 @@ const Reports: FC = () => {
               <td className="w-15 text-start">{item.order_id}</td>
               <td className="w-35 text-left text-dark">{item.customer_name ? item.customer_name : ''}
               </td>
-              <td className="w-25 text-center">{item.date}</td>
-              <td className="w-30 text-center">{formatMoney(item.price)}</td>
               {productSoldStatus(item.status)}
+              <td className="w-30 text-center">{formatMoney(item.price)}</td>
+              <td className="w-25 text-end">{item.date}</td>
             </tr>
             ) : <tr>
               <td colSpan={5} className="text-center">No Item Found</td>
