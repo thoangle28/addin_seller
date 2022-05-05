@@ -177,8 +177,8 @@ const Attribute: FC = () => {
                 setIsUpdateChild(false)
                 setMessage(message)
                 updateUITermAttr(attrId, childId, data.label, data.attr)
-                afterSubmit(true, resetForm, setSubmitting)
-                setActiveIndex(undefined)
+                afterSubmit(true, resetForm, setSubmitting) 
+                setAttrId(0)
             }
             else {
                 setHasErrors(true)
@@ -205,10 +205,11 @@ const Attribute: FC = () => {
             if (code === 200) {
                 setIsEdit(false)
                 setMessage(message)
+                setActiveIndex(undefined)
                 createUIAttr(data.label, data.id, data.value, data.name)
                 setIsUpdateChild(false)
                 afterSubmit(true, resetForm, setSubmitting)
-                setActiveIndex(undefined)
+                setAttrId(0)
             }
             else {
                 setHasErrors(true)
@@ -242,6 +243,7 @@ const Attribute: FC = () => {
                 createUITermAttr(data.id, data.label, data.value, data.attr)
                 setIsEdit(false)
                 setIsUpdateChild(false)
+                setAttrId(0)
                 afterSubmit(true, resetForm, setSubmitting)
             } else {
                 setHasErrors(true)
@@ -457,7 +459,7 @@ const Attribute: FC = () => {
                     </div>
                     <div className="card-body mt-2">
                         <div className="row">
-                            <div className="col-xxl-6 mt-0 ">
+                            <div className="col-xxl-6 mt-0 col-md-6">
                                 <div className="card card-products">
                                     {isEdit || isUpdateChild ? updateForm() : createForm()}
                                     <div className='ms-3'>
@@ -465,7 +467,7 @@ const Attribute: FC = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="col-xxl-6 mt-0 pe-4 pb-8">
+                            <div className="col-xxl-6 mt-0 col-md-6 pe-4 pb-8">
                                 <div className="border border-1 rounded p-6 "  >
                                     <div style={{ height: "100vh" }} className="overflow-scroll">
                                         {parentAttributeList.length > 0 ? (
