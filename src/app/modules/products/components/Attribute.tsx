@@ -292,8 +292,7 @@ const Attribute: FC = () => {
     const scrollToTop = () => {
         window.scrollTo(0, 0)
     }
-    // Create UI FORM  
-    console.log(attrId)
+    // Create UI FORM   
     const createForm = () => {
         return (
             <div className='card-body py-0 ps-4 pe-0'>
