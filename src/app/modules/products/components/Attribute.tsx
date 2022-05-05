@@ -108,6 +108,7 @@ const Attribute: FC = () => {
                 setIsUpdateChild(false)
                 setMessage(message)
                 updateUIAttr(attrId, new_attribute_name, childAttrTaxonomy)
+                setAttrId(0)
                 afterSubmit(false, resetForm, setSubmitting)
             }
             else {
@@ -175,10 +176,10 @@ const Attribute: FC = () => {
             if (code === 200) {
                 setIsEdit(false)
                 setIsUpdateChild(false)
+                setAttrId(0)
                 setMessage(message)
                 updateUITermAttr(attrId, childId, data.label, data.attr)
-                afterSubmit(true, resetForm, setSubmitting) 
-                setAttrId(0)
+                afterSubmit(true, resetForm, setSubmitting)
             }
             else {
                 setHasErrors(true)
@@ -441,10 +442,8 @@ const Attribute: FC = () => {
 
     const noItemFound = () => {
         return <div className="col-xxl-12 mt-0 pe-4 pb-8">
-            <div className="border border-1 rounded p-6 "  >
-                <div style={{ height: "100vh" }} className="overflow-scroll">
-                    <p className='text-center fs-6'>No Item Found</p>
-                </div>
+            <div style={{ height: "50vh" }}  >
+                <p className='text-center fs-6'>No Item Found</p>
             </div>
         </div>
     }
@@ -469,14 +468,14 @@ const Attribute: FC = () => {
                             </div>
                             <div className="col-xxl-6 mt-0 col-md-6 pe-4 pb-8">
                                 <div className="border border-1 rounded p-6 "  >
-                                    <div style={{ height: "100vh" }} className="overflow-scroll">
-                                        {parentAttributeList.length > 0 ? (
+                                    {parentAttributeList.length > 0 ? (
+                                        <div style={{ height: "100vh" }} className="overflow-scroll">
                                             <ul className='ps-0 me-5 list-groupborder'>
                                                 {showList()}
                                             </ul>
-                                        ) : noItemFound()
-                                        }
-                                    </div>
+                                        </div>
+                                    ) : noItemFound()
+                                    }
                                 </div>
                             </div>
                         </div>
