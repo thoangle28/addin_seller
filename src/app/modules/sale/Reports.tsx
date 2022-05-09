@@ -27,6 +27,84 @@ interface formValue {
   last_seven_date?: boolean
 }
 
+
+interface iBaseResponse {
+  current_page: number,
+  total_order: number | string,
+  page_size: number,
+  total_pages: number,
+}
+interface iList extends iBaseResponse {
+  product_sale_list: iProduct[]
+}
+
+interface iProductOrderList extends iBaseResponse {
+  order_list:iOrderList[]
+}
+
+interface iCustomerList extends iBaseResponse {
+  customer_list: iCustomer[]
+}
+
+interface iRefunedList extends iBaseResponse {
+  order_refund_list: iRefuned[]
+}
+
+interface iProductSoldList extends iBaseResponse {
+  product_list: iProductSold[]
+}
+
+interface iOrderList {
+  order_id: string | number,
+  title_product: string;
+  date: string;
+  status: string;
+  price: number;
+  customer_name: string
+}
+
+interface iCustomer {
+  user_id: string | number;
+  city: string;
+  country: string;
+  email: string;
+  phone: number | string;
+  full_name: string;
+}
+
+interface iProduct {
+  date: string;
+  preview: string;
+  product_id: string;
+  product_img: string;
+  product_sale: string;
+  regular_price: string;
+  sale_price: string;
+  sku: string;
+  status: string;
+}
+interface iRefuned {
+  order_id: string;
+  title_product: string;
+  date: string;
+  price_refund: number;
+  product_img: string;
+  product_url: string;
+  sku: string;
+}
+
+interface iProductSold {
+  order_id: string;
+  title_product: string;
+  date: string;
+  price: number;
+  product_img: string;
+  product_url: string;
+  quantity: 1;
+  sku: string;
+  status: string;
+}
+
 const Loading: FC = () => {
   return (
     <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
@@ -131,11 +209,11 @@ const Reports: FC = () => {
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
-  const [list, setList] = useState<any>()
-  const [customerList, setCustomerList] = useState<any>()
-  const [productSoldList, setProductSoldList] = useState<any>()
-  const [productOrderList, setProductOrderList] = useState<any>()
-  const [refundList, setRefundList] = useState<any>()
+  const [list, setList] = useState<iList>()
+  const [customerList, setCustomerList] = useState<iCustomerList>()
+  const [productSoldList, setProductSoldList] = useState<iProductSoldList>()
+  const [productOrderList, setProductOrderList] = useState<iProductOrderList>()
+  const [refundList, setRefundList] = useState<iRefunedList>()
   const [formValue, setFormValue] = useState<formValue>(initFormValue)
   const [formProductOrderValue, setFormProductOrderValue] = useState<formValue>(initFormValue)
   const [formCustomerValue, setFormCustomerValue] = useState<formValue>(initFormValue)
@@ -271,7 +349,7 @@ const Reports: FC = () => {
     if (tab === 'Refunded') showRefundList({ ...formRefund })
   }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, formRefund, tab])
 
-  const find_page_begin_end = (currentPage: number, maxPage: number) => {
+  const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1) => {
     const step = 5
     let beginBlock = 1
     let begin: number = 1
@@ -359,7 +437,7 @@ const Reports: FC = () => {
             </thead>
             <tbody>
               {productSoldList.product_list.length > 0 ? (
-                productSoldList.product_list?.map((item: any, index: number) => (
+                productSoldList.product_list?.map((item: iProductSold, index: number) => (
                   <tr key={index}>
                     <td className='w-20 text-start'>{item.order_id}</td>
                     <td style={{ width: '250px' }} className='text-left'>
@@ -449,7 +527,7 @@ const Reports: FC = () => {
     )
   }
   const displayProductSaleList = () => {
-    const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
+    const listPages = find_page_begin_end(list?.current_page  , list?.total_pages)
     return list ? (
       <div className='col-xs-12'>
         <div className="table-responsive">
@@ -466,7 +544,7 @@ const Reports: FC = () => {
             </thead>
             <tbody>
               {list.product_sale_list.length ? (
-                list.product_sale_list?.map((item: any, index: number) => (
+                list.product_sale_list?.map((item: iProduct, index: number) => (
                   <tr key={index}>
                     <td className=' w-15 text-left'>{item.product_id}</td>
                     <td style={{ width: '250px' }} className=' text-left '>
@@ -572,7 +650,7 @@ const Reports: FC = () => {
             </tr>
           </thead>
           <tbody>
-            {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: any, index: number) => <tr key={index} >
+            {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: iOrderList, index: number) => <tr key={index} >
               <td className="w-15 text-start">{item.order_id}</td>
               <td className="w-35 text-left text-dark">{item.customer_name ? item.customer_name : ''}
               </td>
@@ -642,7 +720,7 @@ const Reports: FC = () => {
             </thead>
             <tbody>
               {customerList.customer_list.length > 0 ? (
-                customerList.customer_list?.map((item: any, index: number) => (
+                customerList.customer_list?.map((item: iCustomer, index: number) => (
                   <tr key={index}>
                     <td className=' w-10 text-start'>{index + 1}</td>
                     <td className=' w-30 text-start'>{item.full_name}</td>
@@ -726,12 +804,12 @@ const Reports: FC = () => {
           </tr>
         </thead>
         <tbody>
-          {refundList.order_refund_list.length > 0 ? refundList?.order_refund_list.map((item: any, index: number) => <tr key={index} >
+          {refundList.order_refund_list.length > 0 ? refundList?.order_refund_list.map((item: iRefuned, index: number) => <tr key={index} >
             <td className="text-start">{item.order_id}</td>
             <td style={{ width: '250px' }} className="text-left">
               <div className='d-flex align-items-center'>
                 <div className='symbol symbol-45px me-5'>
-                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.product_sale} />
+                  <img src={item.product_img ? item.product_img : 'https://via.placeholder.com/75x75/f0f0f0'} alt={item.title_product} />
                 </div>
                 <div style={{ fontSize: "13px !important" }} className='d-flex justify-content-start flex-column'>
                   <a target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6 ' >

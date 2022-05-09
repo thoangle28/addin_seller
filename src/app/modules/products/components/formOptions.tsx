@@ -416,10 +416,15 @@ export const loadAttributeOptions = async ( user_id: any, prevOptions: any, newA
   const response = await common.getAttributesNoChild(user_id)
   const responseJSON = await response.data
   const loadCondition = ( prevOptions && prevOptions.length === responseJSON.data.length )
+  //remove options attributes
+  const optLists: any = [];
+  responseJSON.data && responseJSON.data.map((item: any) => {
+    optLists.push({id: item.id, label: item.label, value: item.value, name: item.name })
+  })
 
   let options: any = []
   if( prevOptions.length <= 0) 
-    options = responseJSON.data || []
+    options = optLists || []
   else {
     options = (loadCondition ? [] : newAttrValue) || []
   }

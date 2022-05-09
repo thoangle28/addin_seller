@@ -126,37 +126,37 @@ const TablesWidget14 = ({
             </span>
           )}
           {!isHome && (
-          <>
-            <div className='me-4 my-1'>
-              <input
-                value={searchTerms}
-                type='text'
-                name='searchTerm'
-                className='form-control px-2 py-2 me-3'
-                id='searchTerm'
-                placeholder='Search'
-                onChange={(e) => {
-                  setSearchTerms(e.target.value)
-                }}
-                onKeyDown={(e) => { onEnterKeyDown(e) }}
-              />
-            </div>
-            <div className='me-4 my-1'>
-              <select
-                className='form-select form-select-solid form-select-sm me-3'
-                value={filterOption}
-                onChange={(e) => {
-                  setFilterOption(e.target.value)
-                  searchEvent(e, searchTerms, e.target.value)
-                }}
-              >
-                <option value=''>All</option>
-                <option value='draft'>Draft</option>
-                <option value='pending'>Pending</option>
-                <option value='publish'>Publish</option>
-              </select>
-            </div>
-          </>
+            <>
+              <div className='me-4 my-1'>
+                <input
+                  value={searchTerms}
+                  type='text'
+                  name='searchTerm'
+                  className='form-control px-2 py-2 me-3'
+                  id='searchTerm'
+                  placeholder='Search'
+                  onChange={(e) => {
+                    setSearchTerms(e.target.value)
+                  }}
+                  onKeyDown={(e) => { onEnterKeyDown(e) }}
+                />
+              </div>
+              <div className='me-4 my-1'>
+                <select
+                  className='form-select form-select-solid form-select-sm me-3'
+                  value={filterOption}
+                  onChange={(e) => {
+                    setFilterOption(e.target.value)
+                    searchEvent(e, searchTerms, e.target.value)
+                  }}
+                >
+                  <option value=''>All</option>
+                  <option value='draft'>Draft</option>
+                  <option value='pending'>Pending</option>
+                  <option value='publish'>Publish</option>
+                </select>
+              </div>
+            </>
           )}
           {/* <div className='my-1'>
             <button className='btn btn-primary me-2 py-2' onClick={searchEvent}>
@@ -222,11 +222,14 @@ const TablesWidget14 = ({
                         </div>
                       </td>
                       <td className='text-center'>{ele.type}</td>
-                      <td className='text-center'>{ele.sku}</td>
+                      <td className='text-center'>{ele.sku ? ele.sku : '-'}</td>
                       <td className='text-end'>
                         {ele.sale_price > 0 && ele.sale_price < ele.price ? (
                           <>
-                            <span>{formatToCurrency(ele.sale_price)}</span>
+                            <p className={`text-center ${ele.type === 'Variable' ? 'mb-2 fs-8' : 'mb-0'}`} >
+                              {ele.type === 'Variable' && 'From'}
+                            </p>
+                            <span>{formatToCurrency(ele.sale_price ? ele.sale_price : '-')}</span>
                             <br />
                             <small
                               className='me-2'
@@ -236,7 +239,7 @@ const TablesWidget14 = ({
                             </small>
                           </>
                         ) : (
-                          <span>{formatToCurrency(ele.price)}</span>
+                          <span> {formatToCurrency(ele.price ? ele.price : '-')}</span>
                         )}
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
