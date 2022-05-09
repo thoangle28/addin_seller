@@ -151,7 +151,7 @@ const Reports: FC = () => {
     if (tab === 'Refunded') setFormRefund({ ...formRefund, [name]: parseInt(value), current_page })
   }
   // API Calling
-  const showProductSaleList = (formValue: any) => {
+  const showProductSaleList = (formValue: formValue) => {
     getProductSaleList(formValue)
       .then((res) => {
         const { code, data } = res.data
@@ -169,7 +169,7 @@ const Reports: FC = () => {
       .catch((err) => console.log(err))
   }
 
-  const showCustomerList = (formCustomerValue: any) => {
+  const showCustomerList = (formCustomerValue: formValue) => {
     getCustomerList(formCustomerValue)
       .then((res) => {
         const { code, data, message } = res.data
@@ -187,7 +187,7 @@ const Reports: FC = () => {
       .catch((err) => console.log(err))
   }
 
-  const showProductOrderList = (formProductOrderValue: any) => {
+  const showProductOrderList = (formProductOrderValue: formValue) => {
     getProductOrderList(formProductOrderValue)
       .then((res) => {
         const { code, data } = res.data
@@ -206,7 +206,7 @@ const Reports: FC = () => {
       .catch((err) => console.log(err))
   }
 
-  const showProductSoldList = (formProductSold: any) => {
+  const showProductSoldList = (formProductSold: formValue) => {
     getProductSoldList(formProductSold).then(res => {
       const { code, data } = res.data
       setMessage('Processing')
@@ -222,7 +222,7 @@ const Reports: FC = () => {
     }).catch((err) => console.log(err))
   }
 
-  const showRefundList = (formRefund: any) => {
+  const showRefundList = (formRefund: formValue) => {
     getRefundedList(formRefund).then(res => {
       const { code, data, message } = res.data
       setMessage('Processing')
