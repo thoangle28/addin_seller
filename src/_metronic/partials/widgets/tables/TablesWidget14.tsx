@@ -232,7 +232,7 @@ const TablesWidget14 = ({
                             <span>{formatToCurrency(ele.sale_price ? ele.sale_price : '-')}</span>
                             <br />
                             <small
-                              className='me-2'
+                              className='me-2 text-center'
                               style={{ color: '#999', textDecoration: 'line-through' }}
                             >
                               {formatToCurrency(ele.price)}
