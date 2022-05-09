@@ -224,12 +224,12 @@ const TablesWidget14 = ({
                       <td className='text-center'>{ele.type}</td>
                       <td className='text-center'>{ele.sku ? ele.sku : '-'}</td>
                       <td className='text-end'>
-                        <p className={`text-center ${ele.type === 'Variable' ? 'mb-2 fs-8' : 'mb-0'}`} >
-                          {ele.type === 'Variable' && 'From'}
-                        </p>
                         {ele.sale_price > 0 && ele.sale_price < ele.price ? (
                           <>
-                            <span>{formatToCurrency(ele.sale_price)}</span>
+                            <p className={`text-center ${ele.type === 'Variable' ? 'mb-2 fs-8' : 'mb-0'}`} >
+                              {ele.type === 'Variable' && 'From'}
+                            </p>
+                            <span>{formatToCurrency(ele.sale_price ? ele.sale_price : '-')}</span>
                             <br />
                             <small
                               className='me-2'
@@ -239,7 +239,7 @@ const TablesWidget14 = ({
                             </small>
                           </>
                         ) : (
-                          <span>{formatToCurrency(ele.price)}</span>
+                          <span> {formatToCurrency(ele.price ? ele.price : '-')}</span>
                         )}
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
