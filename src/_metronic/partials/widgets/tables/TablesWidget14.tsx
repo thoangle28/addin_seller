@@ -226,20 +226,24 @@ const TablesWidget14 = ({
                       <td className='text-end'>
                         {ele.sale_price > 0 && ele.sale_price < ele.price ? (
                           <>
-                            <p className={`text-center ${ele.type === 'Variable' ? 'mb-2 fs-8' : 'mb-0'}`} >
+                            <p className={`  mb-0  ${ele.type === 'Variable' ? 'fs-8' : ''}`} >
                               {ele.type === 'Variable' && 'From'}
                             </p>
                             <span>{formatToCurrency(ele.sale_price ? ele.sale_price : '-')}</span>
                             <br />
-                            <small
-                              className='me-2'
+                            <small 
                               style={{ color: '#999', textDecoration: 'line-through' }}
                             >
                               {formatToCurrency(ele.price)}
                             </small>
                           </>
                         ) : (
-                          <span> {formatToCurrency(ele.price ? ele.price : '-')}</span>
+                          <>
+                            <p className={` mb-0  ${ele.type === 'Variable' ? 'fs-8' : ''}`} >
+                              {ele.type === 'Variable' && 'From'}
+                            </p>
+                            <span>{formatToCurrency(ele.price)}</span>
+                          </>
                         )}
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
