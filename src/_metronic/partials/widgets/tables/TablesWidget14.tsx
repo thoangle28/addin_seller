@@ -239,7 +239,12 @@ const TablesWidget14 = ({
                             </small>
                           </>
                         ) : (
-                          <span> {formatToCurrency(ele.price ? ele.price : '-')}</span>
+                          <>
+                            <p className={`text-center ${ele.type === 'Variable' ? 'mb-2 fs-8' : 'mb-0'}`} >
+                              {ele.type === 'Variable' && 'From'}
+                            </p>
+                            <span>{formatToCurrency(ele.price)}</span>
+                          </>
                         )}
                       </td>
                       <td className='text-end'>{ele.posted_date}</td>
