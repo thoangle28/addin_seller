@@ -7,32 +7,8 @@ import { AddinLoading } from '../../../../_metronic/partials';
 import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
 
-interface iCreateValue {
-    name: string;
-    parrent_attribute: string;
-    parent_id: number
-}
+import { iListItem, iOption, iUpdateAttribute, iCreateValue } from './../../../../models'
 
-interface iUpdateAttribute {
-    parent_id: number;
-    new_attribute_term_name: string;
-    taxonomy: string
-}
-
-interface iListItem {
-    id:number,
-    label:string,
-    name:string,
-    value:string,
-    options: iOption[]
-}
-
-interface iOption {
-    id:number,
-    label:string,
-    value:string,
-    attr:string
-}
 const Attribute: FC = () => {
     // Declare States
     const [parentAttributeList, setParentAttributeList] = useState<any[]>([])
