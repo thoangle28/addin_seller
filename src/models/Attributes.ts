@@ -24,3 +24,23 @@ export interface iOption {
     value: string,
     attr: string
 }
+
+export interface iUpdateAttributeTerm {
+    id_term: number,
+    parent_id: number | string,
+    new_attribute_term_name: string
+}
+
+export interface iUpdateDataAttr {
+    old_attribute_name: string, new_attribute_name: string
+}
+
+export interface iCreateProductAttrPayload {
+    user_id: number,
+    label_name: string
+}
+
+export interface iCreateTermAttrPayload {
+    parent_id: number | string;
+    term_name: string
+}
