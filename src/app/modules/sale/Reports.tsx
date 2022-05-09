@@ -3,107 +3,28 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-interface iReport {
-  weeklySales: any | 0
-  newUsers: any | 0
-  itemOrders: any | 0
-  bugReports: any | 0
-  productSale12M: any | []
-  statistics: any | []
-  loading: boolean | false
-}
+ 
+import {
+  iReport,
+  formValue,
+  iList,
+  iCustomerList,
+  iProductOrderList,
+  iRefunedList,
+  iProductSoldList,
+  iProduct,
+  iProductSold, 
+  iOrderList,
+  iRefuned, 
+  iCustomer
+} from '../../../models'
+
 
 type Props = {
   dataList: any | []
   isPageLoading: boolean | true
   saleReport: iReport
-}
-interface formValue {
-  user_id: number
-  filter_by_month?: number
-  filter_by_year?: number
-  page_size?: number | string
-  current_page?: number | string
-  last_seven_date?: boolean
-}
-
-
-interface iBaseResponse {
-  current_page: number,
-  total_order: number | string,
-  page_size: number,
-  total_pages: number,
-}
-interface iList extends iBaseResponse {
-  product_sale_list: iProduct[]
-}
-
-interface iProductOrderList extends iBaseResponse {
-  order_list:iOrderList[]
-}
-
-interface iCustomerList extends iBaseResponse {
-  customer_list: iCustomer[]
-}
-
-interface iRefunedList extends iBaseResponse {
-  order_refund_list: iRefuned[]
-}
-
-interface iProductSoldList extends iBaseResponse {
-  product_list: iProductSold[]
-}
-
-interface iOrderList {
-  order_id: string | number,
-  title_product: string;
-  date: string;
-  status: string;
-  price: number;
-  customer_name: string
-}
-
-interface iCustomer {
-  user_id: string | number;
-  city: string;
-  country: string;
-  email: string;
-  phone: number | string;
-  full_name: string;
-}
-
-interface iProduct {
-  date: string;
-  preview: string;
-  product_id: string;
-  product_img: string;
-  product_sale: string;
-  regular_price: string;
-  sale_price: string;
-  sku: string;
-  status: string;
-}
-interface iRefuned {
-  order_id: string;
-  title_product: string;
-  date: string;
-  price_refund: number;
-  product_img: string;
-  product_url: string;
-  sku: string;
-}
-
-interface iProductSold {
-  order_id: string;
-  title_product: string;
-  date: string;
-  price: number;
-  product_img: string;
-  product_url: string;
-  quantity: 1;
-  sku: string;
-  status: string;
-}
+} 
 
 const Loading: FC = () => {
   return (
@@ -527,7 +448,7 @@ const Reports: FC = () => {
     )
   }
   const displayProductSaleList = () => {
-    const listPages = find_page_begin_end(list?.current_page  , list?.total_pages)
+    const listPages = find_page_begin_end(list?.current_page, list?.total_pages)
     return list ? (
       <div className='col-xs-12'>
         <div className="table-responsive">
