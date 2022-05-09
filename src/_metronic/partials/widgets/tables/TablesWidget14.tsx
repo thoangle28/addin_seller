@@ -224,7 +224,7 @@ const TablesWidget14 = ({
                       <td className='text-center'>{ele.type}</td>
                       <td className='text-center'>{ele.sku ? ele.sku : '-'}</td>
                       <td className='text-end'>
-                        <p className={`text-center ${ele.type === 'Variable' ? 'mb-2' : 'mb-0'}`} >
+                        <p className={`text-center ${ele.type === 'Variable' ? 'mb-2 fs-8' : 'mb-0'}`} >
                           {ele.type === 'Variable' && 'From'}
                         </p>
                         {ele.sale_price > 0 && ele.sale_price < ele.price ? (
