@@ -313,33 +313,33 @@ const Reports: FC = () => {
   // UI components
   const productSoldStatus = (status: string) => {
     if (status === 'processing')
-      return <td className="w-15 text-center "><span className='badge badge-light-primary'>Processing</span></td>
+      return <td className="text-center"><span className='badge badge-light-primary'>Processing</span></td>
     if (status === 'refunded')
-      return <td className="w-15 text-center "><span className='badge badge-light-warning'>Refunded</span></td>
+      return <td className="text-center"><span className='badge badge-light-warning'>Refunded</span></td>
     if (status === 'in-china-warehous')
-      return <td className="w-15 text-center "><span className='badge badge-light-info'>In China Warehous</span></td>
+      return <td className="text-center"><span className='badge badge-light-info'>In China Warehous</span></td>
     if (status === 'leave-china-port')
-      return <td className="w-15 text-center "><span className='badge badge-light-success'>Leave China Port</span></td>
+      return <td className="text-center"><span className='badge badge-light-success'>Leave China Port</span></td>
     if (status === 'reach-singapre-p')
-      return <td className="w-15 text-center "><span className='badge badge-light-success'>Reach Singapore Port</span></td>
+      return <td className="text-center"><span className='badge badge-light-success'>Reach Singapore Port</span></td>
     if (status === 'reach-tuas-wareho')
-      return <td className="w-15 text-center "><span className='badge badge-light-success'>Reach Tuas Wareho</span></td>
+      return <td className="text-center"><span className='badge badge-light-success'>Reach Tuas Wareho</span></td>
     if (status === 'failed')
-      return <td className="w-15 text-center "><span className='badge badge-light-danger'>Failed</span></td>
+      return <td className="text-center"><span className='badge badge-light-danger'>Failed</span></td>
     if (status === 'cancelled')
-      return <td className="w-15 text-center "><span className='badge badge-light-danger'>Cancelled</span></td>
+      return <td className="text-center"><span className='badge badge-light-danger'>Cancelled</span></td>
     if (status === 'completed')
-      return <td className="w-15 text-center "><span className='badge badge-light-success'>Completed</span></td>
+      return <td className="text-center"><span className='badge badge-light-success'>Completed</span></td>
     if (status === 'on-hold')
-      return <td className="w-15 text-center "><span className='badge badge-light-primary'>On Hold</span></td>
+      return <td className="text-center"><span className='badge badge-light-primary'>On Hold</span></td>
     if (status === 'pending')
-      return <td className="w-15 text-center "><span className='badge badge-light-warning'>Pending</span></td>
+      return <td className="text-center"><span className='badge badge-light-warning'>Pending</span></td>
     if (status === 'approved')
-      return <td className="w-15 text-center "><span className='badge badge-light-success'>Approved</span></td>
+      return <td className="text-center"><span className='badge badge-light-success'>Approved</span></td>
     if (status === 'publish')
-      return <td className="w-15 text-center "><span className='badge badge-light-success'>Approved</span></td>
+      return <td className="text-center"><span className='badge badge-light-success'>Approved</span></td>
     if (status === 'draft')
-      return <td className="w-15 text-center "><span className='badge badge-light-info'>Draft</span></td>
+      return <td className="text-center"><span className='badge badge-light-info'>Draft</span></td>
   }
 
   const displayProductSoldList = () => {
@@ -350,19 +350,19 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                <th className='w-20 text-start'>Order ID</th>
+                <th className='text-start'>Order ID</th>
                 <th style={{ width: '250px' }} className='text-left '>Product Name</th>
-                <th className='w-10 text-center '>SKU</th>
-                <th className='w-10 text-center '>Quantity</th>
-                <th className='w-10 text-left '>Total</th>
-                <th className='w-20 text-end'>Date Created</th>
+                <th className='text-center '>SKU</th>
+                <th className='text-center '>Quantity</th>
+                <th className='text-end '>Total</th>
+                <th className='text-end'>Date Created</th>
               </tr>
             </thead>
             <tbody>
               {productSoldList.product_list.length > 0 ? (
                 productSoldList.product_list?.map((item: iProductSold, index: number) => (
                   <tr key={index}>
-                    <td className='w-20 text-start'>{item.order_id}</td>
+                    <td className='text-start'>{item.order_id}</td>
                     <td style={{ width: '250px' }} className='text-left'>
                       <div className='d-flex align-items-center'>
                         <div className='symbol symbol-45px me-5'>
@@ -382,10 +382,10 @@ const Reports: FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className='w-10 text-center '>{item.sku ? item.sku : '-'}</td>
-                    <td className='w-10 text-center '>{item.quantity}</td>
-                    <td className='w-10 text-left '>{formatMoney(item.price)}</td>
-                    <td className='w-15 text-end'>{item.date}</td>
+                    <td className='text-center '>{item.sku ? item.sku : '-'}</td>
+                    <td className='text-center '>{item.quantity}</td>
+                    <td className='text-end '>{formatMoney(item.price)}</td>
+                    <td className='text-end'>{item.date}</td>
                   </tr>
                 ))
               ) : (
@@ -470,7 +470,7 @@ const Reports: FC = () => {
               {list.product_sale_list.length ? (
                 list.product_sale_list?.map((item: iProduct, index: number) => (
                   <tr key={index}>
-                    <td className=' w-15 text-left'>{item.product_id}</td>
+                    <td className='text-left'>{item.product_id}</td>
                     <td style={{ width: '250px' }} className=' text-left '>
                       <div className='d-flex align-items-center'>
                         <div className='symbol symbol-45px me-5'>
@@ -571,21 +571,21 @@ const Reports: FC = () => {
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
           <thead>
             <tr className="fw-bolder text-muted">
-              <th className="w-15 text-start">Order ID</th>
-              <th className="w-35 text-left">Customer's Name</th>
-              <th className="w-5 text-center">Order Status</th>
-              <th className="w-30 text-center">Total</th>
-              <th className="w-25 text-end">Date Created</th>
+              <th className="text-start">Order ID</th>
+              <th className="text-left">Customer's Name</th>
+              <th className="text-center">Order Status</th>
+              <th className="text-end">Total</th>
+              <th className="text-end">Date Created</th>
             </tr>
           </thead>
           <tbody>
             {productOrderList.order_list.length > 0 ? productOrderList.order_list?.map((item: iOrderList, index: number) => <tr key={index} >
-              <td className="w-15 text-start">{item.order_id}</td>
-              <td className="w-35 text-left text-dark">{item.customer_name ? item.customer_name : ''}
+              <td className="text-start">{item.order_id}</td>
+              <td className="text-left text-dark">{item.customer_name ? item.customer_name : ''}
               </td>
               {productSoldStatus(item.status)}
-              <td className="w-30 text-center">{formatMoney(item.price)}</td>
-              <td className="w-25 text-end">{item.date}</td>
+              <td className="text-end">{formatMoney(item.price)}</td>
+              <td className="text-end">{item.date}</td>
             </tr>
             ) : <tr>
               <td colSpan={5} className="text-center">No Item Found</td>
@@ -639,24 +639,24 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                <th className='w-10 text-start'>No.</th>
-                <th className='w-30 text-start'>Full Name</th>
-                <th className='w-15 text-start'>Email</th>
-                <th className='w-15 text-center'>Phone</th>
-                <th className='w-15 text-center'>City</th>
-                <th className='w-15 text-center'>Country</th>
+                <th className='text-start'>No.</th>
+                <th className='text-start'>Full Name</th>
+                <th className='text-start'>Email</th>
+                <th className='text-center'>Phone</th>
+                <th className='text-center'>City</th>
+                <th className='text-center'>Country</th>
               </tr>
             </thead>
             <tbody>
               {customerList.customer_list.length > 0 ? (
                 customerList.customer_list?.map((item: iCustomer, index: number) => (
                   <tr key={index}>
-                    <td className=' w-10 text-start'>{index + 1}</td>
-                    <td className=' w-30 text-start'>{item.full_name}</td>
-                    <td className=' w-15 text-start'>{item.email ? item.email : '-'}</td>
-                    <td className=' w-15 text-center'>{item.phone}</td>
-                    <td className=' w-15 text-center'>{item.city ? item.city : '-'}</td>
-                    <td className=' w-15 text-center'>{item.country ? item.country : '-'}</td>
+                    <td className=' text-start'>{index + 1}</td>
+                    <td className=' text-start'>{item.full_name}</td>
+                    <td className=' text-start'>{item.email ? item.email : '-'}</td>
+                    <td className=' text-center'>{item.phone}</td>
+                    <td className=' text-center'>{item.city ? item.city : '-'}</td>
+                    <td className=' text-center'>{item.country ? item.country : '-'}</td>
                   </tr>
                 ))
               ) : <tr>
@@ -725,11 +725,11 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className=" text-start">Order ID</th>
+            <th className="text-start">Order ID</th>
             <th style={{ width: '250px' }} className=" text-left">Product Name</th>
-            <th className=" text-center">SKU</th>
-            <th className=" text-center">Total</th>
-            <th className=" text-end">Date Created</th>
+            <th className="text-center">SKU</th>
+            <th className="text-end">Total</th>
+            <th className="text-end">Date Created</th>
           </tr>
         </thead>
         <tbody>
@@ -748,7 +748,7 @@ const Reports: FC = () => {
               </div>
             </td>
             <td className="text-center">{item.sku ? item.sku : '-'}</td>
-            <td className="text-center">{formatMoney(item.price_refund)}</td>
+            <td className="text-end">{formatMoney(item.price_refund)}</td>
             <td className="text-end">{item.date}</td>
           </tr>
           ) : <tr>
