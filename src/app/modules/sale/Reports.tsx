@@ -495,8 +495,8 @@ const Reports: FC = () => {
                       <p className={`  mb-0  ${item.type === 'Variable' ? 'fs-8' : ''}`} >
                         {item.type === 'Variable' && 'From'}
                       </p>
-                      <p>{formatMoney(item.sale_price)}</p>
-                      <p className='m-0 text-muted'>
+                      <p className='mb-1'>{formatMoney(item.sale_price)}</p>
+                      <p className='mb-0 text-muted'>
                         <s>{formatMoney(item.regular_price)}</s>
                       </p>
                     </td>
