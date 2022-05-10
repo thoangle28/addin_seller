@@ -72,6 +72,7 @@ export interface iProduct {
     sale_price: string;
     sku: string;
     status: string;
+    type:string;
 }
 export interface iRefuned {
     order_id: string;

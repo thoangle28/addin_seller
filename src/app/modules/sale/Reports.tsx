@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
- 
+
 import {
   iReport,
   formValue,
@@ -13,9 +13,9 @@ import {
   iRefunedList,
   iProductSoldList,
   iProduct,
-  iProductSold, 
+  iProductSold,
   iOrderList,
-  iRefuned, 
+  iRefuned,
   iCustomer
 } from '../../../models'
 
@@ -24,7 +24,7 @@ type Props = {
   dataList: any | []
   isPageLoading: boolean | true
   saleReport: iReport
-} 
+}
 
 const Loading: FC = () => {
   return (
@@ -455,12 +455,13 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                <th className='w-15 text-left'>#ID</th>
+                <th className='text-left'>#ID</th>
                 <th style={{ width: '250px' }} className='text-left '>Product Name</th>
-                <th className='w-10 text-center'>SKU</th>
-                <th className='w-15 text-center'>Price</th>
-                <th className='w-15 text-center'>Status</th>
-                <th className='w-15 text-end'>Date Created</th>
+                <th className="text-center">Type</th>
+                <th className='text-center'>SKU</th>
+                <th className='text-center'>Price</th>
+                <th className='text-center'>Status</th>
+                <th className='text-end'>Date Created</th>
               </tr>
             </thead>
             <tbody>
@@ -487,15 +488,20 @@ const Reports: FC = () => {
                         </div>
                       </div>
                     </td>
-                    <td className=' w-10 text-center'>{item.sku ? item.sku : '-'}</td>
-                    <td className=' w-15 text-center'>
+                    <td className='text-center'>{item.type}</td>
+
+                    <td className='text-center'>{item.sku ? item.sku : '-'}</td>
+                    <td className='text-center'>
+                      <p className={`  mb-0  ${item.type === 'Variable' ? 'fs-8' : ''}`} >
+                        {item.type === 'Variable' && 'From'}
+                      </p>
                       <p>{formatMoney(item.sale_price)}</p>
                       <p className='m-0 text-muted'>
                         <s>{formatMoney(item.regular_price)}</s>
                       </p>
                     </td>
                     {productSoldStatus(item.status)}
-                    <td className=' w-15 text-end'>{item.date}</td>
+                    <td className='text-end'>{item.date}</td>
                   </tr>
                 ))
               ) : <tr>
