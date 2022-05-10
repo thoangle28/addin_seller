@@ -309,6 +309,7 @@ const Reports: FC = () => {
 
     return listPages
   }
+
   // UI components
   const productSoldStatus = (status: string) => {
     if (status === 'processing')
@@ -340,6 +341,7 @@ const Reports: FC = () => {
     if (status === 'draft')
       return <td className="w-15 text-center "><span className='badge badge-light-info'>Draft</span></td>
   }
+
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
     return productSoldList ? (
@@ -459,7 +461,7 @@ const Reports: FC = () => {
                 <th style={{ width: '250px' }} className='text-left '>Product Name</th>
                 <th className="text-center">Type</th>
                 <th className='text-center'>SKU</th>
-                <th className='text-center'>Price</th>
+                <th className='text-end'>Price</th>
                 <th className='text-center'>Status</th>
                 <th className='text-end'>Date Created</th>
               </tr>
@@ -491,7 +493,7 @@ const Reports: FC = () => {
                     <td className='text-center'>{item.type}</td>
 
                     <td className='text-center'>{item.sku ? item.sku : '-'}</td>
-                    <td className='text-center'>
+                    <td className='text-end'>
                       <p className={`  mb-0  ${item.type === 'Variable' ? 'fs-8' : ''}`} >
                         {item.type === 'Variable' && 'From'}
                       </p>
