@@ -7,7 +7,7 @@ import { AddinLoading } from '../../../../_metronic/partials';
 import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
 
-import { iListItem, iOption, iUpdateAttribute, iCreateValue } from './../../../../models'
+import { iListItem, iOption, iUpdateAttribute, iCreateValue, iCreateProductAttrPayload, iUpdateAttributeTerm, iCreateTermAttrPayload, iUpdateDataAttr } from './../../../../models'
 
 const Attribute: FC = () => {
     // Declare States
@@ -90,7 +90,10 @@ const Attribute: FC = () => {
     }
 
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any, setSubmitting: any) => {
-        updateAttr(old_attribute_name, new_attribute_name).then(res => {
+        const payload:iUpdateDataAttr = {
+            old_attribute_name, new_attribute_name
+        }
+        updateAttr(payload).then(res => {
             const { code, message } = res.data
             setHasErrors(false)
             setMessage("Processing")
@@ -153,7 +156,7 @@ const Attribute: FC = () => {
     }
 
     const updateAttributeTerm = (new_attribute_term_name: string, resetForm: any, setSubmitting: any) => {
-        const payload: any = {
+        const payload: iUpdateAttributeTerm = {
             id_term: childId,
             parent_id: attrId,
             new_attribute_term_name,
@@ -185,7 +188,7 @@ const Attribute: FC = () => {
     }
 
     const createProductAttr = (label_name: string, resetForm: any, setSubmitting: any) => {
-        const payload = {
+        const payload: iCreateProductAttrPayload = {
             user_id: currentUserId,
             label_name
         }
@@ -223,7 +226,7 @@ const Attribute: FC = () => {
     }
 
     const createProductTermAttr = (parent_id: string | number, term_name: string, resetForm: any, setSubmitting: any) => {
-        const payload = {
+        const payload: iCreateTermAttrPayload = {
             term_name, parent_id
         }
         createTermsProductAttribute(payload).then(res => {
