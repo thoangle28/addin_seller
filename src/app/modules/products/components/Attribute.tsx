@@ -140,16 +140,16 @@ const Attribute: FC = () => {
                 ...parentItem, options
             }
 
-            const newParentItem = list.find((item: any) => parseInt(item.id) === attrID) 
+            const newParentItem = list.find((item: any) => item.id.toString() === attrID)
             const result = {
-                ...newParentItem, options: [...newParentItem?.options, {
+                ...newParentItem, options: [...newParentItem.options, {
                     id: childID,
                     label,
                     value: taxonomy,
                     attr: taxonomy
                 }]
             }
-            const newItems = [oldParentResult, result] 
+            const newItems = [oldParentResult, result]
             const newList = list.map(obj => newItems.find(o => o.id === obj.id) || obj);
             setParentAttributeList(newList)
         }
@@ -304,7 +304,7 @@ const Attribute: FC = () => {
                     {({ values, errors, touched, handleSubmit, isSubmitting }) => (
                         <form onSubmit={handleSubmit}>
                             <div className="col-xxs-12">
-                                <label className="form-label mb-2" htmlFor="parrent_attribute">{attrId === 0 ? '' : 'Parent'} Attribute</label>
+                                <label className="form-label mb-2" htmlFor="parrent_attribute">{attrId === 0 ? 'Parent' : ''} Attribute</label>
                                 <Field
                                     component="select"
                                     as="select"
@@ -319,7 +319,7 @@ const Attribute: FC = () => {
                                 </Field>
                             </div>
                             <div className="col-xxs-12 mt-3">
-                                <label className="form-label mb-2" htmlFor="name">{attrId === 0 ? 'Parent' : 'Child'} Attribute Name</label>
+                                <label className="form-label mb-2" htmlFor="name">{attrId === 0 ? 'Child' : 'Parent'} Attribute Name</label>
                                 <Field
                                     component="input"
                                     type='text'

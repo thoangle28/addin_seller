@@ -38,7 +38,7 @@ const ModalAttr = (Props: any) => {
 
   const productAttributeValue = (values: any) => {
     const payload = {
-      parent_id: Props.parentId,
+      taxonomy,
       term_name: values.term_name,
     }
     createTermsProductAttribute(payload).then(res => {
@@ -83,7 +83,7 @@ const ModalAttr = (Props: any) => {
                 initialValues={isAddAttr ? initialFormAttr : initialFormValues}
                 /* validationSchema={ValidationSchema} */
                 enableReinitialize={true}
-                onSubmit={(values, { setSubmitting }) => { 
+                onSubmit={(values, { setSubmitting }) => {
                   setSubmitting(true)
                   isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);
                   setSubmitting(false)
@@ -91,9 +91,14 @@ const ModalAttr = (Props: any) => {
               >
                 {({
                   values,
+                  errors,
+                  touched,
                   handleChange,
+                  handleBlur,
                   handleSubmit,
                   isSubmitting,
+                  resetForm,
+                  setFieldValue,
                 }) => (
                   <form
                     onSubmit={handleSubmit}
