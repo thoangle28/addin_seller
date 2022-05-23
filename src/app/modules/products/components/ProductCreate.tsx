@@ -102,6 +102,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       if (typeof productId === 'undefined' || productId <= 0) {      
         initialFormValues.user_id = currentUserId
         //mapValuesToForm(initialForm, initialFormValues)
+        if (loading) { 
+          initialFormValues.attributes = []
+          initialFormValues.variations = [] 
+        } 
         setNewProduct(true)
         setProductType('simple')
         setLoading(false)
@@ -246,8 +250,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /** Add Variations */
   const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
-    const listAttr: any = []
-
+    const listAttr: any = [] 
     formValues.variations_attr &&
       formValues.variations_attr.map((e: any) => {
         listAttr.push({attr: e, id: 0, label: '', value: ''})
@@ -618,7 +621,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       className='form'
                       noValidate
                       id='kt_modal_create_app_form'
-                    >
+                    > 
                       <div className='current' data-kt-stepper-element='content'>
                         <div className='w-100'>
                           <div className='fv-row mb-5'>
