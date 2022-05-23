@@ -104,6 +104,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       if (typeof productId === 'undefined' || productId <= 0) {
         initialFormValues.user_id = currentUserId
         //mapValuesToForm(initialForm, initialFormValues)
+        if (loading) initialFormValues.attributes = []
+
         setNewProduct(true)
         setProductType('simple')
         setLoading(false)
@@ -112,8 +114,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           setLoading(false)
         }, 2000)
       }
-
-      return mapValuesToForm(initialForm, selectedAttr)
     }
   }, [product, productId])
 
@@ -169,10 +169,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       variation: false,
       visible: true,
     }
-    formValues.attributes.push(newAttr)
+    const attributes = formValues.attributes
     //reset
     setSelectedAttr({ value: '', label: '' })
-    mapValuesToForm(initialForm, formValues)
+    mapValuesToForm(initialForm, attributes.push(newAttr))
   }
 
   const onCloseModal = (attr: any) => {
