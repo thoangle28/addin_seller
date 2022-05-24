@@ -1,14 +1,14 @@
-import React, {FC, useCallback, useEffect, useRef, useState} from 'react'
-import {Formik} from 'formik'
-import {shallowEqual, useSelector, connect, ConnectedProps} from 'react-redux'
+import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { Formik } from 'formik'
+import { shallowEqual, useSelector, connect, ConnectedProps } from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
-import {useHistory, useLocation} from 'react-router'
+import { useHistory, useLocation } from 'react-router'
 import * as detail from '../redux/CreateProductRedux'
-import {RootState} from '../../../../setup'
+import { RootState } from '../../../../setup'
 import Select from 'react-select'
-import {AsyncPaginate} from 'react-select-async-paginate'
-import {confirmAlert} from 'react-confirm-alert' // Import
+import { AsyncPaginate } from 'react-select-async-paginate'
+import { confirmAlert } from 'react-confirm-alert' // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {
   initialForm,
@@ -31,12 +31,12 @@ import {
   uploadImage,
 } from './formOptions'
 
-import {CKEditor} from '@ckeditor/ckeditor5-react'
+import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 
 import ModelAttr from './Modal'
 
-const mapState = (state: RootState) => ({productDetail: state.productDetail})
+const mapState = (state: RootState) => ({ productDetail: state.productDetail })
 const connector = connect(mapState, detail.actions)
 type PropsFromRedux = ConnectedProps<typeof connector>
 
@@ -44,9 +44,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const history = useHistory()
   //get product id or create new
   const userLocation: any = useLocation()
-  const {productId} = userLocation.state ? userLocation.state : 0
-  const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
-  const {accessToken, user} = auth
+  const { productId } = userLocation.state ? userLocation.state : 0
+  const auth: any = useSelector<RootState>(({ auth }) => auth, shallowEqual)
+  const { accessToken, user } = auth
   const currentUserId: number = user ? user.ID : 0
 
   //useState
@@ -57,13 +57,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [productType, setProductType] = useState('simple')
   const [newPhotoGalleries, setNewPhotoGalleries] = useState<any>([])
   const [newThumbnail, setNewThumbnail] = useState('')
-  const [selectedAttr, setSelectedAttr] = useState({value: '', label: ''})
-  const [selectedVar, setSelectedVar] = useState({value: '', label: ''})
+  const [selectedAttr, setSelectedAttr] = useState({ value: '', label: '' })
+  const [selectedVar, setSelectedVar] = useState({ value: '', label: '' })
   const [product, setProductDetail] = useState<any>([])
   const [isAttributeAdded, setAttritesAdded] = useState(false)
-  const [isSaveAttr, setSaveAttr] = useState({loading: false, error: ''})
-  const [isSaveVar, setSaveVar] = useState({loading: false, error: ''})
-  const [formStatus, setFormStatus] = useState({error: 204, message: ''})
+  const [isSaveAttr, setSaveAttr] = useState({ loading: false, error: '' })
+  const [isSaveVar, setSaveVar] = useState({ loading: false, error: '' })
+  const [formStatus, setFormStatus] = useState({ error: 204, message: '' })
   const [usePhotoFromContent, setUsePhotoFromContent] = useState([])
   const [usePhoto, setUsePhoto] = useState(false)
   const [taxonomy, setTaxonomy] = useState<string>()
@@ -72,6 +72,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [isAddAttr, setIsAddAttr] = useState<boolean>(true)
   const [newAttrParent, setNewAttrParent] = useState<any>([])
   const [newAttrValues, setNewAttrValues] = useState<any>([])
+
+  const [parentId, setParentId] = useState()
 
   const tabDefault: any = useRef(null)
   //Get All Properties
@@ -83,9 +85,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
 
     productInfo.then((response: any) => {
-      const {code, message, data} = response
-      setProductDetail({...data})
-      setFormStatus({error: code, message: message})
+      const { code, message, data } = response
+      setProductDetail({ ...data })
+      setFormStatus({ error: code, message: message })
     })
   }, [reloadPage])
 
@@ -99,7 +101,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setNewProduct(false)
       setLoading(false)
     } else {
-      if (typeof productId === 'undefined' || productId <= 0) {      
+      if (typeof productId === 'undefined' || productId <= 0) {
         initialFormValues.user_id = currentUserId
         //mapValuesToForm(initialForm, initialFormValues)
         if (loading) { 
@@ -149,7 +151,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const handleAddMoreAttributes = (formValues: any) => {
     if (!selectedAttr || !selectedAttr.value) return
-    const value: any = {...selectedAttr}
+    const value: any = { ...selectedAttr }
     const isAdded = formValues.attributes.some((x: any) => x.id === value.id)
 
     if (isAdded) {
@@ -169,21 +171,21 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       variation: false,
       visible: true,
     }
-    formValues.attributes.push(newAttr)
+    const attributes = formValues.attributes
     //reset
-    setSelectedAttr({value: '', label: ''})
-    mapValuesToForm(initialForm, formValues)
+    setSelectedAttr({ value: '', label: '' })
+    mapValuesToForm(initialForm, attributes.push(newAttr))
   }
 
   const onCloseModal = (attr: any) => {
     const newOptItem = []
     newOptItem.push(attr)
-  
-    if( !attr ) {
+
+    if (!attr) {
       setNewAttrParent([])
       setNewAttrValues([])
     } else {
-      if( isAddAttr ) {     
+      if (isAddAttr) {
         setNewAttrParent(newOptItem)
       } else {
         setNewAttrValues(newOptItem)
@@ -212,17 +214,17 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
-    setSaveAttr({loading: true, error: ''})
+    setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
       product_id: formValues.id,
       attributes: formValues.attributes,
       type: 'attr',
     }).then((response: any) => {
-      const {code, message, data} = response.data
-      setSaveAttr({loading: false, error: message})
+      const { code, message, data } = response.data
+      setSaveAttr({ loading: false, error: message })
       setTimeout(() => {
-        setSaveAttr({loading: false, error: ''})
+        setSaveAttr({ loading: false, error: '' })
         setReloadPage(true)
       }, 2000)
     })
@@ -230,7 +232,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
-    setSaveVar({loading: true, error: ''})
+    setSaveVar({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
       product_id: formValues.id,
@@ -238,14 +240,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       type: 'var',
     })
       .then((response: any) => {
-        const {code, message, data} = response.data
-        setSaveVar({loading: false, error: message})
+        const { code, message, data } = response.data
+        setSaveVar({ loading: false, error: message })
         setTimeout(() => {
-          setSaveVar({loading: false, error: ''})
+          setSaveVar({ loading: false, error: '' })
           setReloadPage(true)
         }, 2000)
       })
-      .catch(() => {})
+      .catch(() => { })
   }
 
   /** Add Variations */
@@ -253,7 +255,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     const listAttr: any = [] 
     formValues.variations_attr &&
       formValues.variations_attr.map((e: any) => {
-        listAttr.push({attr: e, id: 0, label: '', value: ''})
+        listAttr.push({ attr: e, id: 0, label: '', value: '' })
       })
 
     let nextVar = 0
@@ -368,7 +370,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const confirmDelete = (event: any, handleAction: any) => {
     confirmAlert({
-      customUI: ({onClose}) => {
+      customUI: ({ onClose }) => {
         return (
           <div className='custom-ui'>
             <h2>Are you sure?</h2>
@@ -393,7 +395,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const confirmRequest = (message: string, product_id: number) => {
     confirmAlert({
-      customUI: ({onClose}) => {
+      customUI: ({ onClose }) => {
         return (
           <div className='custom-ui'>
             <p>{message}</p>
@@ -417,7 +419,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       case 'variations':
         formValues.variations.find((x: any) => {
           return x.id === id
-        }).thumbnail = {image_id: false, src: ''}
+        }).thumbnail = { image_id: false, src: '' }
         break
       case 'galleries':
         const newGalleries = formValues.photo_galleries.filter((x: any, index: number) => {
@@ -436,10 +438,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           return index !== id
         })
         formValues.photo_galleries = tempPhotos
-        console.log(formValues.photo_galleries)
         break
       case 'thumbnail':
-        formValues.thumbnail = {image_id: false, src: ''}
+        formValues.thumbnail = { image_id: false, src: '' }
         break
       case 'newThumbnail':
         formValues.new_thumbnail = ''
@@ -514,11 +515,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
                 uploadImage(file_upload)
                   .then((response) => {
-                    const {data} = response
+                    const { data } = response
                     if (data && data.data) {
                       setUploading(false)
-                      const {attach_url, attach_id} = data.data
-                      newGalleries.push({image: attach_url, image_id: attach_id})
+                      const { attach_url, attach_id } = data.data
+                      newGalleries.push({ image: attach_url, image_id: attach_id })
                       //setNewPhotoGalleries(newGalleries)
                       setUsePhotoFromContent(newGalleries)
                       resolve({
@@ -569,32 +570,33 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           </div>
           <div className='card-body py-3'>
             {formStatus && formStatus.error === 401 ? (
-              <div style={{height: '91vh'}}>
+              <div style={{ height: '91vh' }}>
                 <div className='alert alert-danger'>{formStatus.message}</div>
               </div>
             ) : (
               <>
                 <Formik
-                  initialValues={isNewProduct ? {...initialFormValues} : {...initialForm}}
+                  initialValues={isNewProduct ? { ...initialFormValues } : { ...initialForm }}
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
-                  onSubmit={(values, {setSubmitting}) => {
+                  onSubmit={(values, { setSubmitting, resetForm }) => {
                     //save to DB
                     if (values.usePhoto && usePhotoFromContent.length > 0) {
                       values.photo_galleries = usePhotoFromContent
                     }
-                   
+
                     setSubmitting(true)
                     postProduct(values, accessToken)
                       .then((product: any) => {
-                        const {code, message, data} = product
+                        const { code, message, data } = product
                         initialFormValues.attributes = [] //clear
                         initialFormValues.variations = [] //clear
                         initialFormValues.variations_attr = []
-                        
+
                         switch (code) {
                           case 200:
                             confirmRequest(message, data)
+                            resetForm();
                             break
                         }
                         setSubmitting(false) //done
@@ -651,18 +653,18 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               required
                               config={configCKEditor}
                               editor={ClassicEditor}
-                              onReady={(editor: any) => {}}
-                              onBlur={(event: any, editor: any) => {}}
-                              onFocus={(event: any, editor: any) => {}}
+                              onReady={(editor: any) => { }}
+                              onBlur={(event: any, editor: any) => { }}
+                              onFocus={(event: any, editor: any) => { }}
                               onChange={(event: any, editor: any) => {
                                 setFieldValue('content', editor.getData())
                               }}
                               data={values.content}
                               name='content'
                               {...props}
-                              style={{minHeight: '500px'}}
+                              style={{ minHeight: '500px' }}
                             />
-                            <div className="small pt-2 text-danger">Please only add a maximum of 10 images for the content</div>                          
+                            <div className="small pt-2 text-danger">Please only add a maximum of 10 images for the content</div>
                           </div>
                         </div>
                         <div className='w-100'>
@@ -708,7 +710,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   //setNewPhotoGalleries(images)
                                                   const newPhotos: any = []
                                                   images.map((item: any) => {
-                                                    newPhotos.push({image: item, image_id: 0})
+                                                    newPhotos.push({ image: item, image_id: 0 })
                                                   })
                                                   setNewPhotoGalleries(newPhotos)
                                                   setFieldValue('new_photo_galleries', newPhotos)
@@ -720,7 +722,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             }
                                           }}
                                         >
-                                          {({getRootProps, getInputProps}) => (
+                                          {({ getRootProps, getInputProps }) => (
                                             <section className='notice d-flex bg-light-primary rounded border-primary border border-dashed py-3 px-2 dropzone dz-clickable'>
                                               <div {...getRootProps()}>
                                                 <input
@@ -730,7 +732,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 />
                                                 <div
                                                   className='dropzone-msg dz-message needsclick d-flex align-items-center'
-                                                  style={{cursor: 'pointer'}}
+                                                  style={{ cursor: 'pointer' }}
                                                 >
                                                   <i className='bi bi-file-earmark-arrow-up text-primary fs-3x'></i>
                                                   <div className='ms-4'>
@@ -1219,7 +1221,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               styles={styles}
                                               closeMenuOnSelect={true}
                                               value={selectedAttr}
-                                              loadOptions={( search: any, prevOptions: any) => {
+                                              loadOptions={(search: any, prevOptions: any) => {
                                                 return loadAttributeOptions(currentUserId, prevOptions, newAttrParent, search)
                                               }}
                                               onChange={onChangeAttr}
@@ -1250,7 +1252,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           <button
                                             onClick={(event) => {
                                               handleAddNewAttributes()
-                                              //handleChange(event)
+                                              handleChange(event)
                                             }}
                                             type='button'
                                             className='btn btn-sm btn-link ms-5'
@@ -1264,7 +1266,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <div className='accordion' id='product_attribute'>
                                         {(values.attributes &&
                                           values.attributes.map((attr: any, i: number | string) => {
-                                        
+
                                             return (
                                               <div
                                                 className='accordion-item'
@@ -1396,6 +1398,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                         <button
                                                           onClick={(event) => {
                                                             handleAddNewValuesAttr(attr.name)
+                                                            setParentId(attr.id)
                                                             //handleChange(event)
                                                           }}
                                                           type='button'
@@ -1432,7 +1435,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             ) : (
                                               <span
                                                 className='indicator-progress'
-                                                style={{display: 'block'}}
+                                                style={{ display: 'block' }}
                                               >
                                                 Processing...
                                                 <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
@@ -1467,7 +1470,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   onChangeVar(event)
                                                 }}
                                                 options={[
-                                                  {value: 'add_one', label: 'Add variation'},
+                                                  { value: 'add_one', label: 'Add variation' },
                                                   {
                                                     value: 'add_all',
                                                     label: 'Create variations from all attributes',
@@ -1631,39 +1634,39 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                         alt=''
                                                                       />
                                                                     )) || (
-                                                                    <img
-                                                                      className='h-100 variation_thumbnail'
-                                                                      src={
-                                                                        new_thumbnail ||
-                                                                        'https://via.placeholder.com/75x75/f0f0f0'
-                                                                      }
-                                                                      alt=''
-                                                                    />
-                                                                  )}
+                                                                      <img
+                                                                        className='h-100 variation_thumbnail'
+                                                                        src={
+                                                                          new_thumbnail ||
+                                                                          'https://via.placeholder.com/75x75/f0f0f0'
+                                                                        }
+                                                                        alt=''
+                                                                      />
+                                                                    )}
                                                                 </div>
                                                                 {(new_thumbnail ||
                                                                   item.thumbnail) && (
-                                                                  <span
-                                                                    className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
-                                                                    data-kt-image-input-action='remove'
-                                                                    data-bs-toggle='tooltip'
-                                                                    title='Remove Image'
-                                                                    id={`thumbnail_${item.id}`}
-                                                                    onClick={(event) => {
-                                                                      removeVariationThumbnail(
-                                                                        'variations',
-                                                                        item.id,
-                                                                        values
-                                                                      )
-                                                                      handleChange(event)
-                                                                    }}
-                                                                  >
-                                                                    <i
-                                                                      id={`thumbnail__${item.id}`}
-                                                                      className='bi bi-x fs-2'
-                                                                    ></i>
-                                                                  </span>
-                                                                )}
+                                                                    <span
+                                                                      className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
+                                                                      data-kt-image-input-action='remove'
+                                                                      data-bs-toggle='tooltip'
+                                                                      title='Remove Image'
+                                                                      id={`thumbnail_${item.id}`}
+                                                                      onClick={(event) => {
+                                                                        removeVariationThumbnail(
+                                                                          'variations',
+                                                                          item.id,
+                                                                          values
+                                                                        )
+                                                                        handleChange(event)
+                                                                      }}
+                                                                    >
+                                                                      <i
+                                                                        id={`thumbnail__${item.id}`}
+                                                                        className='bi bi-x fs-2'
+                                                                      ></i>
+                                                                    </span>
+                                                                  )}
                                                               </div>
                                                             </div>
                                                             <div className='col-md-9'>
@@ -1872,7 +1875,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               ) : (
                                                 <span
                                                   className='indicator-progress'
-                                                  style={{display: 'block'}}
+                                                  style={{ display: 'block' }}
                                                 >
                                                   Processing...
                                                   <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
@@ -1980,7 +1983,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             }}
                                             onChange={(selectedOption: any) => {
                                               let event = {
-                                                target: {name: 'categories', value: selectedOption},
+                                                target: { name: 'categories', value: selectedOption },
                                               }
                                               handleChange(event)
                                             }}
@@ -2027,7 +2030,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   user_id={parseInt(user.ID)}
                   isAddAttr={isAddAttr}
                   showModal={showModalAttr}
-                  onCloseModal={onCloseModal}                  
+                  onCloseModal={onCloseModal}
+                  parentId={parentId}
                 />
               </>
             )}
