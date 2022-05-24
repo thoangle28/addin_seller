@@ -170,11 +170,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       value: '',
       variation: false,
       visible: true,
-    }
-    const attributes = formValues.attributes
+    } 
+    formValues.attributes.push(newAttr)
     //reset
     setSelectedAttr({ value: '', label: '' })
-    mapValuesToForm(initialForm, attributes.push(newAttr))
+    mapValuesToForm(initialForm, formValues)
   }
 
   const onCloseModal = (attr: any) => {
