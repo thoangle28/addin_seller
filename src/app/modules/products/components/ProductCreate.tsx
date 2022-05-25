@@ -89,6 +89,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setProductDetail({ ...data })
       setFormStatus({ error: code, message: message })
     })
+
   }, [reloadPage])
 
   /**
@@ -97,6 +98,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
+      if( reloadPage ) initialForm.type_product = productType
       setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
@@ -1446,7 +1448,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             disabled={isSaveAttr.loading}
                                           >
                                             {!isSaveAttr.loading ? (
-                                              <span className='indicator-label'>
+                                              <span className='indicator-label' id="btnSave">
                                                 Save Attributes
                                               </span>
                                             ) : (
