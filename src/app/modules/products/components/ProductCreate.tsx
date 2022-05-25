@@ -170,7 +170,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       value: '',
       variation: false,
       visible: true,
-    }
+    } 
     formValues.attributes.push(newAttr)
     //reset
     setSelectedAttr({ value: '', label: '' })
