@@ -1,5 +1,5 @@
- 
-import { iOrderOptions } from "../models"; 
+
+import { iOrderOptions } from "../models";
 
 export const FILTER_STATUS_OPTION: iOrderOptions[] = [
     { name: 'All', value: '' },

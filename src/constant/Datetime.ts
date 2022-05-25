@@ -1,7 +1,12 @@
-export const CURRENT_MONTH: number = new Date().getMonth() + 1
-export const CURRENT_YEAR: number = new Date().getFullYear()
+const date = new Date();
+const currentDate = date.getDate();
+date.setDate(currentDate);
 
-const now = new Date().getUTCFullYear();
+export const CURRENT_MONTH: number = date.getMonth() + 1
+export const CURRENT_YEAR: number = date.getFullYear()
+export const CURRENT_DATE = date.toLocaleDateString('en-CA');
+
+const now = date.getUTCFullYear();
 export const YEARS = Array(now - (now - 5))
     .fill('')
     .map((v, idx) => now - idx)
