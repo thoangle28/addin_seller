@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS } from './../../../constant'
 import {
   iReport,
   formValue,
@@ -88,26 +88,7 @@ const Reports: FC = () => {
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
   const tabs = ['Product Sales', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
-  const now = new Date().getUTCFullYear();
-  const currentMonth: number = new Date().getMonth() + 1
-  const currentYear: number = new Date().getFullYear()
-  const years = Array(now - (now - 5))
-    .fill('')
-    .map((v, idx) => now - idx)
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'June',
-    'July',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ]
+
   const saleReportInit: iReport = {
     weeklySales: 0,
     newUsers: 0,
@@ -121,8 +102,8 @@ const Reports: FC = () => {
   const initFormValue: formValue = {
     user_id: currentUserId,
     page_size: 20,
-    filter_by_month: currentMonth,
-    filter_by_year: currentYear,
+    filter_by_month: CURRENT_MONTH,
+    filter_by_year: CURRENT_YEAR,
   }
 
   const [tab, setTab] = useState('Product Sales')
@@ -808,7 +789,7 @@ const Reports: FC = () => {
               value={formValue.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -826,7 +807,7 @@ const Reports: FC = () => {
               value={formValue.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -850,7 +831,7 @@ const Reports: FC = () => {
               value={formCustomerValue.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -868,7 +849,7 @@ const Reports: FC = () => {
               value={formCustomerValue.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -892,7 +873,7 @@ const Reports: FC = () => {
               value={formProductOrderValue.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -910,7 +891,7 @@ const Reports: FC = () => {
               value={formProductOrderValue.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -934,7 +915,7 @@ const Reports: FC = () => {
               value={formProductSold.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -952,7 +933,7 @@ const Reports: FC = () => {
               value={formProductSold.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -975,7 +956,7 @@ const Reports: FC = () => {
               value={formRefund.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -993,7 +974,7 @@ const Reports: FC = () => {
               value={formRefund.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>

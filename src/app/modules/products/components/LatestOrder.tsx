@@ -1,20 +1,21 @@
-import { FC, useEffect, useRef, useState } from 'react'
-import { initialFormValue, iStatus } from '../../../../models';
+import { FC, useEffect, useState } from 'react'
+import { iApiStatus, initialFormValue, iOrderOptions } from '../../../../models';
 import { AddinLoading } from '../../../../_metronic/partials';
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, LASTEST_ORDER_STATUS, FILTER_STATUS_OPTION } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
 
 const initFormValue: initialFormValue = {
-    status: '',
-    searchTerm: '',
-    date: '',
+    user_id: 1,
+    current_page: 1,
+    page_size: 10,
+    last_seven_date: true,
+    this_month: true,
+    filter_by_month: CURRENT_MONTH,
+    filter_by_year: CURRENT_YEAR,
+    filter_by_status: 'publish',
+    search_by_order_id: 'string',
 }
 
-const options: iStatus[] = [
-    { name: 'All', value: '' },
-    { name: 'Draft', value: 'draft' },
-    { name: 'Pending', value: 'pending' },
-    { name: 'Publish', value: 'publishs' }
-]
 
 const LatestOrder: FC = () => {
     // Declares useState
@@ -55,8 +56,8 @@ const LatestOrder: FC = () => {
                     className='form-select form-select-solid form-select-sm me-3'
                     onChange={(e) => onChangeHandler(e)}
                     name="status"
-                >
-                    {options.map((item: iStatus, index: number) => <option key={index} value={item.value}>{item.name}</option>)}
+                > 
+                    {FILTER_STATUS_OPTION.map((item: iOrderOptions, index: number) => <option key={index} value={item.value}>{item.name}</option>)}
                 </select>
             </div>
             <div className='me-4 my-1'>
@@ -81,7 +82,7 @@ const LatestOrder: FC = () => {
         return <div className='card mb-5 mb-xl-8  bg-white rounded '>
             <div className='card-header border-0'>
                 <h3 className='card-title align-items-start flex-column'>
-                    <span className='card-label fw-bolder fs-3 mb-1'>Latest Order</span>
+                    <span className='card-label fw-bolder fs-3 mb-1'> Orders List </span>
                 </h3>
                 {renderFilterForm()}
             </div>
@@ -117,7 +118,7 @@ const LatestOrder: FC = () => {
         return <PopupComponent>
             <div className="card">
                 <div className="card-header bg-primary align-items-center">
-                    <p className="fs-2 text-white px-3 py-2 mb-0">Latest Order Details</p>
+                    <p className="fs-2 text-white px-3 py-2 mb-0">Order Details</p>
                 </div>
                 <div className="card-body bg-white ">
                     <table className='table table-responsive table-striped'>
