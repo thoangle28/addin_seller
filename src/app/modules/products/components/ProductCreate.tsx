@@ -252,12 +252,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /** Add Variations */
   const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
+
+    const listAttr: any = [];
     //load variations of product
     /* formValues.variations_attr && formValues.variations_attr.map((e: any) => {
       listAttr.push({ attr: e, id: 0, label: '', value: '' })
     }) */
-    //if not 
-
+    //if not     
     formValues.attributes && formValues.attributes.map((e: any) => {
       const checkExisted = formValues.variations.some((x: any) => {
         return x.name === e.name
