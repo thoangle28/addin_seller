@@ -288,6 +288,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const updateAttrToVariations = (name: any, isChecked: any, formValues: any) => {
     const variationsAttr: Array<string> = formValues.variations_attr || []
 
+    //find Object
+    const findAttr = formValues.attributes.find((x: any) => {
+      return name === x.name
+    })
+    
+    if( findAttr ) findAttr.variation = isChecked
+
     if (isChecked) {
       const filterAttr = formValues.attributes.filter((x: any) => {
         return (x.variation || (isChecked && name === x.name)) && !variationsAttr.includes(x.name)
@@ -319,7 +326,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         })
     } else {
       //remove
-
       const filterAttr = formValues.attributes.filter((x: any) => {
         return x.variation && !isChecked && name === x.name && variationsAttr.includes(x.name)
       })
@@ -983,7 +989,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         </span>
                                       </a>
                                     </li>
-                                    {productType === 'variable' ? (
+                                    { (productType === 'variable' || values.type_product === 'variable') ? (
                                       <li className='nav-item me-0'>
                                         <a
                                           className='nav-link btn btn-flex btn-active-secondary w-100'
