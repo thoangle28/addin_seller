@@ -74,6 +74,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newAttrValues, setNewAttrValues] = useState<any>([])
 
   const [parentId, setParentId] = useState()
+  const [producInfoBeforeSave, setProducInfoBeforeSave] = useState<any>([])
 
   const tabDefault: any = useRef(null)
   //Get All Properties
@@ -97,8 +98,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    */
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
-      mapValuesToForm(initialForm, product)
-      if( reloadPage ) initialForm.type_product = productType
+      //mapValuesToForm(initialForm, product)
+      if( reloadPage ) {
+        mapValuesToForm(initialForm, producInfoBeforeSave)
+
+        initialForm.type_product = productType
+        initialForm.attributes = product.attributes
+        initialForm.variations = product.variations
+
+      } else mapValuesToForm(initialForm, product)
+      
       setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
@@ -216,6 +225,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
+
+    setProducInfoBeforeSave({...formValues})
+
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -235,6 +247,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
+    
+    setProducInfoBeforeSave({...formValues})
+
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
