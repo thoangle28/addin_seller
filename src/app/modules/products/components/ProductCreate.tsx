@@ -225,6 +225,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     }).then((response: any) => {
       const { code, message, data } = response.data
       setSaveAttr({ loading: false, error: message })
+      setReloadPage(false)
       setTimeout(() => {
         setSaveAttr({ loading: false, error: '' })
         setReloadPage(true)
@@ -244,6 +245,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       .then((response: any) => {
         const { code, message, data } = response.data
         setSaveVar({ loading: false, error: message })
+        setReloadPage(false)
         setTimeout(() => {
           setSaveVar({ loading: false, error: '' })
           setReloadPage(true)
