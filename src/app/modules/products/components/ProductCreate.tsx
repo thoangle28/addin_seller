@@ -89,6 +89,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setProductDetail({ ...data })
       setFormStatus({ error: code, message: message })
     })
+
   }, [reloadPage])
 
   /**
@@ -97,6 +98,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
+      if( reloadPage ) initialForm.type_product = productType
       setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
@@ -252,11 +254,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /** Add Variations */
   const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
-    const listAttr: any = []
-    formValues.variations_attr &&
-      formValues.variations_attr.map((e: any) => {
-        listAttr.push({ attr: e, id: 0, label: '', value: '' })
+
+    const listAttr: any = [];
+    //load variations of product
+    /* formValues.variations_attr && formValues.variations_attr.map((e: any) => {
+      listAttr.push({ attr: e, id: 0, label: '', value: '' })
+    }) */
+    //if not     
+    formValues.attributes && formValues.attributes.map((e: any) => {
+      const checkExisted = formValues.variations.some((x: any) => {
+        return x.name === e.name
       })
+
+      if( e.variation && !checkExisted) {
+        listAttr.push({ attr: e.name, id: 0, label: '', value: '' })
+      }
+    })
 
     let nextVar = 0
 
@@ -287,6 +300,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   const updateAttrToVariations = (name: any, isChecked: any, formValues: any) => {
     const variationsAttr: Array<string> = formValues.variations_attr || []
+
+    //find Object
+    const findAttr = formValues.attributes.find((x: any) => {
+      return name === x.name
+    })
+    
+    if( findAttr ) findAttr.variation = isChecked
 
     if (isChecked) {
       const filterAttr = formValues.attributes.filter((x: any) => {
@@ -319,7 +339,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         })
     } else {
       //remove
-
       const filterAttr = formValues.attributes.filter((x: any) => {
         return x.variation && !isChecked && name === x.name && variationsAttr.includes(x.name)
       })
@@ -552,7 +571,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const configCKEditor = {
     extraPlugins: [uploadPlugin],
   }
-
+  
   return (
     <>
       {loading && formStatus.error == 204 ? (
@@ -983,7 +1002,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         </span>
                                       </a>
                                     </li>
-                                    {productType === 'variable' ? (
+                                    { (productType === 'variable' || values.type_product === 'variable') ? (
                                       <li className='nav-item me-0'>
                                         <a
                                           className='nav-link btn btn-flex btn-active-secondary w-100'
@@ -1429,7 +1448,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             disabled={isSaveAttr.loading}
                                           >
                                             {!isSaveAttr.loading ? (
-                                              <span className='indicator-label'>
+                                              <span className='indicator-label' id="btnSave">
                                                 Save Attributes
                                               </span>
                                             ) : (
