@@ -51,7 +51,7 @@ export function AsideMenuMain() {
           <AsideMenuItem
             to='/product/LatestOrder' 
             icon='/media/icons/duotune/general/gen019.svg'
-            title='Latest Order'
+            title='Order List'
             fontIcon='bi-layers'
           />
           <div className='menu-item'>

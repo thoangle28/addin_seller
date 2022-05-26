@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS  , TABLE_STATUS} from './../../../constant'
 import {
   iReport,
   formValue,
@@ -16,7 +16,8 @@ import {
   iProductSold,
   iOrderList,
   iRefuned,
-  iCustomer
+  iCustomer,
+  iApiStatus
 } from '../../../models'
 
 
@@ -88,26 +89,7 @@ const Reports: FC = () => {
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
   const tabs = ['Product Sales', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
-  const now = new Date().getUTCFullYear();
-  const currentMonth: number = new Date().getMonth() + 1
-  const currentYear: number = new Date().getFullYear()
-  const years = Array(now - (now - 5))
-    .fill('')
-    .map((v, idx) => now - idx)
-  const months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'June',
-    'July',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ]
+
   const saleReportInit: iReport = {
     weeklySales: 0,
     newUsers: 0,
@@ -121,8 +103,8 @@ const Reports: FC = () => {
   const initFormValue: formValue = {
     user_id: currentUserId,
     page_size: 20,
-    filter_by_month: currentMonth,
-    filter_by_year: currentYear,
+    filter_by_month: CURRENT_MONTH,
+    filter_by_year: CURRENT_YEAR,
   }
 
   const [tab, setTab] = useState('Product Sales')
@@ -311,36 +293,11 @@ const Reports: FC = () => {
   }
 
   // UI components
-  const productSoldStatus = (status: string) => {
-    if (status === 'processing')
-      return <td className="text-center"><span className='badge badge-light-primary'>Processing</span></td>
-    if (status === 'refunded')
-      return <td className="text-center"><span className='badge badge-light-warning'>Refunded</span></td>
-    if (status === 'in-china-warehous')
-      return <td className="text-center"><span className='badge badge-light-info'>In China Warehous</span></td>
-    if (status === 'leave-china-port')
-      return <td className="text-center"><span className='badge badge-light-success'>Leave China Port</span></td>
-    if (status === 'reach-singapre-p')
-      return <td className="text-center"><span className='badge badge-light-success'>Reach Singapore Port</span></td>
-    if (status === 'reach-tuas-wareho')
-      return <td className="text-center"><span className='badge badge-light-success'>Reach Tuas Wareho</span></td>
-    if (status === 'failed')
-      return <td className="text-center"><span className='badge badge-light-danger'>Failed</span></td>
-    if (status === 'cancelled')
-      return <td className="text-center"><span className='badge badge-light-danger'>Cancelled</span></td>
-    if (status === 'completed')
-      return <td className="text-center"><span className='badge badge-light-success'>Completed</span></td>
-    if (status === 'on-hold')
-      return <td className="text-center"><span className='badge badge-light-primary'>On Hold</span></td>
-    if (status === 'pending')
-      return <td className="text-center"><span className='badge badge-light-warning'>Pending</span></td>
-    if (status === 'approved')
-      return <td className="text-center"><span className='badge badge-light-success'>Approved</span></td>
-    if (status === 'publish')
-      return <td className="text-center"><span className='badge badge-light-success'>Approved</span></td>
-    if (status === 'draft')
-      return <td className="text-center"><span className='badge badge-light-info'>Draft</span></td>
-  }
+  const getStatus = (status: string) => {
+    const item = TABLE_STATUS.find((item: iApiStatus) => item.name.toLocaleLowerCase() === status);
+    return item ? <span className={`badge badge-light-${item.btnStatus}`}>{item.name}</span>
+        : <span className='badge badge-light-info'>Draft</span>
+}
 
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
@@ -502,7 +459,7 @@ const Reports: FC = () => {
                         <s>{formatMoney(item.regular_price)}</s>
                       </p>
                     </td>
-                    {productSoldStatus(item.status)}
+                    {getStatus(item.status)}
                     <td className='text-end'>{item.date}</td>
                   </tr>
                 ))
@@ -583,7 +540,7 @@ const Reports: FC = () => {
               <td className="text-start">{item.order_id}</td>
               <td className="text-left text-dark">{item.customer_name ? item.customer_name : ''}
               </td>
-              {productSoldStatus(item.status)}
+              {getStatus(item.status)}
               <td className="text-end">{formatMoney(item.price)}</td>
               <td className="text-end">{item.date}</td>
             </tr>
@@ -808,7 +765,7 @@ const Reports: FC = () => {
               value={formValue.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -826,7 +783,7 @@ const Reports: FC = () => {
               value={formValue.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -850,7 +807,7 @@ const Reports: FC = () => {
               value={formCustomerValue.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -868,7 +825,7 @@ const Reports: FC = () => {
               value={formCustomerValue.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -892,7 +849,7 @@ const Reports: FC = () => {
               value={formProductOrderValue.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -910,7 +867,7 @@ const Reports: FC = () => {
               value={formProductOrderValue.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -934,7 +891,7 @@ const Reports: FC = () => {
               value={formProductSold.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -952,7 +909,7 @@ const Reports: FC = () => {
               value={formProductSold.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -975,7 +932,7 @@ const Reports: FC = () => {
               value={formRefund.filter_by_month}
             >
               <option value=''>None</option>
-              {months.map((item, index) => (
+              {MONTHS.map((item, index) => (
                 <option key={index} value={index + 1}>
                   {item}
                 </option>
@@ -993,7 +950,7 @@ const Reports: FC = () => {
               value={formRefund.filter_by_year}
             >
               <option value=''>None</option>
-              {years.map((item) => (
+              {YEARS.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>

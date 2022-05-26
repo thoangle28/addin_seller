@@ -8,27 +8,8 @@ interface PropsInterface {
 }
 const PopupComponent = (props: PropsInterface) => {
     const { children } = props
-    const [isClosePopup, setIsClosePopup] = useState(false)
 
-    const useOutsideDetection = (ref: any) => {
-        useEffect(() => {
-            function handleClickOutside(event: any) {
-                if (ref.current && !ref.current.contains(event.target)) {
-                    setIsClosePopup(prev => !prev);
-                }
-            }
-            document.addEventListener("mousedown", handleClickOutside);
-            return () => {
-                document.removeEventListener("mousedown", handleClickOutside);
-            };
-        }, [ref]);
-    }
-
-
-
-    const wrapperRef = useRef(null);
-    useOutsideDetection(wrapperRef);
-    return <div ref={wrapperRef} className={`main-popup ${isClosePopup ? 'd-none' : ''}`}>
+    return <div className={`main-popup`}>
         <div className="popup-wrapper">
             {children}
         </div>
