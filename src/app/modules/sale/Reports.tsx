@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, TABLE_STATUS, ITEMS_PER_PAGES } from './../../../constant'
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, TABLE_STATUS, ITEMS_PER_PAGES } from '../../../constant'
 import {
   iReport,
   formValue,
