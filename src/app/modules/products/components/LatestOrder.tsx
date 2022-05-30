@@ -1,12 +1,12 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { iPayload, iOrderOptions, iOrderListResponse, iOrderList, iApiStatus, iOrderListDetailResponse, iOrderDetailItems, iUpdateData } from '../../../../models';
-import { MONTHS, YEARS, CURRENT_DATE, FILTER_STATUS_OPTION, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE } from '../../../../constant'
+import { MONTHS, YEARS, CURRENT_DATE, FILTER_STATUS_OPTION, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS, CURRENT_MONTH, CURRENT_YEAR } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
 import { getOrderDetailById, getOrderListPage, updateOrderStatus } from '../redux/ProductsList';
 import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '../../../../setup';
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { find_page_begin_end } from '../../../../_metronic/helpers';
+import { find_page_begin_end, formatMoney } from '../../../../_metronic/helpers';
 import { useOnClickOutside } from '../../../Hooks';
 
 const LatestOrder: FC = () => {
@@ -18,9 +18,10 @@ const LatestOrder: FC = () => {
         user_id: currentUserId,
         current_page: 1,
         page_size: 50,
-        filter_by_month: 4,
+        filter_by_month: CURRENT_MONTH,
+        filter_by_year: CURRENT_YEAR,
         filter_by_status: 'wc-processing',
-        search_by_order_id: ""
+        search_by_order_id: "",
     }
     const initUpdateData: iUpdateData = {
         order_id: '',
@@ -35,7 +36,6 @@ const LatestOrder: FC = () => {
     const [data, setData] = useState<iOrderListResponse>()
     const [dataDetails, setDataDetails] = useState<iOrderListDetailResponse>()
     const [message, setMessage] = useState<string>()
-
 
     useOnClickOutside(ref, () => setIsShowPopup(false));
 
@@ -53,11 +53,16 @@ const LatestOrder: FC = () => {
         }
     }
     const onUpdateDetail = () => {
+        setIsDetailLoading(true);
         updateOrderStatus(formUpdateData).then(res => {
-            const { code, data, message } = res.data
+            const { code, message } = res.data
             if (code === 200) {
                 onTogglePopup();
-            } else setMessage(message)
+                setIsDetailLoading(false)
+            } else {
+                setIsLoading(false)
+                setIsDetailLoading(message)
+            }
         }).catch(err => console.log(err))
     }
     const onChangeDetailsHandler = (e: any, order_id: string) => {
@@ -71,19 +76,27 @@ const LatestOrder: FC = () => {
         getOrderListPage(payload).then(res => {
             const { code, data, message } = res.data
             if (code === 200) {
-                setData(data)
                 setIsLoading(false)
-            } else setIsLoading(false)
+                setData(data)
+                setMessage(message)
+            } else {
+                setIsLoading(false)
+                setMessage(message)
+            }
         }).catch(err => console.log(err))
     }
     const getDataById = (id: number | string) => {
         setIsShowPopup(prev => !prev)
         setIsDetailLoading(true);
-        getOrderDetailById(id).then(res => {
+        getOrderDetailById(id, currentUserId.toString()).then(res => {
             const { code, data } = res.data
             if (code === 200) {
                 setDataDetails(data)
                 setIsDetailLoading(false);
+                setMessage(message)
+            } else {
+                setIsLoading(false)
+                setMessage(message)
             }
         }).catch()
     }
@@ -108,13 +121,13 @@ const LatestOrder: FC = () => {
     const renderFilterForm = () => {
         return <div className='card-toolbar align-items-end'>
             <div className='me-4 my-1'>
-                <label htmlFor='before_custom_date'>Status:</label>
+                <label htmlFor='Status'>Status:</label>
                 <select
-                    className='form-select form-select-solid form-select-sm me-3'
+                    className='form-select form-select-solid form-select-sm me-0'
                     onChange={(e) => onChangeHandler(e)}
                     name="status"
                 >
-                    {FILTER_STATUS_OPTION.map((item: iOrderOptions, index: number) => <option key={index} value={item.value}>{item.name}</option>)}
+                    {TABLE_STATUS.map((item, index: number) => <option key={index} value={item.key}>{item.name}</option>)}
                 </select>
             </div>
             <div className='me-4 my-1'>
@@ -123,32 +136,31 @@ const LatestOrder: FC = () => {
             </div>
             <div className='me-4 my-1'>
                 <label htmlFor='after_custom_date'>End Date:</label>
-                <input className='form-control px-2 py-2 me-3' defaultValue={CURRENT_DATE} id="after_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="before_custom_date" />
+                <input className='form-control px-2 py-2 me-3' defaultValue={CURRENT_DATE} id="after_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="after_custom_date" />
             </div>
             <div className="me-4 my-1">
+                <label className='form-label ms-3 mb-0'>Month</label>
                 <select
                     className='form-select ms-3 text-primary form-select-solid bg-light-primary form-select-sm me-3'
                     name='filter_by_month'
                     onChange={(e) => { onChangeHandler(e) }}
-                // value={formValue.filter_by_month}
                 >
-                    <option value=''>Month</option>
+                    <option value=''>None</option>
                     {MONTHS.map((item, index: number) => <option key={index} value={index + 1}> {item}</option>)}
                 </select>
             </div>
             <div className="me-4 my-1">
+                <label className='form-label ms-3 mb-0'>Year</label>
                 <select
                     className='form-select text-primary bg-light-primary form-select-solid form-select-sm me-3'
                     name='filter_by_year'
                     onChange={(e) => onChangeHandler(e)}
-                // value={formValue.filter_by_year}
                 >
-                    <option value=''>Year</option>
+                    <option value=''>None</option>
                     {YEARS.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
                 </select>
             </div>
-            <button className='btn btn-sm btn-primary mb-1' onClick={e => getDataOrderList(formFilterData)} > Filter Product </button>
-
+            <button className='btn btn-sm btn-primary mb-1' onClick={e => getDataOrderList(formFilterData)} >Search</button>
         </div>
     }
     const getStatus = (status: string) => {
@@ -157,26 +169,12 @@ const LatestOrder: FC = () => {
             : <span className='badge badge-light-info'>Draft</span>
     }
 
-    const renderTableData = (data?: any) => {
-        return data ? data.map((item: iOrderList, index: number) => <tr key={index}>
-            <td className='align-middle '>{item.order_id}</td>
-            <td className='align-middle '>{item.title_product}</td>
-            <td className="text-center">{getStatus(item.status)}</td>
-            <td className='align-middle text-end'>{item.price}</td>
-            <td className='align-middle text-end'>{item.customer_name}</td>
-            <td className='align-middle text-end'>{item.date}</td>
-            <td className='align-middle text-center'>
-                <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}> Details </p>
-            </td>
-        </tr>) : <tr><td colSpan={7} className="text-center">No Item Found</td></tr>
-    }
-
     const renderTable = () => {
         const listPages = find_page_begin_end(data?.current_page, data?.total_pages)
         return <div className='card mb-5 mb-xl-8  bg-white rounded '>
             <div className='card-header border-0'>
                 <h3 className='card-title align-items-start flex-column'>
-                    <span className='card-label fw-bolder fs-3 mt-6'> Orders List </span>
+                    <span className='card-label fw-bolder fs-3 mt-6'> Orders Listing </span>
                 </h3>
                 {renderFilterForm()}
             </div>
@@ -186,7 +184,17 @@ const LatestOrder: FC = () => {
                         <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
                     </thead>
                     <tbody>
-                        {renderTableData(data?.order_list)}
+                        {data?.order_list ? data.order_list.map((item, index: number) => <tr key={index}>
+                            <td className='align-middle '>{item.order_id}</td>
+                            <td className='align-middle '>{item.title_product}</td>
+                            <td className="text-center">{getStatus(item.status)}</td>
+                            <td className='align-middle text-end'>{formatMoney(item.price)}</td>
+                            <td className='align-middle text-end'>{item.customer_name}</td>
+                            <td className='align-middle text-end'>{item.date}</td>
+                            <td className='align-middle text-center'>
+                                <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}> Details </p>
+                            </td>
+                        </tr>) : <tr><td colSpan={7} className="text-center">No Item Found</td></tr>}
                     </tbody>
                 </table>
                 }
@@ -242,13 +250,14 @@ const LatestOrder: FC = () => {
                         <p className='mb-2'>Name :<span className="fs-7 fw-bolder">{dataDetails?.customer_name}</span></p>
                         <p className='mb-2'>Email: :<span className="fs-7 fw-bolder">{dataDetails?.customer_email}</span></p>
                         <div className='my-1'>
+                            <p className='mb-2 text-danger'>{message}</p>
                             <select
-                                className='form-select form-select-solid form-select-sm me-3'
+                                className='form-select form-select-solid form-select-sm me-0'
                                 onChange={(e) => onChangeDetailsHandler(e, dataDetails?.order_id || '')}
                                 name="order_status"
                                 value={!formUpdateData.order_status ? dataDetails?.order_status : formUpdateData.order_status}
                             >
-                                {TABLE_STATUS.map((item: iApiStatus, index: number) => <option key={index} value={item.key}>{item.name}</option>)}
+                                {FILTER_STATUS.map((item, index: number) => <option key={index} value={item.status}>{item.name}</option>)}
                             </select>
                         </div>
                     </div>
@@ -256,11 +265,10 @@ const LatestOrder: FC = () => {
                         <thead>
                             <tr className='fw-bolder text-muted'>
                                 {ORDER_LIST_POPUP_TABLE.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
-
                             </tr>
                         </thead>
                         <tbody>
-                            {dataDetails ? dataDetails.items.map((item: iOrderDetailItems, index: number) => <tr key={index}>
+                            {dataDetails ? dataDetails.items.map((item, index: number) => <tr key={index}>
                                 <td className='align-middle text-center'>{item.product_id}</td>
                                 <td >
                                     <div className="d-flex align-items-center">
@@ -276,7 +284,7 @@ const LatestOrder: FC = () => {
                                 <td className='align-middle text-center'>{item.sku ? item.sku : '-'}</td>
                                 <td className='align-middle text-center'>{item.variation_id}</td>
                             </tr>
-                            ) : <tr><td colSpan={5} className='text-center'>No Item Found</td></tr>}
+                            ) : <tr><td colSpan={5} className='text-center'>{message}</td></tr>}
                         </tbody>
                     </table>
                 </div>}

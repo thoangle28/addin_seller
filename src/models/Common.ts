@@ -20,3 +20,7 @@ export interface iBaseResponse {
     page_size: number,
     total_pages: number,
 }
+export interface iPopupStatus {
+    name: string;
+    status: string;
+}
