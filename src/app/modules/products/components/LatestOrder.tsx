@@ -1,27 +1,18 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { iPayload, iOrderOptions, iOrderListResponse, iOrderList, iApiStatus, iOrderListDetailResponse, iOrderDetailItems, iUpdateData } from '../../../../models';
-import { MONTHS, YEARS, CURRENT_DATE, FILTER_STATUS_OPTION, TABLE_STATUS, } from '../../../../constant'
+import { MONTHS, YEARS, CURRENT_DATE, FILTER_STATUS_OPTION, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
 import { getOrderDetailById, getOrderListPage, updateOrderStatus } from '../redux/ProductsList';
 import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '../../../../setup';
-
-const Loading: FC = () => {
-    return (
-        <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
-            <div className='card-body d-flex justify-content-center align-items-center'>
-                <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
-                    Loading...
-                    <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                </span>
-            </div>
-        </div>
-    )
-}
+import Loading from '../../../../_metronic/partials/content/Loading'
+import { find_page_begin_end } from '../../../../_metronic/helpers';
+import { useOnClickOutside } from '../../../Hooks';
 
 const LatestOrder: FC = () => {
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
+    const ref = useRef<HTMLDivElement>(null);
 
     const initFormValue: iPayload = {
         user_id: currentUserId,
@@ -44,6 +35,9 @@ const LatestOrder: FC = () => {
     const [data, setData] = useState<iOrderListResponse>()
     const [dataDetails, setDataDetails] = useState<iOrderListDetailResponse>()
     const [message, setMessage] = useState<string>()
+
+
+    useOnClickOutside(ref, () => setIsShowPopup(false));
 
     // Events
     const onChangeHandler = (e: any, current_page: number = 1) => {
@@ -70,11 +64,7 @@ const LatestOrder: FC = () => {
         const { name, value } = e.target;
         setFormUpdateData({ ...formUpdateData, [name]: value, order_id })
     }
-    const afterGetData = () => {
-        setTimeout(() => {
-            setIsLoading(false)
-        }, 3500);
-    }
+
     // API Calling  
     const getDataOrderList = (payload: iPayload) => {
         setIsLoading(true)
@@ -114,47 +104,7 @@ const LatestOrder: FC = () => {
         return () => document.removeEventListener('keydown', onHandleEscapeKey)
     }, [])
 
-    // UI Rendering
-    const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1) => {
-        const step = 5
-        let beginBlock = 1
-        let begin: number = 1
-        let next_end = step * beginBlock
-
-        while (currentPage > next_end) {
-            beginBlock++ //next with 5 items
-            next_end = step * beginBlock
-        }
-
-        begin = next_end - step + 1
-        let end: number = next_end
-        end = end > maxPage ? maxPage : end
-
-        const listPages = []
-        //fist
-        listPages.push({ label: '«', page: 1, class: 'btn-light-primary' })
-        //previous
-        listPages.push({
-            label: '‹',
-            page: currentPage - 1 <= 0 ? 1 : currentPage - 1,
-            class: 'btn-light-primary',
-        })
-        //list page with 5 items
-        for (let index = begin; index <= end; index++) {
-            listPages.push({ label: index, page: index, class: currentPage === index ? 'active' : '' })
-        }
-        //next
-        listPages.push({
-            label: '›',
-            page: currentPage + 1 > maxPage ? maxPage : currentPage + 1,
-            class: 'btn-light-primary',
-        })
-        //last
-        listPages.push({ label: '»', page: maxPage, class: 'btn-light-primary' })
-
-        return listPages
-    }
-
+    // UI Rendering  s
     const renderFilterForm = () => {
         return <div className='card-toolbar align-items-end'>
             <div className='me-4 my-1'>
@@ -183,7 +133,7 @@ const LatestOrder: FC = () => {
                 // value={formValue.filter_by_month}
                 >
                     <option value=''>Month</option>
-                    {MONTHS.map((item, index) => <option key={index} value={index + 1}> {item}</option>)}
+                    {MONTHS.map((item, index: number) => <option key={index} value={index + 1}> {item}</option>)}
                 </select>
             </div>
             <div className="me-4 my-1">
@@ -194,10 +144,10 @@ const LatestOrder: FC = () => {
                 // value={formValue.filter_by_year}
                 >
                     <option value=''>Year</option>
-                    {YEARS.map((item) => <option key={item} value={item}>{item}</option>)}
+                    {YEARS.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
                 </select>
             </div>
-            <button className='btn btn-sm btn-primary' onClick={e => getDataOrderList(formFilterData)} > Filter Product </button>
+            <button className='btn btn-sm btn-primary mb-1' onClick={e => getDataOrderList(formFilterData)} > Filter Product </button>
 
         </div>
     }
@@ -233,15 +183,7 @@ const LatestOrder: FC = () => {
             <div className="card-body mt-2">
                 {isLoading ? <Loading /> : <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
                     <thead>
-                        <tr className='fw-bolder text-muted'>
-                            <th className='align-middle '>Order Id</th>
-                            <th className='align-middle '>Product Title</th>
-                            <th className='align-middle text-center'>Order Status</th>
-                            <th className='align-middle text-end'>Price</th>
-                            <th className='align-middle text-end'>Customer's Name</th>
-                            <th className='align-middle text-end'>Date Created</th>
-                            <th className='align-middle text-center'>Actions</th>
-                        </tr>
+                        <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
                     </thead>
                     <tbody>
                         {renderTableData(data?.order_list)}
@@ -262,11 +204,7 @@ const LatestOrder: FC = () => {
                                     data ? data.page_size : initFormValue.page_size
                                 }
                             >
-                                <option value='10'>10</option>
-                                <option value='20'>20</option>
-                                <option value='50'>50</option>
-                                <option value='30'>30</option>
-                                <option value='100'>100</option>
+                                {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
                             </select>
                             <span className='text-muted fs-8 ms-3'>item(s)/page</span>
                             <span className='text-muted fs-8 ms-3'>
@@ -277,11 +215,11 @@ const LatestOrder: FC = () => {
                     <div className='col-md-6 d-flex justify-content-end'>
                         <div>
                             {listPages &&
-                                listPages.map((item, index) => (
+                                listPages.map((item, index: number) => (
                                     <span
                                         key={index}
                                         onClick={(e: any) => onChangeHandler(e, item.page)}
-                                        className={`btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1   ${item.class}`}
+                                        className={`btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ${item.class}`}
                                     >
                                         {item.label}
                                     </span>
@@ -293,14 +231,14 @@ const LatestOrder: FC = () => {
         </div>
     }
     const renderPopup = () => {
-        return <PopupComponent>
-            <div className="card">
+        return <PopupComponent >
+            <div ref={ref} className="card" >
                 <div className="card-header bg-primary align-items-center justify-content-between">
                     <p className="fs-2 text-white px-3 py-2 mb-0">Order Details</p>
                     <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                 </div>
                 {isDetailLoading ? <Loading /> : <div className="card-body bg-white ">
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex justify-content-between align-items-center mb-3">
                         <p className='mb-2'>Name :<span className="fs-7 fw-bolder">{dataDetails?.customer_name}</span></p>
                         <p className='mb-2'>Email: :<span className="fs-7 fw-bolder">{dataDetails?.customer_email}</span></p>
                         <div className='my-1'>
@@ -317,11 +255,8 @@ const LatestOrder: FC = () => {
                     <table className='table table-responsive table-striped'>
                         <thead>
                             <tr className='fw-bolder text-muted'>
-                                <th className='align-middle text-center'>Product ID</th>
-                                <th className='align-middle '>Product Name</th>
-                                <th className='align-middle text-center'>Quantity</th>
-                                <th className='align-middle text-center'>SKU</th>
-                                <th className='align-middle text-center'>Variation ID</th>
+                                {ORDER_LIST_POPUP_TABLE.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
+
                             </tr>
                         </thead>
                         <tbody>
@@ -333,7 +268,7 @@ const LatestOrder: FC = () => {
                                             <img src={item.product_img} alt={item.name} />
                                         </div>
                                         <div className="d-flex justify-content-start flex-column">
-                                            <a className='fs-6 ' href={item.product_url}>{item.name}</a>
+                                            <a className='fs-6' target={'_blank'} href={item.product_url}>{item.name}</a>
                                         </div>
                                     </div>
                                 </td>
@@ -357,7 +292,7 @@ const LatestOrder: FC = () => {
     }
 
     return <>
-        {!isShowPopup ? '' : renderPopup()}
+        {isShowPopup ? renderPopup() : ''}
         {renderTable()}
     </>
 

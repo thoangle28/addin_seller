@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS  , TABLE_STATUS} from './../../../constant'
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, TABLE_STATUS, ITEMS_PER_PAGES } from './../../../constant'
 import {
   iReport,
   formValue,
@@ -19,7 +19,9 @@ import {
   iCustomer,
   iApiStatus
 } from '../../../models'
-
+import Loading from './../../../_metronic/partials/content/Loading'
+import { find_page_begin_end } from './../../../_metronic/helpers'
+import { TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD } from '../../../constant/Report'
 
 type Props = {
   dataList: any | []
@@ -27,18 +29,6 @@ type Props = {
   saleReport: iReport
 }
 
-const Loading: FC = () => {
-  return (
-    <div className='card card-xxl-stretch-50 mb-5 mb-xl-8'>
-      <div className='card-body d-flex justify-content-center align-items-center'>
-        <span className='indicator-progress text-center' style={{ display: 'block', width: '100px' }}>
-          Loading...
-          <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-        </span>
-      </div>
-    </div>
-  )
-}
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
@@ -252,52 +242,12 @@ const Reports: FC = () => {
     if (tab === 'Refunded') showRefundList({ ...formRefund })
   }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, formRefund, tab])
 
-  const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1) => {
-    const step = 5
-    let beginBlock = 1
-    let begin: number = 1
-    let next_end = step * beginBlock
-
-    while (currentPage > next_end) {
-      beginBlock++ //next with 5 items
-      next_end = step * beginBlock
-    }
-
-    begin = next_end - step + 1
-    let end: number = next_end
-    end = end > maxPage ? maxPage : end
-
-    const listPages = []
-    //fist
-    listPages.push({ label: '«', page: 1, class: 'btn-light-primary' })
-    //previous
-    listPages.push({
-      label: '‹',
-      page: currentPage - 1 <= 0 ? 1 : currentPage - 1,
-      class: 'btn-light-primary',
-    })
-    //list page with 5 items
-    for (let index = begin; index <= end; index++) {
-      listPages.push({ label: index, page: index, class: currentPage === index ? 'active' : '' })
-    }
-    //next
-    listPages.push({
-      label: '›',
-      page: currentPage + 1 > maxPage ? maxPage : currentPage + 1,
-      class: 'btn-light-primary',
-    })
-    //last
-    listPages.push({ label: '»', page: maxPage, class: 'btn-light-primary' })
-
-    return listPages
-  }
-
   // UI components
   const getStatus = (status: string) => {
     const item = TABLE_STATUS.find((item: iApiStatus) => item.name.toLocaleLowerCase() === status);
     return item ? <span className={`badge badge-light-${item.btnStatus}`}>{item.name}</span>
-        : <span className='badge badge-light-info'>Draft</span>
-}
+      : <span className='badge badge-light-info'>Draft</span>
+  }
 
   const displayProductSoldList = () => {
     const listPages = find_page_begin_end(productSoldList?.current_page, productSoldList?.total_pages)
@@ -307,12 +257,7 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                <th className='text-start'>Order ID</th>
-                <th style={{ width: '250px' }} className='text-left '>Product Name</th>
-                <th className='text-center '>SKU</th>
-                <th className='text-center '>Quantity</th>
-                <th className='text-end '>Total</th>
-                <th className='text-end'>Date Created</th>
+                {TABLE_PRODUCT_SOLD.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -370,11 +315,7 @@ const Reports: FC = () => {
                   productSoldList.page_size ? productSoldList.page_size : initFormValue.page_size
                 }
               >
-                <option value='10'>10</option>
-                <option value='20'>20</option>
-                <option value='50'>50</option>
-                <option value='30'>30</option>
-                <option value='100'>100</option>
+                {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-3'>
@@ -414,13 +355,7 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                <th className='text-left'>#ID</th>
-                <th style={{ width: '250px' }} className='text-left '>Product Name</th>
-                <th className="text-center">Type</th>
-                <th className='text-center'>SKU</th>
-                <th className='text-end'>Price</th>
-                <th className='text-center'>Status</th>
-                <th className='text-end'>Date Created</th>
+                {TABLE_PRODUCT_SALE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}
               </tr>
             </thead>
             <tbody>
@@ -485,11 +420,7 @@ const Reports: FC = () => {
                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
                 value={formValue.page_size ? formValue.page_size : initFormValue.page_size}
               >
-                <option value='10'>10</option>
-                <option value='20'>20</option>
-                <option value='50'>50</option>
-                <option value='30'>30</option>
-                <option value='100'>100</option>
+                {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-3'>
@@ -528,11 +459,7 @@ const Reports: FC = () => {
         <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
           <thead>
             <tr className="fw-bolder text-muted">
-              <th className="text-start">Order ID</th>
-              <th className="text-left">Customer's Name</th>
-              <th className="text-center">Order Status</th>
-              <th className="text-end">Total</th>
-              <th className="text-end">Date Created</th>
+              {TABLE_PRODUCT_ORDER.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -563,11 +490,7 @@ const Reports: FC = () => {
               value={formProductOrderValue.page_size ? formProductOrderValue.page_size : initFormValue.page_size}
 
             >
-              <option value='10'>10</option>
-              <option value='20'>20</option>
-              <option value='50'>50</option>
-              <option value='30'>30</option>
-              <option value='100'>100</option>
+              {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
             </select>
             <span className='text-muted fs-8 ms-3'>item(s)/page</span>
             <span className='text-muted fs-8 ms-3'>
@@ -596,12 +519,7 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                <th className='text-start'>No.</th>
-                <th className='text-start'>Full Name</th>
-                <th className='text-start'>Email</th>
-                <th className='text-center'>Phone</th>
-                <th className='text-center'>City</th>
-                <th className='text-center'>Country</th>
+                {TABLE_CUSTOMER_SALE.map((item, index: number) => <th className={item.className}>{item.name}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -642,11 +560,7 @@ const Reports: FC = () => {
                     : initFormValue.page_size
                 }
               >
-                <option value='10'>10</option>
-                <option value='20'>20</option>
-                <option value='50'>50</option>
-                <option value='30'>30</option>
-                <option value='100'>100</option>
+                {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-2'>
@@ -682,11 +596,7 @@ const Reports: FC = () => {
       <table className="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
         <thead>
           <tr className="fw-bolder text-muted">
-            <th className="text-start">Order ID</th>
-            <th style={{ width: '250px' }} className=" text-left">Product Name</th>
-            <th className="text-center">SKU</th>
-            <th className="text-end">Total</th>
-            <th className="text-end">Date Created</th>
+            {TABLE_PRODUCT_ORDER_REFUND.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
           </tr>
         </thead>
         <tbody>
@@ -726,11 +636,7 @@ const Reports: FC = () => {
               value={formRefund.page_size ? formRefund.page_size : initFormValue.page_size}
 
             >
-              <option value='10'>10</option>
-              <option value='20'>20</option>
-              <option value='50'>50</option>
-              <option value='30'>30</option>
-              <option value='100'>100</option>
+              {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
             </select>
             <span className='text-muted fs-8 ms-3'>item(s)/page</span>
             <span className='text-muted fs-8 ms-3'>

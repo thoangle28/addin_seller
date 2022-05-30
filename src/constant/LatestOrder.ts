@@ -1,4 +1,4 @@
-import { iApiStatus } from "../models";
+import { iApiStatus, iTableHead } from "../models";
 
 export const TABLE_STATUS: iApiStatus[] = [
     { key: 'wc-pending', name: 'Pending payment', btnStatus: 'default' },
@@ -14,4 +14,22 @@ export const TABLE_STATUS: iApiStatus[] = [
     { key: 'wc-processing', name: 'Processing', btnStatus: 'warning' },
     { key: 'draft', name: 'Draft', btnStatus: 'secondary' },
     { key: 'trash', name: 'Trash', btnStatus: 'secondary' },
+]
+
+export const ORDER_LIST_TABLE: iTableHead[] = [
+    { name: 'Order Id', className: 'align-middle' },
+    { name: 'Product Title', className: 'align-middle' },
+    { name: 'Order Status', className: 'align-middle text-center' },
+    { name: 'Customer\'s Name', className: 'align-middle text-end' },
+    { name: 'Order Id', className: 'align-middle text-end' },
+    { name: 'Date Created', className: 'align-middle text-end' },
+    { name: 'Actions', className: 'align-middle text-center' },
+]
+
+export const ORDER_LIST_POPUP_TABLE: iTableHead[] = [
+    { name: 'Product ID', className: 'align-middle text-center' },
+    { name: 'Product Name', className: 'align-middle' },
+    { name: 'Quantity', className: 'align-middle text-center' },
+    { name: 'SKU', className: 'align-middle text-center' },
+    { name: 'Variation ID', className: 'align-middle text-center' }, 
 ]
