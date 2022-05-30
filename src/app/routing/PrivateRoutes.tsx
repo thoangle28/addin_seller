@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import { FallbackView } from '../../_metronic/partials'
+import LatestOrder from '../modules/products/components/LatestOrder'
 import { DashboardWrapper } from '../pages/dashboard/DashboardWrapper'
 
 export function PrivateRoutes() {
@@ -16,6 +17,7 @@ export function PrivateRoutes() {
         <Route path='/dashboard' component={DashboardWrapper} />
         <Route path='/product/listing' component={ProductPage} />
         <Route path='/product/attributes' component={ProductPage} />
+        <Route path='/product/LatestOrder' component={LatestOrder} />
         <Route path='/product/create' component={ProductPage} />
         <Route path='/product/update/:id' component={ProductPage} />
         <Route path='/sale-report' component={ReportPage} />

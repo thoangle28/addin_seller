@@ -48,7 +48,12 @@ export function AsideMenuMain() {
             title='Sale Reports'
             fontIcon='bi-layers'
           />
-
+          <AsideMenuItem
+            to='/product/LatestOrder' 
+            icon='/media/icons/duotune/general/gen019.svg'
+            title='Latest Order'
+            fontIcon='bi-layers'
+          />
           <div className='menu-item'>
             <div className='menu-content'>
               <div className='separator mx-1 my-4'></div>
