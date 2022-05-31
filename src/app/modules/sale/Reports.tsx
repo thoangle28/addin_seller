@@ -394,7 +394,7 @@ const Reports: FC = () => {
                         <s>{formatMoney(item.regular_price)}</s>
                       </p>
                     </td>
-                    {getStatus(item.status)}
+                    <td>{getStatus(item.status)}</td>
                     <td className='text-end'>{item.date}</td>
                   </tr>
                 ))
@@ -467,7 +467,7 @@ const Reports: FC = () => {
               <td className="text-start">{item.order_id}</td>
               <td className="text-left text-dark">{item.customer_name ? item.customer_name : ''}
               </td>
-              {getStatus(item.status)}
+              <td>{getStatus(item.status)}</td>
               <td className="text-end">{formatMoney(item.price)}</td>
               <td className="text-end">{item.date}</td>
             </tr>

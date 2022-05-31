@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react'
-import { iPayload, iOrderOptions, iOrderListResponse, iOrderList, iApiStatus, iOrderListDetailResponse, iOrderDetailItems, iUpdateData } from '../../../../models';
-import { MONTHS, YEARS, CURRENT_DATE, FILTER_STATUS_OPTION, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS, CURRENT_MONTH, CURRENT_YEAR } from '../../../../constant'
+import { iPayload, iOrderListResponse, iApiStatus, iOrderListDetailResponse, iUpdateData } from '../../../../models';
+import { MONTHS, YEARS, CURRENT_DATE, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
 import { getOrderDetailById, getOrderListPage, updateOrderStatus } from '../redux/ProductsList';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -17,11 +17,7 @@ const LatestOrder: FC = () => {
     const initFormValue: iPayload = {
         user_id: currentUserId,
         current_page: 1,
-        page_size: 50,
-        filter_by_month: CURRENT_MONTH,
-        filter_by_year: CURRENT_YEAR,
-        filter_by_status: 'wc-processing',
-        search_by_order_id: "",
+        page_size: 20,
     }
     const initUpdateData: iUpdateData = {
         order_id: '',
@@ -184,17 +180,16 @@ const LatestOrder: FC = () => {
                         <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
                     </thead>
                     <tbody>
-                        {data?.order_list ? data.order_list.map((item, index: number) => <tr key={index}>
-                            <td className='align-middle '>{item.order_id}</td>
-                            <td className='align-middle '>{item.title_product}</td>
+                        {data?.order_list.length ? data.order_list.map((item, index: number) => <tr key={index}>
+                            <td className='align-middle'>{item.order_id}</td>
+                            <td className='align-middle text-start'>{item.customer_name}</td>
                             <td className="text-center">{getStatus(item.status)}</td>
                             <td className='align-middle text-end'>{formatMoney(item.price)}</td>
-                            <td className='align-middle text-end'>{item.customer_name}</td>
                             <td className='align-middle text-end'>{item.date}</td>
                             <td className='align-middle text-center'>
                                 <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}> Details </p>
                             </td>
-                        </tr>) : <tr><td colSpan={7} className="text-center">No Item Found</td></tr>}
+                        </tr>) : <tr><td colSpan={7} className="text-center">{message}</td></tr>}
                     </tbody>
                 </table>
                 }
@@ -238,6 +233,7 @@ const LatestOrder: FC = () => {
             </div>
         </div>
     }
+
     const renderPopup = () => {
         return <PopupComponent >
             <div ref={ref} className="card" >
@@ -246,11 +242,12 @@ const LatestOrder: FC = () => {
                     <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                 </div>
                 {isDetailLoading ? <Loading /> : <div className="card-body bg-white ">
+                    <p className='mb-2 text-danger'>{message}</p>
                     <div className="d-flex justify-content-between align-items-center mb-3">
-                        <p className='mb-2'>Name :<span className="fs-7 fw-bolder">{dataDetails?.customer_name}</span></p>
-                        <p className='mb-2'>Email: :<span className="fs-7 fw-bolder">{dataDetails?.customer_email}</span></p>
+                        <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.customer_name}</span></p>
+                        <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_date}</span></p>
+                        <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.customer_email}</span></p>
                         <div className='my-1'>
-                            <p className='mb-2 text-danger'>{message}</p>
                             <select
                                 className='form-select form-select-solid form-select-sm me-0'
                                 onChange={(e) => onChangeDetailsHandler(e, dataDetails?.order_id || '')}
@@ -268,7 +265,7 @@ const LatestOrder: FC = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {dataDetails ? dataDetails.items.map((item, index: number) => <tr key={index}>
+                            {dataDetails?.items.length ? dataDetails.items.map((item, index: number) => <tr key={index}>
                                 <td className='align-middle text-center'>{item.product_id}</td>
                                 <td >
                                     <div className="d-flex align-items-center">
