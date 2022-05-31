@@ -6,7 +6,7 @@ export const TABLE_PRODUCT_SALE: iTableHead[] = [
     { name: 'Type', className: 'text-center' },
     { name: 'SKU', className: 'text-center' },
     { name: 'Price', className: 'text-end' },
-    { name: 'Status', className: 'text-center' },
+    { name: 'Status', className: 'text-start' },
     { name: 'Date Created', className: 'text-end' },
 ]
 
@@ -22,7 +22,7 @@ export const TABLE_PRODUCT_SOLD: iTableHead[] = [
 export const TABLE_PRODUCT_ORDER: iTableHead[] = [
     { name: 'Order ID', className: 'text-start' },
     { name: 'Customer\'s Name', className: 'text-left' },
-    { name: 'Order Status', className: 'text-center' },
+    { name: 'Order Status', className: 'text-start' },
     { name: 'Total', className: 'text-end' },
     { name: 'Date Created', className: 'text-end' },
 ]
