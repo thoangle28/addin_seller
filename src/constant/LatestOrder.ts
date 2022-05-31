@@ -1,23 +1,25 @@
 import { iApiStatus, iPopupStatus, iTableHead } from "../models";
 
 export const TABLE_STATUS: iApiStatus[] = [
+    { key: '', name: 'All', btnStatus: '' }, 
     { key: 'wc-pending', name: 'Pending payment', btnStatus: 'default' },
     { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
+    { key: 'publish', name: 'Publish', btnStatus: 'success' },
     { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
     { key: 'reach-singapore-p', name: 'Reach Singapore Port', btnStatus: 'success' },
     { key: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse', btnStatus: 'success' },
     { key: 'wc-failed', name: 'Failed', btnStatus: 'danger' },
-    { key: 'wc-refunded', name: 'Refunded', btnStatus: 'info' },
+    { key: 'wc-refunded', name: 'Refunded', btnStatus: 'danger' },
     { key: 'wc-cancelled', name: 'Cancelled', btnStatus: 'danger' },
     { key: 'wc-completed', name: 'Completed', btnStatus: 'success' },
-    { key: 'wc-on-hold', name: 'On hold', btnStatus: 'warning' },
-    { key: 'wc-processing', name: 'Processing', btnStatus: 'warning' },
+    { key: 'on-hold', name: 'On hold', btnStatus: 'warning' },
+    { key: 'wc-processing', name: 'Processing', btnStatus: 'primary' },
     { key: 'trash', name: 'Trash', btnStatus: 'secondary' },
 ]
 
 export const ORDER_LIST_TABLE: iTableHead[] = [
-    { name: 'Order Id', className: 'align-middle' }, 
-    { name: 'Customer\'s Name', className: 'align-middle text-start' }, 
+    { name: 'Order Id', className: 'align-middle' },
+    { name: 'Customer\'s Name', className: 'align-middle text-start' },
     { name: 'Order Status', className: 'align-middle text-center' },
     { name: 'Price', className: 'align-middle text-end' },
     { name: 'Date Created', className: 'align-middle text-end' },

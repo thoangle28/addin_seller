@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react'
 import { iPayload, iOrderListResponse, iApiStatus, iOrderListDetailResponse, iUpdateData } from '../../../../models';
-import { MONTHS, YEARS, CURRENT_DATE, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS } from '../../../../constant'
+import { MONTHS, YEARS, TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS, CURRENT_DATE } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
 import { getOrderDetailById, getOrderListPage, updateOrderStatus } from '../redux/ProductsList';
 import { shallowEqual, useSelector } from 'react-redux';
@@ -48,6 +48,11 @@ const LatestOrder: FC = () => {
             setIsShowPopup(false)
         }
     }
+    const clearMessage = () => {
+        setTimeout(() => {
+            setMessage('')
+        }, 3000);
+    }
     const onUpdateDetail = () => {
         setIsDetailLoading(true);
         updateOrderStatus(formUpdateData).then(res => {
@@ -56,8 +61,9 @@ const LatestOrder: FC = () => {
                 onTogglePopup();
                 setIsDetailLoading(false)
             } else {
-                setIsLoading(false)
-                setIsDetailLoading(message)
+                setIsDetailLoading(false)
+                setMessage(message)
+                clearMessage()
             }
         }).catch(err => console.log(err))
     }
@@ -78,6 +84,7 @@ const LatestOrder: FC = () => {
             } else {
                 setIsLoading(false)
                 setMessage(message)
+                clearMessage()
             }
         }).catch(err => console.log(err))
     }
@@ -93,13 +100,14 @@ const LatestOrder: FC = () => {
             } else {
                 setIsLoading(false)
                 setMessage(message)
+                clearMessage()
             }
         }).catch()
     }
 
     useEffect(() => {
         getDataOrderList(formFilterData);
-    }, [formFilterData.current_page, formFilterData.page_size])
+    }, [formFilterData.current_page, formFilterData.page_size, formFilterData.filter_by_status])
 
     useEffect(() => {
         return () => {
@@ -113,9 +121,21 @@ const LatestOrder: FC = () => {
         return () => document.removeEventListener('keydown', onHandleEscapeKey)
     }, [])
 
-    // UI Rendering  s
+    // UI Renderings 
     const renderFilterForm = () => {
         return <div className='card-toolbar align-items-end'>
+            <div className="w-100 d-flex flex-row pb-3 me-3">
+                <div className='flex-fill pe-4'>
+                    <input
+                        className='form-control me-0'
+                        onChange={(e) => onChangeHandler(e)}
+                        name="search_by_order_id"
+                        placeholder='Search'
+                    />
+                </div>
+                <button className='btn btn-sm btn-primary' onClick={e => getDataOrderList(formFilterData)} >Search</button>
+            </div>
+
             <div className='me-4 my-1'>
                 <label htmlFor='Status'>Status:</label>
                 <select
@@ -128,7 +148,7 @@ const LatestOrder: FC = () => {
             </div>
             <div className='me-4 my-1'>
                 <label htmlFor='before_custom_date'>Start Date:</label>
-                <input className='form-control px-2 py-2 me-3' defaultValue={CURRENT_DATE} id="before_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="before_custom_date" />
+                <input className='form-control px-2 py-2 me-3' id="before_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="before_custom_date" />
             </div>
             <div className='me-4 my-1'>
                 <label htmlFor='after_custom_date'>End Date:</label>
@@ -156,13 +176,13 @@ const LatestOrder: FC = () => {
                     {YEARS.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
                 </select>
             </div>
-            <button className='btn btn-sm btn-primary mb-1' onClick={e => getDataOrderList(formFilterData)} >Search</button>
+
         </div>
     }
     const getStatus = (status: string) => {
         const item = TABLE_STATUS.find((item: iApiStatus) => item.name.toLocaleLowerCase() === status);
         return item ? <span className={`badge badge-light-${item.btnStatus}`}>{item.name}</span>
-            : <span className='badge badge-light-info'>Draft</span>
+            : <span className='badge badge-secondary'>Draft</span>
     }
 
     const renderTable = () => {
@@ -237,60 +257,91 @@ const LatestOrder: FC = () => {
     const renderPopup = () => {
         return <PopupComponent >
             <div ref={ref} className="card" >
-                <div className="card-header bg-primary align-items-center justify-content-between">
-                    <p className="fs-2 text-white px-3 py-2 mb-0">Order Details</p>
-                    <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
-                </div>
-                {isDetailLoading ? <Loading /> : <div className="card-body bg-white ">
-                    <p className='mb-2 text-danger'>{message}</p>
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                        <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.customer_name}</span></p>
-                        <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_date}</span></p>
-                        <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.customer_email}</span></p>
-                        <div className='my-1'>
-                            <select
-                                className='form-select form-select-solid form-select-sm me-0'
-                                onChange={(e) => onChangeDetailsHandler(e, dataDetails?.order_id || '')}
-                                name="order_status"
-                                value={!formUpdateData.order_status ? dataDetails?.order_status : formUpdateData.order_status}
-                            >
-                                {FILTER_STATUS.map((item, index: number) => <option key={index} value={item.status}>{item.name}</option>)}
-                            </select>
+                {isDetailLoading ? <Loading /> :
+                    <>
+                        <div className="card-header bg-primary align-items-center justify-content-between">
+                            <p className="fs-2 text-white px-3 py-2 mb-0">Order Details : #{dataDetails?.order_id}</p>
+                            <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                         </div>
-                    </div>
-                    <table className='table table-responsive table-striped'>
-                        <thead>
-                            <tr className='fw-bolder text-muted'>
-                                {ORDER_LIST_POPUP_TABLE.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {dataDetails?.items.length ? dataDetails.items.map((item, index: number) => <tr key={index}>
-                                <td className='align-middle text-center'>{item.product_id}</td>
-                                <td >
-                                    <div className="d-flex align-items-center">
-                                        <div className="symbol me-5">
-                                            <img src={item.product_img} alt={item.name} />
-                                        </div>
-                                        <div className="d-flex justify-content-start flex-column">
-                                            <a className='fs-6' target={'_blank'} href={item.product_url}>{item.name}</a>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className='align-middle text-center'>{item.quantity}</td>
-                                <td className='align-middle text-center'>{item.sku ? item.sku : '-'}</td>
-                                <td className='align-middle text-center'>{item.variation_id}</td>
-                            </tr>
-                            ) : <tr><td colSpan={5} className='text-center'>{message}</td></tr>}
-                        </tbody>
-                    </table>
-                </div>}
-                <div className="card-footer p-1 bg-white">
-                    <div className="text-center">
-                        <button className='btn btn-danger m-4 px-8 py-3 fs-7' onClick={onTogglePopup} >Cancel</button>
-                        <button className='btn btn-success m-4 px-8 py-3 fs-7' onClick={onUpdateDetail}>Update</button>
-                    </div>
-                </div>
+                        <div className="card-body bg-white ">
+                            <p className='text-center fs-2 mb-2 text-danger'>{message}</p>
+                            <div className="d-flex justify-content-between align-items-center mb-3">
+                                <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.customer_name}</span></p>
+                                <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_date}</span></p>
+                                <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.customer_email}</span></p>
+                                <div className='my-1'>
+                                    <select
+                                        className='form-select form-select-solid form-select-sm me-0'
+                                        onChange={(e) => onChangeDetailsHandler(e, dataDetails?.order_id || '')}
+                                        name="order_status"
+                                        value={!formUpdateData.order_status ? dataDetails?.order_status : formUpdateData.order_status}
+                                    >
+                                        {FILTER_STATUS.map((item, index: number) => <option key={index} value={item.status}>{item.name}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="d-flex flex-fill">
+                                <div className=" ">
+                                    <p>Order Billing</p>
+                                    <p className='mb-2'>Address 1 :<span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_address_1}</span></p>
+                                    <p className='mb-2'>Address 2 :<span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_address_2}</span></p>
+                                    <p className='mb-2'>City :<span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_city}</span></p>
+                                    <p className='mb-2'>Company :<span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_company}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_country}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_email}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_first_name}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_last_name}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_phone}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_billing.order_billing_postcode}</span></p>
+                                </div>
+                                <div className=" ">
+                                    <p>Order Shiping</p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_address_1}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_address_2}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_city}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_company}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_country}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_first_name}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_last_name}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_phone}</span></p>
+                                    <p className='mb-2'><span className="fs-7 fw-bolder">{dataDetails?.order_shipping.order_shiping_postcode}</span></p>
+                                </div>
+                            </div>
+                            <table className='table table-responsive table-striped'>
+                                <thead>
+                                    <tr className='fw-bolder text-muted'>
+                                        {ORDER_LIST_POPUP_TABLE.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {dataDetails?.items.length ? dataDetails.items.map((item, index: number) => <tr key={index}>
+                                        <td className='align-middle text-center'>{item.product_id}</td>
+                                        <td >
+                                            <div className="d-flex align-items-center">
+                                                <div className="symbol me-5">
+                                                    <img src={item.product_img} alt={item.name} />
+                                                </div>
+                                                <div className="d-flex justify-content-start flex-column">
+                                                    <a className='fs-6' target={'_blank'} href={item.product_url}>{item.name}</a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className='align-middle text-center'>{item.quantity}</td>
+                                        <td className='align-middle text-center'>{item.sku ? item.sku : '-'}</td>
+                                        <td className='align-middle text-center'>{item.variation_id}</td>
+                                    </tr>
+                                    ) : <tr><td colSpan={5} className='text-center'>{message}</td></tr>}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="card-footer p-1 bg-white">
+                            <div className="text-center">
+                                <button className='btn btn-danger m-4 px-8 py-3 fs-7' onClick={onTogglePopup} >Cancel</button>
+                                <button className='btn btn-success m-4 px-8 py-3 fs-7' onClick={onUpdateDetail}>Update</button>
+                            </div>
+                        </div>
+                    </>
+                }
             </div>
         </PopupComponent >
 

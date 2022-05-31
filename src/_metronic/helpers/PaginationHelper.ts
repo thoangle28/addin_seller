@@ -37,3 +37,5 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
 
     return listPages
 }
+
+export const formatMoney = (money: string | number, currency: string = "$") => currency + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
