@@ -21,7 +21,7 @@ import {
 } from '../../../models'
 import Loading from './../../../_metronic/partials/content/Loading'
 import { find_page_begin_end } from './../../../_metronic/helpers'
-import { TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD } from '../../../constant/Report'
+import { TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD, TABLE_PRODUCT_STATUS } from '../../../constant/Report'
 
 type Props = {
   dataList: any | []
@@ -244,8 +244,8 @@ const Reports: FC = () => {
 
   // UI components
   const getStatus = (status: string) => {
-    const item = TABLE_STATUS.find((item: iApiStatus) => item.name.toLocaleLowerCase() === status);
-    return item ? <span className={`badge badge-light-${item.btnStatus}`}>{item.name}</span>
+    const item = TABLE_PRODUCT_STATUS.find((item) => item.name.toLocaleLowerCase() === status);
+    return item ? <span className={`badge badge-light-${item.btnStyle}`}>{item.name}</span>
       : <span className='badge badge-light-info'>Draft</span>
   }
 
@@ -315,7 +315,7 @@ const Reports: FC = () => {
                   productSoldList.page_size ? productSoldList.page_size : initFormValue.page_size
                 }
               >
-                {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
+                {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-3'>
@@ -394,7 +394,7 @@ const Reports: FC = () => {
                         <s>{formatMoney(item.regular_price)}</s>
                       </p>
                     </td>
-                    <td>{getStatus(item.status)}</td>
+                    <td className='text-center'>{getStatus(item.status)}</td>
                     <td className='text-end'>{item.date}</td>
                   </tr>
                 ))
@@ -420,7 +420,7 @@ const Reports: FC = () => {
                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
                 value={formValue.page_size ? formValue.page_size : initFormValue.page_size}
               >
-                {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
+                {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-3'>
@@ -490,7 +490,7 @@ const Reports: FC = () => {
               value={formProductOrderValue.page_size ? formProductOrderValue.page_size : initFormValue.page_size}
 
             >
-              {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
+              {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
             </select>
             <span className='text-muted fs-8 ms-3'>item(s)/page</span>
             <span className='text-muted fs-8 ms-3'>
@@ -519,7 +519,7 @@ const Reports: FC = () => {
           <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
             <thead>
               <tr className='fw-bolder text-muted'>
-                {TABLE_CUSTOMER_SALE.map((item, index: number) => <th className={item.className}>{item.name}</th>)}
+                {TABLE_CUSTOMER_SALE.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
               </tr>
             </thead>
             <tbody>
@@ -560,7 +560,7 @@ const Reports: FC = () => {
                     : initFormValue.page_size
                 }
               >
-                {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
+                {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
               </select>
               <span className='text-muted fs-8 ms-3'>item(s)/page</span>
               <span className='text-muted fs-8 ms-2'>
@@ -636,7 +636,7 @@ const Reports: FC = () => {
               value={formRefund.page_size ? formRefund.page_size : initFormValue.page_size}
 
             >
-              {ITEMS_PER_PAGES.map(item => <option value={item}>{item}</option>)}
+              {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
             </select>
             <span className='text-muted fs-8 ms-3'>item(s)/page</span>
             <span className='text-muted fs-8 ms-3'>

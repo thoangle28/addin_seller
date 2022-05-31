@@ -1,12 +1,27 @@
 import { iTableHead } from "../models";
 
+
+export const TABLE_PRODUCT_STATUS = [
+    { name: 'Processing', key: 'processing', btnStyle: 'primary' },
+    { name: 'Refunded', key: 'refunded', btnStyle: 'warning' },
+    { name: 'In China Warehous ', key: 'in-china-warehous', btnStyle: 'info' },
+    { name: 'Leave China Port', key: 'leave-china-port', btnStyle: 'success' },
+    { name: 'Reach Singapore Port', key: 'reach-singapre-p', btnStyle: 'success' },
+    { name: 'Reach Tuas Wareho', key: 'reach-tuas-wareho', btnStyle: 'success' },
+    { name: 'Failed', key: 'failed', btnStyle: 'danger' },
+    { name: 'on hold', key: 'on-hold', btnStyle: 'danger' },
+    { name: 'pending', key: 'pending', btnStyle: 'warning' },
+    { name: 'approved', key: 'approved', btnStyle: 'success' },
+    { name: 'publish', key: 'publish', btnStyle: 'success' },
+]
+
 export const TABLE_PRODUCT_SALE: iTableHead[] = [
     { name: '#ID', className: 'text-left' },
     { name: 'Product Name', className: 'text-left' },
     { name: 'Type', className: 'text-center' },
     { name: 'SKU', className: 'text-center' },
     { name: 'Price', className: 'text-end' },
-    { name: 'Status', className: 'text-start' },
+    { name: 'Status', className: 'text-center' },
     { name: 'Date Created', className: 'text-end' },
 ]
 
