@@ -1,10 +1,9 @@
 import { iApiStatus, iPopupStatus, iTableHead } from "../models";
 
 export const TABLE_STATUS: iApiStatus[] = [
-    { key: '', name: 'All', btnStatus: '' }, 
+    { key: '', name: 'All', btnStatus: '' },
     { key: 'wc-pending', name: 'Pending payment', btnStatus: 'default' },
     { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
-    { key: 'publish', name: 'Publish', btnStatus: 'success' },
     { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
     { key: 'reach-singapore-p', name: 'Reach Singapore Port', btnStatus: 'success' },
     { key: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse', btnStatus: 'success' },
@@ -14,7 +13,6 @@ export const TABLE_STATUS: iApiStatus[] = [
     { key: 'wc-completed', name: 'Completed', btnStatus: 'success' },
     { key: 'on-hold', name: 'On hold', btnStatus: 'warning' },
     { key: 'wc-processing', name: 'Processing', btnStatus: 'primary' },
-    { key: 'trash', name: 'Trash', btnStatus: 'secondary' },
 ]
 
 export const ORDER_LIST_TABLE: iTableHead[] = [
@@ -29,9 +27,10 @@ export const ORDER_LIST_TABLE: iTableHead[] = [
 export const ORDER_LIST_POPUP_TABLE: iTableHead[] = [
     { name: 'Product ID', className: 'align-middle text-center' },
     { name: 'Product Name', className: 'align-middle' },
-    { name: 'Quantity', className: 'align-middle text-center' },
     { name: 'SKU', className: 'align-middle text-center' },
-    { name: 'Variation ID', className: 'align-middle text-center' },
+    { name: 'Quantity', className: 'align-middle text-center' },
+    { name: 'Price', className: 'align-middle text-center' },
+    { name: 'Total', className: 'align-middle text-center' }, 
 ]
 
 export const FILTER_STATUS: iPopupStatus[] = [

@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, TABLE_STATUS, ITEMS_PER_PAGES } from '../../../constant'
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, ITEMS_PER_PAGES, TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD, TABLE_PRODUCT_STATUS } from '../../../constant'
 import {
   iReport,
   formValue,
@@ -21,7 +21,6 @@ import {
 } from '../../../models'
 import Loading from './../../../_metronic/partials/content/Loading'
 import { find_page_begin_end } from './../../../_metronic/helpers'
-import { TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD, TABLE_PRODUCT_STATUS } from '../../../constant/Report'
 
 type Props = {
   dataList: any | []
@@ -244,7 +243,7 @@ const Reports: FC = () => {
 
   // UI components
   const getStatus = (status: string) => {
-    const item = TABLE_PRODUCT_STATUS.find((item) => item.name.toLocaleLowerCase() === status);
+    const item = TABLE_PRODUCT_STATUS.find((item: any) => item.name.toLocaleLowerCase() === status);
     return item ? <span className={`badge badge-light-${item.btnStyle}`}>{item.name}</span>
       : <span className='badge badge-light-info'>Draft</span>
   }

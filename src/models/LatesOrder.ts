@@ -44,15 +44,15 @@ interface orderBilling {
     order_billing_postcode: string;
 }
 interface orderShipping {
-    order_shiping_address_1: string;
-    order_shiping_address_2: string;
-    order_shiping_city: string;
-    order_shiping_company: string;
-    order_shiping_country: string;
-    order_shiping_first_name: string;
-    order_shiping_last_name: string;
-    order_shiping_phone: string;
-    order_shiping_postcode: string;
+    order_shipping_address_1: string;
+    order_shipping_address_2: string;
+    order_shipping_city: string;
+    order_shipping_company: string;
+    order_shipping_country: string;
+    order_shipping_first_name: string;
+    order_shipping_last_name: string;
+    order_shipping_phone: string;
+    order_shipping_postcode: string;
 }
 
 export interface iOrderListDetailResponse {

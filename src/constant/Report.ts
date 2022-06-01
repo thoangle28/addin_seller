@@ -1,7 +1,7 @@
 import { iTableHead } from "../models";
 
 
-export const TABLE_PRODUCT_STATUS = [
+export const TABLE_PRODUCT_STATUS: any = [
     { name: 'Processing', key: 'processing', btnStyle: 'primary' },
     { name: 'Refunded', key: 'refunded', btnStyle: 'warning' },
     { name: 'In China Warehous ', key: 'in-china-warehous', btnStyle: 'info' },
