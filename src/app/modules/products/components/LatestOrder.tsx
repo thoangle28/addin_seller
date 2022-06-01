@@ -37,8 +37,8 @@ const LatestOrder: FC = () => {
     useOnClickOutside(ref, () => {
         setIsShowPopup(false);
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
-    }); 
-    
+    });
+
     // Events
     const onChangeHandler = (e: any, current_page: number = 1) => {
         const { name, value } = e.target;
@@ -116,7 +116,7 @@ const LatestOrder: FC = () => {
 
     useEffect(() => {
         getDataOrderList();
-    }, [formFilterData.current_page, formFilterData.page_size, formFilterData.filter_by_status])
+    }, [formFilterData.current_page, formFilterData.page_size, formFilterData.filter_by_status, formFilterData.before_custom_date, formFilterData.after_custom_date])
 
     useEffect(() => {
         return () => {
@@ -137,37 +137,35 @@ const LatestOrder: FC = () => {
     // UI Renderings 
     const renderFilterForm = () => {
         return <div className='card-toolbar align-items-end'>
-            <div className="w-100 d-flex flex-row pb-3">
-                <div className='flex-fill pe-4'>
-                    <input
-                        className='form-control me-0'
-                        onChange={(e) => onChangeHandler(e)}
-                        name="search_by_order_id"
-                        placeholder='Search'
-                    />
-                </div>
-            </div>
-            <div className="d-flex w-100 align-items-end flex-row">
-                <div className='w-25 me-4 my-1'>
+            <div className="d-flex align-items-end flex-row">
+                <div className='me-4 my-1'>
                     <label htmlFor='Status'>Status:</label>
                     <select
-                        className='form-select form-select-solid form-select-sm me-0'
+                        className='form-select form-select-solid fs-7 py-3 form-select-sm me-0'
                         onChange={(e) => onChangeHandler(e)}
                         name="status"
                     >
                         {TABLE_STATUS.map((item, index: number) => <option key={index} value={item.key}>{item.name}</option>)}
                     </select>
                 </div>
-                <div className='w-25 me-4 my-1'>
+                <div className='me-4 my-1'>
                     <label htmlFor='before_custom_date'>Start Date:</label>
-                    <input className='form-control px-2 py-2 me-3' id="before_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="before_custom_date" />
+                    <input className='form-control px-2 py-3 me-3 fs-7' id="before_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="before_custom_date" />
                 </div>
-                <div className='w-25 me-4 my-1'>
+                <div className='me-4 my-1'>
                     <label htmlFor='after_custom_date'>End Date:</label>
-                    <input className='form-control px-2 py-2 me-3' defaultValue={CURRENT_DATE} id="after_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="after_custom_date" />
+                    <input className='form-control px-2 py-3 me-3 fs-7' defaultValue={CURRENT_DATE} id="after_custom_date" placeholder='Date Time' onChange={e => onChangeHandler(e)} type="date" name="after_custom_date" />
                 </div>
-                <div className='w-25 me-4 my-1'>
-                    <button className='w-100 btn btn-sm btn-primary' onClick={getDataOrderList}>Search</button>
+                <div className='me-4 my-1'>
+                    <input
+                        className='form-control fs-7 py-3 me-0 p-2'
+                        onChange={(e) => onChangeHandler(e)}
+                        name="search_by_order_id"
+                        placeholder='Search'
+                    />
+                </div>
+                <div className='me-4 my-1'>
+                    <button className='w-100 btn btn-sm btn-primary' onClick={getDataOrderList}>Filter</button>
                 </div>
             </div>
         </div>
@@ -265,12 +263,9 @@ const LatestOrder: FC = () => {
                                     <span  >{dataDetails?.customer_name}</span>
                                 </div>
                                 <div className='w-25 mb-2'>
-                                    <p className="fs-7 mb-1 fw-bolder">Order Date</p>
-                                    <span  >{dataDetails?.order_date}</span>
-                                </div>
-                                <div className='w-25 mb-2'>
-                                    <p className="fs-7 mb-1 fw-bolder">Email</p>
-                                    <span >{dataDetails?.customer_email}</span></div>
+                                    <p className="fs-7 mb-1 fw-bolder">Date Created</p>
+                                    <span>{dataDetails?.order_date}</span>
+                                </div> 
                                 <div className='mb-25 d-flex align-items-end'>
                                     <div className='me-2'>
                                         <label className="fs-7 mb-1 fw-bolder" htmlFor="">Status</label>
