@@ -96,3 +96,5 @@ export const getOrderListPage = (payload: iPayload) => axios.post(`${API_END_POI
 export const getOrderDetailById = (order_id: string | number, user_id: string) => axios.post(`${API_END_POINT_URL}/sale-report/order-detail`, { order_id, user_id })
 
 export const updateOrderStatus = (payload: iUpdateData) => axios.post(`${API_END_POINT_URL}/sale-report/update-order-status`, payload)
+
+export const getAllOrderStatus = () => axios.post(`${API_END_POINT_URL}/sale-report/get-all-order-status`);
