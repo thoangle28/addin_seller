@@ -97,7 +97,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       mapValuesToForm(initialForm, product)
-      if (reloadPage) initialForm.type_product = productType
+      if (reloadPage) {
+        initialForm.type_product = productType
+        initialForm.new_photo_galleries = newPhotoGalleries
+      }
       setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
@@ -570,7 +573,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const configCKEditor = {
     extraPlugins: [uploadPlugin],
   }
-
+  
   return (
     <>
       {loading && formStatus.error == 204 ? (
@@ -597,11 +600,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   initialValues={isNewProduct ? {...initialFormValues} : {...initialForm}}
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
-                  onSubmit={(values, {setSubmitting, resetForm}) => {
+                  onSubmit={(values, {setSubmitting, resetForm}) => {                   
                     //save to DB
                     if (values.usePhoto && usePhotoFromContent.length > 0) {
                       values.photo_galleries = usePhotoFromContent
-                    }
+                    } 
 
                     setSubmitting(true)
                     postProduct(values, accessToken)
