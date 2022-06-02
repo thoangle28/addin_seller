@@ -28,8 +28,8 @@ export const ORDER_LIST_POPUP_TABLE: iTableHead[] = [
     { name: 'Product ID', className: 'align-middle text-center' },
     { name: 'Product Name', className: 'align-middle' },
     { name: 'SKU', className: 'align-middle text-center' },
-    { name: 'Quantity', className: 'align-middle text-center' },
     { name: 'Price', className: 'align-middle text-center' },
+    { name: 'Quantity', className: 'align-middle text-center' },
     { name: 'Total', className: 'align-middle text-center' }, 
 ]
 
