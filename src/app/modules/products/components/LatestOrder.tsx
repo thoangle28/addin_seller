@@ -289,31 +289,28 @@ const LatestOrder: FC = () => {
                             <div className="d-flex">
                                 <div className='w-50'>
                                     <p className="fs-4 mb-1 fw-bolder">Order Billing</p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Address 1: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_address_1}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Address 2: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_address_2}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>City :  <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_city}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Company: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_company}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Country: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_country}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Email: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_email}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>First Name: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_first_name}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Last Name: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_last_name}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Phone: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_phone}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Post Code: <span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_postcode}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_first_name} {dataDetails?.order_billing.order_billing_last_name}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_address_1}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_address_2}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_city}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_company}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_country}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_postcode}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold mt-3">Phone: {dataDetails?.order_billing.order_billing_phone}</span></p>
                                 </div>
                                 <div className='w-50'>
                                     <p className="fs-4 mb-1 fw-bolder">Order shipping</p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Address 1 : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_address_1}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Address 2 : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_address_2}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>City :  <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_city}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Company : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_company}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Country : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_country}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>First Name : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_first_name}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Last Name : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_last_name}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Phone : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_phone}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'>Post Code : <span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_postcode}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_first_name} {dataDetails?.order_shipping.order_shipping_last_name}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_address_1}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_address_2}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_city}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_company}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_country}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_phone}</span></p>
+                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_postcode}</span></p>
                                 </div>
                             </div>
-                            <div className='w-100 my-4'> 
+                            <div className='w-100 my-4'>
                                 <span>Email : {dataDetails?.customer_email}</span>
                             </div>
                             <table className='table table-responsive table-striped'>
