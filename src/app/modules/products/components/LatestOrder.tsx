@@ -43,6 +43,7 @@ const LatestOrder: FC = () => {
     const onChangeHandler = (e: any, current_page: number = 1) => {
         const { name, value } = e.target;
         setFormFilterData({ ...formFilterData, [name]: value, current_page })
+
     }
     const onTogglePopup = () => {
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
@@ -50,10 +51,6 @@ const LatestOrder: FC = () => {
     }
     const onHandleEscapeKey = (e: KeyboardEvent) => {
         if (e.code === 'Escape') setIsShowPopup(false)
-    }
-
-    const handleEnterKey = (e: KeyboardEvent) => {
-        if (e.key === 'Enter') getDataOrderList()
     }
 
     const clearMessage = () => {
@@ -66,7 +63,7 @@ const LatestOrder: FC = () => {
         updateOrderStatus(formUpdateData).then(res => {
             const { code, message } = res.data
             if (code === 200) {
-                getDataOrderList()
+                getDataOrderList(formFilterData)
                 onTogglePopup();
                 setIsDetailLoading(false)
             } else {
@@ -82,8 +79,9 @@ const LatestOrder: FC = () => {
     }
 
     // API Calling  
-    const getDataOrderList = () => {
+    const getDataOrderList = (formFilterData: iPayload) => {
         setIsLoading(true)
+        console.log(formFilterData)
         getOrderListPage(formFilterData).then(res => {
             const { code, data, message } = res.data
             if (code === 200) {
@@ -116,7 +114,7 @@ const LatestOrder: FC = () => {
 
     // API Running 
     useEffect(() => {
-        getDataOrderList();
+        getDataOrderList(formFilterData);
     }, [formFilterData.current_page, formFilterData.page_size, formFilterData.filter_by_status, formFilterData.before_custom_date, formFilterData.after_custom_date])
 
     // UI Clean Up Effects
@@ -129,10 +127,8 @@ const LatestOrder: FC = () => {
 
     useEffect(() => {
         document.addEventListener('keydown', onHandleEscapeKey)
-        document.addEventListener('keydown', handleEnterKey)
         return () => {
             document.removeEventListener('keydown', onHandleEscapeKey)
-            document.removeEventListener('keydown', handleEnterKey)
         }
     }, [])
 
@@ -167,7 +163,7 @@ const LatestOrder: FC = () => {
                     />
                 </div>
                 <div className='me-4 my-1 w-100'>
-                    <button className='w-100 btn btn-sm btn-primary' onClick={getDataOrderList}>Filter</button>
+                    <button className='w-100 btn btn-sm btn-primary' onClick={() => getDataOrderList(formFilterData)}>Apply</button>
                 </div>
             </div>
         </div>
@@ -213,13 +209,9 @@ const LatestOrder: FC = () => {
                             <span className='text-muted me-3'>Showing</span>
                             <select
                                 name='page_size'
-                                onChange={(e) => {
-                                    onChangeHandler(e)
-                                }}
+                                onChange={(e) => onChangeHandler(e)}
                                 className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
-                                value={
-                                    data ? data.page_size : initFormValue.page_size
-                                }
+                                value={data ? data.page_size : initFormValue.page_size}
                             >
                                 {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
                             </select>
@@ -259,16 +251,16 @@ const LatestOrder: FC = () => {
                         </div>
                         <div style={{ height: '450px' }} className="card-body bg-white overflow-scroll">
                             <p className='text-center fs-2 mb-2 text-danger'>{message}</p>
-                            <div className="d-flex justify-content-between align-items-center mb-3">
-                                <div className='w-25 mb-2'>
-                                    <p className="fs-7 mb-1 fw-bolder">Customer Name</p>
-                                    <span  >{dataDetails?.customer_name}</span>
+                            <div className="row align-items-center mb-3">
+                                <div className='col-sm-4 col-lg-4 col-md-4 mb-2'>
+                                    <p className="fs-7 mb-3 fw-bolder">Customer Name</p>
+                                    <span>{dataDetails?.customer_name}</span>
                                 </div>
-                                <div className='w-25 mb-2'>
-                                    <p className="fs-7 mb-1 fw-bolder">Date Created</p>
+                                <div className='col-sm-4 col-lg-4 col-md-4 mb-2'>
+                                    <p className="fs-7 mb-3 fw-bolder">Date Created</p>
                                     <span>{dataDetails?.order_date}</span>
                                 </div>
-                                <div className='mb-25 d-flex align-items-end'>
+                                <div className='col-sm-4 col-lg-4 col-md-4 d-flex align-items-end'>
                                     <div className='me-2'>
                                         <label className="fs-7 mb-1 fw-bolder" htmlFor="">Status</label>
                                         <select
@@ -286,31 +278,31 @@ const LatestOrder: FC = () => {
                                     }}>Apply</button>
                                 </div>
                             </div>
-                            <div className="d-flex">
-                                <div className='w-50'>
-                                    <p className="fs-4 mb-1 fw-bolder">Order Billing</p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_first_name} {dataDetails?.order_billing.order_billing_last_name}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_address_1}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_address_2}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_city}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_company}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_country}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_billing.order_billing_postcode}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold mt-3">Phone: {dataDetails?.order_billing.order_billing_phone}</span></p>
+                            <div className="row">
+                                <div className='col-sm-4 col-lg-4 col-md-4'>
+                                    <p className="fs-7 mb-1 fw-bolder">Order Billing</p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_first_name} {dataDetails?.order_billing.order_billing_last_name}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_address_1}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_address_2}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_city}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_company}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_country}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_postcode}</span></p>
                                 </div>
-                                <div className='w-50'>
-                                    <p className="fs-4 mb-1 fw-bolder">Order shipping</p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_first_name} {dataDetails?.order_shipping.order_shipping_last_name}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_address_1}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_address_2}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_city}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_company}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_country}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_phone}</span></p>
-                                    <p className='mb-1 fs-8 fw-bolder'><span className="fs-8 fw-bold">{dataDetails?.order_shipping.order_shipping_postcode}</span></p>
+                                <div className='col-sm-4 col-lg-4 col-md-4'>
+                                    <p className="fs-7 mb-1 fw-bolder">Order shipping</p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_first_name} {dataDetails?.order_shipping.order_shipping_last_name}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_address_1}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_address_2}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_city}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_company}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_country}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_phone}</span></p>
+                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_postcode}</span></p>
                                 </div>
                             </div>
                             <div className='w-100 my-4'>
+                                <p className='mb-4 fs-8 fw-bolder'><span className="fs-8 fw-bold mt-3">Phone: {dataDetails?.order_billing.order_billing_phone}</span></p>
                                 <span>Email : {dataDetails?.customer_email}</span>
                             </div>
                             <table className='table table-responsive table-striped'>

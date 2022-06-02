@@ -11,8 +11,7 @@ export const TABLE_PRODUCT_STATUS: any = [
     { name: 'Failed', key: 'failed', btnStyle: 'danger' },
     { name: 'on hold', key: 'on-hold', btnStyle: 'danger' },
     { name: 'pending', key: 'pending', btnStyle: 'warning' },
-    { name: 'approved', key: 'approved', btnStyle: 'success' },
-    { name: 'publish', key: 'publish', btnStyle: 'success' },
+    { name: 'publish', key: 'publish', btnStyle: 'success' }, 
 ]
 
 export const TABLE_PRODUCT_SALE: iTableHead[] = [
