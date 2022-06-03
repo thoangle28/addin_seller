@@ -100,6 +100,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       if (reloadPage) {
         initialForm.type_product = productType
         initialForm.new_photo_galleries = newPhotoGalleries
+        initialForm.new_thumbnail = newThumbnail
       }
       setProductType(initialForm.type_product)
       setNewProduct(false)
