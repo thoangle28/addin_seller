@@ -12,6 +12,7 @@ export const TABLE_PRODUCT_STATUS: any = [
     { name: 'on hold', key: 'on-hold', btnStyle: 'danger' },
     { name: 'pending', key: 'pending', btnStyle: 'warning' },
     { name: 'publish', key: 'publish', btnStyle: 'success' }, 
+    { name: 'completed', key: 'completed', btnStyle: 'success' }, 
 ]
 
 export const TABLE_PRODUCT_SALE: iTableHead[] = [

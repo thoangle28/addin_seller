@@ -81,7 +81,6 @@ const LatestOrder: FC = () => {
     // API Calling  
     const getDataOrderList = (formFilterData: iPayload) => {
         setIsLoading(true)
-        console.log(formFilterData)
         getOrderListPage(formFilterData).then(res => {
             const { code, data, message } = res.data
             if (code === 200) {
@@ -115,7 +114,7 @@ const LatestOrder: FC = () => {
     // API Running 
     useEffect(() => {
         getDataOrderList(formFilterData);
-    }, [formFilterData.current_page, formFilterData.page_size, formFilterData.filter_by_status, formFilterData.before_custom_date, formFilterData.after_custom_date])
+    }, [])
 
     // UI Clean Up Effects
     useEffect(() => {
@@ -141,7 +140,7 @@ const LatestOrder: FC = () => {
                     <select
                         className='form-select form-select-solid fs-7 py-3 form-select-sm me-0'
                         onChange={(e) => onChangeHandler(e)}
-                        name="status"
+                        name="filter_by_status"
                     >
                         {TABLE_STATUS.map((item, index: number) => <option key={index} value={item.key}>{item.name}</option>)}
                     </select>
@@ -249,7 +248,7 @@ const LatestOrder: FC = () => {
                             <p className="fs-2 text-white px-3 py-2 mb-0">Order Details : #{dataDetails?.order_id}</p>
                             <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                         </div>
-                        <div style={{ height: '450px' }} className="card-body bg-white overflow-scroll">
+                        <div style={{ height: '550px' }} className="card-body bg-white overflow-scroll">
                             <p className='text-center fs-2 mb-2 text-danger'>{message}</p>
                             <div className="row align-items-center mb-3">
                                 <div className='col-sm-4 col-lg-4 col-md-4 mb-2'>
@@ -281,29 +280,29 @@ const LatestOrder: FC = () => {
                             <div className="row">
                                 <div className='col-sm-4 col-lg-4 col-md-4'>
                                     <p className="fs-7 mb-1 fw-bolder">Order Billing</p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_first_name} {dataDetails?.order_billing.order_billing_last_name}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_address_1}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_address_2}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_city}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_company}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_country}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_billing.order_billing_postcode}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_first_name} {dataDetails?.order_billing.order_billing_last_name}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_address_1}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_address_2}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_city}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_company}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_country}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_billing.order_billing_postcode}</span></p>
                                 </div>
                                 <div className='col-sm-4 col-lg-4 col-md-4'>
                                     <p className="fs-7 mb-1 fw-bolder">Order shipping</p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_first_name} {dataDetails?.order_shipping.order_shipping_last_name}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_address_1}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_address_2}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_city}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_company}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_country}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_phone}</span></p>
-                                    <p className='mb-1 fw-bolder'><span className="fs-7 fw-bold">{dataDetails?.order_shipping.order_shipping_postcode}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_first_name} {dataDetails?.order_shipping.order_shipping_last_name}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_address_1}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_address_2}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_city}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_company}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_country}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_phone}</span></p>
+                                    <p className='mb-1'><span className="fs-7">{dataDetails?.order_shipping.order_shipping_postcode}</span></p>
                                 </div>
                             </div>
                             <div className='w-100 my-4'>
-                                <p className='mb-4 fs-8 fw-bolder'><span className="fs-8 fw-bold mt-3">Phone: {dataDetails?.order_billing.order_billing_phone}</span></p>
-                                <span>Email : {dataDetails?.customer_email}</span>
+                                <p><span className="fs-7 mt-3">Phone: {dataDetails?.order_billing.order_billing_phone}</span></p>
+                                <span className="fs-7">Email : {dataDetails?.customer_email}</span>
                             </div>
                             <table className='table table-responsive table-striped'>
                                 <thead>
