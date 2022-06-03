@@ -2,7 +2,7 @@ import { iApiStatus, iPopupStatus, iTableHead } from "../models";
 
 export const TABLE_STATUS: iApiStatus[] = [
     { key: '', name: 'All', btnStatus: '' },
-    { key: 'wc-pending', name: 'Pending Payment', btnStatus: 'default' },
+    { key: 'wc-pending', name: 'Pending Payment', btnStatus: 'warning' },
     { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
     { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
     { key: 'wc-reach-singapore-p', name: 'Reach Singapore Port', btnStatus: 'success' },
@@ -30,7 +30,7 @@ export const ORDER_LIST_POPUP_TABLE: iTableHead[] = [
     { name: 'SKU', className: 'align-middle text-center' },
     { name: 'Price', className: 'align-middle text-center' },
     { name: 'Quantity', className: 'align-middle text-center' },
-    { name: 'Total', className: 'align-middle text-center' }, 
+    { name: 'Total', className: 'align-middle text-center' },
 ]
 
 export const FILTER_STATUS: iPopupStatus[] = [
@@ -39,8 +39,7 @@ export const FILTER_STATUS: iPopupStatus[] = [
     { status: 'wc-leave-china-port', name: 'Leave China Port' },
     { status: 'wc-reach-singapre-p', name: 'Reach Singapre Port' },
     { status: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse' },
-    { status: 'wc-failed', name: 'Failed' },
-    { status: 'wc-processing', name: 'Processing' },
+    { status: 'wc-failed', name: 'Failed' }, 
     { status: 'wc-cancelled', name: 'Cancelled' },
     { status: 'wc-refunded', name: 'Refunded' },
     { status: 'wc-on-hold', name: 'On Hold' },

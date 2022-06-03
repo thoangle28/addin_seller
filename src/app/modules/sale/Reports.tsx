@@ -300,6 +300,47 @@ const Reports: FC = () => {
             </tbody>
           </table>
         </div>
+        <div className='row justify-content-between align-items-center'>
+          <div className='col-md-6'>
+            <div className='d-flex align-items-center py-3'>
+              <span className='text-muted me-3'>Showing</span>
+              <select
+                name='page_size'
+                onChange={(e) => {
+                  onChangeHandler(e)
+                }}
+                className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+                value={
+                  productSoldList.page_size ? productSoldList.page_size : initFormValue.page_size
+                }
+              >
+                {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
+              </select>
+              <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+              <span className='text-muted fs-8 ms-3'>
+                Displaying {productSoldList.current_page} of {productSoldList.total_pages} pages
+              </span>
+            </div>
+          </div>
+          {productSoldList.total_pages <= 1 ? '' : <div className='col-md-6 d-flex justify-content-end'>
+            <div>
+              {listPages &&
+                listPages.map((item, index) => (
+                  <span
+                    key={index}
+                    onClick={(e: any) => {
+                      onChangeHandler(e, item.page)
+                    }}
+                    className={
+                      'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                    }
+                  >
+                    {item.label}
+                  </span>
+                ))}
+            </div>
+          </div>}
+        </div>
       </div>
     ) : (
       <Loading />
@@ -357,7 +398,7 @@ const Reports: FC = () => {
                   </tr>
                 ))
               ) : <tr>
-                <td colSpan={6} className='text-center'>
+                <td colSpan={7} className='text-center'>
                   No Item Found
                 </td>
               </tr>
@@ -366,7 +407,45 @@ const Reports: FC = () => {
             </tbody>
           </table>
         </div>
-
+        <div className='row justify-content-between align-items-center'>
+          <div className='col-md-6'>
+            <div className='d-flex align-items-center py-3'>
+              <span className='text-muted me-3'>Showing</span>
+              <select
+                name='page_size'
+                onChange={(e) => {
+                  onChangeHandler(e)
+                }}
+                className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+                value={formValue.page_size ? formValue.page_size : initFormValue.page_size}
+              >
+                {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
+              </select>
+              <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+              <span className='text-muted fs-8 ms-3'>
+                Displaying {list.current_page} of {list.total_pages} pages
+              </span>
+            </div>
+          </div>
+          {list.total_pages <= 1 ? '' : <div className='col-md-6 d-flex justify-content-end'>
+            <div>
+              {listPages &&
+                listPages.map((item, index) => (
+                  <span
+                    key={index}
+                    onClick={(e: any) => {
+                      onChangeHandler(e, item.page)
+                    }}
+                    className={
+                      'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                    }
+                  >
+                    {item.label}
+                  </span>
+                ))}
+            </div>
+          </div>}
+        </div>
       </div>
     ) : (
       <Loading />
@@ -399,7 +478,34 @@ const Reports: FC = () => {
           {/* Pagination */}
         </table>
       </div>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-6">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              name="page_size"
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formProductOrderValue.page_size ? formProductOrderValue.page_size : initFormValue.page_size}
 
+            >
+              {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
+            </select>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
+              Displaying {productOrderList.current_page} of {productOrderList.total_pages} pages
+            </span>
+          </div>
+        </div>
+        {productOrderList.total_pages <= 1 ? '' : <div className="col-md-6 d-flex justify-content-end">
+          {listPages &&
+            listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+              {item.label}
+            </span>
+            )}
+        </div>}
+
+      </div>
     </div>
     ) : (
       <Loading />
@@ -435,8 +541,49 @@ const Reports: FC = () => {
               </tr>
               }
             </tbody>
-            {/* Pagination */}
           </table>
+          <div className='row justify-content-between align-items-center'>
+            <div className='col-md-5'>
+              <div className='d-flex align-items-center py-3'>
+                <span className='text-muted me-3'>Showing</span>
+                <select
+                  name='page_size'
+                  className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+                  onChange={(e) => {
+                    onChangeHandler(e)
+                  }}
+                  value={
+                    formCustomerValue.page_size
+                      ? formCustomerValue.page_size
+                      : initFormValue.page_size
+                  }
+                >
+                  {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
+                </select>
+                <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+                <span className='text-muted fs-8 ms-2'>
+                  Displaying {customerList.current_page} of {customerList.total_pages} pages
+                </span>
+              </div>
+            </div>
+            {customerList.total_pages <= 1 ? '' : <div className='col-md-6 d-flex justify-content-end'>
+              {listPages &&
+                listPages.map((item, index) => (
+                  <span
+                    key={index}
+                    onClick={(e: any) => {
+                      onChangeHandler(e, item.page)
+                    }}
+                    className={
+                      'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class
+                    }
+                  >
+                    {item.label}
+                  </span>
+                ))}
+            </div>}
+
+          </div>
         </div>
       </div>
     ) : (
@@ -478,6 +625,35 @@ const Reports: FC = () => {
         </tbody>
         {/* Pagination */}
       </table>
+      <div className="row justify-content-between align-items-center">
+        <div className="col-md-6">
+          <div className='d-flex align-items-center py-3'>
+            <span className='text-muted me-3'>Showing</span>
+            <select
+              name="page_size"
+              onChange={(e) => { onChangeHandler(e) }}
+              className='form-control form-control-sm text-primary font-weight-bold mr-4 border-0 bg-light-primary select-down'
+              value={formRefund.page_size ? formRefund.page_size : initFormValue.page_size}
+
+            >
+              {ITEMS_PER_PAGES.map((item, index: number) => <option key={index} value={item}>{item}</option>)}
+            </select>
+            <span className='text-muted fs-8 ms-3'>item(s)/page</span>
+            <span className='text-muted fs-8 ms-3'>
+              Displaying {refundList.current_page} of {refundList.total_pages} pages
+            </span>
+          </div>
+        </div>
+        {refundList.total_pages <= 1 ? '' : <div className="col-md-6 d-flex justify-content-end">
+          <div className="col-md-6 d-flex justify-content-end">
+            {listPages &&
+              listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                {item.label}
+              </span>
+              )}
+          </div>
+        </div>} 
+      </div>
     </div >) : <Loading />
   }
   const filterSection = (tab: string) => {

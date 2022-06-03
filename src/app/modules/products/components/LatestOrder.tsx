@@ -33,7 +33,7 @@ const LatestOrder: FC = () => {
     const [data, setData] = useState<iOrderListResponse>()
     const [dataDetails, setDataDetails] = useState<iOrderListDetailResponse>()
     const [message, setMessage] = useState<string>()
-
+    console.log(formFilterData)
     useOnClickOutside(ref, () => {
         setIsShowPopup(false);
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
@@ -84,6 +84,7 @@ const LatestOrder: FC = () => {
         getOrderListPage(formFilterData).then(res => {
             const { code, data, message } = res.data
             if (code === 200) {
+                console.log(data)
                 setIsLoading(false)
                 setData(data)
                 setMessage(message)
@@ -169,7 +170,7 @@ const LatestOrder: FC = () => {
     }
 
     const getStatus = (status: string) => {
-        const item = TABLE_STATUS.find((item: iApiStatus) => item.name.toLocaleLowerCase() === status);
+        const item = TABLE_STATUS.find((item: iApiStatus) => item.key === status);
         return item ? <span className={`badge badge-light-${item.btnStatus}`}>{item.name}</span>
             : <span className='badge badge-secondary'>Draft</span>
     }
@@ -220,25 +221,20 @@ const LatestOrder: FC = () => {
                             </span>
                         </div>
                     </div>
-                    <div className='col-md-6 d-flex justify-content-end'>
+                    {data && data?.total_pages <= 1 ? '' : <div className='col-md-6 d-flex justify-content-end'>
                         <div>
                             {listPages &&
-                                listPages.map((item, index: number) => (
-                                    <span
-                                        key={index}
-                                        onClick={(e: any) => onChangeHandler(e, item.page)}
-                                        className={`btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ${item.class}`}
-                                    >
-                                        {item.label}
-                                    </span>
-                                ))}
+                                listPages.map((item, index) => <span key={index} onClick={(e: any) => { onChangeHandler(e, item.page) }} className={'btn btn-icon btn-sm border-0 btn-hover-primary mr-2 my-1 ' + item.class}>
+                                    {item.label}
+                                </span>
+                                )}
                         </div>
                     </div>
+                    }
                 </div>
             </div>
         </div>
     }
-
     const renderPopup = () => {
         return <PopupComponent >
             <div ref={ref} className="card" >
