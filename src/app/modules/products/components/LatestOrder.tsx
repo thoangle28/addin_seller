@@ -115,7 +115,7 @@ const LatestOrder: FC = () => {
     // API Running 
     useEffect(() => {
         getDataOrderList(formFilterData);
-    }, [])
+    }, [formFilterData.page_size , formFilterData.current_page])
 
     // UI Clean Up Effects
     useEffect(() => {
