@@ -490,7 +490,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
-      categories: Yup.string().required('Please Add Categories !')
+      categories: Yup.array().min(1, 'Please choose the categories before submit!')
     })
   }
 
@@ -660,7 +660,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               onChange={handleChange}
                               onBlur={handleBlur}
                               value={values.name}
-                            /> 
+                            />
                             {touched.name && errors.name ? (
                               <div className='text-danger fs-8'>{errors.name}</div>
                             ) : null}
@@ -2024,8 +2024,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             noOptionsMessage={() => 'No categories found'}
                                             loadingMessage={() => 'Loading data, please wait...'}
                                           />
-                                          {values.categories.length < 1 && errors.categories ? (
-                                            <div className='text-danger fs-8'>Please enter the categories before submit !</div>
+                                          {console.log(touched)}
+                                          {touched.categories && errors.categories ? (
+                                            <div className='text-danger fs-8'>{errors.categories}</div>
                                           ) : null}
                                         </div>
                                       </div>
@@ -2036,6 +2037,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             </div>
                           </div>
                         </div>
+                        {console.log(errors)}
                         <div className='pt-10 justify-content-center mb-5'>
                           <div className='me-0 d-flex flex-stack justify-content-center indicator-progress'>
                             <button
