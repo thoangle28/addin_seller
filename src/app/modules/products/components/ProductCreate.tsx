@@ -490,7 +490,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
-      categories: Yup.array().min(1, 'Please choose the categories before submit!')
+      categories: Yup.array().min(1, 'Please select the categories before submit!')
     })
   }
 
