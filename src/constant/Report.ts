@@ -1,18 +1,32 @@
-import { iTableHead } from "../models";
+import { iApiStatus, iTableHead } from "../models";
 
+export const TABLE_PRODUCT_STATUS: iApiStatus[] = [
+    { key: '', name: 'All', btnStatus: '' },
+    { key: 'wc-pending', name: 'Pending Payment', btnStatus: 'warning' },
+    { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
+    { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
+    { key: 'wc-reach-singapore-p', name: 'Reach Singapore Port', btnStatus: 'success' },
+    { key: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse', btnStatus: 'success' },
+    { key: 'wc-failed', name: 'Failed', btnStatus: 'danger' },
+    { key: 'wc-refunded', name: 'Refunded', btnStatus: 'danger' },
+    { key: 'wc-cancelled', name: 'Cancelled', btnStatus: 'danger' },
+    { key: 'wc-completed', name: 'Completed', btnStatus: 'success' },
+    { key: 'wc-on-hold', name: 'On hold', btnStatus: 'warning' },
+    { key: 'wc-processing', name: 'Processing', btnStatus: 'primary' },
+]
 
-export const TABLE_PRODUCT_STATUS: any = [
-    { name: 'Processing', key: 'processing', btnStyle: 'primary' },
-    { name: 'Refunded', key: 'refunded', btnStyle: 'warning' },
-    { name: 'In China Warehous ', key: 'in-china-warehous', btnStyle: 'info' },
-    { name: 'Leave China Port', key: 'leave-china-port', btnStyle: 'success' },
-    { name: 'Reach Singapore Port', key: 'reach-singapre-p', btnStyle: 'success' },
-    { name: 'Reach Tuas Wareho', key: 'reach-tuas-wareho', btnStyle: 'success' },
-    { name: 'Failed', key: 'failed', btnStyle: 'danger' },
-    { name: 'on hold', key: 'on-hold', btnStyle: 'danger' },
-    { name: 'pending', key: 'pending', btnStyle: 'warning' },
-    { name: 'publish', key: 'publish', btnStyle: 'success' }, 
-    { name: 'completed', key: 'completed', btnStyle: 'success' }, 
+export const TABLE_PRODUCT_SALE_STATUS: any = [
+    { name: 'Processing', btnStatus: 'primary' },
+    { name: 'Refunded', btnStatus: 'warning' },
+    { name: 'In China Warehous ', btnStatus: 'info' },
+    { name: 'Leave China Port', btnStatus: 'success' },
+    { name: 'Reach Singapore Port', btnStatus: 'success' },
+    { name: 'Reach Tuas Wareho', btnStatus: 'success' },
+    { name: 'Failed', btnStatus: 'danger' },
+    { name: 'on hold', btnStatus: 'danger' },
+    { name: 'pending', btnStatus: 'warning' },
+    { name: 'publish', btnStatus: 'success' },
+    { name: 'completed', btnStatus: 'success' },
 ]
 
 export const TABLE_PRODUCT_SALE: iTableHead[] = [

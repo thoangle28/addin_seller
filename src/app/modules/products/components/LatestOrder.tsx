@@ -33,7 +33,7 @@ const LatestOrder: FC = () => {
     const [data, setData] = useState<iOrderListResponse>()
     const [dataDetails, setDataDetails] = useState<iOrderListDetailResponse>()
     const [message, setMessage] = useState<string>()
-    console.log(formFilterData)
+ 
     useOnClickOutside(ref, () => {
         setIsShowPopup(false);
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
@@ -83,8 +83,7 @@ const LatestOrder: FC = () => {
         setIsLoading(true)
         getOrderListPage(formFilterData).then(res => {
             const { code, data, message } = res.data
-            if (code === 200) {
-                console.log(data)
+            if (code === 200) { 
                 setIsLoading(false)
                 setData(data)
                 setMessage(message)
@@ -244,8 +243,8 @@ const LatestOrder: FC = () => {
                             <p className="fs-2 text-white px-3 py-2 mb-0">Order Details : #{dataDetails?.order_id}</p>
                             <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                         </div>
-                        <div style={{ height: '550px' }} className="card-body bg-white overflow-scroll">
-                            <p className='text-center fs-2 mb-2 text-danger'>{message}</p>
+                        <div style={{ height: '500px' }} className="card-body bg-white overflow-scroll">
+                            <p className='fs-7 mb-4 text-danger'>{message}</p>
                             <div className="row align-items-center mb-3">
                                 <div className='col-sm-4 col-lg-4 col-md-4 mb-2'>
                                     <p className="fs-7 mb-3 fw-bolder">Customer Name</p>

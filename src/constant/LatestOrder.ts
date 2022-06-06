@@ -37,7 +37,7 @@ export const FILTER_STATUS: iPopupStatus[] = [
     { status: 'wc-pending', name: 'Pending Payment' },
     { status: 'wc-in-china-warehous', name: 'In China Warehouse' },
     { status: 'wc-leave-china-port', name: 'Leave China Port' },
-    { status: 'wc-reach-singapre-p', name: 'Reach Singapre Port' },
+    { status: 'wc-reach-singapore-p', name: 'Reach Singapre Port' },
     { status: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse' },
     { status: 'wc-failed', name: 'Failed' }, 
     { status: 'wc-cancelled', name: 'Cancelled' },

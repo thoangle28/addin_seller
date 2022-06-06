@@ -3,7 +3,7 @@ import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
 import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from './saleReport'
-import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, ITEMS_PER_PAGES, TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD, TABLE_PRODUCT_STATUS } from '../../../constant'
+import { CURRENT_MONTH, CURRENT_YEAR, MONTHS, YEARS, ITEMS_PER_PAGES, TABLE_CUSTOMER_SALE, TABLE_PRODUCT_ORDER, TABLE_PRODUCT_ORDER_REFUND, TABLE_PRODUCT_SALE, TABLE_PRODUCT_SOLD, TABLE_PRODUCT_STATUS, TABLE_PRODUCT_SALE_STATUS } from '../../../constant'
 import {
   iReport,
   formValue,
@@ -17,7 +17,6 @@ import {
   iOrderList,
   iRefuned,
   iCustomer,
-  iApiStatus
 } from '../../../models'
 import Loading from './../../../_metronic/partials/content/Loading'
 import { find_page_begin_end } from './../../../_metronic/helpers'
@@ -243,9 +242,16 @@ const Reports: FC = () => {
 
   // UI components
   const getStatus = (status: string) => {
-    const item = TABLE_PRODUCT_STATUS.find((item: any) => item.name.toLocaleLowerCase() === status);
-    return item ? <span className={`badge badge-light-${item.btnStyle} text-capitalize`}>{item.name === 'publish' ? 'approved' : item.name}</span>
+    const item = TABLE_PRODUCT_STATUS.find((item: any) => item.key.toLocaleLowerCase() === status);
+    return item ? <span className={`badge badge-light-${item.btnStatus} text-capitalize`}>{item.key === 'publish' ? 'approved' : item.name}</span>
       : <span className='badge badge-light-info text-capitalize'>Draft</span>
+  }
+
+  const getProductListStt = (stt: string) => {
+    const item = TABLE_PRODUCT_SALE_STATUS.find((item: any) => item.name.toLocaleLowerCase() === stt);
+    return item ? <span className={`badge badge-light-${item.btnStatus} text-capitalize`}>{item.name === 'publish' ? 'approved' : item.name}</span>
+      : <span className='badge badge-light-info text-capitalize'>Draft</span>
+
   }
 
   const displayProductSoldList = () => {
@@ -393,7 +399,7 @@ const Reports: FC = () => {
                         <s>{formatMoney(item.regular_price)}</s>
                       </p>
                     </td>
-                    <td className='text-center'>{getStatus(item.status)}</td>
+                    <td className='text-center'>{getProductListStt(item.status)}</td>
                     <td className='text-end'>{item.date}</td>
                   </tr>
                 ))
@@ -652,7 +658,7 @@ const Reports: FC = () => {
               </span>
               )}
           </div>
-        </div>} 
+        </div>}
       </div>
     </div >) : <Loading />
   }
