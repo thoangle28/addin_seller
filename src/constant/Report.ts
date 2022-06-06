@@ -51,7 +51,7 @@ export const TABLE_PRODUCT_SOLD: iTableHead[] = [
 export const TABLE_PRODUCT_ORDER: iTableHead[] = [
     { name: 'Order ID', className: 'text-start' },
     { name: 'Customer\'s Name', className: 'text-left' },
-    { name: 'Order Status', className: 'text-start' },
+    { name: 'Order Status', className: 'text-center' },
     { name: 'Total', className: 'text-end' },
     { name: 'Date Created', className: 'text-end' },
 ]
