@@ -63,7 +63,7 @@ const TicketDetails = () => {
       customUI: ({onClose}) => {
         return (
           <div className='custom-ui'>
-            <h3 style={{color: '#fff'}}>Creat Ticket</h3>
+            <h3 className='text-white'>Create Ticket</h3>
             <p>{message}</p>
             <button
               className='btn btn-sm btn-success'

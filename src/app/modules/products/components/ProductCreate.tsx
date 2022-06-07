@@ -490,7 +490,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
-      categories: Yup.array().min(1, 'Please select the categories before submit!')
+      categories: Yup.array().min(1, '')
     })
   }
 
@@ -1447,7 +1447,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             )
                                           })) ||
                                           null}
-                                      </div>
+                                      </div> 
                                       {!isNewProduct && (
                                         <div className='mt-4'>
                                           <button
@@ -2023,11 +2023,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             className='w-100 fs-7'
                                             noOptionsMessage={() => 'No categories found'}
                                             loadingMessage={() => 'Loading data, please wait...'}
-                                          />
-                                          {console.log(touched)}
-                                          {touched.categories && errors.categories ? (
-                                            <div className='text-danger fs-8'>{errors.categories}</div>
-                                          ) : null}
+                                          /> 
+                                          {values.categories.length < 1 ? <div className='text-danger fs-8 mt-1'>Please select the categories</div> : null}
                                         </div>
                                       </div>
                                     </div>
@@ -2036,8 +2033,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               </div>
                             </div>
                           </div>
-                        </div>
-                        {console.log(errors)}
+                        </div> 
                         <div className='pt-10 justify-content-center mb-5'>
                           <div className='me-0 d-flex flex-stack justify-content-center indicator-progress'>
                             <button
