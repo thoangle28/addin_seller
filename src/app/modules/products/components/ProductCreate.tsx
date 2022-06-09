@@ -1795,7 +1795,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               <div className='row'>
                                                                 <div className='col-md-6 form-group mb-4'>
                                                                   <label className='fs-7 fw-bold mb-2'>
-                                                                    Regular Price ($)
+                                                                    Regular Price ({formatMoney('')})
                                                                   </label>
                                                                   <input
                                                                     type='number'
@@ -1809,7 +1809,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 </div>
                                                                 <div className='col-md-6 form-group mb-4'>
                                                                   <label className='fs-7 fw-bold mb-2'>
-                                                                    Sale Price ($)
+                                                                    Sale Price ({formatMoney('')})
                                                                   </label>
                                                                   <input
                                                                     type='number'

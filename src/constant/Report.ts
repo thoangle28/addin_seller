@@ -7,7 +7,7 @@ export const TABLE_PRODUCT_STATUS: iApiStatus[] = [
     { key: 'wc-pending', name: 'Pending Payment', btnStatus: 'warning' },
     { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
     { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
-    { key: 'wc-reach-singapore-p', name: 'Reach Singapore Port', btnStatus: 'success' },
+    { key: 'wc-reach-singapore-p', name: 'Arrives in Malaysia Port', btnStatus: 'success' },
     { key: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse', btnStatus: 'success' },
     { key: 'wc-failed', name: 'Failed', btnStatus: 'danger' },
     { key: 'wc-refunded', name: 'Refunded', btnStatus: 'danger' },
