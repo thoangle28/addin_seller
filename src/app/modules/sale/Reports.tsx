@@ -87,7 +87,7 @@ const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
-  const tabs = ['Product Sales', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
+  const tabs = ['Promotion Products', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
   const now = new Date().getUTCFullYear();
   const currentMonth: number = new Date().getMonth() + 1
   const currentYear: number = new Date().getFullYear()
@@ -125,7 +125,7 @@ const Reports: FC = () => {
     filter_by_year: currentYear,
   }
 
-  const [tab, setTab] = useState('Product Sales')
+  const [tab, setTab] = useState('Promotion Products')
   const [isActiveIndex, setActiveIndex] = useState<number>(0)
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
   const [isLoading, setIsLoading] = useState<boolean>(false)
@@ -145,7 +145,7 @@ const Reports: FC = () => {
     e.preventDefault()
     const { name, value } = e.target
     if (tab === 'Product Sold') setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
-    if (tab === 'Product Sales') setFormValue({ ...formValue, [name]: parseInt(value), current_page })
+    if (tab === 'Promotion Products') setFormValue({ ...formValue, [name]: parseInt(value), current_page })
     if (tab === 'Customers') setFormCustomerValue({ ...formCustomerValue, [name]: parseInt(value), current_page })
     if (tab === 'Item Orders') setFormProductOrderValue({ ...formProductOrderValue, [name]: parseInt(value), current_page })
     if (tab === 'Refunded') setFormRefund({ ...formRefund, [name]: parseInt(value), current_page })
@@ -263,7 +263,7 @@ const Reports: FC = () => {
   }, [])
   // Load data each tab when user has clicked
   useEffect(() => {
-    if (tab === 'Product Sales') showProductSaleList({ ...formValue })
+    if (tab === 'Promotion Products') showProductSaleList({ ...formValue })
     if (tab === 'Customers') showCustomerList({ ...formCustomerValue })
     if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
     if (tab === 'Product Sold') showProductSoldList({ ...formProductSold })
@@ -794,7 +794,7 @@ const Reports: FC = () => {
     </div >) : <Loading />
   }
   const filterSection = (tab: string) => {
-    if (tab === 'Product Sales')
+    if (tab === 'Promotion Products')
       return (
         <div className='row my-2'>
           <div className='col-md-4 me-4 my-1 d-flex justify-content-center align-items-center'>
@@ -1029,7 +1029,7 @@ const Reports: FC = () => {
               </ul>
               {filterSection(tab)}
               <div>
-                {tab === 'Product Sales' && displayProductSaleList()}
+                {tab === 'Promotion Products' && displayProductSaleList()}
                 {tab === 'Product Sold' && displayProductSoldList()}
                 {tab === 'Customers' && displayCustomerSaleList()}
                 {tab === 'Item Orders' && displayProductOrderList()}
