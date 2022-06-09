@@ -34,7 +34,7 @@ const MixedWidget12: React.FC<Props> = ({
                 className='svg-icon-3x svg-icon-warning d-block my-2'
               />
               <span className='text-warning fw-bold fs-4'>
-                Product Sales
+                Promotion Products
               </span>
             </div>
             <div style={{ textAlign: 'right' }}>
