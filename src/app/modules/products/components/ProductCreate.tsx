@@ -35,6 +35,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 
 import ModelAttr from './Modal'
+import { formatMoney } from '../../../../_metronic/helpers'
 
 const mapState = (state: RootState) => ({ productDetail: state.productDetail })
 const connector = connect(mapState, detail.actions)
@@ -96,12 +97,15 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
    */
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
-      mapValuesToForm(initialForm, product)
+      //mapValuesToForm(initialForm, product)
       if (reloadPage) {
         initialForm.type_product = productType
         initialForm.new_photo_galleries = newPhotoGalleries
         initialForm.new_thumbnail = newThumbnail
-      }
+        initialForm.attributes = product.attributes
+        initialForm.variations = product.variations
+      } else mapValuesToForm(initialForm, product)
+
       setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
@@ -537,7 +541,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 }
 
                 uploadImage(file_upload)
-                  .then((response) => {
+                  .then((response: any) => {
                     const { data } = response
                     if (data && data.data) {
                       setUploading(false)
@@ -1036,7 +1040,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               <span>Regular Price</span>
                                             </label>
                                             <div className='input-group'>
-                                              <span className='input-group-text'>$</span>
+                                              <span className='input-group-text'>{formatMoney('')}</span>
                                               <input
                                                 type='text'
                                                 className='form-control fs-7'
@@ -1055,7 +1059,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               <span>Sale Price</span>
                                             </label>
                                             <div className='input-group'>
-                                              <span className='input-group-text'>$</span>
+                                              <span className='input-group-text'>{formatMoney('')}</span>
                                               <input
                                                 type='text'
                                                 className='form-control fs-7'
@@ -1447,7 +1451,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             )
                                           })) ||
                                           null}
-                                      </div> 
+                                      </div>
                                       {!isNewProduct && (
                                         <div className='mt-4'>
                                           <button
@@ -2023,7 +2027,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             className='w-100 fs-7'
                                             noOptionsMessage={() => 'No categories found'}
                                             loadingMessage={() => 'Loading data, please wait...'}
-                                          /> 
+                                          />
                                           {values.categories.length < 1 ? <div className='text-danger fs-8 mt-1'>Please select the categories</div> : null}
                                         </div>
                                       </div>
@@ -2033,7 +2037,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               </div>
                             </div>
                           </div>
-                        </div> 
+                        </div>
                         <div className='pt-10 justify-content-center mb-5'>
                           <div className='me-0 d-flex flex-stack justify-content-center indicator-progress'>
                             <button

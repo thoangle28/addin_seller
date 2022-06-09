@@ -53,9 +53,9 @@ const find_page_begin_end = (currentPage: number, maxPage: number) => {
 }
 
 const formatToCurrency = (amount: number) => {
-  let formatter = new Intl.NumberFormat('en-US', {
+  let formatter = new Intl.NumberFormat('ms-MY', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'MYR',
   })
   return amount > 0 ? formatter.format(amount) : ''
 }

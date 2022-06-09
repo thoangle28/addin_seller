@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useState } from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../_metronic/partials/widgets'
@@ -19,7 +19,7 @@ import {
   iCustomer,
 } from '../../../models'
 import Loading from './../../../_metronic/partials/content/Loading'
-import { find_page_begin_end } from './../../../_metronic/helpers'
+import { find_page_begin_end, formatMoney } from './../../../_metronic/helpers'
 
 type Props = {
   dataList: any | []
@@ -208,7 +208,6 @@ const Reports: FC = () => {
     }).catch(err => console.log(err))
   }
 
-  const formatMoney = (money: string | number, currency: string = "$") => currency + money.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
   useEffect(() => {
     const allReport = loadAllReports(currentUserId)
