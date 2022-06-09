@@ -2,6 +2,8 @@ import { iApiStatus, iTableHead } from "../models";
 
 export const TABLE_PRODUCT_STATUS: iApiStatus[] = [
     { key: '', name: 'All', btnStatus: '' },
+    { key: 'wc-malaysia-custom-c', name: 'Malaysia Custom Clearance', btnStatus: 'primary' },
+    { key: 'wc-out-for-delivery', name: 'Out For Delivery', btnStatus: 'info' },
     { key: 'wc-pending', name: 'Pending Payment', btnStatus: 'warning' },
     { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
     { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
