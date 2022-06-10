@@ -70,6 +70,10 @@ body {
   border-color: #3699ff !important;
 }
 
+.card-reports .card .rounded-2 {
+  height: 100%;
+}
+
 .select-down {
   width: 55px !important;
   background-position: 90% center !important;
