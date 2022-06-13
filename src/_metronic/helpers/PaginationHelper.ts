@@ -38,4 +38,4 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
     return listPages
 };
 
-export const formatMoney = (amount: string | number, currency: string = "$") => `${currency}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')}`;
+export const formatMoney = (amount: string | number, currency: string = "RM") => `${currency}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`;
