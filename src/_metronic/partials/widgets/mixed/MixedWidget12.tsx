@@ -27,7 +27,7 @@ const MixedWidget12: React.FC<Props> = ({
     <div className={`card ${className}`}>
       <div className="row">
         <div className=' col-xxl-3 col-sm-6'>
-          <div className='d-flex align-items-end justify-content-between bg-light-warning px-4 py-8 rounded-2'>
+          <div className='d-flex align-items-end justify-content-between bg-light-warning px-4 py-8 rounded-2 h-100'>
             <div >
               <KTSVG
                 path='/media/icons/duotune/general/gen032.svg'
@@ -48,7 +48,7 @@ const MixedWidget12: React.FC<Props> = ({
           </div>
         </div>
         <div className=' col-xxl-3 col-sm-6'>
-          <div className='d-flex align-items-end justify-content-between  bg-light-primary px-4 py-8 rounded-2'>
+          <div className='d-flex align-items-end justify-content-between  bg-light-primary px-4 py-8 rounded-2 h-100'>
             <div >
               <KTSVG
                 path='/media/icons/duotune/arrows/arr075.svg'
@@ -69,7 +69,7 @@ const MixedWidget12: React.FC<Props> = ({
           </div>
         </div>
         <div className=' col-xxl-3 col-sm-6'>
-          <div className='d-flex align-items-end justify-content-between  bg-light-danger px-4 py-8 rounded-2'>
+          <div className='d-flex align-items-end justify-content-between  bg-light-danger px-4 py-8 rounded-2 h-100'>
             <div >
               <KTSVG
                 path='/media/icons/duotune/abstract/abs027.svg'
@@ -87,7 +87,7 @@ const MixedWidget12: React.FC<Props> = ({
           </div>
         </div>
         <div className=' col-xxl-3 col-sm-6'>
-          <div className='d-flex align-items-end justify-content-between  bg-light-success px-4 py-8  rounded-2'>
+          <div className='d-flex align-items-end justify-content-between  bg-light-success px-4 py-8  rounded-2 h-100'>
             <div >
               <KTSVG
                 path='/media/icons/duotune/communication/com010.svg'
