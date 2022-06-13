@@ -38,12 +38,11 @@ const MixedWidget12: React.FC<Props> = ({
               </span>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <span
-                className='ps-3 text-warning fs-1 fw-bolder text-800 mt-1'>
+              <p
+                className='ps-3 text-warning fs-1 fw-bolder text-800 my-1'>
                 {weeklySales}
-              </span>
-              <br />
-              <small className='fs-8 text-warning'>products</small>
+              </p>
+              <small style={{ position: "relative", top: "-2px" }} className='fs-8 text-warning'>products</small>
             </div>
           </div>
         </div>
@@ -59,12 +58,11 @@ const MixedWidget12: React.FC<Props> = ({
               </span>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <span
-                className='ps-3 text-primary fs-1 fw-bolder text-800 mt-1'>
+              <p
+                className='ps-3 text-primary fs-1 fw-bolder text-800 my-1'>
                 {newUsers}
-              </span>
-              <br />
-              <small className='fs-8 text-primary'>in month</small>
+              </p>
+              <small style={{ position: "relative", top: "-2px" }} className='fs-8 text-primary'>in month</small>
             </div>
           </div>
         </div>
@@ -80,9 +78,8 @@ const MixedWidget12: React.FC<Props> = ({
               </span>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <span className='ps-3 text-danger fs-1 fw-bolder text-800 mt-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
-              <br />
-              <small className='fs-8 text-danger'>in month</small>
+              <p className='ps-3 text-danger fs-1 fw-bolder text-800 my-1'>{itemOrders}{/* <sub><small className='fs-8'>/m</small></sub> */}</p>
+              <small style={{ position: "relative", top: "-2px" }} className='fs-8 text-danger'>in month</small>
             </div>
           </div>
         </div>
@@ -98,14 +95,13 @@ const MixedWidget12: React.FC<Props> = ({
               </Link>
             </div>
             <div style={{ textAlign: 'right' }}>
-              <span className='ps-3 text-success fs-1 fw-bolder text-800 mt-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</span>
-              <br />
-              <small className='fs-8 text-success'>in month</small>
+              <p className='ps-3 text-success fs-1 fw-bolder text-800 my-1'>{bugReports}{/* <sub><small className='fs-8'>/m</small></sub> */}</p>
+              <small style={{ position: "relative", top: "-2px" }} className='fs-8 text-success'>in month</small>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
 
