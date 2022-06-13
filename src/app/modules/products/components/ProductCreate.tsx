@@ -35,6 +35,7 @@ import { CKEditor } from '@ckeditor/ckeditor5-react'
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic'
 
 import ModelAttr from './Modal'
+import { formatMoney } from '../../../../_metronic/helpers'
 
 const mapState = (state: RootState) => ({ productDetail: state.productDetail })
 const connector = connect(mapState, detail.actions)
@@ -90,7 +91,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       setProductDetail({ ...data })
       setFormStatus({ error: code, message: message })
     })
-
   }, [reloadPage])
 
   /**
@@ -99,15 +99,14 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       //mapValuesToForm(initialForm, product)
-      if( reloadPage ) {
-        mapValuesToForm(initialForm, producInfoBeforeSave)
-
+      if (reloadPage) {
         initialForm.type_product = productType
+        initialForm.new_photo_galleries = newPhotoGalleries
+        initialForm.new_thumbnail = newThumbnail
         initialForm.attributes = product.attributes
         initialForm.variations = product.variations
-
       } else mapValuesToForm(initialForm, product)
-      
+
       setProductType(initialForm.type_product)
       setNewProduct(false)
       setLoading(false)
@@ -181,7 +180,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       value: '',
       variation: false,
       visible: true,
-    } 
+    }
     formValues.attributes.push(newAttr)
     //reset
     setSelectedAttr({ value: '', label: '' })
@@ -271,22 +270,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /** Add Variations */
   const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
-
-    const listAttr: any = [];
+    const listAttr: any = []
     //load variations of product
     /* formValues.variations_attr && formValues.variations_attr.map((e: any) => {
       listAttr.push({ attr: e, id: 0, label: '', value: '' })
     }) */
-    //if not     
-    formValues.attributes && formValues.attributes.map((e: any) => {
-      const checkExisted = formValues.variations.some((x: any) => {
-        return x.name === e.name
-      })
+    //if not
+    formValues.attributes &&
+      formValues.attributes.map((e: any) => {
+        const checkExisted = formValues.variations.some((x: any) => {
+          return x.name === e.name
+        })
 
-      if( e.variation && !checkExisted) {
-        listAttr.push({ attr: e.name, id: 0, label: '', value: '' })
-      }
-    })
+        if (e.variation && !checkExisted) {
+          listAttr.push({ attr: e.name, id: 0, label: '', value: '' })
+        }
+      })
 
     let nextVar = 0
 
@@ -322,8 +321,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     const findAttr = formValues.attributes.find((x: any) => {
       return name === x.name
     })
-    
-    if( findAttr ) findAttr.variation = isChecked
+
+    if (findAttr) findAttr.variation = isChecked
 
     if (isChecked) {
       const filterAttr = formValues.attributes.filter((x: any) => {
@@ -504,6 +503,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       //content: Yup.string().required('no-required'),
       /* name: Yup.string().required("Required!"),
       email: Yup.string().required("Required!") */
+      categories: Yup.array().min(1, '')
     })
   }
 
@@ -550,7 +550,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                 }
 
                 uploadImage(file_upload)
-                  .then((response) => {
+                  .then((response: any) => {
                     const { data } = response
                     if (data && data.data) {
                       setUploading(false)
@@ -588,7 +588,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const configCKEditor = {
     extraPlugins: [uploadPlugin],
   }
-  
+
   return (
     <>
       {loading && formStatus.error == 204 ? (
@@ -632,7 +632,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         switch (code) {
                           case 200:
                             confirmRequest(message, data)
-                            resetForm();
+                            resetForm()
                             break
                         }
                         setSubmitting(false) //done
@@ -700,7 +700,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               {...props}
                               style={{ minHeight: '500px' }}
                             />
-                            <div className="small pt-2 text-danger">Please only add a maximum of 10 images for the content</div>
+                            <div className='small pt-2 text-danger'>
+                              Please only add a maximum of 10 images for the content
+                            </div>
                           </div>
                         </div>
                         <div className='w-100'>
@@ -730,20 +732,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                     <div className='col-md-4'>
                                       <div className='form-group mt-1'>
                                         <Dropzone
-                                          maxFiles={10}
+                                          /* maxFiles={10} */
                                           maxSize={maxFileSize}
                                           onDrop={(acceptedFiles) => {
-                                            if (acceptedFiles.length <= 0) {
-                                              alert(
-                                                'Number of files exceeded limit, 10 files is allow!'
-                                              )
-                                              return
+
+                                            if (acceptedFiles.length > 10) {
+                                              alert('Number of files exceeded limit, 10 files is allow!')
                                             }
 
                                             if (acceptedFiles && acceptedFiles !== undefined) {
-                                              handleFileUpload(acceptedFiles).then(
+                                              const filesList: any = []
+                                              acceptedFiles.map((file: any, index: number) => {
+                                                if (index < 10) filesList.push(file)
+                                              })
+
+                                              handleFileUpload(filesList).then(
                                                 (images) => {
-                                                  //setNewPhotoGalleries(images)
                                                   const newPhotos: any = []
                                                   images.map((item: any) => {
                                                     newPhotos.push({ image: item, image_id: 0 })
@@ -1019,7 +1023,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         </span>
                                       </a>
                                     </li>
-                                    { (productType === 'variable' || values.type_product === 'variable') ? (
+                                    {productType === 'variable' ||
+                                      values.type_product === 'variable' ? (
                                       <li className='nav-item me-0'>
                                         <a
                                           className='nav-link btn btn-flex btn-active-secondary w-100'
@@ -1044,7 +1049,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               <span>Regular Price</span>
                                             </label>
                                             <div className='input-group'>
-                                              <span className='input-group-text'>$</span>
+                                              <span className='input-group-text'>{formatMoney('')}</span>
                                               <input
                                                 type='text'
                                                 className='form-control fs-7'
@@ -1063,7 +1068,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               <span>Sale Price</span>
                                             </label>
                                             <div className='input-group'>
-                                              <span className='input-group-text'>$</span>
+                                              <span className='input-group-text'>{formatMoney('')}</span>
                                               <input
                                                 type='text'
                                                 className='form-control fs-7'
@@ -1258,7 +1263,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               closeMenuOnSelect={true}
                                               value={selectedAttr}
                                               loadOptions={(search: any, prevOptions: any) => {
-                                                return loadAttributeOptions(currentUserId, prevOptions, newAttrParent, search)
+                                                return loadAttributeOptions(
+                                                  currentUserId,
+                                                  prevOptions,
+                                                  newAttrParent,
+                                                  search
+                                                )
                                               }}
                                               onChange={onChangeAttr}
                                               name='attributes'
@@ -1302,7 +1312,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       <div className='accordion' id='product_attribute'>
                                         {(values.attributes &&
                                           values.attributes.map((attr: any, i: number | string) => {
-
                                             return (
                                               <div
                                                 className='accordion-item'
@@ -1465,7 +1474,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             disabled={isSaveAttr.loading}
                                           >
                                             {!isSaveAttr.loading ? (
-                                              <span className='indicator-label' id="btnSave">
+                                              <span className='indicator-label' id='btnSave'>
                                                 Save Attributes
                                               </span>
                                             ) : (
@@ -1795,7 +1804,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               <div className='row'>
                                                                 <div className='col-md-6 form-group mb-4'>
                                                                   <label className='fs-7 fw-bold mb-2'>
-                                                                    Regular Price ($)
+                                                                    Regular Price ({formatMoney('')})
                                                                   </label>
                                                                   <input
                                                                     type='number'
@@ -1809,7 +1818,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 </div>
                                                                 <div className='col-md-6 form-group mb-4'>
                                                                   <label className='fs-7 fw-bold mb-2'>
-                                                                    Sale Price ($)
+                                                                    Sale Price ({formatMoney('')})
                                                                   </label>
                                                                   <input
                                                                     type='number'
@@ -2028,6 +2037,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             noOptionsMessage={() => 'No categories found'}
                                             loadingMessage={() => 'Loading data, please wait...'}
                                           />
+                                          {values.categories.length < 1 ? <div className='text-danger fs-8 mt-1'>Please select the categories</div> : null}
                                         </div>
                                       </div>
                                     </div>

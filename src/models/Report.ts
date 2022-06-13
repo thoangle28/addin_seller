@@ -1,3 +1,5 @@
+import { iBaseResponse } from "./Common"
+
 export interface iReport {
     weeklySales: any | 0
     newUsers: any | 0
@@ -18,12 +20,7 @@ export interface formValue {
 }
 
 
-export interface iBaseResponse {
-    current_page: number,
-    total_order: number | string,
-    page_size: number,
-    total_pages: number,
-}
+
 export interface iList extends iBaseResponse {
     product_sale_list: iProduct[]
 }

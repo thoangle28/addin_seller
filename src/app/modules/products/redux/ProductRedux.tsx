@@ -9,7 +9,7 @@ import storage from 'redux-persist/lib/storage'
 export const actionTypes = {
   productsList: 'GET_PRODUCTS_LIST',
   getProductsListSuccess: 'GET_PRODUCTS_LIST_SUCCESS',
-  nextPage: 'GET_PRODUCTS_LIST_NEXT_PAGE',
+  nextPage: 'GET_PRODUCTS_LIST_NEXT_PAGE', 
 }
 
 export const actions = {

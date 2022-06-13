@@ -1,4 +1,4 @@
-import { Field, Formik, validateYupSchema } from 'formik'
+import { Field, Formik } from 'formik'
 import { FC, useEffect, useState } from 'react';
 import { shallowEqual, useSelector } from 'react-redux';
 import * as Yup from 'yup'
@@ -90,7 +90,7 @@ const Attribute: FC = () => {
     }
 
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any, setSubmitting: any) => {
-        const payload:iUpdateDataAttr = {
+        const payload: iUpdateDataAttr = {
             old_attribute_name, new_attribute_name
         }
         updateAttr(payload).then(res => {
@@ -140,7 +140,7 @@ const Attribute: FC = () => {
                 ...parentItem, options
             }
 
-            const newParentItem = list.find((item: any) => parseInt(item.id) === attrID) 
+            const newParentItem = list.find((item: any) => parseInt(item.id) === attrID)
             const result = {
                 ...newParentItem, options: [...newParentItem?.options, {
                     id: childID,
@@ -149,7 +149,7 @@ const Attribute: FC = () => {
                     attr: taxonomy
                 }]
             }
-            const newItems = [oldParentResult, result] 
+            const newItems = [oldParentResult, result]
             const newList = list.map(obj => newItems.find(o => o.id === obj.id) || obj);
             setParentAttributeList(newList)
         }
