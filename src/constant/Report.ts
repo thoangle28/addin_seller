@@ -43,38 +43,38 @@ switch (localization) {
     default:
         break;
 }
- 
+
 switch (localization) {
     case 'MALAY':
-        TABLE_PRODUCT_SALE_STATUS = [
-            { status: 'wc-malaysia-custom-c', name: 'Malaysia Custom Clearance' },
-            { status: 'wc-out-for-delivery', name: 'Out For Delivery' },
-            { status: 'wc-pending', name: 'Pending Payment' },
-            { status: 'wc-in-china-warehous', name: 'In China Warehouse' },
-            { status: 'wc-leave-china-port', name: 'Leave China Port' },
-            { status: 'wc-reach-singapore-p', name: 'Arrives in Malaysia Port' },
-            { status: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse' },
-            { status: 'wc-failed', name: 'Failed' },
-            { status: 'wc-cancelled', name: 'Cancelled' },
-            { status: 'wc-refunded', name: 'Refunded' },
-            { status: 'wc-on-hold', name: 'On Hold' },
-            { status: 'wc-completed', name: 'Completed' },
-            { status: 'wc-processing', name: 'Processing' },
+        TABLE_PRODUCT_SALE_STATUS = [ 
+            { name: 'Processing', btnStatus: 'primary' },
+            { name: 'Refunded', btnStatus: 'warning' },
+            { name: 'In China Warehous ', btnStatus: 'info' },
+            { name: 'Leave China Port', btnStatus: 'success' },
+            { name: 'Arrives in Malaysia Port', btnStatus: 'success' },
+            { name: 'Reach Tuas Wareho', btnStatus: 'success' },
+            { name: 'Failed', btnStatus: 'danger' },
+            { name: 'on hold', btnStatus: 'danger' },
+            { name: 'Out For Delivery', btnStatus: 'danger' },
+            { name: 'pending', btnStatus: 'warning' },
+            { name: 'publish', btnStatus: 'success' },
+            { name: 'completed', btnStatus: 'success' },
+            { name: 'Malaysia Custom Clearance', btnStatus: 'success' },
         ]
         break;
     case 'SG':
         TABLE_PRODUCT_SALE_STATUS = [
-            { status: 'wc-pending', name: 'Pending Payment' },
-            { status: 'wc-in-china-warehous', name: 'In China Warehouse' },
-            { status: 'wc-leave-china-port', name: 'Leave China Port' },
-            { status: 'wc-reach-singapore-p', name: 'Reach Singapre Port' },
-            { status: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse' },
-            { status: 'wc-failed', name: 'Failed' },
-            { status: 'wc-cancelled', name: 'Cancelled' },
-            { status: 'wc-refunded', name: 'Refunded' },
-            { status: 'wc-on-hold', name: 'On Hold' },
-            { status: 'wc-completed', name: 'Completed' },
-            { status: 'wc-processing', name: 'Processing' },
+            { name: 'Processing', btnStatus: 'primary' },
+            { name: 'Refunded', btnStatus: 'warning' },
+            { name: 'In China Warehous ', btnStatus: 'info' },
+            { name: 'Leave China Port', btnStatus: 'success' },
+            { name: 'Reach Singapore Port', btnStatus: 'success' },
+            { name: 'Reach Tuas Wareho', btnStatus: 'success' },
+            { name: 'Failed', btnStatus: 'danger' },
+            { name: 'on hold', btnStatus: 'danger' },
+            { name: 'pending', btnStatus: 'warning' },
+            { name: 'publish', btnStatus: 'success' },
+            { name: 'completed', btnStatus: 'success' },
         ]
         break;
 
