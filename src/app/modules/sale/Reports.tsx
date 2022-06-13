@@ -27,6 +27,8 @@ type Props = {
   saleReport: iReport
 }
 
+console.log(TABLE_PRODUCT_STATUS)
+
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
