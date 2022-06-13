@@ -75,6 +75,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newAttrValues, setNewAttrValues] = useState<any>([])
 
   const [parentId, setParentId] = useState()
+  const [producInfoBeforeSave, setProducInfoBeforeSave] = useState<any>([])
 
   const tabDefault: any = useRef(null)
   //Get All Properties
@@ -223,6 +224,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
+
+    setProducInfoBeforeSave({...formValues})
+
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -232,6 +236,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     }).then((response: any) => {
       const { code, message, data } = response.data
       setSaveAttr({ loading: false, error: message })
+      setReloadPage(false)
       setTimeout(() => {
         setSaveAttr({ loading: false, error: '' })
         setReloadPage(true)
@@ -241,6 +246,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
+    
+    setProducInfoBeforeSave({...formValues})
+
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -251,6 +259,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       .then((response: any) => {
         const { code, message, data } = response.data
         setSaveVar({ loading: false, error: message })
+        setReloadPage(false)
         setTimeout(() => {
           setSaveVar({ loading: false, error: '' })
           setReloadPage(true)
