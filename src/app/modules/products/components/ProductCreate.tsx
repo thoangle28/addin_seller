@@ -225,7 +225,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
 
-    setProducInfoBeforeSave({...formValues})
+    setProducInfoBeforeSave({ ...formValues })
 
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
@@ -246,8 +246,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
-    
-    setProducInfoBeforeSave({...formValues})
+
+    setProducInfoBeforeSave({ ...formValues })
 
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
@@ -260,10 +260,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         const { code, message, data } = response.data
         setSaveVar({ loading: false, error: message })
         setReloadPage(false)
-        setTimeout(() => {
+        if (code === 200) {
           setSaveVar({ loading: false, error: '' })
           setReloadPage(true)
-        }, 2000)
+        }
       })
       .catch(() => { })
   }
