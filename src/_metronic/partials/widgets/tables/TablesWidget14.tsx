@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { KTSVG } from '../../../helpers'
 import { Link } from 'react-router-dom'
+import { formatMoney } from './../../../helpers'
 
 type Props = {
   className: string
@@ -229,12 +230,12 @@ const TablesWidget14 = ({
                             <p className={`  mb-0  ${ele.type === 'Variable' ? 'fs-8' : ''}`} >
                               {ele.type === 'Variable' && 'From'}
                             </p>
-                            <span>{formatToCurrency(ele.sale_price ? ele.sale_price : '-')}</span>
+                            <span>{ele.sale_price ? formatMoney(ele.sale_price) : '-'}</span>
                             <br />
-                            <small 
+                            <small
                               style={{ color: '#999', textDecoration: 'line-through' }}
                             >
-                              {formatToCurrency(ele.price)}
+                              {formatMoney(ele.price)}
                             </small>
                           </>
                         ) : (
@@ -242,7 +243,7 @@ const TablesWidget14 = ({
                             <p className={` mb-0  ${ele.type === 'Variable' ? 'fs-8' : ''}`} >
                               {ele.type === 'Variable' && 'From'}
                             </p>
-                            <span>{formatToCurrency(ele.price)}</span>
+                            <span>{formatMoney(ele.price)}</span>
                           </>
                         )}
                       </td>
