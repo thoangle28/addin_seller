@@ -27,6 +27,8 @@ type Props = {
   saleReport: iReport
 }
 
+console.log(TABLE_PRODUCT_STATUS)
+
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
     <>
@@ -77,7 +79,6 @@ const Reports: FC = () => {
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
   const currentUserId: number = user ? parseInt(user.ID) : 0
   const tabs = ['Promotion Products', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
-
   const saleReportInit: iReport = {
     weeklySales: 0,
     newUsers: 0,
