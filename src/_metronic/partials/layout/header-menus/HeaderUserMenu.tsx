@@ -10,8 +10,8 @@ import { useDispatch } from 'react-redux'
 import { toAbsoluteUrl } from '../../../helpers'
 
 const HeaderUserMenu: FC = () => {
-  const user: UserModel = useSelector<RootState>(({ auth }) => auth.user, shallowEqual) as UserModel
-
+  const user: UserModel = useSelector<RootState>(({ auth }) => auth.user, shallowEqual) as UserModel 
+  console.log(user)
   const dispatch = useDispatch()
   const logout = () => {
     dispatch(auth.actions.logout())
@@ -25,7 +25,7 @@ const HeaderUserMenu: FC = () => {
       <div className='menu-item px-3'>
         <div className='menu-content d-flex align-items-center px-3'>
           <div className='symbol symbol-50px me-5'>
-            <img alt='Logo' src={toAbsoluteUrl('/media/avatars/blank.png')} />
+            <img alt='Logo' src={user.avatar ? user.avatar : toAbsoluteUrl('/media/avatars/blank.png')} />
           </div>
 
           <div className='d-flex flex-column'>

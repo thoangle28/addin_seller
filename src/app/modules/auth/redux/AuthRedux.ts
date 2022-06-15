@@ -65,12 +65,12 @@ export const reducer = persistReducer(
         return {...state, user: undefined}
       }
 
-      case actionTypes.UserRequestedSuccess: {
+      case actionTypes.UserRequestedSuccess: { 
         return {...state}
       }
 
-      case actionTypes.UserLoaded: {
-        const user = action.payload?.user
+      case actionTypes.UserLoaded: { 
+        const user = action.payload?.user  
         return {...state, user}
       }
 
@@ -121,7 +121,7 @@ export function* saga() {
   })
 
   yield takeLatest(actionTypes.UserRequested, function* userRequested() {
-    const {data: user} = yield getUserByToken()
+    const {data: user} = yield getUserByToken() 
     yield put(actions.fulfillUser(user))
   })
 }
