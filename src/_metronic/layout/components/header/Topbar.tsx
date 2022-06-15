@@ -1,5 +1,8 @@
 import clsx from 'clsx'
 import React, {FC} from 'react'
+import { shallowEqual, useSelector } from 'react-redux'
+import { UserModel } from '../../../../app/modules/auth/models/UserModel'
+import { RootState } from '../../../../setup'
 import {KTSVG, toAbsoluteUrl} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, QuickLinks, Search} from '../../../partials'
 
@@ -11,6 +14,7 @@ const toolbarButtonMarginClass = 'ms-1 ms-lg-3',
 const Topbar: FC = () => {
 
   const showTags = false;
+  const user: UserModel = useSelector<RootState>(({ auth }) => auth.user, shallowEqual) as UserModel 
   
   return (
     <div className='d-flex align-items-stretch flex-shrink-0'>
@@ -117,7 +121,7 @@ const Topbar: FC = () => {
           >
             <img
               className='h-30px w-30px rounded'
-              src={toAbsoluteUrl('/media/avatars/blank.png')}
+              src={user.avatar ? user.avatar : toAbsoluteUrl('/media/avatars/blank.png')}
               alt='metronic'
             />
           </div>
