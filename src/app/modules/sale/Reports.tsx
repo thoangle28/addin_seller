@@ -19,7 +19,7 @@ import {
   iCustomer,
 } from '../../../models'
 import Loading from './../../../_metronic/partials/content/Loading'
-import { find_page_begin_end, formatMoney } from './../../../_metronic/helpers'
+import { find_page_begin_end, formatMoney, accessToken } from './../../../_metronic/helpers'
 
 type Props = {
   dataList: any | []
@@ -27,7 +27,7 @@ type Props = {
   saleReport: iReport
 }
 
-console.log(TABLE_PRODUCT_STATUS)
+const access_token = accessToken
 
 const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: Props) => {
   return (
@@ -77,7 +77,7 @@ const DashboardPage: FC<Props> = ({ dataList = [], isPageLoading, saleReport }: 
 const Reports: FC = () => {
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
-  const currentUserId: number = user ? parseInt(user.ID) : 0
+  const user_id: number = user ? parseInt(user.ID) : 0
   const tabs = ['Promotion Products', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
   const saleReportInit: iReport = {
     weeklySales: 0,
@@ -90,10 +90,11 @@ const Reports: FC = () => {
   }
 
   const initFormValue: formValue = {
-    user_id: currentUserId,
+    user_id,
     page_size: 20,
     filter_by_month: CURRENT_MONTH,
     filter_by_year: CURRENT_YEAR,
+    access_token
   }
 
   const [tab, setTab] = useState('Promotion Products')
@@ -211,7 +212,7 @@ const Reports: FC = () => {
 
 
   useEffect(() => {
-    const allReport = loadAllReports(currentUserId)
+    const allReport = loadAllReports(user_id)
     allReport.then((results: any) => {
       const weeklySales = results.weeklySales.data ? results.weeklySales.data.total_products : 0
       const newUsers = results.newUsers.data ? results.newUsers.data.total_customers : 0

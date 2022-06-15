@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { iOrderListResponse, iPayload, iUpdateData } from '../../../../models';
+import { accessToken } from './../../../../_metronic/helpers'
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT
 
@@ -10,9 +11,11 @@ export function getProductsListTable(userId: number, currentPage: number, pageSi
     page_size: pageSize ? pageSize : 10,
     current_page: currentPage ? currentPage : 1,
     search: terms,
-    status: filterOption
+    status: filterOption,
+    access_token: accessToken
   };
-  return axios.post<{ result: any }>(API_END_POINT_URL + '/products-by-user', args)
+
+  return axios.post(`${API_END_POINT_URL}/products-by-user`, args)
 }
 
 export function getProductDetail(userId: number, product_id: number | 0) {
@@ -51,7 +54,7 @@ export function getProductsList(userId: number) {
     current_page: 1
   };
 
-  return axios.post<any>(API_END_POINT_URL + '/products-by-user', args)
+  return axios.post<any>(`${API_END_POINT_URL}/products-by-user`, args)
 }
 
 
