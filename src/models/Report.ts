@@ -16,7 +16,8 @@ export interface formValue {
     filter_by_year?: number
     page_size?: number | string
     current_page?: number | string
-    last_seven_date?: boolean
+    last_seven_date?: boolean,
+    access_token?: string;
 }
 
 
@@ -69,7 +70,7 @@ export interface iProduct {
     sale_price: string;
     sku: string;
     status: string;
-    type:string;
+    type: string;
 }
 export interface iRefuned {
     order_id: string;

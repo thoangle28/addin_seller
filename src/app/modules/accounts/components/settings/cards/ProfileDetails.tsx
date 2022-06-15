@@ -131,9 +131,9 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
         const { code, message, data } = response.data   
         
         if(code === 200 && message === 'DONE') {
-          confirmRequest('Your profile has been updated successfully.')
-          setLoading(false)
-          setStatus('')
+          confirmRequest('Your profile has been updated successfully.') 
+          window.location.reload() 
+          setLoading(false) 
         } else {
           setStatus(message)
           setLoading(false)
