@@ -101,7 +101,7 @@ const LatestOrder: FC = () => {
     const getDataById = (id: number | string) => {
         setIsShowPopup(prev => !prev)
         setIsDetailLoading(true);
-        getOrderDetailById(id, currentUserId.toString(), accessToken).then(res => {
+        getOrderDetailById(id, currentUserId.toString(), access_token).then(res => {
             const { code, data } = res.data
             if (code === 200) {
                 setDataDetails(data)
