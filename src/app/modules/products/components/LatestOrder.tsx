@@ -2,14 +2,16 @@ import { FC, useEffect, useRef, useState } from 'react'
 import { iPayload, iOrderListResponse, iApiStatus, iOrderListDetailResponse, iUpdateData } from '../../../../models';
 import { TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS, CURRENT_DATE } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
-import { getOrderDetailById, getOrderListPage, updateOrderStatus, getAllOrderStatus } from '../redux/ProductsList';
+import { getOrderDetailById, getOrderListPage, updateOrderStatus } from '../redux/ProductsList';
 import { shallowEqual, useSelector } from 'react-redux';
 import { RootState } from '../../../../setup';
 import Loading from '../../../../_metronic/partials/content/Loading'
 import { find_page_begin_end, formatMoney } from '../../../../_metronic/helpers';
 import { useOnClickOutside } from '../../../Hooks';
+import { accessToken } from '../../../../_metronic/helpers';
 
 const LatestOrder: FC = () => {
+    const access_token = accessToken;
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
     const ref = useRef<HTMLDivElement>(null);
@@ -18,10 +20,12 @@ const LatestOrder: FC = () => {
         user_id: currentUserId,
         current_page: 1,
         page_size: 20,
+        access_token
     }
     const initUpdateData: iUpdateData = {
         order_id: '',
-        order_status: ''
+        order_status: '',
+        access_token
     }
 
     // Declares useState
@@ -33,7 +37,7 @@ const LatestOrder: FC = () => {
     const [data, setData] = useState<iOrderListResponse>()
     const [dataDetails, setDataDetails] = useState<iOrderListDetailResponse>()
     const [message, setMessage] = useState<string>()
- 
+
     useOnClickOutside(ref, () => {
         setIsShowPopup(false);
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
@@ -83,7 +87,7 @@ const LatestOrder: FC = () => {
         setIsLoading(true)
         getOrderListPage(formFilterData).then(res => {
             const { code, data, message } = res.data
-            if (code === 200) { 
+            if (code === 200) {
                 setIsLoading(false)
                 setData(data)
                 setMessage(message)
@@ -97,7 +101,7 @@ const LatestOrder: FC = () => {
     const getDataById = (id: number | string) => {
         setIsShowPopup(prev => !prev)
         setIsDetailLoading(true);
-        getOrderDetailById(id, currentUserId.toString()).then(res => {
+        getOrderDetailById(id, currentUserId.toString(), access_token).then(res => {
             const { code, data } = res.data
             if (code === 200) {
                 setDataDetails(data)
@@ -114,7 +118,7 @@ const LatestOrder: FC = () => {
     // API Running 
     useEffect(() => {
         getDataOrderList(formFilterData);
-    }, [formFilterData.page_size , formFilterData.current_page])
+    }, [formFilterData.page_size, formFilterData.current_page])
 
     // UI Clean Up Effects
     useEffect(() => {

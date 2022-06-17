@@ -14,6 +14,7 @@ export interface iPayload {
     search_by_order_id?: string;
     after_custom_date?: string;
     before_custom_date?: string;
+    access_token?: string;
 }
 
 export interface iOrderListResponse extends iBaseResponse {
@@ -68,4 +69,5 @@ export interface iOrderListDetailResponse {
 export interface iUpdateData {
     order_id: string;
     order_status: string;
+    access_token: string;
 }

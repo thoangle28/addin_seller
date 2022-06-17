@@ -8,6 +8,7 @@ import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
 
 import { iListItem, iOption, iUpdateAttribute, iCreateValue, iCreateProductAttrPayload, iUpdateAttributeTerm, iCreateTermAttrPayload, iUpdateDataAttr } from './../../../../models'
+import { accessToken } from '../../../../_metronic/helpers';
 
 const Attribute: FC = () => {
     // Declare States
@@ -27,6 +28,7 @@ const Attribute: FC = () => {
     const [isLoading, setIsLoading] = useState(false)
 
     // Declare Variables
+    const access_token = accessToken;
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId = user ? user.ID : 0
 
@@ -59,7 +61,7 @@ const Attribute: FC = () => {
 
 
     const fetchData = () => {
-        getAttributesById(currentUserId).then((res: any) => {
+        getAttributesById(currentUserId , access_token).then((res: any) => {
             const { code, data } = res.data
             if (code === 200) {
                 setIsLoading(true)
@@ -91,7 +93,7 @@ const Attribute: FC = () => {
 
     const updateDataAttr = (old_attribute_name: string, new_attribute_name: string, resetForm: any, setSubmitting: any) => {
         const payload: iUpdateDataAttr = {
-            old_attribute_name, new_attribute_name
+            old_attribute_name, new_attribute_name, access_token
         }
         updateAttr(payload).then(res => {
             const { code, message } = res.data
@@ -160,6 +162,7 @@ const Attribute: FC = () => {
             id_term: childId,
             parent_id: attrId,
             new_attribute_term_name,
+            access_token
         };
 
         updateAttributeTerms(payload).then(res => {
@@ -190,7 +193,7 @@ const Attribute: FC = () => {
     const createProductAttr = (label_name: string, resetForm: any, setSubmitting: any) => {
         const payload: iCreateProductAttrPayload = {
             user_id: currentUserId,
-            label_name
+            label_name, access_token
         }
 
         createProductAttributeBrand(payload).then(res => {
@@ -227,7 +230,7 @@ const Attribute: FC = () => {
 
     const createProductTermAttr = (parent_id: string | number, term_name: string, resetForm: any, setSubmitting: any) => {
         const payload: iCreateTermAttrPayload = {
-            term_name, parent_id
+            term_name, parent_id, access_token
         }
         createTermsProductAttribute(payload).then(res => {
             const { code, message, data } = res.data

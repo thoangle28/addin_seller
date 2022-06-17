@@ -44,7 +44,7 @@ export function getAttributesNoChild(user_id: string | number) {
 export const getSubAttributes = (slug: string) => axios.post<any>(API_END_POINT_URL + '/product/attribute-list', { 'name': slug })
 
 export const updateAttr = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute', payload)
-export const getAttributesById = (user_id: string | number) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id })
+export const getAttributesById = (user_id: string | number , access_token:string) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id , access_token })
 export const updateAttributeTerms = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute-term', payload)
 export function getProductsList(userId: number) {
 
@@ -96,7 +96,7 @@ export const createTermsProductAttribute = (payload: any) => axios.post(API_END_
 
 export const getOrderListPage = (payload: iPayload) => axios.post(`${API_END_POINT_URL}/sale-report/order-list-page`, payload)
 
-export const getOrderDetailById = (order_id: string | number, user_id: string) => axios.post(`${API_END_POINT_URL}/sale-report/order-detail`, { order_id, user_id })
+export const getOrderDetailById = (order_id: string | number, user_id: string, access_token: string) => axios.post(`${API_END_POINT_URL}/sale-report/order-detail`, { order_id, user_id, access_token })
 
 export const updateOrderStatus = (payload: iUpdateData) => axios.post(`${API_END_POINT_URL}/sale-report/update-order-status`, payload)
 

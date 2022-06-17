@@ -3,19 +3,21 @@ import { KTSVG } from '../../../../_metronic/helpers'
 import { Formik } from 'formik'
 import { createProductAttributeBrand, createTermsProductAttribute } from '../redux/ProductsList'
 import { useState } from 'react'
+import { accessToken } from '../../../../_metronic/helpers'
 
 const ModalAttr = (Props: any) => {
   const [formMessage, setFormMessage] = useState<string>('')
   const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
   const [newAttr, setNewAttr] = useState<any>(null)
 
+  const access_token = accessToken;
   const initialFormValues: any = {
     taxonomy: taxonomy,
-    term_name: '',
+    term_name: ''
   }
   const initialFormAttr: any = {
     taxonomy: taxonomy,
-    term_name: '',
+    term_name: ''
   }
   const handleHideModal = (newAttr: any) => {
     setFormMessage('')
@@ -24,7 +26,7 @@ const ModalAttr = (Props: any) => {
   const productAttributesBrand = (values: any) => {
     const payload = {
       user_id,
-      label_name: values.term_name
+      label_name: values.term_name, access_token
     }
     createProductAttributeBrand(payload).then(res => {
       const { code, message, data } = res.data
@@ -39,7 +41,7 @@ const ModalAttr = (Props: any) => {
   const productAttributeValue = (values: any) => {
     const payload = {
       parent_id: Props.parentId,
-      term_name: values.term_name,
+      term_name: values.term_name, access_token
     }
     createTermsProductAttribute(payload).then(res => {
       const { code, message, data } = res.data
@@ -83,7 +85,7 @@ const ModalAttr = (Props: any) => {
                 initialValues={isAddAttr ? initialFormAttr : initialFormValues}
                 /* validationSchema={ValidationSchema} */
                 enableReinitialize={true}
-                onSubmit={(values, { setSubmitting }) => { 
+                onSubmit={(values, { setSubmitting }) => {
                   setSubmitting(true)
                   isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);
                   setSubmitting(false)
