@@ -28,19 +28,24 @@ export interface iOption {
 export interface iUpdateAttributeTerm {
     id_term: number,
     parent_id: number | string,
-    new_attribute_term_name: string
+    new_attribute_term_name: string,
+    access_token: string;
 }
 
 export interface iUpdateDataAttr {
-    old_attribute_name: string, new_attribute_name: string
+    old_attribute_name: string,
+    new_attribute_name: string,
+    access_token: string
 }
 
 export interface iCreateProductAttrPayload {
     user_id: number,
-    label_name: string
+    access_token: string
+    label_name: string,
 }
 
 export interface iCreateTermAttrPayload {
     parent_id: number | string;
-    term_name: string
+    term_name: string,
+    access_token: string
 }
