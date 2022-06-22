@@ -49,7 +49,7 @@ export const ORDER_LIST_TABLE: iTableHead[] = [
     { name: 'Order Id', className: 'align-middle' },
     { name: 'Customer\'s Name', className: 'align-middle text-start' },
     { name: 'Order Status', className: 'align-middle text-center' },
-    { name: 'Total Price', className: 'align-middle text-end' },
+    { name: 'Total', className: 'align-middle text-end' },
     { name: 'Date Created', className: 'align-middle text-end' },
     { name: 'Actions', className: 'align-middle text-center' },
 ]
