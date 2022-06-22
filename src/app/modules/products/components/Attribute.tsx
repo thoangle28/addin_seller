@@ -8,7 +8,7 @@ import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
 
 import { iListItem, iOption, iUpdateAttribute, iCreateValue, iCreateProductAttrPayload, iUpdateAttributeTerm, iCreateTermAttrPayload, iUpdateDataAttr } from './../../../../models'
-import { accessToken } from '../../../../_metronic/helpers';
+import { access_token } from '../../../../_metronic/helpers';
 
 const Attribute: FC = () => {
     // Declare States
@@ -27,8 +27,7 @@ const Attribute: FC = () => {
     const [isChildOpen, setIsChildOpen] = useState(false)
     const [isLoading, setIsLoading] = useState(false)
 
-    // Declare Variables
-    const access_token = accessToken;
+    // Declare Variables 
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId = user ? user.ID : 0
 

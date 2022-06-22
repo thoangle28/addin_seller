@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { iOrderListResponse, iPayload, iUpdateData } from '../../../../models';
-import { accessToken } from './../../../../_metronic/helpers'
+import { access_token } from './../../../../_metronic/helpers'
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT
 
@@ -12,7 +12,7 @@ export function getProductsListTable(userId: number, currentPage: number, pageSi
     current_page: currentPage ? currentPage : 1,
     search: terms,
     status: filterOption,
-    access_token: accessToken
+    access_token
   };
 
   return axios.post(`${API_END_POINT_URL}/products-by-user`, args)
@@ -44,7 +44,7 @@ export function getAttributesNoChild(user_id: string | number) {
 export const getSubAttributes = (slug: string) => axios.post<any>(API_END_POINT_URL + '/product/attribute-list', { 'name': slug })
 
 export const updateAttr = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute', payload)
-export const getAttributesById = (user_id: string | number , access_token:string) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id , access_token })
+export const getAttributesById = (user_id: string | number, access_token: string) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id, access_token })
 export const updateAttributeTerms = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute-term', payload)
 export function getProductsList(userId: number) {
 
