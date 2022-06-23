@@ -6,7 +6,6 @@ import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderLis
 import { CURRENT_MONTH, CURRENT_YEAR, } from '../../../../constant'
 import { iReport, formValue } from '../../../../models'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { access_token } from '../../../../_metronic/helpers'
 import { actions } from '../Redux/Actions'
 import PromotionProducts from './PromotionProducts'
 import Customers from './Customers'
@@ -192,7 +191,7 @@ const Reports: FC = () => {
         loading: false,
       })
     })
-  }, []) 
+  }, [])
   useEffect(() => {
     if (tab === 'Promotion Products') showProductSaleList({ ...formValue })
     if (tab === 'Customers') showCustomerList({ ...formCustomerValue })

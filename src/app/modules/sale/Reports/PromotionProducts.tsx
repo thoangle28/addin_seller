@@ -12,8 +12,7 @@ interface Props {
     initFormValue: formValue
 }
 
-const PromotionProducts = (props: Props) => {
-    console.log(props.initFormValue)
+const PromotionProducts = (props: Props) => { 
     const dispatch = useDispatch()
     const { initFormValue } = props
     const promotionProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.promotionProducts, shallowEqual)

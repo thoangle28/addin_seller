@@ -8,12 +8,12 @@ import { RootState } from '../../../../setup';
 import Loading from '../../../../_metronic/partials/content/Loading'
 import { find_page_begin_end, formatMoney } from '../../../../_metronic/helpers';
 import { useOnClickOutside } from '../../../Hooks';
-import { access_token } from '../../../../_metronic/helpers';
-
+ 
 const LatestOrder: FC = () => {
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
     const ref = useRef<HTMLDivElement>(null);
+    const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
  
     const initFormValue: iPayload = {
         user_id: currentUserId,

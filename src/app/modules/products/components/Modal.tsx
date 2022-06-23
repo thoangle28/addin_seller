@@ -3,13 +3,15 @@ import { KTSVG } from '../../../../_metronic/helpers'
 import { Formik } from 'formik'
 import { createProductAttributeBrand, createTermsProductAttribute } from '../redux/ProductsList'
 import { useState } from 'react'
-import { access_token } from '../../../../_metronic/helpers'
+import { shallowEqual, useSelector } from 'react-redux'
+import { RootState } from '../../../../setup'
 
 const ModalAttr = (Props: any) => {
+  const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
   const [formMessage, setFormMessage] = useState<string>('')
   const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
   const [newAttr, setNewAttr] = useState<any>(null)
- 
+
   const initialFormValues: any = {
     taxonomy: taxonomy,
     term_name: ''

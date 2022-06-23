@@ -1,18 +1,16 @@
-import axios from 'axios'
-import { iOrderListResponse, iPayload, iUpdateData } from '../../../../models';
-import { access_token } from './../../../../_metronic/helpers'
+import axios from 'axios' 
+import { iPayload, iUpdateData } from '../../../../models';
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT
 
-//export const END_POINT = 
+//export const END_POINT =  
 export function getProductsListTable(userId: number, currentPage: number, pageSize: number, terms: string, filterOption: string) {
   const args = {
     user_id: userId ? userId : 0,
     page_size: pageSize ? pageSize : 10,
     current_page: currentPage ? currentPage : 1,
     search: terms,
-    status: filterOption,
-    access_token
+    status: filterOption, 
   };
 
   return axios.post(`${API_END_POINT_URL}/products-by-user`, args)
@@ -51,7 +49,7 @@ export function getProductsList(userId: number) {
   const args = {
     user_id: userId ? userId : 0,
     page_size: -1,
-    current_page: 1
+    current_page: 1, 
   };
 
   return axios.post<any>(`${API_END_POINT_URL}/products-by-user`, args)
@@ -79,7 +77,7 @@ export function getProductsListing(userId: number, currentPage: number, pageSize
   const args = {
     user_id: userId ? userId : 0,
     page_size: pageSize ? pageSize : 10,
-    current_page: currentPage ? currentPage : 1
+    current_page: currentPage ? currentPage : 1, 
   };
 
   return axios.post<any>(API_END_POINT_URL + '/products-by-user', args);
