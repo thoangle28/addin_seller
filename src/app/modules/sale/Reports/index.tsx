@@ -193,12 +193,12 @@ const Reports: FC = () => {
     })
   }, [])
   useEffect(() => {
-    if (tab === 'Promotion Products') showProductSaleList({ ...formValue })
-    if (tab === 'Customers') showCustomerList({ ...formCustomerValue })
-    if (tab === 'Item Orders') showProductOrderList({ ...formProductOrderValue })
-    if (tab === 'Product Sold') showProductSoldList({ ...formProductSold })
-    if (tab === 'Refunded') showRefundList({ ...formRefund })
-  }, [formValue, formCustomerValue, formProductOrderValue, formProductSold, formRefund, tab])
+    if (tab === 'Promotion Products') showProductSaleList({ ...initFormValue })
+    if (tab === 'Customers') showCustomerList({ ...initFormValue })
+    if (tab === 'Item Orders') showProductOrderList({ ...initFormValue })
+    if (tab === 'Product Sold') showProductSoldList({ ...initFormValue })
+    if (tab === 'Refunded') showRefundList({ ...initFormValue })
+  }, [tab])
 
 
   const isEmptyObject = (obj: any) => Object.keys(obj)

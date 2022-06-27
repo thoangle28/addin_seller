@@ -49,7 +49,7 @@ export function AsideMenuMain() {
             fontIcon='bi-layers'
           />
           <AsideMenuItem
-            to='/product/LatestOrder' 
+            to='/product/OrdersListing' 
             icon='/media/icons/duotune/general/gen019.svg'
             title='Orders Listing'
             fontIcon='bi-layers'

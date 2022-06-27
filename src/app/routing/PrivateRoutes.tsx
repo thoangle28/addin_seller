@@ -17,7 +17,7 @@ export function PrivateRoutes() {
         <Route path='/dashboard' component={DashboardWrapper} />
         <Route path='/product/listing' component={ProductPage} />
         <Route path='/product/attributes' component={ProductPage} />
-        <Route path='/product/LatestOrder' component={LatestOrder} />
+        <Route path='/product/OrdersListing' component={LatestOrder} />
         <Route path='/product/create' component={ProductPage} />
         <Route path='/product/update/:id' component={ProductPage} />
         <Route path='/sale-report' component={ReportPage} />

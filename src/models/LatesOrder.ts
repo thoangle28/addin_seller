@@ -21,7 +21,7 @@ export interface iOrderListResponse extends iBaseResponse {
     order_list: iOrderList[]
 }
 
-interface iOrderDetailItems {
+export interface iOrderDetailItems {
     name: string;
     price: 300;
     product_id: number;
