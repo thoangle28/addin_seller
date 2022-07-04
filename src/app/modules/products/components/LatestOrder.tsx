@@ -134,6 +134,10 @@ const LatestOrder: FC = () => {
         }
     }, [])
 
+    const isDataExisted = (data: any) => {
+        return Object.keys(data).length
+    }
+    
     // UI Renderings 
     const renderFilterForm = () => {
         return <div className='card-toolbar align-items-end' style={{ flex: "0 0 100%" }}>
@@ -187,11 +191,12 @@ const LatestOrder: FC = () => {
                 {renderFilterForm()}
             </div>
             <div className="card-body mt-2">
-                {isLoading ? <Loading /> : <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+                {isLoading ? <Loading /> : 
+                <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
                     <thead>
                         <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
                     </thead>
-                    {!Object.keys(data).length ? '' :
+                    {!isDataExisted(data) ? '' :
                         <tbody>
                             {data.order_list.length ? data.order_list.map((item: iOrderList, index: number) => <tr key={index}>
                                 <td className='align-middle'>{item.order_id}</td>
@@ -239,6 +244,7 @@ const LatestOrder: FC = () => {
             </div>
         </div>
     }
+
     const renderPopup = () => {
         return <PopupComponent >
             <div ref={ref} className="card" >
@@ -248,7 +254,7 @@ const LatestOrder: FC = () => {
                             <p className="fs-2 text-white px-3 py-2 mb-0">Order Details : #{dataDetails?.order_id}</p>
                             <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                         </div>
-                        {Object.keys(dataDetails).length ?
+                        {isDataExisted(dataDetails) ?
                             <div style={{ height: '500px' }} className="card-body bg-white overflow-scroll">
                                 <p className='fs-7 mb-4 text-danger'>{message}</p>
                                 <div className="row align-items-center mb-3">
