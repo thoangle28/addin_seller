@@ -1,9 +1,27 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC} from 'react'
-import {useLayout} from '../core'
+import { FC } from 'react'
+import { useLayout } from '../core'
 
 const Footer: FC = () => {
-  const {classes} = useLayout()
+  const { classes } = useLayout()
+  const localization = process.env.REACT_APP_LOCALIZATION
+
+  const renderFooter = () => {
+    let footer = ''
+    switch (localization) {
+      case 'MALAY':
+        footer = 'Addin Malaysia'
+        break;
+      case 'SG':
+        footer = 'Addin SG'
+        break;
+
+      default:
+        break;
+    }
+    return footer
+  }
+
   return (
     <div className='footer py-4 d-flex flex-lg-column' id='kt_footer'>
       {/* begin::Container */}
@@ -13,9 +31,7 @@ const Footer: FC = () => {
         {/* begin::Copyright */}
         <div className='text-dark order-2 order-md-1'>
           <span className='text-muted fw-bold me-2'>{new Date().getFullYear()} &copy;</span>
-          <a href='#' className='text-gray-800 text-hover-primary'>
-            AddinSG
-          </a>
+          <a href='#' className='text-gray-800 text-hover-primary'> {renderFooter()}  </a>
         </div>
         {/* end::Copyright */}
 
@@ -44,4 +60,4 @@ const Footer: FC = () => {
   )
 }
 
-export {Footer}
+export { Footer }

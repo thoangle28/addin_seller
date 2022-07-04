@@ -225,7 +225,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
 
-    setProducInfoBeforeSave({...formValues})
+    setProducInfoBeforeSave({ ...formValues })
 
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
@@ -246,8 +246,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
-    
-    setProducInfoBeforeSave({...formValues})
+
+    setProducInfoBeforeSave({ ...formValues })
 
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
@@ -260,10 +260,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         const { code, message, data } = response.data
         setSaveVar({ loading: false, error: message })
         setReloadPage(false)
-        setTimeout(() => {
+        if (code === 200) {
           setSaveVar({ loading: false, error: '' })
           setReloadPage(true)
-        }, 2000)
+        }
       })
       .catch(() => { })
   }
@@ -1804,7 +1804,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               <div className='row'>
                                                                 <div className='col-md-6 form-group mb-4'>
                                                                   <label className='fs-7 fw-bold mb-2'>
-                                                                    Regular Price ($)
+                                                                    Regular Price ({formatMoney('')})
                                                                   </label>
                                                                   <input
                                                                     type='number'
@@ -1818,7 +1818,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 </div>
                                                                 <div className='col-md-6 form-group mb-4'>
                                                                   <label className='fs-7 fw-bold mb-2'>
-                                                                    Sale Price ($)
+                                                                    Sale Price ({formatMoney('')})
                                                                   </label>
                                                                   <input
                                                                     type='number'

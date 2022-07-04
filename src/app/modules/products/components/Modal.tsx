@@ -3,19 +3,22 @@ import { KTSVG } from '../../../../_metronic/helpers'
 import { Formik } from 'formik'
 import { createProductAttributeBrand, createTermsProductAttribute } from '../redux/ProductsList'
 import { useState } from 'react'
+import { shallowEqual, useSelector } from 'react-redux'
+import { RootState } from '../../../../setup'
 
 const ModalAttr = (Props: any) => {
+  const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
   const [formMessage, setFormMessage] = useState<string>('')
   const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
   const [newAttr, setNewAttr] = useState<any>(null)
 
   const initialFormValues: any = {
     taxonomy: taxonomy,
-    term_name: '',
+    term_name: ''
   }
   const initialFormAttr: any = {
     taxonomy: taxonomy,
-    term_name: '',
+    term_name: ''
   }
   const handleHideModal = (newAttr: any) => {
     setFormMessage('')
@@ -24,7 +27,7 @@ const ModalAttr = (Props: any) => {
   const productAttributesBrand = (values: any) => {
     const payload = {
       user_id,
-      label_name: values.term_name
+      label_name: values.term_name, access_token
     }
     createProductAttributeBrand(payload).then(res => {
       const { code, message, data } = res.data
@@ -39,7 +42,7 @@ const ModalAttr = (Props: any) => {
   const productAttributeValue = (values: any) => {
     const payload = {
       parent_id: Props.parentId,
-      term_name: values.term_name,
+      term_name: values.term_name, access_token
     }
     createTermsProductAttribute(payload).then(res => {
       const { code, message, data } = res.data
@@ -83,7 +86,7 @@ const ModalAttr = (Props: any) => {
                 initialValues={isAddAttr ? initialFormAttr : initialFormValues}
                 /* validationSchema={ValidationSchema} */
                 enableReinitialize={true}
-                onSubmit={(values, { setSubmitting }) => { 
+                onSubmit={(values, { setSubmitting }) => {
                   setSubmitting(true)
                   isAddAttr ? productAttributesBrand(values) : productAttributeValue(values);
                   setSubmitting(false)

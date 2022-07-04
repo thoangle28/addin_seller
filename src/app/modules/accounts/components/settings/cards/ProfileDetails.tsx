@@ -95,8 +95,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
   const reloadHeader = (s: boolean) => {
     onUpdateProfile(s)
   }
-
-  const history = useHistory();
+ 
   const confirmRequest = (message: string) => {
     confirmAlert({
       customUI: ({ onClose }) => {
@@ -108,8 +107,8 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
               className='btn btn-sm btn-success'
               onClick={() => {
                 reloadHeader(true)
-                history.push("/account/overview");
                 onClose()
+                window.location.reload()  
               }}
             >
               Close
@@ -131,9 +130,8 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
         const { code, message, data } = response.data   
         
         if(code === 200 && message === 'DONE') {
-          confirmRequest('Your profile has been updated successfully.')
-          setLoading(false)
-          setStatus('')
+          confirmRequest('Your profile has been updated successfully.')   
+          setLoading(false) 
         } else {
           setStatus(message)
           setLoading(false)

@@ -1,18 +1,19 @@
-import axios from 'axios'
-import { iOrderListResponse, iPayload, iUpdateData } from '../../../../models';
+import axios from 'axios' 
+import { iPayload, iUpdateData } from '../../../../models';
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT
 
-//export const END_POINT = 
+//export const END_POINT =  
 export function getProductsListTable(userId: number, currentPage: number, pageSize: number, terms: string, filterOption: string) {
   const args = {
     user_id: userId ? userId : 0,
     page_size: pageSize ? pageSize : 10,
     current_page: currentPage ? currentPage : 1,
     search: terms,
-    status: filterOption
+    status: filterOption, 
   };
-  return axios.post<{ result: any }>(API_END_POINT_URL + '/products-by-user', args)
+
+  return axios.post(`${API_END_POINT_URL}/products-by-user`, args)
 }
 
 export function getProductDetail(userId: number, product_id: number | 0) {
@@ -41,17 +42,17 @@ export function getAttributesNoChild(user_id: string | number) {
 export const getSubAttributes = (slug: string) => axios.post<any>(API_END_POINT_URL + '/product/attribute-list', { 'name': slug })
 
 export const updateAttr = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute', payload)
-export const getAttributesById = (user_id: string | number) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id })
+export const getAttributesById = (user_id: string | number, access_token: string) => axios.post(API_END_POINT_URL + '/product/get-attribute-created-by-brand', { user_id, access_token })
 export const updateAttributeTerms = (payload: any) => axios.post(API_END_POINT_URL + '/product/update-attribute-term', payload)
 export function getProductsList(userId: number) {
 
   const args = {
     user_id: userId ? userId : 0,
     page_size: -1,
-    current_page: 1
+    current_page: 1, 
   };
 
-  return axios.post<any>(API_END_POINT_URL + '/products-by-user', args)
+  return axios.post<any>(`${API_END_POINT_URL}/products-by-user`, args)
 }
 
 
@@ -76,7 +77,7 @@ export function getProductsListing(userId: number, currentPage: number, pageSize
   const args = {
     user_id: userId ? userId : 0,
     page_size: pageSize ? pageSize : 10,
-    current_page: currentPage ? currentPage : 1
+    current_page: currentPage ? currentPage : 1, 
   };
 
   return axios.post<any>(API_END_POINT_URL + '/products-by-user', args);
@@ -93,7 +94,7 @@ export const createTermsProductAttribute = (payload: any) => axios.post(API_END_
 
 export const getOrderListPage = (payload: iPayload) => axios.post(`${API_END_POINT_URL}/sale-report/order-list-page`, payload)
 
-export const getOrderDetailById = (order_id: string | number, user_id: string) => axios.post(`${API_END_POINT_URL}/sale-report/order-detail`, { order_id, user_id })
+export const getOrderDetailById = (order_id: string | number, user_id: string, access_token: string) => axios.post(`${API_END_POINT_URL}/sale-report/order-detail`, { order_id, user_id, access_token })
 
 export const updateOrderStatus = (payload: iUpdateData) => axios.post(`${API_END_POINT_URL}/sale-report/update-order-status`, payload)
 
