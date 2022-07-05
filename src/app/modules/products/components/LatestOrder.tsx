@@ -333,7 +333,8 @@ const LatestOrder: FC = () => {
                                             <td className='align-middle text-center'>{item.sku ? item.sku : '-'}</td>
                                             <td className='align-middle text-center'>{formatMoney(item.price / item.quantity)}</td>
                                             <td className='align-middle text-center'>{item.quantity}</td>
-                                            <td className='align-middle text-center'>{formatMoney(item.price)}</td>
+                                            <td className='align-middle text-center'>{formatMoney(item.discount)}</td>
+                                            <td className='align-middle text-center'>{formatMoney(item.total)}</td>
                                         </tr>
                                         ) : <tr><td colSpan={5} className='text-center'>{message}</td></tr>}
                                     </tbody>
