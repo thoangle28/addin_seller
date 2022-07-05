@@ -5,8 +5,7 @@ import { formValue, iCustomer } from '../../../../models'
 import { RootState } from '../../../../setup'
 import { find_page_begin_end } from '../../../../_metronic/helpers'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { actions } from '../Redux/Actions'
-import { getCustomerList } from '../saleReport'
+import { actions, fetchCustomer } from '../Redux/Actions'
 
 interface Props { initFormValue: formValue }
 
@@ -15,7 +14,7 @@ const Customers = (props: Props) => {
     const { initFormValue } = props
     const customerList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.customerList, shallowEqual)
     const reduxFormValue: any = useSelector<RootState>(({ reportReducers }) => reportReducers.formCustomerValue, shallowEqual)
-
+    
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [formCustomerValue, setFormCustomerValue] = useState<formValue>(Object.keys(reduxFormValue).length ? reduxFormValue : initFormValue)
 
@@ -27,19 +26,12 @@ const Customers = (props: Props) => {
 
     const showCustomerList = (formCustomerValue: formValue) => {
         setIsLoading(true)
-        getCustomerList(formCustomerValue)
-            .then((res) => {
-                const { code, data } = res.data
-                if (code === 200) {
-                    setIsLoading(false)
-                    dispatch(actions.getCustomerList(data))
-                }
-            })
-            .catch((err) => console.log(err))
+        dispatch(fetchCustomer(formCustomerValue))
     }
     useEffect(() => {
         showCustomerList({ ...formCustomerValue })
-    }, [formCustomerValue])
+        setIsLoading(false)
+    }, [formCustomerValue , showCustomerList])
 
     const filterSection = () => {
         return (
@@ -82,10 +74,9 @@ const Customers = (props: Props) => {
                 </div>
             </div>
         )
-    }
-
+    } 
     const listPages = find_page_begin_end(customerList?.current_page, customerList?.total_pages)
-    return customerList ? (
+    return customerList.data ? (
         <>
             {filterSection()}
             <div className='col-xs-12'>
@@ -97,8 +88,8 @@ const Customers = (props: Props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {customerList.customer_list.length ? (
-                                customerList.customer_list?.map((item: iCustomer, index: number) => (
+                            {customerList.data.customer_list.length > 0 ? (
+                                customerList.data.customer_list?.map((item: iCustomer, index: number) => (
                                     <tr key={index}>
                                         <td className=' text-start'>{index + 1}</td>
                                         <td className=' text-start'>{item.full_name}</td>
@@ -109,7 +100,7 @@ const Customers = (props: Props) => {
                                     </tr>
                                 ))
                             ) : <tr>
-                                <td colSpan={6} className='text-center'>
+                                <td colSpan={TABLE_CUSTOMER_SALE.length} className='text-center'>
                                     No Item Found
                                 </td>
                             </tr>
