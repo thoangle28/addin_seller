@@ -5,8 +5,7 @@ import { formValue, iProductSold } from "../../../../models"
 import { RootState } from "../../../../setup"
 import { find_page_begin_end, formatMoney } from "../../../../_metronic/helpers"
 import Loading from "../../../../_metronic/partials/content/Loading"
-import { actions } from "../Redux/Actions"
-import { getProductSoldList } from "../saleReport"
+import { actions, fetchProductSold } from "../Redux/Actions"
 
 interface Props {
     initFormValue: formValue
@@ -29,17 +28,12 @@ const ProductSold = (props: Props) => {
 
     const showProductSoldList = (formProductSold: formValue) => {
         setIsLoading(true)
-        getProductSoldList(formProductSold).then(res => {
-            const { code, data } = res.data
-            if (code === 200) {
-                setIsLoading(false)
-                dispatch(actions.getProductSoldList(data))
-            }
-        }).catch((err) => console.log(err))
+        dispatch(fetchProductSold(formProductSold))
     }
 
     useEffect(() => {
         showProductSoldList(formProductSold)
+        setIsLoading(false)
     }, [formProductSold])
 
 
@@ -126,7 +120,7 @@ const ProductSold = (props: Props) => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className='text-center'>
+                                    <td colSpan={TABLE_PRODUCT_SOLD.length} className='text-center'>
                                         No Item Found
                                     </td>
                                 </tr>

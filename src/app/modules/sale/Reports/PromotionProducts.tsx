@@ -5,8 +5,7 @@ import { formValue, iProduct } from '../../../../models'
 import { RootState } from '../../../../setup'
 import { find_page_begin_end, formatMoney } from '../../../../_metronic/helpers'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { actions, fetchPromotionList } from '../Redux/Actions'
-import { getProductSaleList } from '../saleReport'
+import { actions, fetchPromotionList } from '../Redux/Actions' 
 
 interface Props {
     initFormValue: formValue
@@ -35,19 +34,12 @@ const PromotionProducts = (props: Props) => {
 
     const getPromotionProducts = (formValue: formValue) => {
         setIsLoading(true)
-        getProductSaleList(formValue)
-            .then((res) => {
-                const { code, data } = res.data
-                if (code === 200) {
-                    setIsLoading(false)
-                    dispatch(actions.getProductPromotionList(data))
-                }
-            })
-            .catch((err) => console.log(err))
+        dispatch(fetchPromotionList(formValue))
     }
 
     useEffect(() => {
         getPromotionProducts(formValue)
+        setIsLoading(false)
     }, [formValue])
 
     const filterSection = () => <div className='row my-2'>
@@ -87,9 +79,8 @@ const PromotionProducts = (props: Props) => {
                 ))}
             </select>
         </div>
-    </div>
-
-    const listPages = find_page_begin_end(promotionProducts?.current_page, promotionProducts?.total_pages)
+    </div> 
+    const listPages = find_page_begin_end(promotionProducts.current_page, promotionProducts.total_pages)
     return promotionProducts ? (
         <>
             {filterSection()}
@@ -102,8 +93,8 @@ const PromotionProducts = (props: Props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {promotionProducts?.product_sale_list.length > 0 ? (
-                                promotionProducts?.product_sale_list.map((item: iProduct, index: number) => (
+                            {promotionProducts.product_sale_list.length > 0 ? (
+                                promotionProducts.product_sale_list.map((item: iProduct, index: number) => (
                                     <tr key={index}>
                                         <td className='text-left'>{item.product_id}</td>
                                         <td style={{ width: '250px' }} className=' text-left '>

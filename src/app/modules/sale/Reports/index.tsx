@@ -6,7 +6,7 @@ import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderLis
 import { CURRENT_MONTH, CURRENT_YEAR, } from '../../../../constant'
 import { iReport, formValue } from '../../../../models'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { actions } from '../Redux/Actions'
+import { actions, fetchCustomer, fetchProductOrder, fetchProductSold, fetchPromotionList, fetchRefundedList } from '../Redux/Actions'
 import PromotionProducts from './PromotionProducts'
 import Customers from './Customers'
 import ProductSold from './ProductSold'
@@ -95,11 +95,6 @@ const Reports: FC = () => {
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
-  const [formValue, setFormValue] = useState<formValue>(initFormValue)
-  const [formProductOrderValue, setFormProductOrderValue] = useState<formValue>(initFormValue)
-  const [formCustomerValue, setFormCustomerValue] = useState<formValue>(initFormValue)
-  const [formProductSold, setFormProductSold] = useState<formValue>(initFormValue)
-  const [formRefund, setFormRefund] = useState<formValue>(initFormValue)
 
   // Declare useSelector
   const promotionProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.promotionProducts, shallowEqual)
@@ -111,64 +106,27 @@ const Reports: FC = () => {
   // API Calling
   const showProductSaleList = (formValue: formValue) => {
     setIsLoading(true)
-    getProductSaleList(formValue)
-      .then((res) => {
-        const { code, data } = res.data
-        if (code === 200) {
-          setIsLoading(false)
-          dispatch(actions.getProductPromotionList(data))
-        }
-      })
-      .catch((err) => console.log(err))
+    dispatch(fetchPromotionList(formValue))
   }
 
   const showCustomerList = (formCustomerValue: formValue) => {
     setIsLoading(true)
-    getCustomerList(formCustomerValue)
-      .then((res) => {
-        const { code, data } = res.data
-        if (code === 200) {
-          setIsLoading(false)
-          dispatch(actions.getCustomerList(data))
-        }
-      })
-      .catch((err) => console.log(err))
+    dispatch(fetchCustomer(formCustomerValue))
   }
 
   const showProductOrderList = (formProductOrderValue: formValue) => {
     setIsLoading(true)
-    getProductOrderList(formProductOrderValue)
-      .then((res) => {
-        const { code, data } = res.data
-        if (code === 200) {
-          setIsLoading(false)
-          dispatch(actions.getProductOrderList(data))
-        }
-
-      })
-      .catch((err) => console.log(err))
+    dispatch(fetchProductOrder(formProductOrderValue))
   }
 
   const showProductSoldList = (formProductSold: formValue) => {
     setIsLoading(true)
-    getProductSoldList(formProductSold).then(res => {
-      const { code, data } = res.data
-      if (code === 200) {
-        setIsLoading(false)
-        dispatch(actions.getProductSoldList(data))
-      }
-    }).catch((err) => console.log(err))
+    dispatch(fetchProductSold(formProductSold))
   }
 
   const showRefundList = (formRefund: formValue) => {
     setIsLoading(true)
-    getRefundedList(formRefund).then(res => {
-      const { code, data } = res.data
-      if (code === 200) {
-        setIsLoading(false)
-        dispatch(actions.getRefundedList(data))
-      }
-    }).catch(err => console.log(err))
+    dispatch(fetchRefundedList(formRefund))
   }
 
   useEffect(() => {
@@ -192,12 +150,27 @@ const Reports: FC = () => {
       })
     })
   }, [])
-  useEffect(() => {
-    if (tab === 'Promotion Products') showProductSaleList({ ...initFormValue })
-    if (tab === 'Customers') showCustomerList({ ...initFormValue })
-    if (tab === 'Item Orders') showProductOrderList({ ...initFormValue })
-    if (tab === 'Product Sold') showProductSoldList({ ...initFormValue })
-    if (tab === 'Refunded') showRefundList({ ...initFormValue })
+  useEffect(() => { 
+    if (tab === 'Promotion Products') {
+      showProductSaleList({ ...initFormValue })
+      setIsLoading(false)
+    }
+    if (tab === 'Customers') {
+      showCustomerList({ ...initFormValue })
+      setIsLoading(false)
+    }
+    if (tab === 'Item Orders') {
+      showProductOrderList({ ...initFormValue })
+      setIsLoading(false)
+    }
+    if (tab === 'Product Sold') {
+      showProductSoldList({ ...initFormValue })
+      setIsLoading(false)
+    }
+    if (tab === 'Refunded') {
+      showRefundList({ ...initFormValue })
+      setIsLoading(false)
+    }
   }, [tab])
 
 

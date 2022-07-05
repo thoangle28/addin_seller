@@ -5,7 +5,7 @@ import { formValue, iOrderList } from "../../../../models"
 import { RootState } from "../../../../setup"
 import { find_page_begin_end, formatMoney } from "../../../../_metronic/helpers"
 import Loading from "../../../../_metronic/partials/content/Loading"
-import { actions } from "../Redux/Actions"
+import { actions, fetchProductOrder } from "../Redux/Actions"
 import { getProductOrderList } from "../saleReport"
 
 interface Props {
@@ -30,21 +30,13 @@ const ProductOrder = (props: Props) => {
 
     useEffect(() => {
         showProductOrderList({ ...formProductOrderValue })
+        setIsLoading(false)
     }, [formProductOrderValue])
 
 
     const showProductOrderList = (formProductOrderValue: formValue) => {
         setIsLoading(true)
-        getProductOrderList(formProductOrderValue)
-            .then((res) => {
-                const { code, data } = res.data
-                if (code === 200) {
-                    setIsLoading(false)
-                    dispatch(actions.getProductOrderList(data))
-                }
-
-            })
-            .catch((err) => console.log(err))
+        dispatch(fetchProductOrder(formProductOrderValue))
     }
 
     // UI components
@@ -114,12 +106,12 @@ const ProductOrder = (props: Props) => {
                                 <td className="text-end">{item.date}</td>
                             </tr>
                             ) : <tr>
-                                <td colSpan={5} className="text-center">No Item Found</td>
+                                <td colSpan={TABLE_PRODUCT_ORDER.length} className="text-center">No Item Found</td>
                             </tr>
                             }
                         </tbody>
                         {/* Pagination */}
-                    </table> 
+                    </table>
                     }
                 </div>
                 <div className="row justify-content-between align-items-center">

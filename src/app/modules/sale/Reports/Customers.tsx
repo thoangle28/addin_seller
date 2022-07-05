@@ -14,7 +14,7 @@ const Customers = (props: Props) => {
     const { initFormValue } = props
     const customerList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.customerList, shallowEqual)
     const reduxFormValue: any = useSelector<RootState>(({ reportReducers }) => reportReducers.formCustomerValue, shallowEqual)
-    
+
     const [isLoading, setIsLoading] = useState<boolean>(false)
     const [formCustomerValue, setFormCustomerValue] = useState<formValue>(Object.keys(reduxFormValue).length ? reduxFormValue : initFormValue)
 
@@ -31,7 +31,7 @@ const Customers = (props: Props) => {
     useEffect(() => {
         showCustomerList({ ...formCustomerValue })
         setIsLoading(false)
-    }, [formCustomerValue , showCustomerList])
+    }, [formCustomerValue])
 
     const filterSection = () => {
         return (
@@ -74,9 +74,10 @@ const Customers = (props: Props) => {
                 </div>
             </div>
         )
-    } 
-    const listPages = find_page_begin_end(customerList?.current_page, customerList?.total_pages)
-    return customerList.data ? (
+    }
+ 
+    const listPages = find_page_begin_end(customerList.current_page, customerList.total_pages)
+    return customerList ? (
         <>
             {filterSection()}
             <div className='col-xs-12'>
@@ -88,8 +89,8 @@ const Customers = (props: Props) => {
                             </tr>
                         </thead>
                         <tbody>
-                            {customerList.data.customer_list.length > 0 ? (
-                                customerList.data.customer_list?.map((item: iCustomer, index: number) => (
+                            {customerList.customer_list.length > 0 ? (
+                                customerList.customer_list?.map((item: iCustomer, index: number) => (
                                     <tr key={index}>
                                         <td className=' text-start'>{index + 1}</td>
                                         <td className=' text-start'>{item.full_name}</td>

@@ -5,8 +5,7 @@ import { formValue, iRefuned } from "../../../../models"
 import { RootState } from "../../../../setup"
 import { find_page_begin_end, formatMoney } from "../../../../_metronic/helpers"
 import Loading from "../../../../_metronic/partials/content/Loading"
-import { actions } from "../Redux/Actions"
-import { getRefundedList } from "../saleReport"
+import { actions, fetchRefundedList } from "../Redux/Actions"
 
 interface Props {
     initFormValue: formValue
@@ -29,17 +28,12 @@ const ProductRefuned = (props: Props) => {
 
     const showRefundList = (formRefund: formValue) => {
         setIsLoading(true)
-        getRefundedList(formRefund).then(res => {
-            const { code, data } = res.data
-            if (code === 200) {
-                setIsLoading(false)
-                dispatch(actions.getRefundedList(data))
-            }
-        }).catch(err => console.log(err))
+        dispatch(fetchRefundedList(formRefund))
     }
 
     useEffect(() => {
         showRefundList({ ...formRefund })
+        setIsLoading(false)
     }, [formRefund])
 
 
@@ -113,7 +107,7 @@ const ProductRefuned = (props: Props) => {
                             <td className="text-end">{item.date}</td>
                         </tr>
                         ) : <tr>
-                            <td colSpan={5} className="text-center">No Item Found</td>
+                            <td colSpan={TABLE_PRODUCT_ORDER_REFUND.length} className="text-center">No Item Found</td>
                         </tr>
                         }
                     </tbody>
