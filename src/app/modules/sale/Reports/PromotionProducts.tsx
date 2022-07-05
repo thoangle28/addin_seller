@@ -5,14 +5,14 @@ import { formValue, iProduct } from '../../../../models'
 import { RootState } from '../../../../setup'
 import { find_page_begin_end, formatMoney } from '../../../../_metronic/helpers'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { actions } from '../Redux/Actions'
+import { actions, fetchPromotionList } from '../Redux/Actions'
 import { getProductSaleList } from '../saleReport'
 
 interface Props {
     initFormValue: formValue
 }
 
-const PromotionProducts = (props: Props) => { 
+const PromotionProducts = (props: Props) => {
     const dispatch = useDispatch()
     const { initFormValue } = props
     const promotionProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.promotionProducts, shallowEqual)
@@ -142,7 +142,7 @@ const PromotionProducts = (props: Props) => {
                                     </tr>
                                 ))
                             ) : <tr>
-                                <td colSpan={7} className='text-center'>
+                                <td colSpan={TABLE_PRODUCT_SALE.length} className='text-center'>
                                     No Item Found
                                 </td>
                             </tr>

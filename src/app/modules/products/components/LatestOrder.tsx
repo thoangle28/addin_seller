@@ -331,7 +331,7 @@ const LatestOrder: FC = () => {
                                                 </div>
                                             </td>
                                             <td className='align-middle text-center'>{item.sku ? item.sku : '-'}</td>
-                                            <td className='align-middle text-center'>{formatMoney(item.price / item.quantity)}</td>
+                                            <td className='align-middle text-center'>{formatMoney(item.price)}</td>
                                             <td className='align-middle text-center'>{item.quantity}</td>
                                             <td className='align-middle text-center'>{formatMoney(item.discount)}</td>
                                             <td className='align-middle text-center'>{formatMoney(item.total)}</td>

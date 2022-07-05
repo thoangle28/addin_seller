@@ -1,5 +1,6 @@
 import { formValue, iCustomerList, iList, iProductOrderList, iProductSoldList, iRefunedList } from '../../../../models'
 import { actionTypes } from './Types'
+import { getCustomerList, getProductSaleList } from './../saleReport';
 
 export const actions = {
     getCustomerList: (payload: iCustomerList) => ({
@@ -40,5 +41,23 @@ export const actions = {
     getRefundListInput: (payload: formValue) => ({
         type: actionTypes.GET_REFUNDED_LIST_INPUT,
         payload
-    })
+    }),
+}
+
+export const fetchCustomer = (formData: any) => async (dispatch: any) => {
+    try {
+        const res = await getCustomerList(formData);
+        dispatch(actions.getCustomerList(res.data))
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+export const fetchPromotionList = (formData: any) => async (dispatch: any) => {
+    try {
+        const res = await getProductSaleList(formData)
+        dispatch(actions.getProductPromotionList(res.data))
+    } catch (error) {
+        console.log(error)
+    }
 }
