@@ -6,7 +6,7 @@ import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderLis
 import { CURRENT_MONTH, CURRENT_YEAR, } from '../../../../constant'
 import { iReport, formValue } from '../../../../models'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { actions, fetchCustomer, fetchProductOrder, fetchProductSold, fetchPromotionList, fetchRefundedList } from '../Redux/Actions'
+import { fetchCustomer, fetchProductOrder, fetchProductSold, fetchPromotionList, fetchRefundedList } from '../Redux/Actions'
 import PromotionProducts from './PromotionProducts'
 import Customers from './Customers'
 import ProductSold from './ProductSold'
@@ -68,6 +68,7 @@ const Reports: FC = () => {
   const dispatch = useDispatch()
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
+
   const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
   const user_id: number = user ? parseInt(user.ID) : 0
   const tabs = ['Promotion Products', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
@@ -93,7 +94,6 @@ const Reports: FC = () => {
   const [tab, setTab] = useState('Promotion Products')
   const [isActiveIndex, setActiveIndex] = useState<number>(0)
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
 
   // Declare useSelector
@@ -102,32 +102,13 @@ const Reports: FC = () => {
   const soldProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.soldProducts, shallowEqual)
   const refundedList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.refundedList, shallowEqual)
   const orderProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.orderProducts, shallowEqual)
-
+  const isLoading: any = useSelector<RootState>(({ reportReducers }) => reportReducers.isRequestLoading, shallowEqual)
   // API Calling
-  const showProductSaleList = (formValue: formValue) => {
-    setIsLoading(true)
-    dispatch(fetchPromotionList(formValue))
-  }
-
-  const showCustomerList = (formCustomerValue: formValue) => {
-    setIsLoading(true)
-    dispatch(fetchCustomer(formCustomerValue))
-  }
-
-  const showProductOrderList = (formProductOrderValue: formValue) => {
-    setIsLoading(true)
-    dispatch(fetchProductOrder(formProductOrderValue))
-  }
-
-  const showProductSoldList = (formProductSold: formValue) => {
-    setIsLoading(true)
-    dispatch(fetchProductSold(formProductSold))
-  }
-
-  const showRefundList = (formRefund: formValue) => {
-    setIsLoading(true)
-    dispatch(fetchRefundedList(formRefund))
-  }
+  const showProductSaleList = (formValue: formValue) => dispatch(fetchPromotionList(formValue))
+  const showCustomerList = (formCustomerValue: formValue) => dispatch(fetchCustomer(formCustomerValue))
+  const showProductOrderList = (formProductOrderValue: formValue) => dispatch(fetchProductOrder(formProductOrderValue))
+  const showProductSoldList = (formProductSold: formValue) => dispatch(fetchProductSold(formProductSold))
+  const showRefundList = (formRefund: formValue) => dispatch(fetchRefundedList(formRefund))
 
   useEffect(() => {
     const allReport = loadAllReports(user_id)
@@ -150,31 +131,13 @@ const Reports: FC = () => {
       })
     })
   }, [])
-  useEffect(() => { 
-    if (tab === 'Promotion Products') {
-      showProductSaleList({ ...initFormValue })
-      setIsLoading(false)
-    }
-    if (tab === 'Customers') {
-      showCustomerList({ ...initFormValue })
-      setIsLoading(false)
-    }
-    if (tab === 'Item Orders') {
-      showProductOrderList({ ...initFormValue })
-      setIsLoading(false)
-    }
-    if (tab === 'Product Sold') {
-      showProductSoldList({ ...initFormValue })
-      setIsLoading(false)
-    }
-    if (tab === 'Refunded') {
-      showRefundList({ ...initFormValue })
-      setIsLoading(false)
-    }
+  useEffect(() => {
+    if (tab === 'Promotion Products') showProductSaleList({ ...initFormValue })
+    if (tab === 'Customers') showCustomerList({ ...initFormValue })
+    if (tab === 'Item Orders') showProductOrderList({ ...initFormValue })
+    if (tab === 'Product Sold') showProductSoldList({ ...initFormValue })
+    if (tab === 'Refunded') showRefundList({ ...initFormValue })
   }, [tab])
-
-
-  const isEmptyObject = (obj: any) => Object.keys(obj)
 
   return (
     <div className='card card-reports pb-5'>
@@ -198,15 +161,11 @@ const Reports: FC = () => {
                 return <li key={index} onClick={() => { setTab(tab); setActiveIndex(index) }} className="nav-item cursor-pointer"><p className={`dropdown-item ${checkOpen ? 'active' : ''}`}  >{tab}</p></li>
               })}
             </ul>
-            {isLoading ? <Loading /> : (
-              <>
-                {tab === 'Promotion Products' && isEmptyObject(promotionProducts).length ? <PromotionProducts initFormValue={initFormValue} /> : ''}
-                {tab === 'Product Sold' && isEmptyObject(soldProducts).length ? <ProductSold initFormValue={initFormValue} /> : ""}
-                {tab === 'Customers' && isEmptyObject(customerList).length ? <Customers initFormValue={initFormValue} /> : ''}
-                {tab === 'Item Orders' && isEmptyObject(orderProducts).length ? <ProductOrder initFormValue={initFormValue} /> : ''}
-                {tab === 'Refunded' && isEmptyObject(refundedList).length ? <ProductRefuned initFormValue={initFormValue} /> : ''}
-              </>
-            )}
+            {tab === 'Promotion Products' ? <PromotionProducts initFormValue={initFormValue} /> : ''}
+            {tab === 'Product Sold' ? <ProductSold initFormValue={initFormValue} /> : ''}
+            {tab === 'Customers' ? <Customers initFormValue={initFormValue} /> : ''}
+            {tab === 'Item Orders' ? <ProductOrder initFormValue={initFormValue} /> : ''}
+            {tab === 'Refunded' ? <ProductRefuned initFormValue={initFormValue} /> : ''}
           </div>
         </div>
       </div>

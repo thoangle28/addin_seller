@@ -5,7 +5,7 @@ import { formValue, iProductSold } from "../../../../models"
 import { RootState } from "../../../../setup"
 import { find_page_begin_end, formatMoney } from "../../../../_metronic/helpers"
 import Loading from "../../../../_metronic/partials/content/Loading"
-import { actions, fetchProductSold } from "../Redux/Actions"
+import { fetchProductSold, getProductSoldListInput } from "../Redux/Actions"
 
 interface Props {
     initFormValue: formValue
@@ -16,24 +16,22 @@ const ProductSold = (props: Props) => {
     const dispatch = useDispatch()
     const soldProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.soldProducts, shallowEqual)
     const reduxFormValue: any = useSelector<RootState>(({ reportReducers }) => reportReducers.formProductSold, shallowEqual)
+    const isLoading: any = useSelector<RootState>(({ reportReducers }) => reportReducers.requestIsLoading, shallowEqual)
 
-    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [formProductSold, setFormProductSold] = useState<formValue>(Object.keys(reduxFormValue).length ? reduxFormValue : initFormValue)
 
     const onChangeHandler = (e: any, current_page: number = 1) => {
         const { name, value } = e.target
         setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
-        dispatch(actions.getProductSoldListInput({ ...formProductSold, [name]: parseInt(value), current_page }))
+        dispatch(getProductSoldListInput({ ...formProductSold, [name]: parseInt(value), current_page }))
     }
 
-    const showProductSoldList = (formProductSold: formValue) => {
-        setIsLoading(true)
+    const showProductSoldList = (formProductSold: formValue) => { 
         dispatch(fetchProductSold(formProductSold))
     }
 
     useEffect(() => {
         showProductSoldList(formProductSold)
-        setIsLoading(false)
     }, [formProductSold])
 
 
