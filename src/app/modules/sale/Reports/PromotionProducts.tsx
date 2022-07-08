@@ -38,6 +38,10 @@ const PromotionProducts = (props: Props) => {
 
     useEffect(() => {
         getPromotionProducts(formValue)
+        const abortController = new AbortController() 
+        return () => {
+            abortController.abort() 
+        }
     }, [formValue])
 
     const filterSection = () => <div className='row my-2'>
@@ -87,9 +91,7 @@ const PromotionProducts = (props: Props) => {
             <div className="table-responsive">
                 {isLoading ? <Loading /> : <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
                     <thead>
-                        <tr className='fw-bolder text-muted'>
-                            {TABLE_PRODUCT_SALE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}
-                        </tr>
+                        <tr className='fw-bolder text-muted'>{TABLE_PRODUCT_SALE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
                     </thead>
                     {isEmptyObject(promotionProducts).length ? <tbody>
                         {promotionProducts.product_sale_list.length > 0 ? (
@@ -139,7 +141,6 @@ const PromotionProducts = (props: Props) => {
                         }
                         {/* Pagination */}
                     </tbody> : ''}
-
                 </table>
                 }
             </div>

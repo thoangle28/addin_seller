@@ -29,6 +29,10 @@ const ProductOrder = (props: Props) => {
 
     useEffect(() => {
         showProductOrderList({ ...formProductOrderValue })
+        const abortController = new AbortController() 
+        return () => {
+            abortController.abort() 
+        }
     }, [formProductOrderValue])
 
 

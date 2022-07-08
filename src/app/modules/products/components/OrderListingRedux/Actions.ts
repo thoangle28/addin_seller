@@ -2,7 +2,6 @@ import { iOrderListDetailResponse, iOrderListResponse, iPayload, iUpdateData } f
 import { actionTypes } from './Types'
 import { getOrderListPage, getOrderDetailById, updateOrderStatus } from './../../redux/ProductsList'
 
-
 const getAllOrderFail = () => ({
     type: actionTypes.GET_ALL_ORDER_LISTING_FAILURE
 })
@@ -38,7 +37,7 @@ export const updateOrderListingDetail = (payload: iUpdateData) => async (dispatc
     dispatch(updateOrderListingDetailRequest())
     try {
         const res = await updateOrderStatus(payload)
-        const { data, code } = res.data
+        const { code } = res.data
         code !== 200 ? dispatch(updateOrderListingDetailFailure()) : dispatch(updateOrderListingDetailSuccess())
     } catch (error) {
         dispatch(updateOrderListingDetailFailure())
@@ -53,7 +52,7 @@ const getOrderDetailRequest = () => ({
     type: actionTypes.GET_ORDER_LISTING_DETAILS_REQUEST
 })
 
-const getOrderListingDetails = (payload: iOrderListDetailResponse) => ({
+const getOrderDetailSuccess = (payload: iOrderListDetailResponse) => ({
     type: actionTypes.GET_ORDER_LISTING_DETAILS_SUCCESS,
     payload
 })
@@ -63,7 +62,7 @@ export const getOrderListingById = (id: string | number, order_id: string, acces
     try {
         const res = await getOrderDetailById(id, order_id, access_token);
         const { data, code } = res.data
-        code !== 200 ? dispatch(getOrderDetailFailure()) : dispatch(getOrderListingDetails(data))
+        code !== 200 ? dispatch(getOrderDetailFailure()) : dispatch(getOrderDetailSuccess(data))
     } catch (error) {
         dispatch(getOrderDetailFailure())
     }

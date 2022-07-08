@@ -28,6 +28,10 @@ const Customers = (props: Props) => {
 
     useEffect(() => {
         showCustomerList({ ...formCustomerValue })
+        const abortController = new AbortController() 
+        return () => {
+            abortController.abort() 
+        }
     }, [formCustomerValue])
     const isEmptyObject = (obj: any) => Object.keys(obj)
 

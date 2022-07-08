@@ -37,10 +37,10 @@ const getProductPromotionListRequest = () => ({
 
 const getProductSoldListSuccess = (payload: iProductSoldList) => ({
     type: actionTypes.GET_PRODUCT_SOLD_LIST_SUCCESS,
-    payload,
+    payload
 })
 const getProductSoldListFailure = () => ({
-    type: actionTypes.GET_PRODUCT_SOLD_LIST_FAILURE,
+    type: actionTypes.GET_PRODUCT_SOLD_LIST_FAILURE
 })
 const getProductSoldListRequest = () => ({
     type: actionTypes.GET_PRODUCT_SOLD_LIST_REQUEST

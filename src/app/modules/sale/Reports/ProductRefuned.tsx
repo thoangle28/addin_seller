@@ -30,6 +30,10 @@ const ProductRefuned = (props: Props) => {
 
     useEffect(() => {
         showRefundList({ ...formRefund })
+        const abortController = new AbortController() 
+        return () => {
+            abortController.abort() 
+        }
     }, [formRefund])
 
 

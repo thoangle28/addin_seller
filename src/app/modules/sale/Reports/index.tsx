@@ -1,12 +1,11 @@
 import { FC, useEffect, useState } from 'react'
-import { shallowEqual, useDispatch, useSelector } from 'react-redux'
+import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../../_metronic/partials/widgets'
-import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from '../saleReport'
+import { loadAllReports, } from '../saleReport'
 import { CURRENT_MONTH, CURRENT_YEAR, } from '../../../../constant'
 import { iReport, formValue } from '../../../../models'
-import Loading from '../../../../_metronic/partials/content/Loading'
-import { fetchCustomer, fetchProductOrder, fetchProductSold, fetchPromotionList, fetchRefundedList } from '../Redux/Actions'
+import Loading from '../../../../_metronic/partials/content/Loading' 
 import PromotionProducts from './PromotionProducts'
 import Customers from './Customers'
 import ProductSold from './ProductSold'
@@ -64,8 +63,7 @@ const DashboardPage: FC<Props> = ({ saleReport }: Props) => {
   )
 }
 
-const Reports: FC = () => {
-  const dispatch = useDispatch()
+const Reports: FC = () => { 
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
 
@@ -96,20 +94,6 @@ const Reports: FC = () => {
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
 
-  // Declare useSelector
-  const promotionProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.promotionProducts, shallowEqual)
-  const customerList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.customerList, shallowEqual)
-  const soldProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.soldProducts, shallowEqual)
-  const refundedList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.refundedList, shallowEqual)
-  const orderProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.orderProducts, shallowEqual)
-  const isLoading: any = useSelector<RootState>(({ reportReducers }) => reportReducers.isRequestLoading, shallowEqual)
-  // API Calling
-  const showProductSaleList = (formValue: formValue) => dispatch(fetchPromotionList(formValue))
-  const showCustomerList = (formCustomerValue: formValue) => dispatch(fetchCustomer(formCustomerValue))
-  const showProductOrderList = (formProductOrderValue: formValue) => dispatch(fetchProductOrder(formProductOrderValue))
-  const showProductSoldList = (formProductSold: formValue) => dispatch(fetchProductSold(formProductSold))
-  const showRefundList = (formRefund: formValue) => dispatch(fetchRefundedList(formRefund))
-
   useEffect(() => {
     const allReport = loadAllReports(user_id)
     allReport.then((results: any) => {
@@ -130,15 +114,8 @@ const Reports: FC = () => {
         loading: false,
       })
     })
-  }, [])
-  useEffect(() => {
-    if (tab === 'Promotion Products') showProductSaleList({ ...initFormValue })
-    if (tab === 'Customers') showCustomerList({ ...initFormValue })
-    if (tab === 'Item Orders') showProductOrderList({ ...initFormValue })
-    if (tab === 'Product Sold') showProductSoldList({ ...initFormValue })
-    if (tab === 'Refunded') showRefundList({ ...initFormValue })
-  }, [tab])
-
+  }, []) 
+  
   return (
     <div className='card card-reports pb-5'>
       <div className='card-header border-0 pt-5'>

@@ -14,6 +14,7 @@ const inititalState: any = {
 
 export const orderListingReducer = (state = inititalState, action: any) => {
     const { type, payload } = action
+    console.log(type)
     switch (type) {
         case actionTypes.GET_ALL_ORDER_LISTING_FAILURE:
             return {
@@ -74,7 +75,10 @@ export const orderListingReducer = (state = inititalState, action: any) => {
                 ...state,
                 requestHasError: false,
                 requestIsLoading: true,
-                requestIsSuccess: false
+                requestIsSuccess: false,
+                requestDetailIsSuccess: false,
+                requestDetailHasError: false,
+                requestDetailIsLoading: true,
             }
         }
         case actionTypes.UPDATE_ORDER_LISTING_DETAILS_SUCCESS: {

@@ -59,11 +59,11 @@ const LatestOrder: FC = () => {
     const onHandleEscapeKey = (e: KeyboardEvent) => {
         if (e.code === 'Escape') setIsShowPopup(false)
     }
-    const onUpdateDetail = () => {
-        dispatch(updateOrderListingDetail(formUpdateData))
+    const onUpdateDetail = async () => {
+        await dispatch(updateOrderListingDetail(formUpdateData))
         if (isSuccess) {
             setIsShowPopup(false)
-            dispatch(fetchOrderListings(formFilterData))
+            getDataOrderList(formFilterData)
         }
     }
     const onChangeDetailsHandler = (e: any, order_id: string) => {
@@ -82,7 +82,7 @@ const LatestOrder: FC = () => {
 
     // API Running 
     useEffect(() => {
-        getDataOrderList(formFilterData);
+        getDataOrderList(formFilterData); 
     }, [formFilterData.page_size, formFilterData.current_page])
 
 
@@ -153,7 +153,8 @@ const LatestOrder: FC = () => {
                 {isLoading ? <Loading /> :
                     <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
                         <thead>
-                            <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
+                            <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}
+                            </tr>
                         </thead>
                         {!isDataExisted(data) ? '' :
                             <tbody>
@@ -164,7 +165,7 @@ const LatestOrder: FC = () => {
                                     <td className='align-middle text-end'>{formatMoney(item.price)}</td>
                                     <td className='align-middle text-end'>{item.date}</td>
                                     <td className='align-middle text-center'>
-                                        <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}> Details </p>
+                                        <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}>Details</p>
                                     </td>
                                 </tr>) : <tr><td colSpan={ORDER_LIST_TABLE.length} className="text-center">No Item Found</td></tr>}
                             </tbody>
