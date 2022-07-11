@@ -5,8 +5,7 @@ import { formValue, iProductSold } from "../../../../models"
 import { RootState } from "../../../../setup"
 import { find_page_begin_end, formatMoney } from "../../../../_metronic/helpers"
 import Loading from "../../../../_metronic/partials/content/Loading"
-import { actions } from "../Redux/Actions"
-import { getProductSoldList } from "../saleReport"
+import { fetchProductSold, getProductSoldListInput } from "../Redux/Actions"
 
 interface Props {
     initFormValue: formValue
@@ -17,29 +16,26 @@ const ProductSold = (props: Props) => {
     const dispatch = useDispatch()
     const soldProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.soldProducts, shallowEqual)
     const reduxFormValue: any = useSelector<RootState>(({ reportReducers }) => reportReducers.formProductSold, shallowEqual)
+    const isLoading: any = useSelector<RootState>(({ reportReducers }) => reportReducers.requestIsLoading, shallowEqual)
 
-    const [isLoading, setIsLoading] = useState<boolean>(false)
     const [formProductSold, setFormProductSold] = useState<formValue>(Object.keys(reduxFormValue).length ? reduxFormValue : initFormValue)
 
     const onChangeHandler = (e: any, current_page: number = 1) => {
         const { name, value } = e.target
         setFormProductSold({ ...formProductSold, [name]: parseInt(value), current_page })
-        dispatch(actions.getProductSoldListInput({ ...formProductSold, [name]: parseInt(value), current_page }))
+        dispatch(getProductSoldListInput({ ...formProductSold, [name]: parseInt(value), current_page }))
     }
 
     const showProductSoldList = (formProductSold: formValue) => {
-        setIsLoading(true)
-        getProductSoldList(formProductSold).then(res => {
-            const { code, data } = res.data
-            if (code === 200) {
-                setIsLoading(false)
-                dispatch(actions.getProductSoldList(data))
-            }
-        }).catch((err) => console.log(err))
+        dispatch(fetchProductSold(formProductSold))
     }
 
     useEffect(() => {
         showProductSoldList(formProductSold)
+        const abortController = new AbortController()
+        return () => {
+            abortController.abort()
+        }
     }, [formProductSold])
 
 
@@ -81,6 +77,7 @@ const ProductSold = (props: Props) => {
             </select>
         </div>
     </div>
+    const isEmptyObject = (obj: any) => Object.keys(obj)
 
     const listPages = find_page_begin_end(soldProducts?.current_page, soldProducts?.total_pages)
     return soldProducts ? (
@@ -94,45 +91,41 @@ const ProductSold = (props: Props) => {
                                 {TABLE_PRODUCT_SOLD.map((item, index: number) => <th key={index} className={item.className}>{item.name}</th>)}
                             </tr>
                         </thead>
-                        <tbody>
-                            {soldProducts.product_list ? (
-                                soldProducts.product_list?.map((item: iProductSold, index: number) => (
-                                    <tr key={index}>
-                                        <td className='text-start'>{item.order_id}</td>
-                                        <td style={{ width: '250px' }} className='text-left'>
-                                            <div className='d-flex align-items-center'>
-                                                <div className='symbol symbol-45px me-5'>
-                                                    <img
-                                                        src={
-                                                            item.product_img
-                                                                ? item.product_img
-                                                                : 'https://via.placeholder.com/75x75/f0f0f0'
-                                                        }
-                                                        alt={item.title_product}
-                                                    />
-                                                </div>
-                                                <div className='d-flex justify-content-start flex-column'>
-                                                    <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6 '>
-                                                        {item.title_product}
-                                                    </a>
-                                                </div>
+                        {isEmptyObject(soldProducts).length ? <tbody>
+                            {soldProducts.product_list.length > 0 ? soldProducts.product_list.map((item: iProductSold, index: number) => (
+                                <tr key={index}>
+                                    <td className='text-start'>{item.order_id}</td>
+                                    <td style={{ width: '250px' }} className='text-left'>
+                                        <div className='d-flex align-items-center'>
+                                            <div className='symbol symbol-45px me-5'>
+                                                <img
+                                                    src={
+                                                        item.product_img
+                                                            ? item.product_img
+                                                            : 'https://via.placeholder.com/75x75/f0f0f0'
+                                                    }
+                                                    alt={item.title_product}
+                                                />
                                             </div>
-                                        </td>
-                                        <td className='text-center '>{item.sku ? item.sku : '-'}</td>
-                                        <td className='text-center '>{item.quantity}</td>
-                                        <td className='text-end '>{formatMoney(item.price)}</td>
-                                        <td className='text-end'>{item.date}</td>
-                                    </tr>
-                                ))
-                            ) : (
-                                <tr>
-                                    <td colSpan={6} className='text-center'>
-                                        No Item Found
+                                            <div className='d-flex justify-content-start flex-column'>
+                                                <a style={{ fontSize: "13px !important" }} target="blank" href={item.product_url ? item.product_url : '#'} className='text-dark fw-bolder text-hover-primary fs-6 '>
+                                                    {item.title_product}
+                                                </a>
+                                            </div>
+                                        </div>
                                     </td>
+                                    <td className='text-center '>{item.sku ? item.sku : '-'}</td>
+                                    <td className='text-center '>{item.quantity}</td>
+                                    <td className='text-end '>{formatMoney(item.price)}</td>
+                                    <td className='text-end'>{item.date}</td>
                                 </tr>
-                            )}
+                            )) : <tr>
+                                <td colSpan={TABLE_PRODUCT_SOLD.length} className='text-center'>No Item Found</td>
+                            </tr>
+                            }
                             {/* Pagination */}
-                        </tbody>
+                        </tbody> : ''}
+
                     </table>
                 </div>
                 }
@@ -179,9 +172,8 @@ const ProductSold = (props: Props) => {
                 </div>
             </div>
         </>
-    ) : (
-        <Loading />
-    )
+    ) : <Loading />
+
 }
 
 export default ProductSold

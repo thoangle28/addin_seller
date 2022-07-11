@@ -60,6 +60,7 @@ export const ORDER_LIST_POPUP_TABLE: iTableHead[] = [
     { name: 'SKU', className: 'align-middle text-center' },
     { name: 'Price', className: 'align-middle text-center' },
     { name: 'Quantity', className: 'align-middle text-center' },
+    { name: 'Discount', className: 'align-middle text-center' },
     { name: 'Total', className: 'align-middle text-center' },
 ]
 

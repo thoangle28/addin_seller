@@ -1,44 +1,53 @@
 import { FC, useEffect, useRef, useState } from 'react'
-import { iPayload, iOrderListResponse, iApiStatus, iOrderListDetailResponse, iUpdateData } from '../../../../models';
+import { iPayload, iApiStatus, iUpdateData, iOrderList, iOrderDetailItems } from '../../../../models';
 import { TABLE_STATUS, ORDER_LIST_TABLE, ITEMS_PER_PAGES, ORDER_LIST_POPUP_TABLE, FILTER_STATUS, CURRENT_DATE } from '../../../../constant'
 import PopupComponent from '../../../../_metronic/partials/common/Popup';
-import { getOrderDetailById, getOrderListPage, updateOrderStatus } from '../redux/ProductsList';
-import { shallowEqual, useSelector } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../../setup';
 import Loading from '../../../../_metronic/partials/content/Loading'
 import { find_page_begin_end, formatMoney } from '../../../../_metronic/helpers';
 import { useOnClickOutside } from '../../../Hooks';
- 
+import { fetchOrderListings, getOrderListingById, updateOrderListingDetail } from './OrderListingRedux/Actions'
+
 const LatestOrder: FC = () => {
+    const dispatch = useDispatch()
+
+    const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
+    const data: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.orderListing, shallowEqual)
+    const dataDetails: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.orderListingInputDetails, shallowEqual)
+    const isLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsLoading, shallowEqual)
+    const isDetailLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailIsLoading, shallowEqual)
+    const isDetailError: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailHasError, shallowEqual)
+    const isSuccess: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsSuccess, shallowEqual)
+    const isFailure: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestHasError, shallowEqual)
+    const message: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.message, shallowEqual)
+
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
     const ref = useRef<HTMLDivElement>(null);
-    const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
- 
+
     const initFormValue: iPayload = {
         user_id: currentUserId,
         current_page: 1,
         page_size: 20,
         access_token
     }
+
     const initUpdateData: iUpdateData = {
         order_id: '',
         order_status: '',
         access_token
     }
 
-    // Declares useState
-    const [isLoading, setIsLoading] = useState<boolean>(false)
-    const [isDetailLoading, setIsDetailLoading] = useState<boolean>(false)
+    // Declares useState 
     const [isShowPopup, setIsShowPopup] = useState<boolean>(false)
+    const [isShowError, setIsShowError] = useState<boolean>(true)
     const [formFilterData, setFormFilterData] = useState<iPayload>(initFormValue)
     const [formUpdateData, setFormUpdateData] = useState<iUpdateData>(initUpdateData)
-    const [data, setData] = useState<iOrderListResponse>()
-    const [dataDetails, setDataDetails] = useState<iOrderListDetailResponse>()
-    const [message, setMessage] = useState<string>()
 
     useOnClickOutside(ref, () => {
-        setIsShowPopup(false);
+        setIsShowPopup(false); 
+        setIsShowError(false) 
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
     });
 
@@ -52,29 +61,16 @@ const LatestOrder: FC = () => {
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
         setIsShowPopup(prevState => !prevState)
     }
+
     const onHandleEscapeKey = (e: KeyboardEvent) => {
         if (e.code === 'Escape') setIsShowPopup(false)
     }
-
-    const clearMessage = () => {
-        setTimeout(() => {
-            setMessage('')
-        }, 3000);
-    }
-    const onUpdateDetail = () => {
-        setIsDetailLoading(true);
-        updateOrderStatus(formUpdateData).then(res => {
-            const { code, message } = res.data
-            if (code === 200) {
-                getDataOrderList(formFilterData)
-                onTogglePopup();
-                setIsDetailLoading(false)
-            } else {
-                setIsDetailLoading(false)
-                setMessage(message)
-                clearMessage()
-            }
-        }).catch(err => console.log(err))
+    const onUpdateDetail = async () => {
+        await dispatch(updateOrderListingDetail(formUpdateData))
+        if (isSuccess) {
+            setIsShowPopup(false)
+            getDataOrderList(formFilterData)
+        }
     }
     const onChangeDetailsHandler = (e: any, order_id: string) => {
         const { name, value } = e.target;
@@ -83,35 +79,11 @@ const LatestOrder: FC = () => {
 
     // API Calling  
     const getDataOrderList = (formFilterData: iPayload) => {
-        setIsLoading(true)
-        getOrderListPage(formFilterData).then(res => {
-            const { code, data, message } = res.data
-            if (code === 200) {
-                setIsLoading(false)
-                setData(data)
-                setMessage(message)
-            } else {
-                setIsLoading(false)
-                setMessage(message)
-                clearMessage()
-            }
-        }).catch(err => console.log(err))
+        dispatch(fetchOrderListings(formFilterData))
     }
     const getDataById = (id: number | string) => {
         setIsShowPopup(prev => !prev)
-        setIsDetailLoading(true);
-        getOrderDetailById(id, currentUserId.toString(), access_token).then(res => {
-            const { code, data } = res.data
-            if (code === 200) {
-                setDataDetails(data)
-                setIsDetailLoading(false);
-                setMessage(message)
-            } else {
-                setIsLoading(false)
-                setMessage(message)
-                clearMessage()
-            }
-        }).catch()
+        dispatch(getOrderListingById(id, currentUserId.toString(), access_token))
     }
 
     // API Running 
@@ -119,13 +91,6 @@ const LatestOrder: FC = () => {
         getDataOrderList(formFilterData);
     }, [formFilterData.page_size, formFilterData.current_page])
 
-    // UI Clean Up Effects
-    useEffect(() => {
-        return () => {
-            setDataDetails(undefined)
-            setMessage('')
-        };
-    }, [])
 
     useEffect(() => {
         document.addEventListener('keydown', onHandleEscapeKey)
@@ -133,6 +98,10 @@ const LatestOrder: FC = () => {
             document.removeEventListener('keydown', onHandleEscapeKey)
         }
     }, [])
+
+    const isDataExisted = (data: any) => {
+        return Object.keys(data).length
+    }
 
     // UI Renderings 
     const renderFilterForm = () => {
@@ -178,7 +147,7 @@ const LatestOrder: FC = () => {
     }
 
     const renderTable = () => {
-        const listPages = find_page_begin_end(data?.current_page, data?.total_pages)
+        const listPages = find_page_begin_end(data.current_page, data.total_pages)
         return <div className='card mb-5 mb-xl-8  bg-white rounded '>
             <div className='card-header border-0'>
                 <h3 className='card-title align-items-start flex-column'>
@@ -187,23 +156,27 @@ const LatestOrder: FC = () => {
                 {renderFilterForm()}
             </div>
             <div className="card-body mt-2">
-                {isLoading ? <Loading /> : <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
-                    <thead>
-                        <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}</tr>
-                    </thead>
-                    <tbody>
-                        {data?.order_list.length ? data.order_list.map((item, index: number) => <tr key={index}>
-                            <td className='align-middle'>{item.order_id}</td>
-                            <td className='align-middle text-start'>{item.customer_name}</td>
-                            <td className="text-center">{getStatus(item.status)}</td>
-                            <td className='align-middle text-end'>{formatMoney(item.price)}</td>
-                            <td className='align-middle text-end'>{item.date}</td>
-                            <td className='align-middle text-center'>
-                                <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}> Details </p>
-                            </td>
-                        </tr>) : <tr><td colSpan={7} className="text-center">{message}</td></tr>}
-                    </tbody>
-                </table>
+                {isLoading ? <Loading /> :
+                    <table className='table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4'>
+                        <thead>
+                            <tr className='fw-bolder text-muted'>{ORDER_LIST_TABLE.map((item, index: number) => <td key={index} className={item.className}>{item.name}</td>)}
+                            </tr>
+                        </thead>
+                        {!isDataExisted(data) ? '' :
+                            <tbody>
+                                {data.order_list.length > 0 ? data.order_list.map((item: iOrderList, index: number) => <tr key={index}>
+                                    <td className='align-middle'>{item.order_id}</td>
+                                    <td className='align-middle text-start'>{item.customer_name}</td>
+                                    <td className="text-center">{getStatus(item.status)}</td>
+                                    <td className='align-middle text-end'>{formatMoney(item.price)}</td>
+                                    <td className='align-middle text-end'>{item.date}</td>
+                                    <td className='align-middle text-center'>
+                                        <p className="badge bg-success mx-4 mb-0 cursor-pointer" onClick={() => getDataById(item.order_id)}>Details</p>
+                                    </td>
+                                </tr>) : <tr><td colSpan={ORDER_LIST_TABLE.length} className="text-center">No Item Found</td></tr>}
+                            </tbody>
+                        }
+                    </table>
                 }
                 <div className='row justify-content-between align-items-center'>
                     <div className='col-md-6'>
@@ -237,17 +210,17 @@ const LatestOrder: FC = () => {
             </div>
         </div>
     }
+
     const renderPopup = () => {
         return <PopupComponent >
             <div ref={ref} className="card" >
                 {isDetailLoading ? <Loading /> :
                     <>
                         <div className="card-header bg-primary align-items-center justify-content-between">
-                            <p className="fs-2 text-white px-3 py-2 mb-0">Order Details : #{dataDetails?.order_id}</p>
+                            <p className="fs-2 text-white px-3 py-2 mb-0">Order Details : # {dataDetails?.order_id}</p>
                             <p className='text-white fw-bolder cursor-pointer text-end fs-1 mt-4' onClick={onTogglePopup} >&times;</p>
                         </div>
                         <div style={{ height: '500px' }} className="card-body bg-white overflow-scroll">
-                            <p className='fs-7 mb-4 text-danger'>{message}</p>
                             <div className="row align-items-center mb-3">
                                 <div className='col-sm-4 col-lg-4 col-md-4 mb-2'>
                                     <p className="fs-7 mb-3 fw-bolder">Customer Name</p>
@@ -270,9 +243,7 @@ const LatestOrder: FC = () => {
                                             {FILTER_STATUS.map((item, index: number) => <option key={index} value={item.status}>{item.name}</option>)}
                                         </select>
                                     </div>
-                                    <button className='badge badge-primary border-0 p-4' onClick={() => {
-                                        onUpdateDetail()
-                                    }}>Apply</button>
+                                    <button className='badge badge-primary border-0 p-4' onClick={onUpdateDetail}>Apply</button>
                                 </div>
                             </div>
                             <div className="row">
@@ -309,7 +280,7 @@ const LatestOrder: FC = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {dataDetails?.items.length ? dataDetails.items.map((item, index: number) => <tr key={index}>
+                                    {dataDetails?.items.length ? dataDetails.items.map((item: iOrderDetailItems, index: number) => <tr key={index}>
                                         <td className='align-middle text-center'>{item.product_id}</td>
                                         <td >
                                             <div className="d-flex align-items-center">
@@ -322,11 +293,12 @@ const LatestOrder: FC = () => {
                                             </div>
                                         </td>
                                         <td className='align-middle text-center'>{item.sku ? item.sku : '-'}</td>
-                                        <td className='align-middle text-center'>{formatMoney(item.price / item.quantity)}</td>
-                                        <td className='align-middle text-center'>{item.quantity}</td>
                                         <td className='align-middle text-center'>{formatMoney(item.price)}</td>
+                                        <td className='align-middle text-center'>{item.quantity}</td>
+                                        <td className='align-middle text-center'>{formatMoney(item.discount)}</td>
+                                        <td className='align-middle text-center'>{formatMoney(item.total)}</td>
                                     </tr>
-                                    ) : <tr><td colSpan={5} className='text-center'>{message}</td></tr>}
+                                    ) : <tr><td colSpan={ORDER_LIST_POPUP_TABLE.length} className='text-center'>No Item Found</td></tr>}
                                 </tbody>
                             </table>
                         </div>
@@ -334,11 +306,24 @@ const LatestOrder: FC = () => {
                 }
             </div>
         </PopupComponent >
+    }
 
+    const renderError = (message: string) => {
+        return isShowError ? <PopupComponent>
+            <div ref={ref} className="card" >
+                <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
+                    Error!
+                </div>
+                <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
+                    {message}
+                </div>
+            </div>
+        </PopupComponent> : ''
     }
 
     return <>
-        {isShowPopup ? renderPopup() : ''}
+        {isFailure ? renderError(message) : ''}
+        {isShowPopup && !isDetailError ? renderPopup() : ''}
         {renderTable()}
     </>
 

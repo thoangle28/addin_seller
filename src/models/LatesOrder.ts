@@ -1,4 +1,3 @@
-import { string } from "yup";
 import { iBaseResponse } from "./Common";
 import { iOrderList } from "./Report";
 
@@ -21,7 +20,7 @@ export interface iOrderListResponse extends iBaseResponse {
     order_list: iOrderList[]
 }
 
-interface iOrderDetailItems {
+export interface iOrderDetailItems {
     name: string;
     price: 300;
     product_id: number;
@@ -29,7 +28,9 @@ interface iOrderDetailItems {
     product_url: string;
     sku: string;
     variation_id: number;
+    discount: number | string;
     quantity: number;
+    total:number
 }
 
 interface orderBilling {
