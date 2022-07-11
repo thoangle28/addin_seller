@@ -20,6 +20,7 @@ const initProductState = {
     requestHasError: false,
     requestIsLoading: false,
     requestIsSuccess: false,
+    message: '',
     formValue: {},
     formProductOrderValue: {},
     formCustomerValue: {},
@@ -38,7 +39,7 @@ export const reportReducers = (state: any = initProductState, action: any) => {
         case actionTypes.GET_CUSTOMER_LIST_SUCCESS:
             return { ...state, customerList: payload, ...isSuccess }
         case actionTypes.GET_CUSTOMER_LIST_FAILURE:
-            return { ...state, ...isFailure }
+            return { ...state, ...isFailure, message: payload }
         case actionTypes.GET_CUSTOMER_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_PRODUCT_ORDER_LIST_SUCCESS:

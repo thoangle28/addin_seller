@@ -13,11 +13,14 @@ const LatestOrder: FC = () => {
     const dispatch = useDispatch()
 
     const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
-    const data: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.orderListing)
-    const dataDetails: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.orderListingInputDetails)
-    const isLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsLoading)
-    const isDetailLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailIsLoading)
-    const isSuccess: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsSuccess)
+    const data: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.orderListing, shallowEqual)
+    const dataDetails: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.orderListingInputDetails, shallowEqual)
+    const isLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsLoading, shallowEqual)
+    const isDetailLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailIsLoading, shallowEqual)
+    const isDetailError: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailHasError, shallowEqual)
+    const isSuccess: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsSuccess, shallowEqual)
+    const isFailure: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestHasError, shallowEqual)
+    const message: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.message, shallowEqual)
 
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
@@ -38,11 +41,13 @@ const LatestOrder: FC = () => {
 
     // Declares useState 
     const [isShowPopup, setIsShowPopup] = useState<boolean>(false)
+    const [isShowError, setIsShowError] = useState<boolean>(true)
     const [formFilterData, setFormFilterData] = useState<iPayload>(initFormValue)
     const [formUpdateData, setFormUpdateData] = useState<iUpdateData>(initUpdateData)
 
     useOnClickOutside(ref, () => {
-        setIsShowPopup(false);
+        setIsShowPopup(false); 
+        setIsShowError(false) 
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
     });
 
@@ -56,6 +61,7 @@ const LatestOrder: FC = () => {
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
         setIsShowPopup(prevState => !prevState)
     }
+
     const onHandleEscapeKey = (e: KeyboardEvent) => {
         if (e.code === 'Escape') setIsShowPopup(false)
     }
@@ -82,7 +88,7 @@ const LatestOrder: FC = () => {
 
     // API Running 
     useEffect(() => {
-        getDataOrderList(formFilterData); 
+        getDataOrderList(formFilterData);
     }, [formFilterData.page_size, formFilterData.current_page])
 
 
@@ -302,8 +308,22 @@ const LatestOrder: FC = () => {
         </PopupComponent >
     }
 
+    const renderError = (message: string) => {
+        return isShowError ? <PopupComponent>
+            <div ref={ref} className="card" >
+                <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
+                    Error!
+                </div>
+                <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
+                    {message}
+                </div>
+            </div>
+        </PopupComponent> : ''
+    }
+
     return <>
-        {isShowPopup ? renderPopup() : ''}
+        {isFailure ? renderError(message) : ''}
+        {isShowPopup && !isDetailError ? renderPopup() : ''}
         {renderTable()}
     </>
 

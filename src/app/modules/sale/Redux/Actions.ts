@@ -6,8 +6,9 @@ const getCustomerListSuccess = (payload: iCustomerList) => ({
     type: actionTypes.GET_CUSTOMER_LIST_SUCCESS,
     payload
 })
-const getCustomerListFailure = () => ({
-    type: actionTypes.GET_CUSTOMER_LIST_FAILURE
+const getCustomerListFailure = (payload: any) => ({
+    type: actionTypes.GET_CUSTOMER_LIST_FAILURE,
+    payload
 })
 const getCustomerListRequest = () => ({
     type: actionTypes.GET_CUSTOMER_LIST_REQUEST
@@ -83,10 +84,10 @@ export const fetchCustomer = (formData: formValue) => async (dispatch: any) => {
     dispatch(getCustomerListRequest())
     try {
         const res = await getCustomerList(formData);
-        const { data, code } = res.data
-        code !== 200 ? dispatch(getCustomerListFailure()) : dispatch(getCustomerListSuccess(data))
-    } catch (error) {
-        dispatch(getCustomerListFailure())
+        const { data, code, message } = res.data
+        code !== 200 ? dispatch(getCustomerListFailure(message)) : dispatch(getCustomerListSuccess(data))
+    } catch (error: any) {
+        dispatch(getCustomerListFailure(error.message))
     }
 }
 

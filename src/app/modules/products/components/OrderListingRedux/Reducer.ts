@@ -7,6 +7,7 @@ const inititalState: any = {
     requestDetailHasError: false,
     requestDetailIsLoading: false,
     requestDetailIsSuccess: false,
+    message: '',
     orderListing: {},
     orderListingInput: {},
     orderListingInputDetails: {}
@@ -14,7 +15,6 @@ const inititalState: any = {
 
 export const orderListingReducer = (state = inititalState, action: any) => {
     const { type, payload } = action
-    console.log(type)
     switch (type) {
         case actionTypes.GET_ALL_ORDER_LISTING_FAILURE:
             return {
@@ -22,6 +22,7 @@ export const orderListingReducer = (state = inititalState, action: any) => {
                 requestHasError: true,
                 requestIsLoading: false,
                 requestIsSuccess: false,
+                message: payload
             }
         case actionTypes.GET_ALL_ORDER_LISTING_REQUEST: {
             return {

@@ -1,16 +1,19 @@
-import { FC, useEffect, useState } from 'react'
-import { shallowEqual, useSelector } from 'react-redux'
+import { FC, useEffect, useRef, useState } from 'react'
+import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../../_metronic/partials/widgets'
 import { loadAllReports, } from '../saleReport'
 import { CURRENT_MONTH, CURRENT_YEAR, } from '../../../../constant'
 import { iReport, formValue } from '../../../../models'
-import Loading from '../../../../_metronic/partials/content/Loading' 
+import Loading from '../../../../_metronic/partials/content/Loading'
 import PromotionProducts from './PromotionProducts'
 import Customers from './Customers'
 import ProductSold from './ProductSold'
 import ProductOrder from './ProductOrder'
 import ProductRefuned from './ProductRefuned'
+import { getCustomerListInput, getProductSoldListInput, getProductOrderListInput, getPromotionProductInput, getRefundListInput } from './../Redux/Actions'
+import PopupComponent from '../../../../_metronic/partials/common/Popup'
+import { useOnClickOutside } from '../../../Hooks'
 
 type Props = {
   dataList: any | []
@@ -63,13 +66,19 @@ const DashboardPage: FC<Props> = ({ saleReport }: Props) => {
   )
 }
 
-const Reports: FC = () => { 
+const Reports: FC = () => {
+  const dispatch = useDispatch()
+
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
 
   const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
   const user_id: number = user ? parseInt(user.ID) : 0
   const tabs = ['Promotion Products', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
+  const isFailure: any = useSelector<RootState>(({ reportReducers }) => reportReducers.requestHasError, shallowEqual)
+  const message: any = useSelector<RootState>(({ reportReducers }) => reportReducers.message, shallowEqual)
+
+  const ref = useRef<HTMLDivElement>(null);
 
   const saleReportInit: iReport = {
     weeklySales: 0,
@@ -88,12 +97,15 @@ const Reports: FC = () => {
     filter_by_year: CURRENT_YEAR,
     access_token
   }
-
   const [tab, setTab] = useState('Promotion Products')
   const [isActiveIndex, setActiveIndex] = useState<number>(0)
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
-
+  const [isShowPopup, setIsShowPopup] = useState<boolean>(true)
+   
+  useOnClickOutside(ref, () => {
+    setIsShowPopup(false);
+  });
   useEffect(() => {
     const allReport = loadAllReports(user_id)
     allReport.then((results: any) => {
@@ -114,10 +126,23 @@ const Reports: FC = () => {
         loading: false,
       })
     })
-  }, []) 
+  }, [])
+  useEffect(() => {
+    return () => {
+      dispatch(getCustomerListInput(initFormValue))
+      dispatch(getProductOrderListInput(initFormValue))
+      dispatch(getProductSoldListInput(initFormValue))
+      dispatch(getRefundListInput(initFormValue))
+      dispatch(getPromotionProductInput(initFormValue))
+    }
+  }, [])
   
-  return (
-    <div className='card card-reports pb-5'>
+  useEffect(()=>{
+    setIsShowPopup(true);
+  },[tab])
+
+  const renderContent = () => {
+    return <div className='card card-reports pb-5'>
       <div className='card-header border-0 pt-5'>
         <h3 className='card-title align-items-start flex-column'>
           <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
@@ -147,6 +172,25 @@ const Reports: FC = () => {
         </div>
       </div>
     </div>
+  }
+
+  const renderPopup = (message: string) => {
+    return isShowPopup ? <PopupComponent>
+      <div ref={ref} className="card" >
+        <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
+          Error!
+        </div>
+        <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
+          {message}
+        </div>
+      </div>
+    </PopupComponent> : ''
+  }
+  
+  return (<>
+    {isFailure ? renderPopup(message) : ''}
+    {renderContent()}
+  </>
   )
 }
 
