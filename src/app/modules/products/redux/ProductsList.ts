@@ -92,7 +92,7 @@ export const createProductAttributeBrand = (payload: any) => axios.post(API_END_
 
 export const createTermsProductAttribute = (payload: any) => axios.post(API_END_POINT_URL + '/product/create-terms-product-attribute', payload)
 
-export const getOrderListPage = (payload: iPayload) => axios.post(`${API_END_POINT_URL}/sale-report/order-list-pages`, payload)
+export const getOrderListPage = (payload: iPayload) => axios.post(`${API_END_POINT_URL}/sale-report/order-list-page`, payload)
 
 export const getOrderDetailById = (order_id: string | number, user_id: string, access_token: string) => axios.post(`${API_END_POINT_URL}/sale-report/order-detail`, { order_id, user_id, access_token })
 
