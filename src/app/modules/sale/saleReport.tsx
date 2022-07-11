@@ -53,7 +53,7 @@ function getStatisticsSales12Months(params: any) {
 }
 
 
-export const getCustomerList = (params: formValue) => axios.post(API_END_POINT_URL + '/sale-report/customer-lists', params)
+export const getCustomerList = (params: formValue) => axios.post(API_END_POINT_URL + '/sale-report/customer-list', params)
 export const getProductSaleList = (params: formValue) => axios.post(API_END_POINT_URL + '/sale-report/product-sale-list', params)
 export const getProductOrderList = (params: formValue) => axios.post(API_END_POINT_URL + '/sale-report/order-list', params)
 export const getRefundedList = (params: formValue) => axios.post(API_END_POINT_URL + '/sale-report/orders-refund', params)
