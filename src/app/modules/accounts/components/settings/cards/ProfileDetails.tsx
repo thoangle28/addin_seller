@@ -108,9 +108,8 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
               className='btn btn-sm btn-success'
               onClick={() => {
                 reloadHeader(true)
-                onClose() 
                 history.push("/account/overview");
-                window.location.reload()  
+                onClose() 
               }}
             >
               Close
