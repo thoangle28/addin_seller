@@ -2,62 +2,18 @@ import { formValue, iCustomerList, iList, iProductOrderList, iProductSoldList, i
 import { actionTypes } from './Types'
 import { getCustomerList, getProductSaleList, getRefundedList, getProductSoldList, getProductOrderList } from './../saleReport';
 
-const getCustomerListSuccess = (payload: iCustomerList) => ({
-    type: actionTypes.GET_CUSTOMER_LIST_SUCCESS,
-    payload
-})
-const getCustomerListFailure = (payload: any) => ({
-    type: actionTypes.GET_CUSTOMER_LIST_FAILURE,
-    payload
-})
-const getCustomerListRequest = () => ({
-    type: actionTypes.GET_CUSTOMER_LIST_REQUEST
+const isSuccess = (type: string, payload: any) => ({
+    type, payload
+});
+
+const isFailure = (type: string, payload: any) => ({
+    type, payload
 })
 
-const getProductOrderListSuccess = (payload: iProductOrderList) => ({
-    type: actionTypes.GET_PRODUCT_ORDER_LIST_SUCCESS,
-    payload
-})
-const getProductOrderListFailure = () => ({
-    type: actionTypes.GET_PRODUCT_ORDER_LIST_FAILURE
-})
-const getProductOrderListRequest = () => ({
-    type: actionTypes.GET_PRODUCT_ORDER_LIST_REQUEST
-})
+const isRequest = (type: string) => ({ type })
 
-const getProductPromotionListSuccess = (payload: iList) => ({
-    type: actionTypes.GET_PRODUCT_PROMOTION_LIST_SUCCESS,
-    payload
-})
-const getProductPromotionListFailure = () => ({
-    type: actionTypes.GET_PRODUCT_PROMOTION_LIST_FAILURE,
-})
-const getProductPromotionListRequest = () => ({
-    type: actionTypes.GET_PRODUCT_PROMOTION_LIST_REQUEST
-})
 
-const getProductSoldListSuccess = (payload: iProductSoldList) => ({
-    type: actionTypes.GET_PRODUCT_SOLD_LIST_SUCCESS,
-    payload
-})
-const getProductSoldListFailure = () => ({
-    type: actionTypes.GET_PRODUCT_SOLD_LIST_FAILURE
-})
-const getProductSoldListRequest = () => ({
-    type: actionTypes.GET_PRODUCT_SOLD_LIST_REQUEST
-})
-
-const getRefundedListSuccess = (payload: iRefunedList) => ({
-    type: actionTypes.GET_REFUNDED_LIST_SUCCESS, payload
-})
-const getRefundedListRequest = () => ({
-    type: actionTypes.GET_REFUNDED_LIST_REQUEST
-})
-const getRefundedListFailure = () => ({
-    type: actionTypes.GET_REFUNDED_LIST_FAILURE
-})
-
-// GET SAVE DATA TO REDUX VIA FORM
+//SAVE DATA TO REDUX VIA FORM
 export const getCustomerListInput = (payload: formValue) => ({
     type: actionTypes.GET_CUSTOMER_LIST_INPUT,
     payload
@@ -79,58 +35,57 @@ export const getRefundListInput = (payload: formValue) => ({
     payload
 })
 
-
 export const fetchCustomer = (formData: formValue) => async (dispatch: any) => {
-    dispatch(getCustomerListRequest())
+    dispatch(isRequest(actionTypes.GET_CUSTOMER_LIST_REQUEST))
     try {
         const res = await getCustomerList(formData);
         const { data, code, message } = res.data
-        code !== 200 ? dispatch(getCustomerListFailure(message)) : dispatch(getCustomerListSuccess(data))
+        code !== 200 ? dispatch(isFailure(actionTypes.GET_CUSTOMER_LIST_FAILURE, message)) : dispatch(isSuccess(actionTypes.GET_CUSTOMER_LIST_SUCCESS, data))
     } catch (error: any) {
-        dispatch(getCustomerListFailure(error.message))
+        dispatch(isFailure(actionTypes.GET_CUSTOMER_LIST_FAILURE, error.message))
     }
 }
 
 export const fetchPromotionList = (formData: formValue) => async (dispatch: any) => {
-    dispatch(getProductPromotionListRequest())
+    dispatch(isRequest(actionTypes.GET_PRODUCT_ORDER_LIST_REQUEST))
     try {
         const res = await getProductSaleList(formData)
-        const { data, code } = res.data
-        code !== 200 ? dispatch(getProductPromotionListFailure()) : dispatch(getProductPromotionListSuccess(data))
-    } catch (error) {
-        dispatch(getProductPromotionListFailure())
+        const { data, code, message } = res.data
+        code !== 200 ? dispatch(isFailure(actionTypes.GET_PRODUCT_PROMOTION_LIST_FAILURE, message)) : dispatch(isSuccess(actionTypes.GET_PRODUCT_PROMOTION_LIST_SUCCESS, data))
+    } catch (error: any) {
+        dispatch(isFailure(actionTypes.GET_PRODUCT_PROMOTION_LIST_FAILURE, error.message))
     }
 }
 
 export const fetchRefundedList = (formData: formValue) => async (dispatch: any) => {
-    dispatch(getRefundedListRequest())
+    dispatch(isRequest(actionTypes.GET_REFUNDED_LIST_REQUEST))
     try {
         const res = await getRefundedList(formData)
-        const { data, code } = res.data
-        code !== 200 ? dispatch(getRefundedListFailure()) : dispatch(getRefundedListSuccess(data))
-    } catch (error) {
-        dispatch(getRefundedListFailure())
+        const { data, code, message } = res.data
+        code !== 200 ? dispatch(isFailure(actionTypes.GET_REFUNDED_LIST_FAILURE, message)) : dispatch(isSuccess(actionTypes.GET_REFUNDED_LIST_SUCCESS, data))
+    } catch (error: any) {
+        dispatch(isFailure(actionTypes.GET_REFUNDED_LIST_FAILURE, error.message))
     }
 }
 
 export const fetchProductSold = (formData: formValue) => async (dispatch: any) => {
-    dispatch(getProductSoldListRequest())
+    dispatch(isRequest(actionTypes.GET_PRODUCT_SOLD_LIST_REQUEST))
     try {
         const res = await getProductSoldList(formData)
-        const { data, code } = res.data
-        code !== 200 ? dispatch(getProductSoldListFailure()) : dispatch(getProductSoldListSuccess(data))
-    } catch (err) {
-        dispatch(getProductSoldListFailure())
+        const { data, code, message } = res.data
+        code !== 200 ? dispatch(isFailure(actionTypes.GET_REFUNDED_LIST_FAILURE, message)) : dispatch(isSuccess(actionTypes.GET_REFUNDED_LIST_SUCCESS, data))
+    } catch (error: any) {
+        dispatch(isFailure(actionTypes.GET_REFUNDED_LIST_FAILURE, error.message))
     }
 }
 
 export const fetchProductOrder = (formData: formValue) => async (dispatch: any) => {
-    dispatch(getProductOrderListRequest())
+    dispatch(isRequest(actionTypes.GET_PRODUCT_ORDER_LIST_REQUEST))
     try {
         const res = await getProductOrderList(formData)
-        const { data, code } = res.data
-        code !== 200 ? dispatch(getProductOrderListFailure()) : dispatch(getProductOrderListSuccess(data))
-    } catch (error) {
-        dispatch(getProductOrderListFailure())
+        const { data, code, message } = res.data
+        code !== 200 ? dispatch(isFailure(actionTypes.GET_PRODUCT_ORDER_LIST_FAILURE, message)) : dispatch(isSuccess(actionTypes.GET_PRODUCT_ORDER_LIST_SUCCESS, data))
+    } catch (error: any) {
+        dispatch(isFailure(actionTypes.GET_PRODUCT_ORDER_LIST_FAILURE, error.message))
     }
 }

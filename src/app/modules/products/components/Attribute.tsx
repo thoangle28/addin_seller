@@ -274,7 +274,7 @@ const Attribute: FC = () => {
             {
                 checkOpen && <>
                     {!!attr.options && attr.options.map((i: iOption, index: number) =>
-                        <div key={index + Math.random()} className="d-flex justify-content-between mt-4 align-items-center">
+                        <div key={i.id} className="d-flex justify-content-between mt-4 align-items-center">
                             <p className='my-2 ms-8'>{i.label} </p>
                             <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }
                             } className='text-success cursor-pointer fs-6 me-8'>Edit</span>
