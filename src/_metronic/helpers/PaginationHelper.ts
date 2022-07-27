@@ -38,7 +38,7 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
     return listPages
 };
 
-export const formatMoney = (amount: string | number, currency: string = "$") => {
+export const formatMoney = (amount: string | number = '0.0', currency: string = "$") => {
     const localization: string | undefined = process.env.REACT_APP_LOCALIZATION;
     switch (localization) {
         case 'MALAY':
@@ -49,7 +49,9 @@ export const formatMoney = (amount: string | number, currency: string = "$") => 
             break;
         default:
             currency = '$'
-            break; 
+            break;
     }
+    if (!amount)
+        return
     return `${currency}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
 };
