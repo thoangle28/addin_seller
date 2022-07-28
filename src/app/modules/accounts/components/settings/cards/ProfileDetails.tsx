@@ -65,6 +65,7 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
   const [loading, setLoading] = useState(false)
   const [newBrandLogo, setNewBrandLogo] = useState('')
   const [newPersonalPhoto, setNewPersonalPhoto] = useState('')
+  const history = useHistory();
   
   useEffect(() => {
     const loadUserProfile = () => {
@@ -107,7 +108,8 @@ const ProfileDetails: React.FC<Props> = ({ onUpdateProfile = (status: boolean) =
               className='btn btn-sm btn-success'
               onClick={() => {
                 reloadHeader(true)
-                onClose()
+                onClose() 
+                history.push("/account/overview");
                 window.location.reload()  
               }}
             >

@@ -1,17 +1,19 @@
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { shallowEqual, useDispatch, useSelector } from 'react-redux'
 import { RootState } from '../../../../setup'
 import { MixedWidget11, MixedWidget12, MixedWidget13 } from '../../../../_metronic/partials/widgets'
-import { loadAllReports, getProductSaleList, getCustomerList, getProductOrderList, getRefundedList, getProductSoldList } from '../saleReport'
+import { loadAllReports, } from '../saleReport'
 import { CURRENT_MONTH, CURRENT_YEAR, } from '../../../../constant'
 import { iReport, formValue } from '../../../../models'
 import Loading from '../../../../_metronic/partials/content/Loading'
-import { actions } from '../Redux/Actions'
 import PromotionProducts from './PromotionProducts'
 import Customers from './Customers'
 import ProductSold from './ProductSold'
 import ProductOrder from './ProductOrder'
 import ProductRefuned from './ProductRefuned'
+import { getCustomerListInput, getProductSoldListInput, getProductOrderListInput, getPromotionProductInput, getRefundListInput } from './../Redux/Actions'
+import PopupComponent from '../../../../_metronic/partials/common/Popup'
+import { useOnClickOutside } from '../../../Hooks'
 
 type Props = {
   dataList: any | []
@@ -66,11 +68,17 @@ const DashboardPage: FC<Props> = ({ saleReport }: Props) => {
 
 const Reports: FC = () => {
   const dispatch = useDispatch()
+
   const data = useSelector<RootState>(({ product }) => product, shallowEqual)
   const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
+
   const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
   const user_id: number = user ? parseInt(user.ID) : 0
   const tabs = ['Promotion Products', 'Customers', 'Item Orders', 'Product Sold', 'Refunded']
+  const isFailure: any = useSelector<RootState>(({ reportReducers }) => reportReducers.requestHasError, shallowEqual)
+  const message: any = useSelector<RootState>(({ reportReducers }) => reportReducers.message, shallowEqual)
+
+  const ref = useRef<HTMLDivElement>(null);
 
   const saleReportInit: iReport = {
     weeklySales: 0,
@@ -89,88 +97,15 @@ const Reports: FC = () => {
     filter_by_year: CURRENT_YEAR,
     access_token
   }
-
   const [tab, setTab] = useState('Promotion Products')
   const [isActiveIndex, setActiveIndex] = useState<number>(0)
   const [isPageLoading, setPageLoading] = useState<boolean>(true)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   const [saleReport, setSaleReport] = useState<iReport>(saleReportInit)
-  const [formValue, setFormValue] = useState<formValue>(initFormValue)
-  const [formProductOrderValue, setFormProductOrderValue] = useState<formValue>(initFormValue)
-  const [formCustomerValue, setFormCustomerValue] = useState<formValue>(initFormValue)
-  const [formProductSold, setFormProductSold] = useState<formValue>(initFormValue)
-  const [formRefund, setFormRefund] = useState<formValue>(initFormValue)
-
-  // Declare useSelector
-  const promotionProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.promotionProducts, shallowEqual)
-  const customerList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.customerList, shallowEqual)
-  const soldProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.soldProducts, shallowEqual)
-  const refundedList: any = useSelector<RootState>(({ reportReducers }) => reportReducers.refundedList, shallowEqual)
-  const orderProducts: any = useSelector<RootState>(({ reportReducers }) => reportReducers.orderProducts, shallowEqual)
-
-  // API Calling
-  const showProductSaleList = (formValue: formValue) => {
-    setIsLoading(true)
-    getProductSaleList(formValue)
-      .then((res) => {
-        const { code, data } = res.data
-        if (code === 200) {
-          setIsLoading(false)
-          dispatch(actions.getProductPromotionList(data))
-        }
-      })
-      .catch((err) => console.log(err))
-  }
-
-  const showCustomerList = (formCustomerValue: formValue) => {
-    setIsLoading(true)
-    getCustomerList(formCustomerValue)
-      .then((res) => {
-        const { code, data } = res.data
-        if (code === 200) {
-          setIsLoading(false)
-          dispatch(actions.getCustomerList(data))
-        }
-      })
-      .catch((err) => console.log(err))
-  }
-
-  const showProductOrderList = (formProductOrderValue: formValue) => {
-    setIsLoading(true)
-    getProductOrderList(formProductOrderValue)
-      .then((res) => {
-        const { code, data } = res.data
-        if (code === 200) {
-          setIsLoading(false)
-          dispatch(actions.getProductOrderList(data))
-        }
-
-      })
-      .catch((err) => console.log(err))
-  }
-
-  const showProductSoldList = (formProductSold: formValue) => {
-    setIsLoading(true)
-    getProductSoldList(formProductSold).then(res => {
-      const { code, data } = res.data
-      if (code === 200) {
-        setIsLoading(false)
-        dispatch(actions.getProductSoldList(data))
-      }
-    }).catch((err) => console.log(err))
-  }
-
-  const showRefundList = (formRefund: formValue) => {
-    setIsLoading(true)
-    getRefundedList(formRefund).then(res => {
-      const { code, data } = res.data
-      if (code === 200) {
-        setIsLoading(false)
-        dispatch(actions.getRefundedList(data))
-      }
-    }).catch(err => console.log(err))
-  }
-
+  const [isShowPopup, setIsShowPopup] = useState<boolean>(true)
+   
+  useOnClickOutside(ref, () => {
+    setIsShowPopup(false);
+  });
   useEffect(() => {
     const allReport = loadAllReports(user_id)
     allReport.then((results: any) => {
@@ -193,18 +128,21 @@ const Reports: FC = () => {
     })
   }, [])
   useEffect(() => {
-    if (tab === 'Promotion Products') showProductSaleList({ ...initFormValue })
-    if (tab === 'Customers') showCustomerList({ ...initFormValue })
-    if (tab === 'Item Orders') showProductOrderList({ ...initFormValue })
-    if (tab === 'Product Sold') showProductSoldList({ ...initFormValue })
-    if (tab === 'Refunded') showRefundList({ ...initFormValue })
-  }, [tab])
+    return () => {
+      dispatch(getCustomerListInput(initFormValue))
+      dispatch(getProductOrderListInput(initFormValue))
+      dispatch(getProductSoldListInput(initFormValue))
+      dispatch(getRefundListInput(initFormValue))
+      dispatch(getPromotionProductInput(initFormValue))
+    }
+  }, [])
+  
+  useEffect(()=>{
+    setIsShowPopup(true);
+  },[tab])
 
-
-  const isEmptyObject = (obj: any) => Object.keys(obj)
-
-  return (
-    <div className='card card-reports pb-5'>
+  const renderContent = () => {
+    return <div className='card card-reports pb-5'>
       <div className='card-header border-0 pt-5'>
         <h3 className='card-title align-items-start flex-column'>
           <span className='card-label fw-bolder fs-3 mb-1'>Sale Reports</span>
@@ -225,19 +163,34 @@ const Reports: FC = () => {
                 return <li key={index} onClick={() => { setTab(tab); setActiveIndex(index) }} className="nav-item cursor-pointer"><p className={`dropdown-item ${checkOpen ? 'active' : ''}`}  >{tab}</p></li>
               })}
             </ul>
-            {isLoading ? <Loading /> : (
-              <>
-                {tab === 'Promotion Products' && isEmptyObject(promotionProducts).length ? <PromotionProducts initFormValue={initFormValue} /> : ''}
-                {tab === 'Product Sold' && isEmptyObject(soldProducts).length ? <ProductSold initFormValue={initFormValue} /> : ""}
-                {tab === 'Customers' && isEmptyObject(customerList).length ? <Customers initFormValue={initFormValue} /> : ''}
-                {tab === 'Item Orders' && isEmptyObject(orderProducts).length ? <ProductOrder initFormValue={initFormValue} /> : ''}
-                {tab === 'Refunded' && isEmptyObject(refundedList).length ? <ProductRefuned initFormValue={initFormValue} /> : ''}
-              </>
-            )}
+            {tab === 'Promotion Products' ? <PromotionProducts initFormValue={initFormValue} /> : ''}
+            {tab === 'Product Sold' ? <ProductSold initFormValue={initFormValue} /> : ''}
+            {tab === 'Customers' ? <Customers initFormValue={initFormValue} /> : ''}
+            {tab === 'Item Orders' ? <ProductOrder initFormValue={initFormValue} /> : ''}
+            {tab === 'Refunded' ? <ProductRefuned initFormValue={initFormValue} /> : ''}
           </div>
         </div>
       </div>
     </div>
+  }
+
+  // const renderPopup = (message: string) => {
+  //   return isShowPopup ? <PopupComponent>
+  //     <div ref={ref} className="card" >
+  //       <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
+  //         Error!
+  //       </div>
+  //       <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
+  //         {message}
+  //       </div>
+  //     </div>
+  //   </PopupComponent> : ''
+  // }
+  
+  return (<>
+    {/* {isFailure ? renderPopup(message) : ''} */}
+    {renderContent()}
+  </>
   )
 }
 

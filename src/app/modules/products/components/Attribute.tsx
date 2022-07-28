@@ -8,7 +8,7 @@ import AlertMessage from '../../../../_metronic/partials/common/alert';
 import { getAttributesById, updateAttr, createProductAttributeBrand, createTermsProductAttribute, updateAttributeTerms } from '../redux/ProductsList';
 
 import { iListItem, iOption, iUpdateAttribute, iCreateValue, iCreateProductAttrPayload, iUpdateAttributeTerm, iCreateTermAttrPayload, iUpdateDataAttr } from './../../../../models'
- 
+
 const Attribute: FC = () => {
     // Declare States
     const [parentAttributeList, setParentAttributeList] = useState<any[]>([])
@@ -61,7 +61,7 @@ const Attribute: FC = () => {
 
 
     const fetchData = () => {
-        getAttributesById(currentUserId , access_token).then((res: any) => {
+        getAttributesById(currentUserId, access_token).then((res: any) => {
             const { code, data } = res.data
             if (code === 200) {
                 setIsLoading(true)
@@ -258,10 +258,10 @@ const Attribute: FC = () => {
         setActiveIndex(isActiveIndex === index ? undefined : index);
     };
 
-    const showData = () => parentAttributeList && parentAttributeList.map((attr: iListItem, index: number) => <option value={attr.id} key={index}>{attr.label}</option>)
+    const showData = () => parentAttributeList && parentAttributeList.map((attr: iListItem) => <option value={attr.id} key={attr.id}>{attr.label}</option>)
     const showList = () => parentAttributeList ? parentAttributeList.map((attr: iListItem, index: number) => {
         const checkOpen = isActiveIndex === index;
-        return <li key={index} className='list-group-item border border-bottom-1 p-2 mb-2 bg-body rounded'>
+        return <li key={attr.id} className='list-group-item border border-bottom-1 p-2 mb-2 bg-body rounded'>
             <div className="d-flex justify-content-between align-items-center ms-4" >
                 <div className='cursor-pointer' onClick={() => { toggleAttr(index) }}>
                     <span>{attr.label} </span>
@@ -274,7 +274,7 @@ const Attribute: FC = () => {
             {
                 checkOpen && <>
                     {!!attr.options && attr.options.map((i: iOption, index: number) =>
-                        <div key={index + Math.random()} className="d-flex justify-content-between mt-4 align-items-center">
+                        <div key={i.id} className="d-flex justify-content-between mt-4 align-items-center">
                             <p className='my-2 ms-8'>{i.label} </p>
                             <span onClick={() => { setIsUpdateChild(true); setChildId(i.id); setAttrId(attr.id); setChildAttrTaxonomy(i.attr); setchildAttr(i.label); setParentAttribute(attr.label); scrollToTop() }
                             } className='text-success cursor-pointer fs-6 me-8'>Edit</span>
