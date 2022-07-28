@@ -39,13 +39,13 @@ export const reportReducers = (state: any = initProductState, action: any) => {
         case actionTypes.GET_CUSTOMER_LIST_SUCCESS:
             return { ...state, customerList: payload, ...isSuccess }
         case actionTypes.GET_CUSTOMER_LIST_FAILURE:
-            return { ...state, ...isFailure, message: payload }
+            return { ...state, ...isFailure, payload }
         case actionTypes.GET_CUSTOMER_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_PRODUCT_ORDER_LIST_SUCCESS:
             return { ...state, orderProducts: payload, ...isSuccess }
         case actionTypes.GET_PRODUCT_ORDER_LIST_FAILURE:
-            return { ...state, ...isFailure }
+            return { ...state, ...isFailure, payload }
         case actionTypes.GET_PRODUCT_ORDER_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_PRODUCT_PROMOTION_LIST_SUCCESS:
@@ -53,21 +53,21 @@ export const reportReducers = (state: any = initProductState, action: any) => {
         case actionTypes.GET_PRODUCT_PROMOTION_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_PRODUCT_PROMOTION_LIST_FAILURE:
-            return { ...state, ...isFailure }
+            return { ...state, ...isFailure, payload }
         case actionTypes.GET_PRODUCT_SOLD_LIST_SUCCESS:
             return { ...state, soldProducts: payload, ...isSuccess }
         case actionTypes.GET_PRODUCT_SOLD_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_PRODUCT_SOLD_LIST_FAILURE:
-            return { ...state, ...isFailure }
+            return { ...state, ...isFailure, payload }
         case actionTypes.GET_PRODUCT_ORDER_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_PRODUCT_ORDER_LIST_FAILURE:
-            return { ...state, ...isFailure }
+            return { ...state, ...isFailure, payload }
         case actionTypes.GET_REFUNDED_LIST_SUCCESS:
             return { ...state, refundedList: payload, ...isSuccess }
         case actionTypes.GET_REFUNDED_LIST_FAILURE:
-            return { ...state, ...isFailure }
+            return { ...state, ...isFailure, payload }
         case actionTypes.GET_REFUNDED_LIST_REQUEST:
             return { ...state, ...isLoading }
         case actionTypes.GET_CUSTOMER_LIST_INPUT:

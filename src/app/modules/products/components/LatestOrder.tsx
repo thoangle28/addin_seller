@@ -21,7 +21,7 @@ const LatestOrder: FC = () => {
     const isSuccess: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsSuccess, shallowEqual)
     const isFailure: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestHasError, shallowEqual)
     const message: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.message, shallowEqual)
-
+    console.log(dataDetails)
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
     const ref = useRef<HTMLDivElement>(null);
@@ -44,10 +44,9 @@ const LatestOrder: FC = () => {
     const [isShowError, setIsShowError] = useState<boolean>(true)
     const [formFilterData, setFormFilterData] = useState<iPayload>(initFormValue)
     const [formUpdateData, setFormUpdateData] = useState<iUpdateData>(initUpdateData)
-
     useOnClickOutside(ref, () => {
-        setIsShowPopup(false); 
-        setIsShowError(false) 
+        setIsShowPopup(false);
+        setIsShowError(false)
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
     });
 
@@ -67,6 +66,7 @@ const LatestOrder: FC = () => {
     }
     const onUpdateDetail = async () => {
         await dispatch(updateOrderListingDetail(formUpdateData))
+        setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' }) 
         if (isSuccess) {
             setIsShowPopup(false)
             getDataOrderList(formFilterData)
@@ -232,13 +232,13 @@ const LatestOrder: FC = () => {
                                 </div>
                                 <div className='col-sm-4 col-lg-4 col-md-4 d-flex align-items-end'>
                                     <div className='me-2'>
-                                        <label className="fs-7 mb-1 fw-bolder" htmlFor="">Status</label>
+                                        <label className="fs-7 mb-1 fw-bolder" htmlFor="order_status">Status</label>
                                         <select
+                                            id="order_status"
                                             className='form-select form-select-solid form-select-sm me-0'
                                             onChange={(e) => onChangeDetailsHandler(e, dataDetails?.order_id || '')}
                                             name="order_status"
                                             value={!formUpdateData.order_status ? dataDetails?.order_status : formUpdateData.order_status}
-
                                         >
                                             {FILTER_STATUS.map((item, index: number) => <option key={index} value={item.status}>{item.name}</option>)}
                                         </select>
@@ -308,21 +308,21 @@ const LatestOrder: FC = () => {
         </PopupComponent >
     }
 
-    const renderError = (message: string) => {
-        return isShowError ? <PopupComponent>
-            <div ref={ref} className="card" >
-                <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
-                    Error!
-                </div>
-                <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
-                    {message}
-                </div>
-            </div>
-        </PopupComponent> : ''
-    }
+    // const renderError = (message: string) => {
+    //     return isShowError ? <PopupComponent>
+    //         <div ref={ref} className="card" >
+    //             <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
+    //                 Error!
+    //             </div>
+    //             <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
+    //                 {message}
+    //             </div>
+    //         </div>
+    //     </PopupComponent> : ''
+    // }
 
     return <>
-        {isFailure ? renderError(message) : ''}
+        {/* {isFailure ? renderError(message) : ''} */}
         {isShowPopup && !isDetailError ? renderPopup() : ''}
         {renderTable()}
     </>

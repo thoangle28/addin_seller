@@ -154,7 +154,7 @@ const TablesWidget14 = ({
                   <option value=''>All</option>
                   <option value='draft'>Draft</option>
                   <option value='pending'>Pending</option>
-                  <option value='publish'>Publish</option>
+                  <option value='publish'>Approved</option>
                 </select>
               </div>
             </>
