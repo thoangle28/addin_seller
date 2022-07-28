@@ -308,21 +308,21 @@ const LatestOrder: FC = () => {
         </PopupComponent >
     }
 
-    const renderError = (message: string) => {
-        return isShowError ? <PopupComponent>
-            <div ref={ref} className="card" >
-                <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
-                    Error!
-                </div>
-                <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
-                    {message}
-                </div>
-            </div>
-        </PopupComponent> : ''
-    }
+    // const renderError = (message: string) => {
+    //     return isShowError ? <PopupComponent>
+    //         <div ref={ref} className="card" >
+    //             <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
+    //                 Error!
+    //             </div>
+    //             <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
+    //                 {message}
+    //             </div>
+    //         </div>
+    //     </PopupComponent> : ''
+    // }
 
     return <>
-        {isFailure ? renderError(message) : ''}
+        {/* {isFailure ? renderError(message) : ''} */}
         {isShowPopup && !isDetailError ? renderPopup() : ''}
         {renderTable()}
     </>
