@@ -2,8 +2,7 @@
 import React, { useEffect, useRef } from 'react'
 import ApexCharts, { ApexOptions } from 'apexcharts'
 import { KTSVG } from '../../../helpers'
-import { getCSSVariableValue } from '../../../assets/ts/_utils'
-import { Dropdown1 } from '../../content/dropdown/Dropdown1'
+import { getCSSVariableValue } from '../../../assets/ts/_utils' 
 import { Link } from 'react-router-dom'
 
 type Props = {
@@ -28,8 +27,7 @@ const MixedWidget2: React.FC<Props> = ({
   newUsers,
   itemOrders,
   bugReports,
-  statistics,
-  loading
+  statistics, 
 }) => {
   const chartRef = useRef<HTMLDivElement | null>(null)
 
