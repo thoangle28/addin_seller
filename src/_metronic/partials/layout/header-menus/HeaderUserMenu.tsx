@@ -3,18 +3,11 @@ import { FC } from 'react'
 import { shallowEqual, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { UserModel } from '../../../../app/modules/auth/models/UserModel'
-import { RootState } from '../../../../setup'
-import { Languages } from './Languages'
-import * as auth from '../../../../app/modules/auth/redux/AuthRedux'
-import { useDispatch } from 'react-redux'
+import { RootState } from '../../../../setup' 
 import { toAbsoluteUrl } from '../../../helpers'
 
 const HeaderUserMenu: FC = () => {
-  const user: UserModel = useSelector<RootState>(({ auth }) => auth.user, shallowEqual) as UserModel  
-  const dispatch = useDispatch()
-  const logout = () => {
-    dispatch(auth.actions.logout())
-  }
+  const user: UserModel = useSelector<RootState>(({ auth }) => auth.user, shallowEqual) as UserModel
 
   return (
     <div

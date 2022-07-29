@@ -23,7 +23,7 @@ const App: React.FC<Props> = ({ basename }) => {
         document.title = 'Addin SG | Addin Seller Portal'
         break;
     }
-  }, [])
+  }, [localization])
   return (
     <Suspense fallback={<LayoutSplashScreen />}>
       <BrowserRouter basename={basename}>

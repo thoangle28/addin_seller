@@ -19,9 +19,6 @@ const LatestOrder: FC = () => {
     const isDetailLoading: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailIsLoading, shallowEqual)
     const isDetailError: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestDetailHasError, shallowEqual)
     const isSuccess: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestIsSuccess, shallowEqual)
-    const isFailure: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.requestHasError, shallowEqual)
-    const message: any = useSelector<RootState>(({ orderListingReducer }) => orderListingReducer.message, shallowEqual)
-    console.log(dataDetails)
     const user: any = useSelector<RootState>(({ auth }) => auth.user, shallowEqual)
     const currentUserId: number = user ? parseInt(user.ID) : 0
     const ref = useRef<HTMLDivElement>(null);
@@ -41,12 +38,10 @@ const LatestOrder: FC = () => {
 
     // Declares useState 
     const [isShowPopup, setIsShowPopup] = useState<boolean>(false)
-    const [isShowError, setIsShowError] = useState<boolean>(true)
     const [formFilterData, setFormFilterData] = useState<iPayload>(initFormValue)
     const [formUpdateData, setFormUpdateData] = useState<iUpdateData>(initUpdateData)
     useOnClickOutside(ref, () => {
         setIsShowPopup(false);
-        setIsShowError(false)
         setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
     });
 
@@ -66,7 +61,7 @@ const LatestOrder: FC = () => {
     }
     const onUpdateDetail = async () => {
         await dispatch(updateOrderListingDetail(formUpdateData))
-        setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' }) 
+        setFormUpdateData({ ...formUpdateData, order_id: '', order_status: '' })
         if (isSuccess) {
             setIsShowPopup(false)
             getDataOrderList(formFilterData)
@@ -288,7 +283,7 @@ const LatestOrder: FC = () => {
                                                     <img src={item.product_img} alt={item.name} />
                                                 </div>
                                                 <div className="d-flex justify-content-start flex-column">
-                                                    <a className='fs-6' target={'_blank'} href={item.product_url}>{item.name}</a>
+                                                    <a className='fs-6' target={'_blank'} rel="noreferrer" href={item.product_url}>{item.name}</a>
                                                 </div>
                                             </div>
                                         </td>
@@ -306,23 +301,9 @@ const LatestOrder: FC = () => {
                 }
             </div>
         </PopupComponent >
-    }
+    } 
 
-    // const renderError = (message: string) => {
-    //     return isShowError ? <PopupComponent>
-    //         <div ref={ref} className="card" >
-    //             <div className="card-header bg-danger text-white text-bolder fs-1 align-items-center justify-content-center">
-    //                 Error!
-    //             </div>
-    //             <div style={{ height: '150px' }} className="p-0 card-body bg-white d-flex align-items-center justify-content-center fs-3">
-    //                 {message}
-    //             </div>
-    //         </div>
-    //     </PopupComponent> : ''
-    // }
-
-    return <>
-        {/* {isFailure ? renderError(message) : ''} */}
+    return <> 
         {isShowPopup && !isDetailError ? renderPopup() : ''}
         {renderTable()}
     </>
