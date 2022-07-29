@@ -1,29 +1,16 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState, useEffect } from 'react'
-import { KTSVG } from '../../../../../../_metronic/helpers'
+import React, { useState } from 'react'
 import * as Yup from 'yup'
 import { useFormik } from 'formik'
 import { shallowEqual, useSelector } from 'react-redux'
-import { IUpdatePassword, IUpdateEmail, updatePassword, updateEmail } from '../SettingsModel'
+import { IUpdatePassword, updatePassword } from '../SettingsModel'
 import { confirmAlert } from 'react-confirm-alert'
 
-import axios from 'axios'
 import { RootState } from '../../../../../../setup'
 import { useHistory } from 'react-router-dom'
 import { changePassword } from '../server/api'
 import clsx from 'clsx'
 
-const emailFormValidationSchema = Yup.object().shape({
-  newEmail: Yup.string()
-    .email('Wrong email format')
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Email is required'),
-  confirmPassword: Yup.string()
-    .min(3, 'Minimum 3 symbols')
-    .max(50, 'Maximum 50 symbols')
-    .required('Password is required'),
-})
 
 const passwordFormValidationSchema = Yup.object().shape({
   old_password: Yup.string()
@@ -35,7 +22,7 @@ const passwordFormValidationSchema = Yup.object().shape({
     .max(50, 'Maximum 50 symbols')
     .required('Password is required')
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#%&])(?=.{8,})/,
       "Must contain 8 characters, one uppercase, one lowercase, one number and one special case character."
     ),
   password_confirm: Yup.string()
@@ -49,31 +36,12 @@ const SignInMethod: React.FC = () => {
   // Declares selector 
   const auth: any = useSelector<RootState>(({ auth }) => auth, shallowEqual)
   const { user } = auth
-  // Declare States
-  const [emailUpdateData, setEmailUpdateData] = useState<IUpdateEmail>(updateEmail)
-  const [passwordUpdateData, setPasswordUpdateData] = useState<IUpdatePassword>(updatePassword)
-
-  const [showEmailForm, setShowEmailForm] = useState<boolean>(false)
+  // Declare States 
+  const [passwordUpdateData] = useState<IUpdatePassword>(updatePassword)
   const [showPasswordForm, setPasswordForm] = useState<boolean>(false)
-
-  const [loading1, setLoading1] = useState(false)
   const [loading2, setLoading2] = useState(false)
 
 
-  const formik1 = useFormik<IUpdateEmail>({
-    initialValues: {
-      ...emailUpdateData,
-    },
-    validationSchema: emailFormValidationSchema,
-    onSubmit: (values) => {
-      setLoading1(true)
-      setTimeout((values) => {
-        setEmailUpdateData(values)
-        setLoading1(false)
-        setShowEmailForm(false)
-      }, 1000)
-    },
-  })
   const history = useHistory();
 
   const confirmRequest = (code: number, message: string) => {
@@ -86,7 +54,7 @@ const SignInMethod: React.FC = () => {
             <button
               className={`btn btn-sm ${code === 200 ? 'btn-success' : 'btn-danger'}`}
               onClick={() => {
-                if( code === 200) history.push("/logout");
+                if (code === 200) history.push("/logout");
                 onClose()
               }}
             >
@@ -256,7 +224,7 @@ const SignInMethod: React.FC = () => {
                         Current Password
                       </label>
                       <input
-                        type='text'                      
+                        type='text'
                         id='old_password'
                         {...formik2.getFieldProps('old_password')}
                         className={clsx(
@@ -310,7 +278,7 @@ const SignInMethod: React.FC = () => {
                         Confirm New Password
                       </label>
                       <input
-                        type='text'                       
+                        type='text'
                         id='password_confirm'
                         {...formik2.getFieldProps('password_confirm')}
                         className={clsx(
@@ -334,8 +302,8 @@ const SignInMethod: React.FC = () => {
 
                 <div className='form-text mb-5 mt-5'>
                   Note:<span className='invalid-feedback d-flex'>
-                  Password must be at least 8 characters, including: 
-                  <br />one uppercase, one lowercase, one number and one special case character.</span>
+                    Password must be at least 8 characters, including:
+                    <br />one uppercase, one lowercase, one number and one special case character.</span>
                   {/* Password must be at least 8 character and contain symbols */}
                 </div>
 
