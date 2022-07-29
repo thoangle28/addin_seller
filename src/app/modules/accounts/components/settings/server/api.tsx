@@ -1,5 +1,4 @@
-import axios from 'axios'
-import { userInfo } from 'os';
+import axios from 'axios' 
 import { IChangePasswordPayload, IProfileDetails } from '../SettingsModel';
 
 const API_END_POINT_URL = process.env.REACT_APP_API_END_POINT

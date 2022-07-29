@@ -1,28 +1,28 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from 'react'
-import {Link} from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../../setup'
-import { getUserProfile, UpdateProfileDetails } from './settings/server/api'
-import { IProfileDetails, profileDetailsInitValues as defaultValues } from './settings/SettingsModel'
+import { getUserProfile } from './settings/server/api'
+import { profileDetailsInitValues as defaultValues } from './settings/SettingsModel'
 import { FallbackView } from '../../products/components/formOptions'
 import { toAbsoluteUrl } from '../../../../_metronic/helpers'
 
 export function Overview() {
-  const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
-  const { accessToken, user } = auth
+  const auth: any = useSelector<RootState>(({ auth }) => auth, shallowEqual)
+  const { user } = auth
   //const userProfile: IProfileDetails = {...defaultValues}
 
   const [loading, setLoading] = useState(true)
-  const [initialValues, setInitialValues] = useState({...defaultValues})
+  const [initialValues, setInitialValues] = useState({ ...defaultValues })
 
   useEffect(() => {
     const loadUserProfile = () => {
       return new Promise((resolve, reject) => {
-        getUserProfile({ user_id: user.ID, user_email: user.user_email}).then((response) => {
+        getUserProfile({ user_id: user.ID, user_email: user.user_email }).then((response) => {
           const userData = response.data;
           resolve(userData.data);
-        }).catch(() => {})
+        }).catch(() => { })
       })
     }
 
@@ -30,7 +30,7 @@ export function Overview() {
       setInitialValues(data);
       setLoading(false)
     })
-    
+
   }, [user, setLoading])
 
   return (
@@ -40,17 +40,17 @@ export function Overview() {
           <div className='card-title m-0'>
             <h3 className='fw-bolder m-0'>Profile Details</h3>
           </div>
-          { !loading && 
-          <Link to='/account/settings' className='btn btn-primary align-self-center btn-sm'>
-            Edit Profile
-          </Link> }
+          {!loading &&
+            <Link to='/account/settings' className='btn btn-primary align-self-center btn-sm'>
+              Edit Profile
+            </Link>}
         </div>
-        { loading ? (
+        {loading ? (
           <div className='card-body py-10 loading-body'>
-           <FallbackView />
+            <FallbackView />
           </div>
         ) : (
-          <div className='card-body p-9'> 
+          <div className='card-body p-9'>
             <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>Avatar</label>
               <div className='col-lg-8 fv-row'>
@@ -60,35 +60,37 @@ export function Overview() {
                 >
                   <div className='image-input-wrapper h-65px w-auto'>
                     <img className='symbol'
-                      style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
-                      src={ initialValues.personal_photo ? initialValues.personal_photo : toAbsoluteUrl('/media/avatars/blank.png')} /> 
+                      alt={initialValues.company}
+                      style={{ height: '100%', width: 'auto', maxWidth: '200px' }}
+                      src={initialValues.personal_photo ? initialValues.personal_photo : toAbsoluteUrl('/media/avatars/blank.png')} />
                   </div>
                 </div>
               </div>
-            </div>  
+            </div>
             <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>Brand Name</label>
 
               <div className='col-lg-8 fv-row'>
                 <span className='fw-bold fs-6'>{initialValues.company}</span>
               </div>
-            </div>    
+            </div>
             <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>Brand Logo</label>
 
               <div className='col-lg-8 fv-row'>
-              <div
+                <div
                   className='image-input image-input-outline me-5'
                   data-kt-image-input='true'
                 >
                   <div className='image-input-wrapper h-65px w-auto'>
                     <img className='symbol'
-                      style={{ height: '100%', width: 'auto', maxWidth: '200px' }} 
-                      src={ initialValues.avatar ? initialValues.avatar : toAbsoluteUrl('/media/avatars/blank.png')} /> 
+                      alt={initialValues.company} 
+                      style={{ height: '100%', width: 'auto', maxWidth: '200px' }}
+                      src={initialValues.avatar ? initialValues.avatar : toAbsoluteUrl('/media/avatars/blank.png')} />
                   </div>
                 </div>
               </div>
-            </div>       
+            </div>
             <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>
                 Full Name
@@ -126,7 +128,7 @@ export function Overview() {
                   data-bs-toggle='tooltip'
                   title='Email address must be active'
                 ></i>
-                </label>
+              </label>
               <div className='col-lg-8'>
                 <span className='fw-bolder fs-6 me-2'>{initialValues.contactEmail}</span>
                 {initialValues.contactEmail && <span className='badge badge-success'>Verified</span>}
@@ -140,7 +142,7 @@ export function Overview() {
               </div>
             </div>
 
-          {/*  <div className='row mb-7'>
+            {/*  <div className='row mb-7'>
               <label className='col-lg-4 fw-bold text-muted'>
                 Country
                 <i
@@ -161,17 +163,17 @@ export function Overview() {
               <div className='col-lg-8'>
                 <span className='fw-bolder fs-6 text-dark'>
                   {
-                    (initialValues.communications.email 
-                    && initialValues.communications.phone) 
-                    ? 'Email, Phone' 
-                    : (initialValues.communications.email && 'Email' 
-                    || initialValues.communications.phone && 'Phone')
+                    (initialValues.communications.email
+                      && initialValues.communications.phone)
+                      ? 'Email, Phone'
+                      : (initialValues.communications.email && 'Email'
+                        || initialValues.communications.phone && 'Phone')
                   }
                 </span>
               </div>
             </div>
 
-          {/*  <div className='row mb-10'>
+            {/*  <div className='row mb-10'>
               <label className='col-lg-4 fw-bold text-muted'>Allow Changes</label>
 
               <div className='col-lg-8'>

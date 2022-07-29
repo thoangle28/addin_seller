@@ -1,8 +1,7 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from 'react'
 import {KTSVG, toAbsoluteUrl} from '../../../_metronic/helpers'
-import {Link} from 'react-router-dom'
-import {Dropdown1} from '../../../_metronic/partials'
+import {Link} from 'react-router-dom' 
 import {useLocation} from 'react-router'
 import { shallowEqual, useSelector } from 'react-redux'
 import { RootState } from '../../../setup'
@@ -15,10 +14,9 @@ type Props = {
 const AccountHeader: React.FC<Props> = ({reload} : Props) => {  
   const location = useLocation()
   const auth: any = useSelector<RootState>(({auth}) => auth, shallowEqual)
-  const { accessToken, user } = auth
+  const {  user } = auth
   //const userProfile: IProfileDetails = {...defaultValues}
-  const [initialValues, setInitialValues] = useState({...defaultValues})
-  const [loading, setLoading] = useState(false)
+  const [initialValues, setInitialValues] = useState({...defaultValues}) 
 
   useEffect(() => {
     const loadUserProfile = () => {
@@ -31,11 +29,10 @@ const AccountHeader: React.FC<Props> = ({reload} : Props) => {
     }
 
     loadUserProfile().then((data: any) => {
-      setInitialValues(data);
-      setLoading(false)
+      setInitialValues(data); 
     })
     
-  }, [user, setLoading, reload]) 
+  }, [user, reload]) 
   
   return (
     <div className='card mb-5 mb-xl-10'>

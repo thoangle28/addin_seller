@@ -9,8 +9,7 @@ import { RootState } from '../../../../setup'
 const ModalAttr = (Props: any) => {
   const access_token: any = useSelector<RootState>(({ auth }) => auth.accessToken, shallowEqual)
   const [formMessage, setFormMessage] = useState<string>('')
-  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props
-  const [newAttr, setNewAttr] = useState<any>(null)
+  const { showModal, onCloseModal, isAddAttr, user_id, taxonomy } = Props 
 
   const initialFormValues: any = {
     taxonomy: taxonomy,

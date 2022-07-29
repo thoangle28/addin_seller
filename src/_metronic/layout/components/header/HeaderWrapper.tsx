@@ -1,16 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import clsx from 'clsx'
-import React from 'react'
-import {Link} from 'react-router-dom'
-import {KTSVG, toAbsoluteUrl} from '../../../helpers'
-import {useLayout} from '../../core'
-import {Header} from './Header'
-import {DefaultTitle} from './page-title/DefaultTitle'
-import {Topbar} from './Topbar'
+import { Link } from 'react-router-dom'
+import { KTSVG, toAbsoluteUrl } from '../../../helpers'
+import { useLayout } from '../../core'
+import { Topbar } from './Topbar'
 
 export function HeaderWrapper() {
-  const {config, classes, attributes} = useLayout()
-  const {header, aside} = config
+  const { config, classes, attributes } = useLayout()
+  const { aside } = config
 
   return (
     <div
@@ -71,13 +68,13 @@ export function HeaderWrapper() {
             </div>
           )} */}
 
-         {/*  {header.left === 'page-title' && (
+          {/*  {header.left === 'page-title' && (
             <div className='d-flex align-items-center' id='kt_header_nav'>
               <DefaultTitle />
             </div>
           )} */}
 
-          <div className='d-flex align-items-stretch flex-shrink-0' style={{marginLeft: 'auto'}}>
+          <div className='d-flex align-items-stretch flex-shrink-0' style={{ marginLeft: 'auto' }}>
             <Topbar />
           </div>
         </div>

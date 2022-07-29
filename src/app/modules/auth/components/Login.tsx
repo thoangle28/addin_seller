@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import * as Yup from 'yup'
 import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 import { useFormik } from 'formik'
 import * as auth from '../redux/AuthRedux'
-import { login, signup } from '../redux/AuthCRUD'
+import { signup } from '../redux/AuthCRUD'
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()    //.email('Wrong email format')

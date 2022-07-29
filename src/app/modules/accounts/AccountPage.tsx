@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react'
-import {Redirect, Route, Switch} from 'react-router-dom'
-import {PageLink, PageTitle} from '../../../_metronic/layout/core'
-import {Overview} from './components/Overview'
-import {Settings} from './components/settings/Settings'
-import {AccountHeader} from './AccountHeader'
+import React, { useState } from 'react'
+import { Redirect, Route, Switch } from 'react-router-dom'
+import { PageLink, PageTitle } from '../../../_metronic/layout/core'
+import { Overview } from './components/Overview'
+import { Settings } from './components/settings/Settings'
+import { AccountHeader } from './AccountHeader'
 
 const accountBreadCrumbs: Array<PageLink> = [
   {
@@ -21,10 +21,10 @@ const accountBreadCrumbs: Array<PageLink> = [
 ]
 
 const AccountPage: React.FC = () => {
-  
+
   const [reload, setReloadPageHeader] = useState(0)
   const onReloadHeader = (status: boolean) => {
-    if( status ) {
+    if (status) {
       const time = new Date().getTime()
       setReloadPageHeader(time)
     }

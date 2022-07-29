@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useEffect, useRef, useState } from 'react'
+import { FC, useEffect, useRef, useState } from 'react'
 import { Formik } from 'formik'
 import { shallowEqual, useSelector, connect, ConnectedProps } from 'react-redux'
 import * as Yup from 'yup'
@@ -75,7 +75,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   const [newAttrValues, setNewAttrValues] = useState<any>([])
 
   const [parentId, setParentId] = useState()
-  const [producInfoBeforeSave, setProducInfoBeforeSave] = useState<any>([])
 
   const tabDefault: any = useRef(null)
   //Get All Properties
@@ -225,8 +224,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
 
-    setProducInfoBeforeSave({ ...formValues })
-
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -247,7 +244,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
 
-    setProducInfoBeforeSave({ ...formValues })
 
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({

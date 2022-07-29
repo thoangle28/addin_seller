@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react'
 import { ProfileDetails } from './cards/ProfileDetails'
 import { SignInMethod } from './cards/SignInMethod'
-import { DeactivateAccount } from './cards/DeactivateAccount'
 
 type Props = {
   onChangeStatus?: (s: boolean) => void

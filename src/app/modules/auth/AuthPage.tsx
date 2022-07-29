@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import { Registration } from './components/Registration'
 import { ForgotPassword } from './components/ForgotPassword'
 import { ForgotPasswordValidation } from './components/ForrgotPasswordValidation'
 import { Login } from './components/Login'
 import { toAbsoluteUrl } from '../../../_metronic/helpers'
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 export function AuthPage() {
 
