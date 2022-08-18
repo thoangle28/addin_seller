@@ -9,21 +9,7 @@ type Props = {
   basename: string
 }
 
-const App: React.FC<Props> = ({ basename }) => {
-  const localization = process.env.REACT_APP_LOCALIZATION
-  useEffect(() => {
-    switch (localization) {
-      case 'MALAY':
-        document.title = 'Addin Malaysia | Addin Seller Portal'
-        break;
-      case 'SG':
-        document.title = 'Addin SG | Addin Seller Portal'
-        break;
-      default:
-        document.title = 'Addin SG | Addin Seller Portal'
-        break;
-    }
-  }, [localization])
+const App: React.FC<Props> = ({ basename }) => { 
   return (
     <Suspense fallback={<LayoutSplashScreen />}>
       <BrowserRouter basename={basename}>
