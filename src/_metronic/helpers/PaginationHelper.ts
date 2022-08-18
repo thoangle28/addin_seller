@@ -41,6 +41,18 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
 export const formatMoney = (amount: string | number = '0.0', currency: string = "$") => {
     const localization: string | undefined = process.env.REACT_APP_LOCALIZATION;
     switch (localization) {
+        case 'VN':
+            currency = 'VNĐ'
+            break;
+        case 'TH':
+            currency = '฿'
+            break;
+        case 'PH':
+            currency = '₱'
+            break;
+        case 'ID':
+            currency = 'RP'
+            break;
         case 'MALAY':
             currency = 'RM'
             break;
@@ -52,6 +64,6 @@ export const formatMoney = (amount: string | number = '0.0', currency: string = 
             break;
     }
     if (!amount)
-        return
+        return `${currency}`
     return `${currency}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
 };
