@@ -11,12 +11,24 @@ const Footer: FC = () => {
     switch (localization) {
       case 'MALAY':
         footer = 'Addin Malaysia'
+        break; 
+      case 'HK':
+        footer = 'Addin Hongkong'
         break;
-      case 'SG':
-        footer = 'Addin SG'
+      case 'ID':
+        footer = 'Addin Indonesia'
         break;
-
+      case 'VN':
+        footer = 'Addin Việt Nam'
+        break;
+      case 'TW':
+        footer = 'Addin Taiwan'
+        break;
+      case 'TH':
+        footer = 'Addin Thailand'
+        break;
       default:
+        footer = 'Addin SG'
         break;
     }
     return footer

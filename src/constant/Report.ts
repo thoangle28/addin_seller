@@ -41,12 +41,26 @@ switch (localization) {
         break;
 
     default:
+        TABLE_PRODUCT_STATUS = [
+            { key: '', name: 'All', btnStatus: '' },
+            { key: 'wc-pending', name: 'Pending Payment', btnStatus: 'warning' },
+            { key: 'wc-in-china-warehous', name: 'In China Warehouse', btnStatus: 'warning' },
+            { key: 'wc-leave-china-port', name: 'Leave China Port', btnStatus: 'info' },
+            { key: 'wc-reach-singapore-p', name: 'Reach Singapore Port', btnStatus: 'success' },
+            { key: 'wc-reach-tuas-wareho', name: 'Reach Tuas Warehouse', btnStatus: 'success' },
+            { key: 'wc-failed', name: 'Failed', btnStatus: 'danger' },
+            { key: 'wc-refunded', name: 'Refunded', btnStatus: 'danger' },
+            { key: 'wc-cancelled', name: 'Cancelled', btnStatus: 'danger' },
+            { key: 'wc-completed', name: 'Completed', btnStatus: 'success' },
+            { key: 'wc-on-hold', name: 'On hold', btnStatus: 'warning' },
+            { key: 'wc-processing', name: 'Processing', btnStatus: 'primary' }
+        ]
         break;
 }
 
 switch (localization) {
     case 'MALAY':
-        TABLE_PRODUCT_SALE_STATUS = [ 
+        TABLE_PRODUCT_SALE_STATUS = [
             { name: 'Processing', btnStatus: 'primary' },
             { name: 'Refunded', btnStatus: 'warning' },
             { name: 'In China Warehous ', btnStatus: 'info' },

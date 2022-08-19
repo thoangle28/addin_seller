@@ -1042,7 +1042,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         <div className='form-group row'>
                                           <div className='col-md-6 mb-5'>
                                             <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
-                                              <span>Regular Price</span>
+                                              <span>Regular Price ({formatMoney('')})</span>
                                             </label>
                                             <div className='input-group'>
                                               <span className='input-group-text'>{formatMoney('')}</span>
@@ -1061,7 +1061,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           </div>
                                           <div className='col-md-6 mb-5'>
                                             <label className='d-flex align-items-center fs-7 fw-bold mb-2'>
-                                              <span>Sale Price</span>
+                                              <span>Sale Price ({formatMoney('')})</span>
                                             </label>
                                             <div className='input-group'>
                                               <span className='input-group-text'>{formatMoney('')}</span>

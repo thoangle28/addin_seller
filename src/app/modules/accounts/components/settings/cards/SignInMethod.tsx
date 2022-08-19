@@ -100,107 +100,7 @@ const SignInMethod: React.FC = () => {
       </div>
 
       <div id='kt_account_signin_method' className='collapse show'>
-        <div className='card-body border-top p-9'>
-          {/* <div className='d-flex flex-wrap align-items-center'>
-            <div id='kt_signin_email' className={' ' + (showEmailForm && 'd-none')}>
-              <div className='fs-6 fw-bolder mb-1'>Email Address</div>
-              <div className='fw-bold text-gray-600'>support@keenthemes.com</div>
-            </div>
-
-            <div
-              id='kt_signin_email_edit'
-              className={'flex-row-fluid ' + (!showEmailForm && 'd-none')}
-            >
-              <form
-                onSubmit={formik1.handleSubmit}
-                id='kt_signin_change_email'
-                className='form'
-                noValidate
-              >
-                <div className='row mb-6'>
-                  <div className='col-lg-6 mb-4 mb-lg-0'>
-                    <div className='fv-row mb-0'>
-                      <label htmlFor='emailaddress' className='form-label fs-6 fw-bolder mb-3'>
-                        Enter New Email Address
-                      </label>
-                      <input
-                        type='email'
-                        className='form-control form-control-lg form-control-solid'
-                        id='emailaddress'
-                        placeholder='Email Address'
-                        {...formik1.getFieldProps('newEmail')}
-                      />
-                      {formik1.touched.newEmail && formik1.errors.newEmail && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik1.errors.newEmail}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className='col-lg-6'>
-                    <div className='fv-row mb-0'>
-                      <label
-                        htmlFor='confirmemailpassword'
-                        className='form-label fs-6 fw-bolder mb-3'
-                      >
-                        Confirm Password
-                      </label>
-                      <input
-                        type='password'
-                        className='form-control form-control-lg form-control-solid'
-                        id='confirmemailpassword'
-                        {...formik1.getFieldProps('confirmPassword')}
-                      />
-                      {formik1.touched.confirmPassword && formik1.errors.confirmPassword && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik1.errors.confirmPassword}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className='d-flex'>
-                  <button
-                    id='kt_signin_submit'
-                    type='submit'
-                    className='btn btn-primary  me-2 px-6'
-                  >
-                    {!loading1 && 'Update Email'}
-                    {loading1 && (
-                      <span className='indicator-progress' style={{ display: 'block' }}>
-                        Please wait...{' '}
-                        <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
-                      </span>
-                    )}
-                  </button>
-                  <button
-                    id='kt_signin_cancel'
-                    type='button'
-                    onClick={() => {
-                      setShowEmailForm(false)
-                    }}
-                    className='btn btn-color-gray-400 btn-active-light-primary px-6'
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
-
-            <div id='kt_signin_email_button' className={'ms-auto ' + (showEmailForm && 'd-none')}>
-              <button
-                onClick={() => {
-                  setShowEmailForm(true)
-                }}
-                className='btn btn-light btn-active-light-primary'
-              >
-                Change Email
-              </button>
-            </div>
-          </div>
-
-          <div className='separator separator-dashed my-6'></div> */}
-
+        <div className='card-body border-top p-9'> 
           <div className='d-flex flex-wrap align-items-center mb-10'>
             <div id='kt_signin_password' className={' ' + (showPasswordForm && 'd-none')}>
               <div className='fs-6 fw-bolder mb-1'>Password</div>
@@ -324,6 +224,7 @@ const SignInMethod: React.FC = () => {
                   <button
                     onClick={() => {
                       setPasswordForm(false)
+                      formik2.resetForm()
                     }}
                     id='kt_password_cancel'
                     type='button'
