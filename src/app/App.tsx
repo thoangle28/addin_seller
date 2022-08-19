@@ -10,6 +10,15 @@ type Props = {
 }
 
 const App: React.FC<Props> = ({ basename }) => { 
+  useEffect(() => {
+    if ("caches" in window) {
+      caches.keys().then((names) => {
+        names.forEach((name) => {
+          caches.delete(name);
+        });
+      });
+    }
+  }, []);
   return (
     <Suspense fallback={<LayoutSplashScreen />}>
       <BrowserRouter basename={basename}>
