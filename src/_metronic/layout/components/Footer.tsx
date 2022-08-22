@@ -19,7 +19,7 @@ const Footer: FC = () => {
         footer = 'Addin Indonesia'
         break;
       case 'VN':
-        footer = 'Addin Việt Nam'
+        footer = 'Addin Vietnam'
         break;
       case 'TW':
         footer = 'Addin Taiwan'
@@ -27,6 +27,9 @@ const Footer: FC = () => {
       case 'TH':
         footer = 'Addin Thailand'
         break;
+      case 'PH':
+        footer = 'Addin Philippines'
+        break
       default:
         footer = 'Addin SG'
         break;

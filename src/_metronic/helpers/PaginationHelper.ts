@@ -42,7 +42,7 @@ export const formatMoney = (amount: string | number, currency: string = "$") => 
     const localization: string | undefined = process.env.REACT_APP_LOCALIZATION;
     switch (localization) {
         case 'VN':
-            currency = 'VNĐ'
+            currency = '₫'
             break;
         case 'TH':
             currency = '฿'
