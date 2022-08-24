@@ -51,13 +51,16 @@ export const formatMoney = (amount: string | number, currency: string = "$") => 
             currency = '₱'
             break;
         case 'ID':
-            currency = 'RP'
+            currency = 'Rp'
             break;
         case 'MALAY':
             currency = 'RM'
             break;
         case 'SG':
             currency = '$'
+            break;
+        case 'TW':
+            currency = 'NT$'
             break;
         default:
             currency = '$'

@@ -254,11 +254,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
       .then((response: any) => {
         const { code, message, data } = response.data
-        setSaveVar({ loading: false, error: message })
-        setReloadPage(false)
+        setSaveVar({ loading: false, error: message }) 
         if (code === 200) {
-          setSaveVar({ loading: false, error: '' })
-          setReloadPage(true)
+          setSaveVar({ loading: false, error: '' }) 
         }
       })
       .catch(() => { })
@@ -623,8 +621,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         const { code, message, data } = product
                         initialFormValues.attributes = [] //clear
                         initialFormValues.variations = [] //clear
-                        initialFormValues.variations_attr = []
-
+                        initialFormValues.variations_attr = [] 
+                        setReloadPage(true)
                         switch (code) {
                           case 200:
                             confirmRequest(message, data)
