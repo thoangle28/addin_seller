@@ -242,9 +242,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   /* Add more Attributes */
-  const saveProductVariations = (formValues: any) => {
-
-
+  const saveProductVariations = (formValues: any) => { 
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -619,14 +617,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                     postProduct(values, accessToken)
                       .then((product: any) => {
                         const { code, message, data } = product
-                        initialFormValues.attributes = [] //clear
-                        initialFormValues.variations = [] //clear
+                        // initialFormValues.attributes = [] //clear
+                        // initialFormValues.variations = [] //clear
                         initialFormValues.variations_attr = [] 
-                        setReloadPage(true)
                         switch (code) {
                           case 200:
-                            confirmRequest(message, data)
-                            resetForm()
+                            confirmRequest(message, data) 
                             break
                         }
                         setSubmitting(false) //done
