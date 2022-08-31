@@ -8,6 +8,7 @@ import * as detail from '../redux/CreateProductRedux'
 import { RootState } from '../../../../setup'
 import Select from 'react-select'
 import { AsyncPaginate } from 'react-select-async-paginate'
+import imgPlaceholder from './../../../../_metronic/assets/images.png'
 import { confirmAlert } from 'react-confirm-alert' // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {
@@ -242,7 +243,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   /* Add more Attributes */
-  const saveProductVariations = (formValues: any) => { 
+  const saveProductVariations = (formValues: any) => {
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -252,9 +253,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
       .then((response: any) => {
         const { code, message, data } = response.data
-        setSaveVar({ loading: false, error: message }) 
+        setSaveVar({ loading: false, error: message })
         if (code === 200) {
-          setSaveVar({ loading: false, error: '' }) 
+          setSaveVar({ loading: false, error: '' })
         }
       })
       .catch(() => { })
@@ -619,10 +620,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         const { code, message, data } = product
                         // initialFormValues.attributes = [] //clear
                         // initialFormValues.variations = [] //clear
-                        initialFormValues.variations_attr = [] 
+                        initialFormValues.variations_attr = []
                         switch (code) {
                           case 200:
-                            confirmRequest(message, data) 
+                            confirmRequest(message, data)
                             break
                         }
                         setSubmitting(false) //done
@@ -871,7 +872,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         )) || (
                                           <img
                                             className='h-100'
-                                            src='https://via.placeholder.com/75x75/f0f0f0'
+                                            src={imgPlaceholder}
                                             alt=''
                                           />
                                         )}
@@ -1664,7 +1665,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                         className='h-100 variation_thumbnail'
                                                                         src={
                                                                           item.thumbnail.src ||
-                                                                          'https://via.placeholder.com/75x75/f0f0f0'
+                                                                          imgPlaceholder
                                                                         }
                                                                         alt=''
                                                                       />
@@ -1673,7 +1674,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                         className='h-100 variation_thumbnail'
                                                                         src={
                                                                           new_thumbnail ||
-                                                                          'https://via.placeholder.com/75x75/f0f0f0'
+                                                                          imgPlaceholder
                                                                         }
                                                                         alt=''
                                                                       />
