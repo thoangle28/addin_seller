@@ -223,8 +223,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   /* Add more Attributes */
-  const saveProductAttributes = (formValues: any) => {
-
+  const saveProductAttributes = (formValues: any) => { 
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -234,11 +233,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     }).then((response: any) => {
       const { code, message, data } = response.data
       setSaveAttr({ loading: false, error: message })
-      setReloadPage(false)
-      setTimeout(() => {
-        setSaveAttr({ loading: false, error: '' })
-        setReloadPage(true)
-      }, 2000)
+      setReloadPage(false) 
     })
   }
 
@@ -254,8 +249,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       .then((response: any) => {
         const { code, message, data } = response.data
         setSaveVar({ loading: false, error: message })
+        setReloadPage(false)
         if (code === 200) {
           setSaveVar({ loading: false, error: '' })
+          setReloadPage(true)
         }
       })
       .catch(() => { })
@@ -462,10 +459,10 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         formValues.new_photo_galleries = tempGalleries
         setNewPhotoGalleries(tempGalleries)
 
-        const tempPhotos = formValues.new_photo_galleries.filter((x: any, index: number) => {
-          return index !== id
-        })
-        formValues.photo_galleries = tempPhotos
+        // const tempPhotos = formValues.new_photo_galleries.filter((x: any, index: number) => {
+        //   return index !== id
+        // })
+        // formValues.photo_galleries = tempPhotos
         break
       case 'thumbnail':
         formValues.thumbnail = { image_id: false, src: '' }
@@ -609,7 +606,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
                   onSubmit={(values, { setSubmitting, resetForm }) => {
-                    //save to DB
+                    // console.log(values)
+                    // setSubmitting(false)
+                    // return
                     if (values.usePhoto && usePhotoFromContent.length > 0) {
                       values.photo_galleries = usePhotoFromContent
                     }
@@ -620,7 +619,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         const { code, message, data } = product
                         // initialFormValues.attributes = [] //clear
                         // initialFormValues.variations = [] //clear
-                        initialFormValues.variations_attr = []
+                        // initialFormValues.variations_attr = []
                         switch (code) {
                           case 200:
                             confirmRequest(message, data)
@@ -877,7 +876,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           />
                                         )}
                                     </div>
-                                    {(newThumbnail || (values && values.thumbnail.src)) && (
+                                    {/* {(newThumbnail || (values && values.thumbnail.src)) && (
                                       <span
                                         className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
                                         data-kt-image-input-action='remove'
@@ -898,7 +897,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       >
                                         <i id={`product_thumbnail_1`} className='bi bi-x fs-2'></i>
                                       </span>
-                                    )}
+                                    )} */}
                                   </div>
                                 </div>
                                 <div className='col-md-8 mb-5'>
@@ -2047,7 +2046,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             >
                               {isSubmitting ? (
                                 <>
-                                  Processing...{' '}
+                                  Processing...
                                   <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                                 </>
                               ) : !isNewProduct ? (
