@@ -95,7 +95,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /**
    * Get Product Details
-   */
+   */ 
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       //mapValuesToForm(initialForm, product)
@@ -223,7 +223,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
   }
 
   /* Add more Attributes */
-  const saveProductAttributes = (formValues: any) => { 
+  const saveProductAttributes = (formValues: any) => {
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -233,7 +233,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     }).then((response: any) => {
       const { code, message, data } = response.data
       setSaveAttr({ loading: false, error: message })
-      setReloadPage(false) 
+      setReloadPage(false)
     })
   }
 
@@ -418,7 +418,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
-  const confirmRequest = (message: string, product_id: number) => {
+  const confirmRequest = (message: string) => {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
@@ -605,7 +605,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   initialValues={isNewProduct ? { ...initialFormValues } : { ...initialForm }}
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
-                  onSubmit={(values, { setSubmitting, resetForm }) => {
+                  onSubmit={(values, { setSubmitting, resetForm }) => { 
                     // console.log(values)
                     // setSubmitting(false)
                     // return
@@ -622,7 +622,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         // initialFormValues.variations_attr = []
                         switch (code) {
                           case 200:
-                            confirmRequest(message, data)
+                            confirmRequest(message)
                             break
                         }
                         setSubmitting(false) //done
@@ -691,7 +691,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               style={{ minHeight: '500px' }}
                             />
                             <div className='small pt-2 text-danger'>
-                              Please only add a maximum of 10 images for the content
+                              Please only add a maximum of 10 photos for the content
                             </div>
                           </div>
                         </div>
@@ -852,6 +852,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         })}
                                     </div>
                                   </div>
+                                  <p className='small pt-2 text-danger'>*Priority order to add photos: 1: Photo Gallery - 2: Thumbnail</p>
                                 </div>
                               </div>
                             </div>
