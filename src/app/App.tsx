@@ -4,7 +4,7 @@ import { I18nProvider } from '../_metronic/i18n/i18nProvider'
 import { LayoutProvider, LayoutSplashScreen } from '../_metronic/layout/core'
 import AuthInit from './modules/auth/redux/AuthInit'
 import { Routes } from './routing/Routes'
-
+import { COUNTRY } from './../constant'
 type Props = {
   basename: string
 }
@@ -20,34 +20,12 @@ const App: React.FC<Props> = ({ basename }) => {
     }
   }, []);
 
-  const localization = process.env.REACT_APP_LOCALIZATION
+  const localization: string = process.env.REACT_APP_LOCALIZATION || ''
+
+  const showPageTitle = (title: string): string => document.title = `Addin ${!COUNTRY[title] ? 'SG' : COUNTRY[title]} | Addin Seller Portal`
+
   useEffect(() => {
-    switch (localization) {
-      case 'MALAY':
-        document.title = 'Addin Malaysia | Addin Seller Portal'
-        break;
-      case 'VN':
-        document.title = 'Addin Vietnam | Addin Seller Portal'
-        break;
-      case 'PH':
-        document.title = 'Addin Philippines | Addin Seller Portal'
-        break;
-      case 'ID':
-        document.title = 'Addin Indonesia | Addin Seller Portal'
-        break;
-      case 'TH':
-        document.title = 'Addin Thailand | Addin Seller Portal'
-        break;
-      case 'HK':
-        document.title = 'Addin Hongkong | Addin Seller Portal'
-        break;
-      case 'TW':
-        document.title = 'Addin Taiwan | Addin Seller Portal'
-        break;
-      default:
-        document.title = 'Addin SG | Addin Seller Portal'
-        break;
-    }
+    showPageTitle(localization)
   }, [])
   return (
     <Suspense fallback={<LayoutSplashScreen />}>

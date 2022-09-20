@@ -38,35 +38,19 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
     return listPages
 };
 
-export const formatMoney = (amount: string | number, currency: string = "$") => {
-    const localization: string | undefined = process.env.REACT_APP_LOCALIZATION;
-    switch (localization) {
-        case 'VN':
-            currency = '₫'
-            break;
-        case 'TH':
-            currency = '฿'
-            break;
-        case 'PH':
-            currency = '₱'
-            break;
-        case 'ID':
-            currency = 'Rp'
-            break;
-        case 'MALAY':
-            currency = 'RM'
-            break;
-        case 'SG':
-            currency = '$'
-            break;
-        case 'TW':
-            currency = 'NT$'
-            break;
-        default:
-            currency = '$'
-            break;
-    }
+export const formatMoney = (amount: string | number) => {
+    const localization: any = process.env.REACT_APP_LOCALIZATION;
+     
+    const currencySymbols: any = {
+        "VN": '₫',
+        "TH": '฿',
+        "PH": '₱',
+        "ID": 'Rp',
+        "MALAY": "RM",
+        "SG": "$",
+        "TW": "NT$"
+    } 
     if (!amount)
-        return `${currency}`
-    return `${currency}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
+        return `${amount}${currencySymbols[localization]}`
+    return `${currencySymbols[localization]}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
 };

@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react'
-import { Formik } from 'formik'
+import { Formik, useFormikContext } from 'formik'
 import { shallowEqual, useSelector, connect, ConnectedProps } from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
@@ -95,7 +95,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /**
    * Get Product Details
-   */ 
+   */
+
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       //mapValuesToForm(initialForm, product)
@@ -105,7 +106,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         initialForm.new_thumbnail = newThumbnail
         initialForm.attributes = product.attributes
         initialForm.variations = product.variations
-      } else mapValuesToForm(initialForm, product)
+      } else { 
+        mapValuesToForm(initialForm, product)
+      }
 
       setProductType(initialForm.type_product)
       setNewProduct(false)
@@ -447,21 +450,20 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }).thumbnail = { image_id: false, src: '' }
         break
       case 'galleries':
-        const newGalleries = formValues.photo_galleries.filter((x: any, index: number) => {
+        const newGalleries = formValues.photo_galleries.filter((x: any) => {
           return parseInt(x.image_id) !== id
         })
         formValues.photo_galleries = newGalleries
         break
       case 'new_galleries':
-        const tempGalleries = newPhotoGalleries.filter((x: any, index: number) => {
-          return index !== id
-        })
-        formValues.new_photo_galleries = tempGalleries
+        const tempGalleries = newPhotoGalleries.filter((x: any) => {
+          return x.image_id !== id
+        }) 
         setNewPhotoGalleries(tempGalleries)
-
-        // const tempPhotos = formValues.new_photo_galleries.filter((x: any, index: number) => {
+        // formValues.new_photo_galleries = tempGalleries
+        // const tempPhotos = newPhotoGalleries.filter((x: any, index: number) => {
         //   return index !== id
-        // })
+        // }) 
         // formValues.photo_galleries = tempPhotos
         break
       case 'thumbnail':
@@ -605,7 +607,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                   initialValues={isNewProduct ? { ...initialFormValues } : { ...initialForm }}
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
-                  onSubmit={(values, { setSubmitting, resetForm }) => { 
+                  onSubmit={(values, { setSubmitting, resetForm }) => {
                     // console.log(values)
                     // setSubmitting(false)
                     // return
@@ -628,7 +630,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                         setSubmitting(false) //done
                       })
                       .catch(() => {
-                        //setSubmitting(false) //error
+                        setSubmitting(false) //error
                       })
                   }}
                 >
@@ -740,8 +742,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 (images) => {
                                                   const newPhotos: any = []
                                                   images.map((item: any) => {
-                                                    newPhotos.push({ image: item, image_id: 0 })
-                                                  })
+                                                    newPhotos.push({ image: item, image_id: Math.random() })
+                                                  }) 
                                                   setNewPhotoGalleries(newPhotos)
                                                   setFieldValue('new_photo_galleries', newPhotos)
                                                 },
@@ -786,7 +788,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             image.src && (
                                               <div
                                                 className='form-group image-input image-input-outline'
-                                                key={`photo-galleries-${i}`}
+                                                key={`photo-galleries-${Math.random()}`}
                                               >
                                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                                   <img className='h-100' src={image.src} alt='' />
@@ -796,7 +798,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   data-kt-image-input-action='remove'
                                                   data-bs-toggle='tooltip'
                                                   title='Remove Image'
-                                                  key={'remove_image_' + i}
+                                                  key={'remove_image_' + Math.random()}
                                                   onClick={(event) => {
                                                     removeVariationThumbnail(
                                                       'galleries',
@@ -808,7 +810,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 >
                                                   <i
                                                     className='bi bi-x fs-2'
-                                                    id={'remove_image_' + i}
+                                                    id={'remove_image_' + Math.random()}
                                                   ></i>
                                                 </span>
                                               </div>
@@ -816,12 +818,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           )
                                         })}
                                       {newPhotoGalleries &&
-                                        newPhotoGalleries.map((item: any, i: number) => {
+                                        newPhotoGalleries.map((item: any) => {
                                           return (
                                             item && (
                                               <div
                                                 className='form-group image-input image-input-outline new-photo'
-                                                key={'image_' + i}
+                                                key={item.image_id}
                                               >
                                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                                   <img className='h-100' src={item.image} alt='' />
@@ -831,18 +833,18 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   data-kt-image-input-action='remove'
                                                   data-bs-toggle='tooltip'
                                                   title='Remove Image'
-                                                  key={'remove_image_' + i}
+                                                  key={'remove_image_' + item.image_id}
                                                   onClick={(event) => {
                                                     removeVariationThumbnail(
                                                       'new_galleries',
-                                                      i,
+                                                      item.image_id,
                                                       values
                                                     )
                                                     handleChange(event)
                                                   }}
                                                 >
                                                   <i
-                                                    id={'remove_image_' + i}
+                                                    id={'remove_image_' + item.image_id}
                                                     className='bi bi-x fs-2'
                                                   ></i>
                                                 </span>
