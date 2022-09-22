@@ -48,7 +48,8 @@ export const formatMoney = (amount: string | number) => {
         "ID": 'Rp',
         "MALAY": "RM",
         "SG": "$",
-        "TW": "NT$"
+        "TW": "NT$",
+        "HK":"$"
     } 
     if (!amount)
         return `${amount}${currencySymbols[localization]}`
