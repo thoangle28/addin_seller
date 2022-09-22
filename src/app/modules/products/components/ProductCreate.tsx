@@ -106,7 +106,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         initialForm.new_thumbnail = newThumbnail
         initialForm.attributes = product.attributes
         initialForm.variations = product.variations
-      } else { 
+      } else {
         mapValuesToForm(initialForm, product)
       }
 
@@ -130,7 +130,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }, 2000)
       }
     }
-  }, [product, productId])
+  }, [product])
 
   /**
    * The events on the form
@@ -441,7 +441,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       },
     })
   }
-
+  const test = [...newPhotoGalleries]
   const removeVariationThumbnail = (case_type: string, id: number | string, formValues: any) => {
     switch (case_type) {
       case 'variations':
@@ -456,11 +456,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         formValues.photo_galleries = newGalleries
         break
       case 'new_galleries':
-        const tempGalleries = newPhotoGalleries.filter((x: any) => {
+
+        const tempGalleries = test.filter((x: any) => {
           return x.image_id !== id
-        }) 
+        })
         setNewPhotoGalleries(tempGalleries)
-        // formValues.new_photo_galleries = tempGalleries
+        formValues.new_photo_galleries = tempGalleries
         // const tempPhotos = newPhotoGalleries.filter((x: any, index: number) => {
         //   return index !== id
         // }) 
@@ -604,16 +605,16 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
             ) : (
               <>
                 <Formik
-                  initialValues={isNewProduct ? { ...initialFormValues } : { ...initialForm }}
+                  initialValues={isNewProduct ? initialFormValues : initialForm}
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
                   onSubmit={(values, { setSubmitting, resetForm }) => {
-                    // console.log(values)
-                    // setSubmitting(false)
-                    // return
                     if (values.usePhoto && usePhotoFromContent.length > 0) {
                       values.photo_galleries = usePhotoFromContent
                     }
+                    // console.log(values)
+                    // setSubmitting(false)
+                    // return
 
                     setSubmitting(true)
                     postProduct(values, accessToken)
@@ -651,7 +652,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       className='form'
                       noValidate
                       id='kt_modal_create_app_form'
-                    >
+                    > 
                       <div className='current' data-kt-stepper-element='content'>
                         <div className='w-100'>
                           <div className='fv-row mb-5'>
@@ -736,14 +737,13 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               const filesList: any = []
                                               acceptedFiles.map((file: any, index: number) => {
                                                 if (index < 10) filesList.push(file)
-                                              })
-
+                                              }) 
                                               handleFileUpload(filesList).then(
                                                 (images) => {
                                                   const newPhotos: any = []
                                                   images.map((item: any) => {
                                                     newPhotos.push({ image: item, image_id: Math.random() })
-                                                  }) 
+                                                  })
                                                   setNewPhotoGalleries(newPhotos)
                                                   setFieldValue('new_photo_galleries', newPhotos)
                                                 },
@@ -854,8 +854,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         })}
                                     </div>
                                   </div>
-                                  <p className='small pt-2 text-danger'>*Priority order to add photos: 1: Photo Gallery - 2: Thumbnail</p>
-                                </div>
+                                 </div>
                               </div>
                             </div>
                             <div className='col-md-4'>
