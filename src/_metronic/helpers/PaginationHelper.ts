@@ -38,10 +38,14 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
     return listPages
 };
 
+interface iCurrency {
+    [key: string]: String
+}
+
 export const formatMoney = (amount: string | number) => {
     const localization: any = process.env.REACT_APP_LOCALIZATION;
-     
-    const currencySymbols: any = {
+
+    const currencySymbols: iCurrency = {
         "VN": '₫',
         "TH": '฿',
         "PH": '₱',
@@ -49,9 +53,13 @@ export const formatMoney = (amount: string | number) => {
         "MALAY": "RM",
         "SG": "$",
         "TW": "NT$",
-        "HK":"$"
-    } 
+        "HK": "HK$"
+    }
+    
     if (!amount)
         return `${amount}${currencySymbols[localization]}`
+    if (['HK','VN'].includes(localization))
+        return `${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}${currencySymbols[localization]}`
+
     return `${currencySymbols[localization]}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
 };

@@ -95,8 +95,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /**
    * Get Product Details
-   */
-
+   */ 
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       //mapValuesToForm(initialForm, product)
@@ -108,9 +107,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         initialForm.variations = product.variations
       } else {
         mapValuesToForm(initialForm, product)
-      }
-
-      setProductType(initialForm.type_product)
+      } 
       setNewProduct(false)
       setLoading(false)
     } else {
@@ -121,8 +118,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           initialFormValues.attributes = []
           initialFormValues.variations = []
         }
-        setNewProduct(true)
-        setProductType('simple')
+        setNewProduct(true) 
         setLoading(false)
       } else {
         setTimeout(() => {
@@ -130,8 +126,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }, 2000)
       }
     }
-  }, [product])
-
+  }, [product, productId]) 
   /**
    * The events on the form
    * @param event
@@ -259,7 +254,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }
       })
       .catch(() => { })
-  }
+  } 
 
   /** Add Variations */
   const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
@@ -652,7 +647,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                       className='form'
                       noValidate
                       id='kt_modal_create_app_form'
-                    > 
+                    >
                       <div className='current' data-kt-stepper-element='content'>
                         <div className='w-100'>
                           <div className='fv-row mb-5'>
@@ -737,7 +732,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               const filesList: any = []
                                               acceptedFiles.map((file: any, index: number) => {
                                                 if (index < 10) filesList.push(file)
-                                              }) 
+                                              })
                                               handleFileUpload(filesList).then(
                                                 (images) => {
                                                   const newPhotos: any = []
@@ -854,7 +849,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         })}
                                     </div>
                                   </div>
-                                 </div>
+                                </div>
                               </div>
                             </div>
                             <div className='col-md-4'>
@@ -1373,8 +1368,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               />
                                                               Visible on the product page
                                                             </label>
-                                                          </div>
-                                                          {productType === 'variable' && (
+                                                          </div> 
+                                                          {productType === 'variable' ? (
                                                             <div className='form-check form-check-custom form-check-solid'>
                                                               <label className='form-check-label ms-0 d-flex align-items-center'>
                                                                 <input
@@ -1395,7 +1390,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 Used for variations
                                                               </label>
                                                             </div>
-                                                          )}
+                                                          ) : ''}
                                                         </div>
                                                       </div>
                                                       <div className='col-md-7'>
