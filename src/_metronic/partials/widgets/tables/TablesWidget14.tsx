@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { KTSVG } from '../../../helpers'
 import { Link } from 'react-router-dom'
 import { formatMoney } from './../../../helpers'
+import imgPlaceholder from './../../../assets/images.png'
 
 type Props = {
   className: string
@@ -205,7 +206,7 @@ const TablesWidget14 = ({
                               src={
                                 ele.thumbnail
                                   ? ele.thumbnail
-                                  : 'https://via.placeholder.com/75x75/f0f0f0'
+                                  : imgPlaceholder
                               }
                               alt=''
                             />

@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef, useState } from 'react'
-import { Formik } from 'formik'
+import { Formik, useFormikContext } from 'formik'
 import { shallowEqual, useSelector, connect, ConnectedProps } from 'react-redux'
 import * as Yup from 'yup'
 import Dropzone from 'react-dropzone'
@@ -8,6 +8,7 @@ import * as detail from '../redux/CreateProductRedux'
 import { RootState } from '../../../../setup'
 import Select from 'react-select'
 import { AsyncPaginate } from 'react-select-async-paginate'
+import imgPlaceholder from './../../../../_metronic/assets/images.png'
 import { confirmAlert } from 'react-confirm-alert' // Import
 import 'react-confirm-alert/src/react-confirm-alert.css' // Import css
 import {
@@ -94,7 +95,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /**
    * Get Product Details
-   */
+   */ 
   useEffect(() => {
     if (product && productId > 0 && product.id === productId) {
       //mapValuesToForm(initialForm, product)
@@ -104,9 +105,9 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         initialForm.new_thumbnail = newThumbnail
         initialForm.attributes = product.attributes
         initialForm.variations = product.variations
-      } else mapValuesToForm(initialForm, product)
-
-      setProductType(initialForm.type_product)
+      } else {
+        mapValuesToForm(initialForm, product)
+      } 
       setNewProduct(false)
       setLoading(false)
     } else {
@@ -117,8 +118,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
           initialFormValues.attributes = []
           initialFormValues.variations = []
         }
-        setNewProduct(true)
-        setProductType('simple')
+        setNewProduct(true) 
         setLoading(false)
       } else {
         setTimeout(() => {
@@ -126,8 +126,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }, 2000)
       }
     }
-  }, [product, productId])
-
+  }, [product, productId]) 
   /**
    * The events on the form
    * @param event
@@ -223,7 +222,6 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
 
   /* Add more Attributes */
   const saveProductAttributes = (formValues: any) => {
-
     setSaveAttr({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -234,17 +232,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       const { code, message, data } = response.data
       setSaveAttr({ loading: false, error: message })
       setReloadPage(false)
-      setTimeout(() => {
-        setSaveAttr({ loading: false, error: '' })
-        setReloadPage(true)
-      }, 2000)
     })
   }
 
   /* Add more Attributes */
   const saveProductVariations = (formValues: any) => {
-
-
     setSaveVar({ loading: true, error: '' })
     saveProductProperties({
       accessToken,
@@ -262,7 +254,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }
       })
       .catch(() => { })
-  }
+  } 
 
   /** Add Variations */
   const createVariations = (numToAdd: number, maxAllow: number, formValues: any) => {
@@ -424,7 +416,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
     })
   }
 
-  const confirmRequest = (message: string, product_id: number) => {
+  const confirmRequest = (message: string) => {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
@@ -444,7 +436,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
       },
     })
   }
-
+  const test = [...newPhotoGalleries]
   const removeVariationThumbnail = (case_type: string, id: number | string, formValues: any) => {
     switch (case_type) {
       case 'variations':
@@ -453,22 +445,22 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
         }).thumbnail = { image_id: false, src: '' }
         break
       case 'galleries':
-        const newGalleries = formValues.photo_galleries.filter((x: any, index: number) => {
+        const newGalleries = formValues.photo_galleries.filter((x: any) => {
           return parseInt(x.image_id) !== id
         })
         formValues.photo_galleries = newGalleries
         break
       case 'new_galleries':
-        const tempGalleries = newPhotoGalleries.filter((x: any, index: number) => {
-          return index !== id
-        })
-        formValues.new_photo_galleries = tempGalleries
-        setNewPhotoGalleries(tempGalleries)
 
-        const tempPhotos = formValues.new_photo_galleries.filter((x: any, index: number) => {
-          return index !== id
+        const tempGalleries = test.filter((x: any) => {
+          return x.image_id !== id
         })
-        formValues.photo_galleries = tempPhotos
+        setNewPhotoGalleries(tempGalleries)
+        formValues.new_photo_galleries = tempGalleries
+        // const tempPhotos = newPhotoGalleries.filter((x: any, index: number) => {
+        //   return index !== id
+        // }) 
+        // formValues.photo_galleries = tempPhotos
         break
       case 'thumbnail':
         formValues.thumbnail = { image_id: false, src: '' }
@@ -608,33 +600,33 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
             ) : (
               <>
                 <Formik
-                  initialValues={isNewProduct ? { ...initialFormValues } : { ...initialForm }}
+                  initialValues={isNewProduct ? initialFormValues : initialForm}
                   validationSchema={ValidationSchema}
                   enableReinitialize={true}
                   onSubmit={(values, { setSubmitting, resetForm }) => {
-                    //save to DB
                     if (values.usePhoto && usePhotoFromContent.length > 0) {
                       values.photo_galleries = usePhotoFromContent
                     }
+                    // console.log(values)
+                    // setSubmitting(false)
+                    // return
 
                     setSubmitting(true)
                     postProduct(values, accessToken)
                       .then((product: any) => {
                         const { code, message, data } = product
-                        initialFormValues.attributes = [] //clear
-                        initialFormValues.variations = [] //clear
-                        initialFormValues.variations_attr = []
-
+                        // initialFormValues.attributes = [] //clear
+                        // initialFormValues.variations = [] //clear
+                        // initialFormValues.variations_attr = []
                         switch (code) {
                           case 200:
-                            confirmRequest(message, data)
-                            resetForm()
+                            confirmRequest(message)
                             break
                         }
                         setSubmitting(false) //done
                       })
                       .catch(() => {
-                        //setSubmitting(false) //error
+                        setSubmitting(false) //error
                       })
                   }}
                 >
@@ -697,7 +689,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                               style={{ minHeight: '500px' }}
                             />
                             <div className='small pt-2 text-danger'>
-                              Please only add a maximum of 10 images for the content
+                              Please only add a maximum of 10 photos for the content
                             </div>
                           </div>
                         </div>
@@ -741,12 +733,11 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                               acceptedFiles.map((file: any, index: number) => {
                                                 if (index < 10) filesList.push(file)
                                               })
-
                                               handleFileUpload(filesList).then(
                                                 (images) => {
                                                   const newPhotos: any = []
                                                   images.map((item: any) => {
-                                                    newPhotos.push({ image: item, image_id: 0 })
+                                                    newPhotos.push({ image: item, image_id: Math.random() })
                                                   })
                                                   setNewPhotoGalleries(newPhotos)
                                                   setFieldValue('new_photo_galleries', newPhotos)
@@ -792,7 +783,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                             image.src && (
                                               <div
                                                 className='form-group image-input image-input-outline'
-                                                key={`photo-galleries-${i}`}
+                                                key={`photo-galleries-${Math.random()}`}
                                               >
                                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                                   <img className='h-100' src={image.src} alt='' />
@@ -802,7 +793,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   data-kt-image-input-action='remove'
                                                   data-bs-toggle='tooltip'
                                                   title='Remove Image'
-                                                  key={'remove_image_' + i}
+                                                  key={'remove_image_' + Math.random()}
                                                   onClick={(event) => {
                                                     removeVariationThumbnail(
                                                       'galleries',
@@ -814,7 +805,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                 >
                                                   <i
                                                     className='bi bi-x fs-2'
-                                                    id={'remove_image_' + i}
+                                                    id={'remove_image_' + Math.random()}
                                                   ></i>
                                                 </span>
                                               </div>
@@ -822,12 +813,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                           )
                                         })}
                                       {newPhotoGalleries &&
-                                        newPhotoGalleries.map((item: any, i: number) => {
+                                        newPhotoGalleries.map((item: any) => {
                                           return (
                                             item && (
                                               <div
                                                 className='form-group image-input image-input-outline new-photo'
-                                                key={'image_' + i}
+                                                key={item.image_id}
                                               >
                                                 <div className='image-input-wrapper w-65px h-65px overflow-hidden ms-2 me-2 mb-3'>
                                                   <img className='h-100' src={item.image} alt='' />
@@ -837,18 +828,18 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                   data-kt-image-input-action='remove'
                                                   data-bs-toggle='tooltip'
                                                   title='Remove Image'
-                                                  key={'remove_image_' + i}
+                                                  key={'remove_image_' + item.image_id}
                                                   onClick={(event) => {
                                                     removeVariationThumbnail(
                                                       'new_galleries',
-                                                      i,
+                                                      item.image_id,
                                                       values
                                                     )
                                                     handleChange(event)
                                                   }}
                                                 >
                                                   <i
-                                                    id={'remove_image_' + i}
+                                                    id={'remove_image_' + item.image_id}
                                                     className='bi bi-x fs-2'
                                                   ></i>
                                                 </span>
@@ -877,12 +868,12 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                         )) || (
                                           <img
                                             className='h-100'
-                                            src='https://via.placeholder.com/75x75/f0f0f0'
+                                            src={imgPlaceholder}
                                             alt=''
                                           />
                                         )}
                                     </div>
-                                    {(newThumbnail || (values && values.thumbnail.src)) && (
+                                    {/* {(newThumbnail || (values && values.thumbnail.src)) && (
                                       <span
                                         className='btn btn-icon btn-circle btn-active-color-primary w-15px h-15px bg-body shadow'
                                         data-kt-image-input-action='remove'
@@ -903,7 +894,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                       >
                                         <i id={`product_thumbnail_1`} className='bi bi-x fs-2'></i>
                                       </span>
-                                    )}
+                                    )} */}
                                   </div>
                                 </div>
                                 <div className='col-md-8 mb-5'>
@@ -1377,8 +1368,8 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                               />
                                                               Visible on the product page
                                                             </label>
-                                                          </div>
-                                                          {productType === 'variable' && (
+                                                          </div> 
+                                                          {productType === 'variable' ? (
                                                             <div className='form-check form-check-custom form-check-solid'>
                                                               <label className='form-check-label ms-0 d-flex align-items-center'>
                                                                 <input
@@ -1399,7 +1390,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                 Used for variations
                                                               </label>
                                                             </div>
-                                                          )}
+                                                          ) : ''}
                                                         </div>
                                                       </div>
                                                       <div className='col-md-7'>
@@ -1670,7 +1661,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                         className='h-100 variation_thumbnail'
                                                                         src={
                                                                           item.thumbnail.src ||
-                                                                          'https://via.placeholder.com/75x75/f0f0f0'
+                                                                          imgPlaceholder
                                                                         }
                                                                         alt=''
                                                                       />
@@ -1679,7 +1670,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                                                                         className='h-100 variation_thumbnail'
                                                                         src={
                                                                           new_thumbnail ||
-                                                                          'https://via.placeholder.com/75x75/f0f0f0'
+                                                                          imgPlaceholder
                                                                         }
                                                                         alt=''
                                                                       />
@@ -2052,7 +2043,7 @@ const ProductCreate: FC<PropsFromRedux> = (props) => {
                             >
                               {isSubmitting ? (
                                 <>
-                                  Processing...{' '}
+                                  Processing...
                                   <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                                 </>
                               ) : !isNewProduct ? (

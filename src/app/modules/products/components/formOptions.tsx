@@ -68,9 +68,9 @@ export const mapValuesToForm = (initialValues: any, productValues: any) => {
   initialValues.inventory_sku = productValues.inventory_sku
   initialValues.attributes = productValues.attributes
   initialValues.variations = productValues.variations
-  initialValues.thumbnail = productValues.thumbnail
+  initialValues.thumbnail = productValues.thumbnail || ''
   initialValues.new_thumbnail = ''
-  initialValues.photo_galleries = productValues.photo_galleries
+  initialValues.photo_galleries = productValues.photo_galleries || []
   initialValues.new_photo_galleries = [];//productValues.new_photo_galleries
   initialValues.general_price = productValues.general_price
   initialValues.general_regular_price = productValues.general_regular_price

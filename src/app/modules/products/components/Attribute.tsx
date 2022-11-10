@@ -60,14 +60,12 @@ const Attribute: FC = () => {
     })
 
 
-    const fetchData = () => {
-        getAttributesById(currentUserId, access_token).then((res: any) => {
-            const { code, data } = res.data
-            if (code === 200) {
-                setIsLoading(true)
-                setParentAttributeList(data)
-            }
-        }).catch(err => console.log(err));
+    const fetchData = async () => {
+        const { data } = await getAttributesById(currentUserId, access_token)
+        if (data.data) {
+            setIsLoading(true)
+            setParentAttributeList(data.data)
+        }
     }
 
     const editMode = () => {
@@ -405,7 +403,7 @@ const Attribute: FC = () => {
                         >
                             {({ values, errors, touched, handleChange, handleBlur, handleSubmit, isSubmitting, resetForm }) => (
                                 <form onSubmit={handleSubmit}>
-                                    <div className="form-group row">
+                                    <div className="form-group row"> 
                                         <div className='col-md-12 mt-1'>
                                             <label htmlFor='new_attribute_name' className=' form-label mb-2 d-flex align-items-center fs-7 fw-bold mb-2'>
                                                 <span>Name</span>

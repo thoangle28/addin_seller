@@ -38,32 +38,28 @@ export const find_page_begin_end = (currentPage: number = 1, maxPage: number = 1
     return listPages
 };
 
-export const formatMoney = (amount: string | number, currency: string = "$") => {
-    const localization: string | undefined = process.env.REACT_APP_LOCALIZATION;
-    switch (localization) {
-        case 'VN':
-            currency = 'VNĐ'
-            break;
-        case 'TH':
-            currency = '฿'
-            break;
-        case 'PH':
-            currency = '₱'
-            break;
-        case 'ID':
-            currency = 'RP'
-            break;
-        case 'MALAY':
-            currency = 'RM'
-            break;
-        case 'SG':
-            currency = '$'
-            break;
-        default:
-            currency = '$'
-            break;
+interface iCurrency {
+    [key: string]: String
+}
+
+export const formatMoney = (amount: string | number) => {
+    const localization: any = process.env.REACT_APP_LOCALIZATION;
+
+    const currencySymbols: iCurrency = {
+        "VN": '₫',
+        "TH": '฿',
+        "PH": '₱',
+        "ID": 'Rp',
+        "MALAY": "RM",
+        "SG": "$",
+        "TW": "NT$",
+        "HK": "HK$"
     }
+    
     if (!amount)
-        return `${currency}`
-    return `${currency}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
+        return `${amount}${currencySymbols[localization]}`
+    if (['HK','VN'].includes(localization))
+        return `${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}${currencySymbols[localization]}`
+
+    return `${currencySymbols[localization]}${amount.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,') || ''}`
 };

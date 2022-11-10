@@ -23,7 +23,7 @@ const AuthInit: FC<PropsFromRedux> = (props) => {
   const logOut = () => {
     localStorage.clear();//clear all
     history.push('/auth/login')
-  }
+  } 
   // We should request user by authToken before rendering the application
   useEffect(() => {
     const requestUser = async () => {
